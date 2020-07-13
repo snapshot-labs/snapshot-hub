@@ -1,0 +1,555 @@
+{
+  "kovan": {
+    "network": "kovan",
+    "chainId": 42,
+    "defaultPrecision": 4,
+    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/bonustrack/balancer-kovan",
+    "addresses": {
+      "bFactory": "0x8f7F78080219d4066A8036ccD30D588B416a40DB",
+      "bActions": "0x1266F7220cCc4f1957b3f1EA713F3F434Fc3BDc7",
+      "dsProxyRegistry": "0x130767E0cf05469CF11Fa3fcf270dfC1f52b9072",
+      "proxy": "0xdf6F5B1f49eFf8d1C45f2AADC045cB91C33e44b8",
+      "weth": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
+      "multicall": "0x2cc8688C5f75E365aaEEb4ea8D6a480405A48D2A"
+    },
+    "connectors": {
+      "injected": {
+        "id": "injected",
+        "name": "MetaMask"
+      },
+      "walletconnect": {
+        "id": "walletconnect",
+        "name": "WalletConnect"
+      },
+      "portis": {
+        "id": "portis",
+        "name": "Portis",
+        "options": {
+          "network": "kovan"
+        }
+      }
+    },
+    "tokens": {
+      "0xd0A1E359811322d97991E03f863a0C30C2cF029C": {
+        "address": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
+        "symbol": "WETH",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#828384"
+      },
+      "0x1528F3FCc26d13F7079325Fb78D9442607781c8C": {
+        "address": "0x1528F3FCc26d13F7079325Fb78D9442607781c8C",
+        "symbol": "DAI",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#fab323"
+      },
+      "0xef13C0c8abcaf5767160018d268f9697aE4f5375": {
+        "address": "0xef13C0c8abcaf5767160018d268f9697aE4f5375",
+        "symbol": "MKR",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#5eb8aa"
+      },
+      "0x2F375e94FC336Cdec2Dc0cCB5277FE59CBf1cAe5": {
+        "address": "0x2F375e94FC336Cdec2Dc0cCB5277FE59CBf1cAe5",
+        "symbol": "USDC",
+        "decimals": 6,
+        "precision": 2,
+        "chartColor": "#2875ca"
+      },
+      "0x8c9e6c40d3402480ACE624730524fACC5482798c": {
+        "address": "0x8c9e6c40d3402480ACE624730524fACC5482798c",
+        "symbol": "REP",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#422940"
+      },
+      "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb": {
+        "address": "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "precision": 4,
+        "chartColor": "#779bc0"
+      },
+      "0x1f1f156E0317167c11Aa412E3d1435ea29Dc3cCE": {
+        "address": "0x1f1f156E0317167c11Aa412E3d1435ea29Dc3cCE",
+        "symbol": "BAT",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#ff5700"
+      },
+      "0x86436BcE20258a6DcfE48C9512d4d49A30C4d8c4": {
+        "address": "0x86436BcE20258a6DcfE48C9512d4d49A30C4d8c4",
+        "symbol": "SNX",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#ffffff"
+      },
+      "0x37f03a12241E9FD3658ad6777d289c3fb8512Bc9": {
+        "address": "0x37f03a12241E9FD3658ad6777d289c3fb8512Bc9",
+        "symbol": "ANT",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#E7983D"
+      },
+      "0xccb0F4Cf5D3F97f4a55bb5f5cA321C3ED033f244": {
+        "address": "0xccb0F4Cf5D3F97f4a55bb5f5cA321C3ED033f244",
+        "symbol": "ZRX",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#536DFE"
+      }
+    },
+    "errors": []
+  },
+  "homestead": {
+    "network": "homestead",
+    "chainId": 1,
+    "defaultPrecision": 4,
+    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/bonustrack/balancer",
+    "addresses": {
+      "bFactory": "0x9424B1412450D0f8Fc2255FAf6046b98213B76Bd",
+      "bActions": "0x54b28bB7930976839C61f142746cADDBE819A742",
+      "dsProxyRegistry": "0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4",
+      "proxy": "0x6317C5e82A06E1d8bf200d21F4510Ac2c038AC81",
+      "weth": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "multicall": "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441"
+    },
+    "connectors": {
+      "injected": {
+        "id": "injected",
+        "name": "MetaMask"
+      },
+      "walletconnect": {
+        "id": "walletconnect",
+        "name": "WalletConnect"
+      },
+      "portis": {
+        "id": "portis",
+        "name": "Portis",
+        "options": {
+          "network": "mainnet"
+        }
+      }
+    },
+    "tokens": {
+      "0xba100000625a3754423978a60c9317c58a424e3D": {
+        "symbol": "BAL",
+        "address": "0xba100000625a3754423978a60c9317c58a424e3D",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#fafafa"
+      },
+      "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": {
+        "symbol": "WETH",
+        "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#433455"
+      },
+      "0x6B175474E89094C44Da98b954EedeAC495271d0F": {
+        "symbol": "DAI",
+        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#5d6872"
+      },
+      "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2": {
+        "symbol": "MKR",
+        "address": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#7e9e99"
+      },
+      "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": {
+        "symbol": "USDC",
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "precision": 2,
+        "chartColor": "#9d9f7f"
+      },
+      "0x0327112423F3A68efdF1fcF402F6c5CB9f7C33fd": {
+        "symbol": "BTC++",
+        "address": "0x0327112423F3A68efdF1fcF402F6c5CB9f7C33fd",
+        "decimals": 18,
+        "precision": 6,
+        "chartColor": "#557064"
+      },
+      "0x39AA39c021dfbaE8faC545936693aC917d5E7563": {
+        "symbol": "cUSDC",
+        "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+        "decimals": 8,
+        "precision": 2,
+        "chartColor": "#6eaa78"
+      },
+      "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643": {
+        "symbol": "cDAI",
+        "address": "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+        "decimals": 8,
+        "precision": 2,
+        "chartColor": "#93a167"
+      },
+      "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5": {
+        "symbol": "cETH",
+        "address": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
+        "decimals": 8,
+        "precision": 4,
+        "chartColor": "#c28d75"
+      },
+      "0x1985365e9f78359a9B6AD760e32412f4a445E862": {
+        "symbol": "REP",
+        "address": "0x1985365e9f78359a9B6AD760e32412f4a445E862",
+        "name": "Augur",
+        "decimals": 18,
+        "precision": 4,
+        "chartColor": "#6e6962"
+      },
+      "0x514910771AF9Ca656af840dff83E8264EcF986CA": {
+        "symbol": "LINK",
+        "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#387080"
+      },
+      "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599": {
+        "symbol": "WBTC",
+        "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+        "decimals": 8,
+        "precision": 4,
+        "chartColor": "#68aca9"
+      },
+      "0x0D8775F648430679A709E98d2b0Cb6250d2887EF": {
+        "symbol": "BAT",
+        "address": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#be955c"
+      },
+      "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F": {
+        "symbol": "SNX",
+        "address": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#908d9a"
+      },
+      "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51": {
+        "symbol": "sUSD",
+        "address": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#416aa3"
+      },
+      "0x960b236A07cf122663c4303350609A66A7B288C0": {
+        "symbol": "ANT",
+        "address": "0x960b236A07cf122663c4303350609A66A7B288C0",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#c28d75"
+      },
+      "0xE41d2489571d322189246DaFA5ebDe1F4699F498": {
+        "symbol": "ZRX",
+        "address": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#9a4f50"
+      },
+      "0x3212b29E33587A00FB1C83346f5dBFA69A458923": {
+        "symbol": "imBTC",
+        "address": "0x3212b29E33587A00FB1C83346f5dBFA69A458923",
+        "decimals": 8,
+        "precision": 4,
+        "chartColor": "#c38890"
+      },
+      "0x5228a22e72ccC52d415EcFd199F99D0665E7733b": {
+        "symbol": "pBTC",
+        "address": "0x5228a22e72ccC52d415EcFd199F99D0665E7733b",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#8b5580"
+      },
+      "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6": {
+        "symbol": "sBTC",
+        "address": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#6f6776"
+      },
+      "0x9Cb2f26A23b8d89973F08c957C4d7cdf75CD341c": {
+        "symbol": "DZAR",
+        "address": "0x9Cb2f26A23b8d89973F08c957C4d7cdf75CD341c",
+        "decimals": 6,
+        "precision": 2,
+        "chartColor": "#666092"
+      },
+      "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828": {
+        "symbol": "UMA",
+        "address": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#a593a5"
+      },
+      "0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d": {
+        "symbol": "aDAI",
+        "address": "0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#c38890"
+      },
+      "0x71fc860F7D3A592A4a98740e39dB31d25db65ae8": {
+        "symbol": "aUSDT",
+        "address": "0x71fc860F7D3A592A4a98740e39dB31d25db65ae8",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#8b5580"
+      },
+      "0x9bA00D6856a4eDF4665BcA2C2309936572473B7E": {
+        "symbol": "aUSDC",
+        "address": "0x9bA00D6856a4eDF4665BcA2C2309936572473B7E",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#c5ccb8"
+      },
+      "0x625aE63000f46200499120B906716420bd059240": {
+        "symbol": "aSUSD",
+        "address": "0x625aE63000f46200499120B906716420bd059240",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#9a9a97"
+      },
+      "0x4DA9b813057D04BAef4e5800E36083717b4a0341": {
+        "symbol": "aTUSD",
+        "address": "0x4DA9b813057D04BAef4e5800E36083717b4a0341",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#6f6776"
+      },
+      "0x6Ee0f7BB50a54AB5253dA0667B0Dc2ee526C30a8": {
+        "symbol": "aBUSD",
+        "address": "0x6Ee0f7BB50a54AB5253dA0667B0Dc2ee526C30a8",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#93a167"
+      },
+      "0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d": {
+        "symbol": "PNK",
+        "address": "0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d",
+        "name": "Pinakion",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#5d2e9a"
+      },
+      "0x27054b13b1B798B345b591a4d22e6562d47eA75a": {
+        "symbol": "AST",
+        "address": "0x27054b13b1B798B345b591a4d22e6562d47eA75a",
+        "decimals": 4,
+        "precision": 2,
+        "chartColor": "#416aa3"
+      },
+      "0xbf70A33A13fBe8D0106Df321Da0Cf654d2E9Ab50": {
+        "symbol": "ETHBTCRSI7030",
+        "address": "0xbf70A33A13fBe8D0106Df321Da0Cf654d2E9Ab50",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#6f6776"
+      },
+      "0x136faE4333EA36A24bb751E2d505D6ca4Fd9f00b": {
+        "symbol": "ETHRSIAPY",
+        "address": "0x136faE4333EA36A24bb751E2d505D6ca4Fd9f00b",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#93a167"
+      },
+      "0xbF4a2DdaA16148a9D0fA2093FfAC450ADb7cd4aa": {
+        "symbol": "ETHMNY",
+        "address": "0xbF4a2DdaA16148a9D0fA2093FfAC450ADb7cd4aa",
+        "decimals": 2,
+        "precision": 2,
+        "chartColor": "#ff005d"
+      },
+      "0xdd974D5C2e2928deA5F71b9825b8b646686BD200": {
+        "symbol": "KNC",
+        "address": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#557064"
+      },
+      "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD": {
+        "symbol": "LRC",
+        "address": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#6e6962"
+      },
+      "0x408e41876cCCDC0F92210600ef50372656052a38": {
+        "symbol": "REN",
+        "address": "0x408e41876cCCDC0F92210600ef50372656052a38",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#be955c"
+      },
+      "0x04abEdA201850aC0124161F037Efd70c74ddC74C": {
+        "symbol": "NEST",
+        "address": "0x04abEdA201850aC0124161F037Efd70c74ddC74C",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#be955c"
+      },
+      "0xB4EFd85c19999D84251304bDA99E90B92300Bd93": {
+        "symbol": "RPL",
+        "address": "0xB4EFd85c19999D84251304bDA99E90B92300Bd93",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#a593a5"
+      },
+      "0x31Bb711de2e457066c6281f231fb473FC5c2afd3": {
+        "symbol": "VETH",
+        "address": "0x31Bb711de2e457066c6281f231fb473FC5c2afd3",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#baa55c"
+      },
+      "0x4c327471C44B2dacD6E90525f9D629bd2e4f662C": {
+        "symbol": "GHOST",
+        "address": "0x4c327471C44B2dacD6E90525f9D629bd2e4f662C",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#557064"
+      },
+      "0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb": {
+        "symbol": "sETH",
+        "address": "0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#557064"
+      },
+      "0x6810e776880C02933D47DB1b9fc05908e5386b96": {
+        "symbol": "GNO",
+        "address": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#c38890"
+      },
+      "0x543Ff227F64Aa17eA132Bf9886cAb5DB55DCAddf": {
+        "symbol": "GEN",
+        "address": "0x543Ff227F64Aa17eA132Bf9886cAb5DB55DCAddf",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#8b5580"
+      },
+      "0xa1d65E8fB6e87b60FECCBc582F7f97804B725521": {
+        "symbol": "DXD",
+        "address": "0xa1d65E8fB6e87b60FECCBc582F7f97804B725521",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#c5ccb8"
+      },
+      "0x06AF07097C9Eeb7fD685c692751D5C66dB49c215": {
+        "symbol": "CHAI",
+        "address": "0x06AF07097C9Eeb7fD685c692751D5C66dB49c215",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#9a9a97"
+      },
+      "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671": {
+        "symbol": "NMR",
+        "address": "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#6e6962"
+      },
+      "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03": {
+        "symbol": "LEND",
+        "address": "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#c7bdf4"
+      },
+      "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c": {
+        "symbol": "ENJ",
+        "address": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#387080"
+      },
+      "0x12B19D3e2ccc14Da04FAe33e63652ce469b3F2FD": {
+        "symbol": "GRID",
+        "address": "0x12B19D3e2ccc14Da04FAe33e63652ce469b3F2FD",
+        "decimals": 12,
+        "precision": 2,
+        "chartColor": "#387080"
+      },
+      "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D": {
+        "symbol": "renBTC",
+        "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+        "decimals": 8,
+        "precision": 2,
+        "chartColor": "#9a9a97"
+      },
+      "0xc00e94Cb662C3520282E6f5717214004A7f26888": {
+        "symbol": "COMP",
+        "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#387080"
+      },
+      "0x9f49ed43C90A540d1cF12f6170aCE8d0B88a14E6": {
+        "symbol": "ETHRSIAPY2",
+        "address": "0x9f49ed43C90A540d1cF12f6170aCE8d0B88a14E6",
+        "decimals": 18,
+        "precision": 2,
+        "chartColor": "#93a167"
+      },
+      "0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9": {
+        "symbol": "cUSDT",
+        "address": "0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9",
+        "decimals": 8,
+        "precision": 2,
+        "chartColor": "#557064"
+      }
+    },
+    "errors": [
+      "0x0b76544F6C413a555F309Bf76260d1E02377c02A",
+      "0x0bb217E40F8a5Cb79Adf04E1aAb60E5abd0dfC1e",
+      "0x13f25cd52b21650caa8225C9942337d914C9B030",
+      "0x177d39AC676ED1C67A2b268AD7F1E58826E5B0af",
+      "0x1844b21593262668B7248d0f57a220CaaBA46ab9",
+      "0x26CE25148832C04f3d7F26F32478a9fe55197166",
+      "0x28c8d01FF633eA9Cd8fc6a451D7457889E698de6",
+      "0x2bDC0D42996017fCe214b21607a515DA41A9E0C5",
+      "0x2d0E95bd4795D7aCe0da3C0Ff7b706a5970eb9D3",
+      "0x2f85E502a988AF76f7ee6D83b7db8d6c0A823bf9",
+      "0x3543638eD4a9006E4840B105944271Bcea15605D",
+      "0x37E1160184F7dD29f00b78C050Bf13224780b0B0",
+      "0x3893b9422Cd5D70a81eDeFfe3d5A1c6A978310BB",
+      "0x38c6A68304cdEfb9BEc48BbFaABA5C5B47818bb2",
+      "0x4270bb238f6DD8B1c3ca01f96CA65b2647c06D3C",
+      "0x4470BB87d77b963A013DB939BE332f927f2b992e",
+      "0x4689a4e169eB39cC9078C0940e21ff1Aa8A39B9C",
+      "0x56ba2Ee7890461f463F7be02aAC3099f6d5811A8",
+      "0x5E6b6d9aBAd9093fdc861Ea1600eBa1b355Cd940",
+      "0x622dFfCc4e83C64ba959530A5a5580687a57581b",
+      "0x6Ba460AB75Cd2c56343b3517ffeBA60748654D26",
+      "0x7703C35CfFdC5CDa8D27aa3df2F9ba6964544b6e",
+      "0x78B7FADA55A64dD895D8c8c35779DD8b67fA8a05",
+      "0x81c9151de0C8bafCd325a57E3dB5a5dF1CEBf79c",
+      "0x8E766F57F7d16Ca50B4A0b90b88f6468A09b0439",
+      "0x95dAaaB98046846bF4B2853e23cba236fa394A31",
+      "0xa44E5137293E855B1b7bC7E2C6f8cD796fFCB037",
+      "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
+      "0xB97048628DB6B661D4C2aA833e95Dbe1A905B280",
+      "0xBA5F11b16B155792Cf3B2E6880E8706859A8AEB6",
+      "0xbbFF862d906E348E9946Bfb2132ecB157Da3D4b4",
+      "0xc9859fccC876e6b4B3C749C5D29EA04F48aCb74F",
+      "0xCc34366E3842cA1BD36c1f324d15257960fCC801",
+      "0xd26114cd6EE289AccF82350c8d8487fedB8A0C07",
+      "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "0xDc5864eDe28BD4405aa04d93E05A0531797D9D59",
+      "0xe3818504c1B32bF1557b16C238B2E01Fd3149C17",
+      "0xF433089366899D83a9f26A773D59ec7eCF30355e",
+      "0xfAE4Ee59CDd86e3Be9e8b90b53AA866327D7c090",
+      "0xa7DE087329BFcda5639247F96140f9DAbe3DeED1",
+      "0xb9eaf49d9f913bC1314e37bb5482891840c8e3C1"
+    ]
+  }
+}

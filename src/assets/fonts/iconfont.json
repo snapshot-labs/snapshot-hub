@@ -1,0 +1,107 @@
+{
+  "id": "1685988",
+  "name": "oswap",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "583318",
+      "name": "check",
+      "font_class": "check",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "1251102",
+      "name": "bullet",
+      "font_class": "bullet",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "1174377",
+      "name": "unlock",
+      "font_class": "unlock",
+      "unicode": "e672",
+      "unicode_decimal": 58994
+    },
+    {
+      "icon_id": "59347",
+      "name": "warning",
+      "font_class": "warning",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "8953348",
+      "name": "wallet",
+      "font_class": "wallet",
+      "unicode": "e846",
+      "unicode_decimal": 59462
+    },
+    {
+      "icon_id": "1262104",
+      "name": "search",
+      "font_class": "search",
+      "unicode": "e6f2",
+      "unicode_decimal": 59122
+    },
+    {
+      "icon_id": "13519508",
+      "name": "user-solid",
+      "font_class": "user",
+      "unicode": "e66f",
+      "unicode_decimal": 58991
+    },
+    {
+      "icon_id": "11262646",
+      "name": "go",
+      "font_class": "go",
+      "unicode": "e6cb",
+      "unicode_decimal": 59083
+    },
+    {
+      "icon_id": "13895880",
+      "name": "arrow-up",
+      "font_class": "arrow-up",
+      "unicode": "e75c",
+      "unicode_decimal": 59228
+    },
+    {
+      "icon_id": "14232782",
+      "name": "arrow-up",
+      "font_class": "arrow-down",
+      "unicode": "e75d",
+      "unicode_decimal": 59229
+    },
+    {
+      "icon_id": "11262647",
+      "name": "back",
+      "font_class": "back",
+      "unicode": "e6cc",
+      "unicode_decimal": 59084
+    },
+    {
+      "icon_id": "2518398",
+      "name": "close",
+      "font_class": "close",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "7141712",
+      "name": "external-link",
+      "font_class": "external-link",
+      "unicode": "e636",
+      "unicode_decimal": 58934
+    },
+    {
+      "icon_id": "7988810",
+      "name": "arrows-v",
+      "font_class": "switch",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    }
+  ]
+}

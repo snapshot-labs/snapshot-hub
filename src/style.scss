@@ -1,0 +1,131 @@
+@import '~@vue/ui/dist/vue-ui.css';
+@import './fonts';
+@import './vars';
+@import "~@primer/css/index.scss";
+
+html, body, #app {
+  background-color: $black;
+  color: $gray;
+  font-family: $font-weight-normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  outline: none !important;
+}
+
+h1, h2, h3, h4 {
+  color: $white;
+  font-family: $font-weight-bold;
+}
+
+p {
+  font-size: 20px;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+a {
+  color: $gray;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: none !important;
+  }
+}
+
+::placeholder {
+  color: $gray;
+}
+
+.input {
+  outline: none;
+  color: $white;
+  background-color: transparent;
+  border: none;
+}
+
+textarea {
+  font-size: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $black;
+  background-clip: padding-box;
+  border: 0;
+  border-radius: 0;
+
+  &:hover {
+    background-color: $border-color;
+  }
+}
+
+.modal {
+  .shell {
+    @extend .border-0;
+    @extend .border-md;
+    @extend .rounded-md-2;
+    @extend .rounded-lg-2;
+    background-color: $black;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 540px;
+  }
+
+  .modal-body {
+    flex: auto;
+  }
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 16px;
+}
+
+.column {
+  width: 140px;
+}
+
+.anim-fade-in {
+  animation-duration: 0.6s !important;
+}
+
+.line-height-0 {
+  line-height: 0;
+}
+
+.vue-ui-loading-indicator {
+  &.overlay {
+    background-color: transparent !important;
+  }
+
+  .animation {
+    border-color: transparentize($white, 0.8);
+    border-right-color: $white;
+  }
+
+  .loading-xl {
+    .animation {
+      border-width: 6px;
+      width: 64px;
+      height: 64px;
+    }
+  }
+}
+
+.bg-black {
+  background-color: $black;
+}
+
+.State {
+  font-size: 16px;
+  line-height: 30px;
+  height: 28px;
+  vertical-align: middle;
+  padding: 0 12px;
+  border-radius: 14px;
+}
