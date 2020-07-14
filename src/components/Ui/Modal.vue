@@ -17,6 +17,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../../vars';
+
 .modal {
   position: fixed;
   display: flex;
@@ -39,6 +41,13 @@ export default {
   }
 
   .shell {
+    border: $border;
+    border-radius: $border-radius;
+    background-color: $black;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 440px;
+
     max-height: calc(100vh - 160px);
     display: flex;
     flex-direction: column;
@@ -47,6 +56,7 @@ export default {
     width: 100%;
 
     @media (max-width: 767px) {
+      border: 0;
       width: 100% !important;
       max-width: 100% !important;
       max-height: 100% !important;
@@ -55,6 +65,7 @@ export default {
     }
 
     .modal-body {
+      flex: auto;
       text-align: initial;
       overflow-y: auto;
       overflow-x: hidden;

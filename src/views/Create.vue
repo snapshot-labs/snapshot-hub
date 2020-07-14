@@ -7,8 +7,8 @@
       </router-link>
     </div>
     <div>
-      <div class="col-8 float-left pr-5">
-        <div class="d-flex flex-column mb-4">
+      <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
+        <div class="d-flex flex-column mb-6">
           <input
             v-autofocus
             v-model="name"
@@ -39,7 +39,7 @@
           </UiButton>
         </Block>
       </div>
-      <div class="col-4 float-left">
+      <div class="col-12 col-lg-4 float-left">
         <Block title="Actions">
           <div class="mb-2">
             <UiButton class="width-full mb-2">

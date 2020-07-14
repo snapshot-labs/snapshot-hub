@@ -7,15 +7,33 @@
           {{ token.name || _shorten(token.token) }}
         </router-link>
       </div>
-      <div class="d-flex">
-        <div class="col-8 float-left pr-5">
-          <h1 v-text="proposal.payload.name" class="mb-2" />
-          <div class="mb-4">
-            <span class="State bg-green" title="Status: Open">
-              Active
-            </span>
+      <div>
+        <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
+          <h1 class="mb-2">
+            {{ proposal.payload.name }}
+            <span v-text="`#${id}`" class="text-gray" />
+          </h1>
+          <div class="mb-6">
+            <span class="State bg-green mr-2" v-text="'Active'" />
+            By:
+            <a
+              :href="_etherscanLink(proposal.authors[0])"
+              target="_blank"
+              class="mr-2"
+            >
+              {{ _shorten(proposal.authors[0]) }}
+              <Icon name="external-link" />
+            </a>
+            IPFS Hash:
+            <a
+              :href="`https://gateway.pinata.cloud/ipfs/${proposal.ipfsHash}`"
+              target="_blank"
+            >
+              {{ _shorten(proposal.ipfsHash) }}
+              <Icon name="external-link" />
+            </a>
           </div>
-          <div v-html="formatMarkdown(proposal.payload.body)" class="mb-5" />
+          <div v-html="formatMarkdown(proposal.payload.body)" class="mb-6" />
           <Block title="Cast a vote">
             <div class="mb-3">
               <UiButton
@@ -37,38 +55,41 @@
             </UiButton>
           </Block>
         </div>
-        <div class="col-4 float-left">
-          <Block title="Informations">
-            <p>
-              Author:
-              <a
-                :href="_etherscanLink(proposal.authors[0])"
-                target="_blank"
-                class="text-white"
-              >
-                {{ _shorten(proposal.authors[0]) }}
-                <Icon name="external-link" />
-              </a>
-            </p>
-            <p>
-              IPFS Hash:
-              <a
-                :href="`https://gateway.pinata.cloud/ipfs/${proposal.ipfsHash}`"
-                target="_blank"
-                class="text-white"
-              >
-                {{ _shorten(proposal.ipfsHash) }}
-                <Icon name="external-link" />
-              </a>
-            </p>
-          </Block>
+        <div class="col-12 col-lg-4 float-left">
           <Block title="Results">
             <div v-for="(choice, i) in proposal.payload.choices" :key="i">
-              <div class="text-white mb-1">{{ choice }} 50%</div>
+              <div class="text-white mb-1">
+                {{ choice }}
+                <span
+                  v-text="
+                    `${
+                      votes.filter(vote => vote.payload.choice === i + 1).length
+                    }`
+                  "
+                  class="text-gray ml-1"
+                />
+                <span class="float-right">50%</span>
+              </div>
               <UiProgress
                 :value="Math.random(0, 100) * 100"
                 :max="100"
                 class="mb-3"
+              />
+            </div>
+          </Block>
+          <Block v-if="votes.length > 0" title="Votes" :counter="votes.length">
+            <div v-for="(vote, i) in votes" :key="i" class="mb-2 text-white">
+              <a
+                :href="_etherscanLink(vote.authors[0])"
+                target="_blank"
+                class="text-white"
+              >
+                {{ _shorten(vote.authors[0]) }}
+                <Icon name="external-link" />
+              </a>
+              <span
+                v-text="proposal.payload.choices[vote.payload.choice - 1]"
+                class="float-right"
               />
             </div>
           </Block>
@@ -110,6 +131,11 @@ export default {
         proposal: this.id,
         choice: this.selectedChoice
       });
+      const proposalObj = await this.getProposal({
+        token: this.token.token,
+        id: this.id
+      });
+      this.votes = proposalObj.votes;
       this.voteLoading = false;
     },
     formatMarkdown(str) {
@@ -118,10 +144,12 @@ export default {
   },
   async created() {
     this.loading = true;
-    this.proposal = await this.getProposal({
+    const proposalObj = await this.getProposal({
       token: this.token.token,
       id: this.id
     });
+    this.proposal = proposalObj.proposal;
+    this.votes = proposalObj.votes;
     this.loading = false;
     this.loaded = true;
   }

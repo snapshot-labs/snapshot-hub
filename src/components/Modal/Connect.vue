@@ -1,5 +1,5 @@
 <template>
-  <UiModal :open="open" @close="$emit('close')" style="max-width: 440px;">
+  <UiModal :open="open" @close="$emit('close')">
     <h3 class="m-4 mb-0 text-center">Connect wallet</h3>
     <div class="m-4 border rounded-2">
       <a

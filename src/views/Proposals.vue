@@ -9,8 +9,10 @@
           </a>
         </div>
         <div class="d-flex flex-items-center flex-auto">
-          <h3 v-text="'Proposals'" class="mr-2" />
-          <UiCounter :counter="totalProposals" />
+          <h3 class="mr-2">
+            Proposals
+            <UiCounter :counter="totalProposals" class="ml-1" />
+          </h3>
         </div>
       </div>
       <router-link :to="{ name: 'create' }">
@@ -50,13 +52,15 @@ import tokens from '@/helpers/tokens.json';
 export default {
   data() {
     return {
-      key: this.$route.params.key,
       loading: false,
       loaded: false,
       proposals: {}
     };
   },
   computed: {
+    key() {
+      return this.$route.params.key;
+    },
     token() {
       return tokens[this.key] ? tokens[this.key] : { token: this.key };
     },

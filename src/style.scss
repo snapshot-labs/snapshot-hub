@@ -53,30 +53,13 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: $black;
+  background-color: $border-color;
   background-clip: padding-box;
   border: 0;
   border-radius: 0;
 
   &:hover {
     background-color: $border-color;
-  }
-}
-
-.modal {
-  .shell {
-    @extend .border-0;
-    @extend .border-md;
-    @extend .rounded-md-2;
-    @extend .rounded-lg-2;
-    background-color: $black;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    max-width: 540px;
-  }
-
-  .modal-body {
-    flex: auto;
   }
 }
 

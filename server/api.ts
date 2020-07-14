@@ -25,11 +25,24 @@ router.get('/:token/proposals', async (req, res) => {
 
 router.get('/:token/proposal/:id', async (req, res) => {
   const { token, id } = req.params;
-  const multi = redis.multi();
+  let multi = redis.multi();
   multi.getAsync(`token:${token}:proposal:${id}`);
   multi.getAsync(`token:${token}:proposal:${id}:vote:index`);
   const [proposal, totalVotes] = await multi.execAsync();
-  return res.json(JSON.parse(proposal));
+  multi = redis.multi();
+  const ids = [];
+  let i = 1;
+  while (i <= totalVotes) {
+    multi.getAsync(`token:${token}:proposal:${id}:vote:${i}`);
+    // @ts-ignore
+    ids.push(i);
+    i++;
+  }
+  const votes = await multi.execAsync();
+  return res.json({
+    proposal: JSON.parse(proposal),
+    votes: votes.map(vote => JSON.parse(vote))
+  });
 });
 
 router.post('/proposal', async (req, res) => {
