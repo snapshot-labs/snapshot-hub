@@ -24,14 +24,14 @@
         <Block title="Choices">
           <div class="overflow-hidden mb-2">
             <div v-for="(choice, i) in choices" :key="i" class="d-flex mb-2">
-              <UiButton class="mr-2">{{ i + 1 }}</UiButton>
-              <UiButton class="flex-auto">
+              <UiButton class="d-flex width-full">
+                <span class="mr-4">{{ i + 1 }}</span>
                 <input
                   v-model="choices[i]"
-                  class="input height-full width-full"
+                  class="input height-full flex-auto"
                 />
+                <span @click="removeChoice(i)">x</span>
               </UiButton>
-              <UiButton @click="removeChoice(i)" class="ml-2">x</UiButton>
             </div>
           </div>
           <UiButton @click="addChoice" class="d-block width-full">
@@ -61,9 +61,9 @@
           </div>
           <UiButton
             @click="handleSubmit"
-            :disabled="loading"
+            :disabled="loading || !web3.account"
             :loading="loading"
-            class="d-block width-full"
+            class="d-block width-full button--submit"
           >
             Publish
           </UiButton>

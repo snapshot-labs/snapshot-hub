@@ -4,7 +4,7 @@
     <div v-else>
       <Topnav />
       <div class="d-flex flex-row pb-6">
-        <router-view class="flex-auto" />
+        <router-view :key="$route.path" class="flex-auto" />
       </div>
     </div>
     <Notifications />

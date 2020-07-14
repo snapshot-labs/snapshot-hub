@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { ethers } from 'ethers';
-import { AddressZero } from 'ethers/constants';
-import { formatEther, getAddress, Interface } from 'ethers/utils';
+import { getAddress } from 'ethers/utils';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import connectors from '@/helpers/connectors';
@@ -21,16 +20,7 @@ const state = {
   name: null,
   active: false,
   balances: {},
-  dsProxyAddress: null,
-  proxyAllowances: {},
   currentBlockNumber: 0
-};
-
-const getters = {
-  hasProxy: state => {
-    const proxyAddress = state.dsProxyAddress;
-    return !!proxyAddress && proxyAddress !== AddressZero;
-  }
 };
 
 const mutations = {
@@ -124,16 +114,6 @@ const mutations = {
   },
   SIGN_MESSAGE_FAILURE(_state, payload) {
     console.debug('SIGN_MESSAGE_FAILURE', payload);
-  },
-  GET_BALANCES_REQUEST() {
-    console.debug('GET_BALANCES_REQUEST');
-  },
-  GET_BALANCES_SUCCESS(_state, payload) {
-    Vue.set(_state, 'balances', payload);
-    console.debug('GET_BALANCES_SUCCESS');
-  },
-  GET_BALANCES_FAILURE(_state, payload) {
-    console.debug('GET_BALANCES_FAILURE', payload);
   }
 };
 
@@ -287,58 +267,12 @@ const actions = {
     }
   },
   loadAccount: async ({ dispatch }) => {
-    await Promise.all([
-      dispatch('lookupAddress'),
-      dispatch('getBalances'),
-      dispatch('getMyPoolShares')
-    ]);
-  },
-  getBalances: async ({ commit }) => {
-    commit('GET_BALANCES_REQUEST');
-    const address = state.account;
-    // @ts-ignore
-    const tokens = Object.entries(config.tokens).map(token => token[1].address);
-    const promises: any = [];
-    const multi = new ethers.Contract(
-      config.addresses.multicall,
-      abi['Multicall'],
-      web3
-    );
-    const calls = [];
-    const testToken = new Interface(abi.TestToken);
-    tokens.forEach(token => {
-      // @ts-ignore
-      calls.push([token, testToken.functions.balanceOf.encode([address])]);
-    });
-    promises.push(multi.aggregate(calls));
-    promises.push(multi.getEthBalance(address));
-    const balances: any = {};
-    try {
-      // @ts-ignore
-      const [[, response], ethBalance] = await Promise.all(promises);
-      balances.ether = parseFloat(formatEther(ethBalance as any));
-      let i = 0;
-      response.forEach(value => {
-        if (tokens && tokens[i]) {
-          const tokenBalance = testToken.functions.balanceOf.decode(value);
-          balances[getAddress(tokens[i])] = parseFloat(
-            formatEther(tokenBalance.toString())
-          );
-        }
-        i++;
-      });
-      commit('GET_BALANCES_SUCCESS', balances);
-      return balances;
-    } catch (e) {
-      commit('GET_BALANCES_FAILURE', e);
-      return Promise.reject();
-    }
+    await Promise.all([dispatch('lookupAddress'), dispatch('getMyPoolShares')]);
   }
 };
 
 export default {
   state,
-  getters,
   mutations,
   actions
 };

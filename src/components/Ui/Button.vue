@@ -33,6 +33,23 @@ export default {
   height: 46px;
   font-size: 18px;
 
+  &.button--submit {
+    background-color: $bg-blue;
+    border: 1px solid $bg-blue;
+
+    &:hover {
+      color: $white;
+      background-color: $bg-blue;
+      border: 1px solid $bg-blue;
+    }
+
+    &:disabled {
+      color: $white !important;
+      border: 1px solid $text-gray;
+      background-color: $text-gray;
+    }
+  }
+
   &:hover {
     color: $white;
     border-color: $white;

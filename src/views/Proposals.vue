@@ -15,7 +15,7 @@
           </h3>
         </div>
       </div>
-      <router-link :to="{ name: 'create' }">
+      <router-link v-if="web3.account" :to="{ name: 'create' }">
         <UiButton>New proposal</UiButton>
       </router-link>
     </div>

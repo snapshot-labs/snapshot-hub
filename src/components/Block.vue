@@ -4,7 +4,7 @@
       {{ title }}
       <UiCounter v-if="counter" :counter="counter" class="ml-1" />
     </h4>
-    <div class="p-4">
+    <div :class="!slim && 'p-4'">
       <slot />
     </div>
   </div>
@@ -12,6 +12,6 @@
 
 <script>
 export default {
-  props: ['title', 'counter']
+  props: ['title', 'counter', 'slim']
 };
 </script>

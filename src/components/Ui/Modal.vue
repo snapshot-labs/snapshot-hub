@@ -1,7 +1,9 @@
 <template>
   <div v-if="open" class="modal mx-auto">
     <div class="backdrop" @click="$emit('close')" />
-    <div class="shell overflow-hidden anim-scale-in position-relative">
+    <div
+      class="shell overflow-hidden anim-scale-in position-relative rounded-0 rounded-md-2"
+    >
       <slot />
       <a @click="$emit('close')" class="position-absolute right-0 top-1 p-4">
         <Icon name="close" />
@@ -28,7 +30,7 @@ export default {
   right: 0;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 40;
 
   .backdrop {
     position: fixed;
@@ -42,13 +44,12 @@ export default {
 
   .shell {
     border: $border;
-    border-radius: $border-radius;
     background-color: $black;
     padding-left: 0 !important;
     padding-right: 0 !important;
     max-width: 440px;
 
-    max-height: calc(100vh - 160px);
+    max-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
     z-index: 999;

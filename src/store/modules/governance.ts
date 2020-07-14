@@ -1,4 +1,8 @@
 import client from '@/helpers/client';
+import { ethers } from 'ethers';
+import config from '@/helpers/config';
+import abi from '@/helpers/abi';
+import { formatEther, Interface } from 'ethers/utils';
 
 const mutations = {
   POST_REQUEST() {
@@ -36,6 +40,15 @@ const mutations = {
   },
   GET_PROPOSAL_FAILURE(_state, payload) {
     console.debug('GET_PROPOSAL_FAILURE', payload);
+  },
+  GET_VOTERS_BALANCES_REQUEST() {
+    console.debug('GET_VOTERS_BALANCES_REQUEST');
+  },
+  GET_VOTERS_BALANCES_SUCCESS() {
+    console.debug('GET_VOTERS_BALANCES_SUCCESS');
+  },
+  GET_VOTERS_BALANCES_FAILURE(_state, payload) {
+    console.debug('GET_VOTERS_BALANCES_FAILURE', payload);
   }
 };
 
@@ -100,16 +113,68 @@ const actions = {
       commit('GET_PROPOSALS_FAILURE', e);
     }
   },
-  getProposal: async ({ commit }, payload) => {
+  getProposal: async ({ commit, dispatch }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
       const result = await client.request(
         `${payload.token}/proposal/${payload.id}`
       );
+      const votes = await dispatch('getVotersBalances', {
+        token: payload.token,
+        addresses: result.votes.map(vote => vote.authors[0])
+      });
+      result.votes = result.votes
+        .map(vote => {
+          vote.balance = votes[vote.authors[0]];
+          return vote;
+        })
+        .sort((a, b) => b.balance - a.balance)
+        .filter(vote => vote.balance > 0);
+      result.results = {
+        totalVotes: result.proposal.payload.choices.map(
+          (choice, i) =>
+            result.votes.filter(vote => vote.payload.choice === i + 1).length
+        ),
+        totalBalances: result.proposal.payload.choices.map((choice, i) =>
+          result.votes
+            .filter(vote => vote.payload.choice === i + 1)
+            .reduce((a, b) => a + b.balance, 0)
+        ),
+        totalVotesBalances: result.votes.reduce((a, b) => a + b.balance, 0)
+      };
       commit('GET_PROPOSAL_SUCCESS');
       return result;
     } catch (e) {
       commit('GET_PROPOSAL_FAILURE', e);
+    }
+  },
+  getVotersBalances: async ({ commit }, { token, addresses }) => {
+    commit('GET_VOTERS_BALANCES_REQUEST');
+    const multi = new ethers.Contract(
+      config.addresses.multicall,
+      abi['Multicall'],
+      ethers.getDefaultProvider()
+    );
+    const calls = [];
+    const testToken = new Interface(abi.TestToken);
+    addresses.forEach(address => {
+      // @ts-ignore
+      calls.push([token, testToken.functions.balanceOf.encode([address])]);
+    });
+    const balances: any = {};
+    try {
+      const [, response] = await multi.aggregate(calls);
+      response.forEach((value, i) => {
+        const tokenBalance = testToken.functions.balanceOf.decode(value);
+        balances[addresses[i]] = parseFloat(
+          formatEther(tokenBalance.toString())
+        );
+      });
+      commit('GET_VOTERS_BALANCES_SUCCESS');
+      return balances;
+    } catch (e) {
+      commit('GET_VOTERS_BALANCES_FAILURE', e);
+      return Promise.reject();
     }
   }
 };
