@@ -56,15 +56,7 @@
                 "
                 class="float-right text-white"
               />
-              <a
-                :href="_etherscanLink(vote.authors[0])"
-                target="_blank"
-                class="text-white"
-              >
-                <Avatar :address="vote.authors[0]" size="16" class="mr-1" />
-                {{ _shorten(vote.authors[0]) }}
-                <Icon name="external-link" />
-              </a>
+              <User :address="vote.authors[0]" />
               <span
                 v-text="proposal.payload.choices[vote.payload.choice - 1]"
                 class="text-white ml-2"
@@ -84,15 +76,7 @@
           <Block title="Informations">
             <div class="mb-1">
               <b>Author</b>
-              <a
-                :href="_etherscanLink(proposal.authors[0])"
-                target="_blank"
-                class="float-right text-white"
-              >
-                <Avatar :address="proposal.authors[0]" size="16" class="mr-1" />
-                {{ _shorten(proposal.authors[0]) }}
-                <Icon name="external-link" />
-              </a>
+              <User :address="proposal.authors[0]" class="float-right" />
             </div>
             <div class="mb-1">
               <b>IPFS</b>
@@ -102,7 +86,7 @@
                 class="float-right text-white"
               >
                 {{ _shorten(proposal.ipfsHash) }}
-                <Icon name="external-link" />
+                <Icon name="external-link" class="ml-1" />
               </a>
             </div>
             <div class="mb-1">
@@ -121,11 +105,11 @@
           <Block title="Current results">
             <div v-for="(choice, i) in proposal.payload.choices" :key="i">
               <div class="text-white mb-1">
+                <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalBalances[i]" class="mr-1">
                   {{ $n(results.totalBalances[i]) }}
                   {{ token.symbol || _shorten(token.token) }}
                 </span>
-                <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalVotes[i]" class="text-gray mr-1">
                   {{ $n(results.totalVotes[i]) }} vote{{
                     results.totalVotes[i] > 1 ? 's' : ''
@@ -155,8 +139,10 @@
       <ModalConfirm
         :open="modalOpen"
         @close="modalOpen = false"
+        @reload="loadProposal"
         :token="token.token"
-        :proposal="id"
+        :proposal="proposal"
+        :id="id"
         :selectedChoice="selectedChoice"
       />
     </template>
@@ -189,17 +175,20 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposal'])
+    ...mapActions(['getProposal']),
+    async loadProposal() {
+      const proposalObj = await this.getProposal({
+        token: this.token.token,
+        id: this.id
+      });
+      this.proposal = proposalObj.proposal;
+      this.votes = proposalObj.votes;
+      this.results = proposalObj.results;
+    }
   },
   async created() {
     this.loading = true;
-    const proposalObj = await this.getProposal({
-      token: this.token.token,
-      id: this.id
-    });
-    this.proposal = proposalObj.proposal;
-    this.votes = proposalObj.votes;
-    this.results = proposalObj.results;
+    await this.loadProposal();
     this.loading = false;
     this.loaded = true;
   }

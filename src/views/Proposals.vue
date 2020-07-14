@@ -5,7 +5,7 @@
         <div>
           <a :href="_etherscanLink(token.token)" target="_blank">
             {{ token.name || _shorten(key) }}
-            <Icon name="external-link" />
+            <Icon name="external-link" class="ml-1" />
           </a>
         </div>
         <div class="d-flex flex-items-center flex-auto">

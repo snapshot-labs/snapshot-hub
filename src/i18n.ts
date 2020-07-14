@@ -31,7 +31,7 @@ export default new VueI18n({
       percent: {
         style: 'percent',
         minimumFractionDigits: 0,
-        maximumFractionDigits: 3
+        maximumFractionDigits: 2
       }
     }
   },
