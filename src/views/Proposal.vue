@@ -18,7 +18,14 @@
             v-html="proposal.payload.body.replace(/\n/g, '<br />')"
             class="mb-6"
           />
-          <Block class="mb-4" title="Cast your vote">
+          <Block
+            v-if="
+              web3.currentBlockNumber >= proposal.payload.startBlock &&
+                web3.currentBlockNumber < proposal.payload.endBlock
+            "
+            class="mb-4"
+            title="Cast your vote"
+          >
             <div class="mb-3">
               <UiButton
                 v-for="(choice, i) in proposal.payload.choices"

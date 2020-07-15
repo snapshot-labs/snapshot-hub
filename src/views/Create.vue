@@ -94,13 +94,16 @@ export default {
       return tokens[this.key] ? tokens[this.key] : { token: this.key };
     },
     isValid() {
+      const minBlock = (3600 * 24) / 15;
       return (
         !this.loading &&
         this.web3.account &&
         this.name &&
         this.body &&
         this.startBlock &&
+        this.startBlock >= this.web3.currentBlockNumber &&
         this.endBlock &&
+        this.endBlock >= this.web3.currentBlockNumber + minBlock &&
         this.choices.length >= 2 &&
         this.choices.reduce((a, b) => (!a ? false : b), true)
       );

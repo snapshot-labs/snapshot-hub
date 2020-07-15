@@ -86,21 +86,17 @@ textarea {
 }
 
 .vue-ui-loading-indicator {
+  display: inline-block;
+  vertical-align: middle;
+
   &.overlay {
+    display: flex;
     background-color: transparent !important;
   }
 
   .animation {
     border-color: transparentize($white, 0.8);
     border-right-color: $white;
-  }
-
-  .loading-xl {
-    .animation {
-      border-width: 6px;
-      width: 64px;
-      height: 64px;
-    }
   }
 }
 

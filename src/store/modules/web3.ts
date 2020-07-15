@@ -24,6 +24,15 @@ const state = {
 };
 
 const mutations = {
+  LOGOUT(_state) {
+    Vue.set(_state, 'injectedLoaded', false);
+    Vue.set(_state, 'injectedChainId', null);
+    Vue.set(_state, 'account', null);
+    Vue.set(_state, 'name', null);
+    Vue.set(_state, 'active', false);
+    Vue.set(_state, 'balances', {});
+    console.debug('LOGOUT');
+  },
   LOAD_WEB3_REQUEST() {
     console.debug('LOAD_WEB3_REQUEST');
   },
@@ -134,6 +143,9 @@ const actions = {
       web3 = new ethers.providers.Web3Provider(provider);
       await dispatch('loadWeb3');
     }
+  },
+  logout: async ({ commit }) => {
+    commit('LOGOUT');
   },
   loadWeb3: async ({ commit, dispatch }) => {
     commit('LOAD_WEB3_REQUEST');
