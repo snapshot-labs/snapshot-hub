@@ -13,7 +13,7 @@
             {{ proposal.payload.name }}
             <span v-text="`#${id}`" class="text-gray" />
           </h1>
-          <span class="State bg-green mb-4" v-text="'Active'" />
+          <State :proposal="proposal" class="mb-4" />
           <p
             v-html="proposal.payload.body.replace(/\n/g, '<br />')"
             class="mb-6"

@@ -22,8 +22,9 @@
     <div class="rounded-2 border overflow-hidden">
       <div class="px-4 py-3 bg-gray-dark">
         <span class="mr-3">All</span>
-        <span class="mr-3">Actives</span>
-        <span class="mr-3">Approved</span>
+        <span class="mr-3">Active</span>
+        <span class="mr-3">Pending</span>
+        <span class="mr-3">Closed</span>
       </div>
       <RowLoading v-if="loading" />
       <div v-if="loaded">

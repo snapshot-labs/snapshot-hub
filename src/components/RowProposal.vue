@@ -4,7 +4,7 @@
     :to="{ name: 'proposal', params: { key: token, id: i } }"
   >
     <div>
-      <span v-text="'Active'" class="State bg-green d-inline-block mr-2 mb-2" />
+      <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />
       <h3 v-text="proposal.payload.name" class="d-inline-block mb-1" />
     </div>
     <div>

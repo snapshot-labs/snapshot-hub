@@ -14,8 +14,9 @@ const mutations = {
 };
 
 const actions = {
-  init: async ({ commit }) => {
+  init: async ({ commit, dispatch }) => {
     commit('SET', { loading: true });
+    await dispatch('getBlockNumber');
     commit('SET', { loading: false, init: true });
   },
   loading: ({ commit }, payload) => {

@@ -41,7 +41,6 @@ const mutations = {
     Vue.set(_state, 'injectedChainId', payload.injectedChainId);
     Vue.set(_state, 'account', payload.account);
     Vue.set(_state, 'name', payload.name);
-    Vue.set(_state, 'currentBlockNumber', payload.currentBlockNumber);
     console.debug('LOAD_PROVIDER_SUCCESS');
   },
   LOAD_PROVIDER_FAILURE(_state, payload) {
@@ -114,6 +113,16 @@ const mutations = {
   },
   SIGN_MESSAGE_FAILURE(_state, payload) {
     console.debug('SIGN_MESSAGE_FAILURE', payload);
+  },
+  GET_BLOCK_NUMBER_REQUEST() {
+    console.debug('GET_BLOCK_NUMBER_REQUEST');
+  },
+  GET_BLOCK_NUMBER_SUCCESS(_state, payload) {
+    Vue.set(_state, 'currentBlockNumber', payload);
+    console.debug('GET_BLOCK_NUMBER_SUCCESS', payload);
+  },
+  GET_BLOCK_NUMBER_FAILURE(_state, payload) {
+    console.debug('GET_BLOCK_NUMBER_FAILURE', payload);
   }
 };
 
@@ -180,13 +189,11 @@ const actions = {
       const network = await web3.getNetwork();
       const accounts = await web3.listAccounts();
       const account = accounts.length > 0 ? accounts[0] : null;
-      const currentBlockNumber = await web3.getBlockNumber();
       commit('LOAD_PROVIDER_SUCCESS', {
         injectedLoaded: true,
         injectedChainId: network.chainId,
         account,
-        name,
-        currentBlockNumber
+        name
       });
     } catch (e) {
       commit('LOAD_PROVIDER_FAILURE', e);
@@ -268,6 +275,18 @@ const actions = {
   },
   loadAccount: async ({ dispatch }) => {
     await Promise.all([dispatch('lookupAddress'), dispatch('getMyPoolShares')]);
+  },
+  getBlockNumber: async ({ commit }) => {
+    commit('GET_BLOCK_NUMBER_REQUEST');
+    try {
+      const defaultProvider = ethers.getDefaultProvider();
+      const blockNumber = await defaultProvider.getBlockNumber();
+      commit('GET_BLOCK_NUMBER_SUCCESS', blockNumber);
+      return blockNumber;
+    } catch (e) {
+      commit('GET_BLOCK_NUMBER_FAILURE', e);
+      return Promise.reject();
+    }
   }
 };
 
