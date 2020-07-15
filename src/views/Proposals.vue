@@ -33,6 +33,7 @@
           :key="i"
           :proposal="proposal"
           :token="key"
+          :verified="token.verified"
           :i="i"
         />
       </div>
@@ -63,7 +64,9 @@ export default {
       return this.$route.params.key;
     },
     token() {
-      return tokens[this.key] ? tokens[this.key] : { token: this.key };
+      return tokens[this.key]
+        ? tokens[this.key]
+        : { token: this.key, verified: [] };
     },
     totalProposals() {
       return Object.entries(this.proposals).length;

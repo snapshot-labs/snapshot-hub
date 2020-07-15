@@ -4,6 +4,7 @@ import { getAddress } from 'ethers/utils';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import connectors from '@/helpers/connectors';
+import { lsSet, lsRemove } from '@/helpers/utils';
 
 const infuraId = process.env.VUE_APP_INFURA_ID;
 const backupUrls = {
@@ -138,13 +139,15 @@ const mutations = {
 const actions = {
   login: async ({ dispatch }, connector = 'injected') => {
     const options = config.connectors[connector].options || {};
-    provider = await connectors[connector](options);
+    provider = await connectors[connector].connect(options);
     if (provider) {
       web3 = new ethers.providers.Web3Provider(provider);
       await dispatch('loadWeb3');
+      if (state.account) lsSet('connector', connector);
     }
   },
   logout: async ({ commit }) => {
+    lsRemove('connector');
     commit('LOGOUT');
   },
   loadWeb3: async ({ commit, dispatch }) => {

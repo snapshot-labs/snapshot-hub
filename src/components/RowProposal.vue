@@ -10,10 +10,11 @@
     <div>
       <span v-text="`#${i}`" class="text-gray" />
       By {{ _shorten(proposal.authors[0]) }}
-      started on
-      {{ $d(new Date(proposal.payload.startBlock * 1e3), 'short') }}
-      end on
-      {{ $d(new Date(proposal.payload.endBlock * 1e3), 'short') }}
+      <Icon v-if="isVerified" name="check" title="Verified" />
+      start block
+      {{ $n(proposal.payload.startBlock) }}
+      end block
+      {{ $n(proposal.payload.endBlock) }}
     </div>
   </router-link>
 </template>
@@ -23,7 +24,17 @@ export default {
   props: {
     token: String,
     proposal: Object,
+    verified: Array,
     i: String
+  },
+  computed: {
+    isVerified() {
+      return (
+        Array.isArray(this.verified) &&
+        this.verified.length > 0 &&
+        this.verified.includes(this.proposal.authors[0])
+      );
+    }
   }
 };
 </script>

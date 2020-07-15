@@ -46,13 +46,13 @@
             </UiButton>
           </Block>
           <Block
-            v-if="votes.length > 0"
+            v-if="Object.keys(votes).length > 0"
             title="Votes"
-            :counter="votes.length"
+            :counter="Object.keys(votes).length"
             :slim="true"
           >
             <div
-              v-for="(vote, i) in votes"
+              v-for="(vote, address, i) in votes"
               :key="i"
               :style="i === 0 && 'border: 0 !important;'"
               class="px-4 py-3 border-top"
@@ -63,16 +63,12 @@
                 "
                 class="float-right text-white"
               />
-              <User :address="vote.authors[0]" />
+              <User :address="address" :verified="token.verified" />
               <span
                 v-text="proposal.payload.choices[vote.payload.choice - 1]"
                 class="text-white ml-2"
               />
-              <a
-                :href="`https://gateway.pinata.cloud/ipfs/${vote.ipfsHash}`"
-                target="_blank"
-                class="ml-2"
-              >
+              <a :href="_ipfsUrl(vote.ipfsHash)" target="_blank" class="ml-2">
                 IPFS
                 <Icon name="external-link" />
               </a>
@@ -83,12 +79,16 @@
           <Block title="Informations">
             <div class="mb-1">
               <b>Author</b>
-              <User :address="proposal.authors[0]" class="float-right" />
+              <User
+                :address="proposal.authors[0]"
+                :verified="token.verified"
+                class="float-right"
+              />
             </div>
             <div class="mb-1">
               <b>IPFS</b>
               <a
-                :href="`https://gateway.pinata.cloud/ipfs/${proposal.ipfsHash}`"
+                :href="_ipfsUrl(proposal.ipfsHash)"
                 target="_blank"
                 class="float-right text-white"
               >
@@ -170,7 +170,7 @@ export default {
       loaded: false,
       voteLoading: false,
       proposal: {},
-      votes: [],
+      votes: {},
       results: [],
       modalOpen: false,
       selectedChoice: 0
@@ -178,7 +178,9 @@ export default {
   },
   computed: {
     token() {
-      return tokens[this.key] ? tokens[this.key] : { token: this.key };
+      return tokens[this.key]
+        ? tokens[this.key]
+        : { token: this.key, verified: [] };
     }
   },
   methods: {

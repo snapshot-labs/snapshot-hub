@@ -1,6 +1,5 @@
 import serveStatic from 'serve-static';
 import bodyParser from 'body-parser';
-// @ts-ignore
 import frameguard from 'frameguard';
 import cors from 'cors';
 import api from './server/api';

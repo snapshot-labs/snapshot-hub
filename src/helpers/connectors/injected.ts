@@ -1,4 +1,8 @@
-export default async function() {
+async function isLoggedIn() {
+  return !!window['ethereum'] && !!window['ethereum'].selectedAddress;
+}
+
+async function connect() {
   let provider;
   if (window['ethereum']) {
     provider = window['ethereum'];
@@ -12,3 +16,8 @@ export default async function() {
   }
   return provider;
 }
+
+export default {
+  connect,
+  isLoggedIn
+};

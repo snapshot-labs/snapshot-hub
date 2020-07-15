@@ -2,7 +2,11 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 
 const infuraId = process.env.VUE_APP_INFURA_ID || '';
 
-export default async function() {
+async function isLoggedIn() {
+  return true;
+}
+
+async function connect() {
   let provider;
   try {
     provider = new WalletConnectProvider({ infuraId });
@@ -12,3 +16,8 @@ export default async function() {
   }
   return provider;
 }
+
+export default {
+  connect,
+  isLoggedIn
+};

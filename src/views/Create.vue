@@ -91,7 +91,9 @@ export default {
   },
   computed: {
     token() {
-      return tokens[this.key] ? tokens[this.key] : { token: this.key };
+      return tokens[this.key]
+        ? tokens[this.key]
+        : { token: this.key, verified: [] };
     },
     isValid() {
       const minBlock = (3600 * 24) / 15;

@@ -43,7 +43,7 @@
             >
               Connect wallet
             </UiButton>
-            <UiButton class="ml-2">
+            <UiButton @click="modalAboutOpen = true" class="ml-2">
               <span v-text="'?'" class="ml-n1 mr-n1" />
             </UiButton>
           </div>
@@ -53,6 +53,7 @@
           @close="modalOpen = false"
           @login="handleLogin"
         />
+        <ModalAbout :open="modalAboutOpen" @close="modalAboutOpen = false" />
       </Container>
     </nav>
   </Sticky>
@@ -66,7 +67,8 @@ export default {
   data() {
     return {
       loading: false,
-      modalOpen: false
+      modalOpen: false,
+      modalAboutOpen: false
     };
   },
   computed: {

@@ -122,26 +122,35 @@ const actions = {
       );
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
-        addresses: result.votes.map(vote => vote.authors[0])
+        addresses: Object.values(result.votes).map(
+          (vote: any) => vote.authors[0]
+        )
       });
-      result.votes = result.votes
-        .map(vote => {
-          vote.balance = votes[vote.authors[0]];
-          return vote;
-        })
-        .sort((a, b) => b.balance - a.balance)
-        .filter(vote => vote.balance > 0);
+      result.votes = Object.fromEntries(
+        Object.entries(result.votes)
+          .map((vote: any) => {
+            vote[1].balance = votes[vote[1].authors[0]];
+            return vote;
+          })
+          .sort((a, b) => b[1].balance - a[1].balance)
+          .filter(vote => vote[1].balance > 0)
+      );
       result.results = {
         totalVotes: result.proposal.payload.choices.map(
           (choice, i) =>
-            result.votes.filter(vote => vote.payload.choice === i + 1).length
+            Object.values(result.votes).filter(
+              (vote: any) => vote.payload.choice === i + 1
+            ).length
         ),
         totalBalances: result.proposal.payload.choices.map((choice, i) =>
-          result.votes
-            .filter(vote => vote.payload.choice === i + 1)
-            .reduce((a, b) => a + b.balance, 0)
+          Object.values(result.votes)
+            .filter((vote: any) => vote.payload.choice === i + 1)
+            .reduce((a, b: any) => a + b.balance, 0)
         ),
-        totalVotesBalances: result.votes.reduce((a, b) => a + b.balance, 0)
+        totalVotesBalances: Object.values(result.votes).reduce(
+          (a, b: any) => a + b.balance,
+          0
+        )
       };
       commit('GET_PROPOSAL_SUCCESS');
       return result;
