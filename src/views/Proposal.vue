@@ -2,7 +2,7 @@
   <Container>
     <template v-if="loaded">
       <div class="mb-3">
-        <router-link :to="{ name: 'home' }">
+        <router-link :to="{ name: 'proposals' }">
           <Icon name="back" size="22" class="v-align-middle" />
           {{ token.name || _shorten(token.token) }}
         </router-link>
@@ -11,7 +11,7 @@
         <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
           <h1 class="mb-2">
             {{ proposal.payload.name }}
-            <span v-text="`#${id}`" class="text-gray" />
+            <span v-text="`#${_shorten(id)}`" class="text-gray" />
           </h1>
           <State :proposal="proposal" class="mb-4" />
           <p
@@ -126,9 +126,11 @@
                   class="float-right"
                   v-text="
                     $n(
-                      ((100 / results.totalVotesBalances) *
-                        results.totalBalances[i]) /
-                        1e2,
+                      !results.totalVotesBalances
+                        ? 0
+                        : ((100 / results.totalVotesBalances) *
+                            results.totalBalances[i]) /
+                            1e2,
                       'percent'
                     )
                   "

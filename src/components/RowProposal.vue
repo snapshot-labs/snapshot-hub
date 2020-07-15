@@ -8,7 +8,7 @@
       <h3 v-text="proposal.payload.name" class="d-inline-block mb-1" />
     </div>
     <div>
-      <span v-text="`#${i}`" class="text-gray" />
+      <span v-text="`#${_shorten(i)}`" class="text-gray" />
       By {{ _shorten(proposal.authors[0]) }}
       <Icon v-if="isVerified" name="check" title="Verified" />
       start block
