@@ -1,6 +1,7 @@
 import express from 'express';
 import redis from './redis';
 import pinata from './pinata';
+import relayer from './relayer';
 
 const router = express.Router();
 
@@ -49,9 +50,11 @@ router.post('/proposal', async (req, res) => {
   const message = req.body.message;
   const { token } = message;
   // @TODO message validation
+  const proposalId = await redis.incrAsync(`token:${token}:proposal:index`);
+  message.id = proposalId;
+  message.relayerSig = await relayer.signMessage(JSON.stringify(message));
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;
-  const proposalId = await redis.incrAsync(`token:${token}:proposal:index`);
   const result = await redis.setAsync(`token:${token}:proposal:${proposalId}`, JSON.stringify(message));
   return res.json({ result });
 });
@@ -61,9 +64,11 @@ router.post('/vote', async (req, res) => {
   const { token } = message;
   const proposalId = message.payload.proposal;
   // @TODO message validation
+  const voteId = await redis.incrAsync(`token:${token}:proposal:${proposalId}:vote:index`);
+  message.id = voteId;
+  message.relayerSig = await relayer.signMessage(JSON.stringify(message));
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;
-  const voteId = await redis.incrAsync(`token:${token}:proposal:${proposalId}:vote:index`);
   const result = await redis.setAsync(`token:${token}:proposal:${proposalId}:vote:${voteId}`, JSON.stringify(message));
   return res.json({ result });
 });

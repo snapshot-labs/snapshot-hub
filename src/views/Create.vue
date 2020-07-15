@@ -61,7 +61,7 @@
           </div>
           <UiButton
             @click="handleSubmit"
-            :disabled="loading || !web3.account"
+            :disabled="!isValid"
             :loading="loading"
             class="d-block width-full button--submit"
           >
@@ -92,6 +92,18 @@ export default {
   computed: {
     token() {
       return tokens[this.key] ? tokens[this.key] : { token: this.key };
+    },
+    isValid() {
+      return (
+        !this.loading &&
+        this.web3.account &&
+        this.name &&
+        this.body &&
+        this.startBlock &&
+        this.endBlock &&
+        this.choices.length >= 2 &&
+        this.choices.reduce((a, b) => (!a ? false : b), true)
+      );
     }
   },
   methods: {
@@ -99,6 +111,7 @@ export default {
     addChoice() {
       this.choices.push('');
     },
+
     removeChoice(i) {
       delete this.choices[i];
       this.choices = this.choices.filter(String);

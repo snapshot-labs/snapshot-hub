@@ -67,10 +67,11 @@ const actions = {
           choices: payload.choices,
           startBlock: payload.startBlock,
           endBlock: payload.endBlock
-        },
-        sig: undefined
+        }
       };
-      message.sig = await dispatch('signMessage', JSON.stringify(message));
+      const sig = await dispatch('signMessage', JSON.stringify(message));
+      // @ts-ignore
+      message.sig = [sig];
       const result = await client.request('proposal', { message });
       commit('POST_SUCCESS');
       dispatch('notify', ['green', 'Your proposal is in!']);
@@ -90,10 +91,11 @@ const actions = {
         payload: {
           proposal: payload.proposal,
           choice: payload.choice
-        },
-        sig: undefined
+        }
       };
-      message.sig = await dispatch('signMessage', JSON.stringify(message));
+      const sig = await dispatch('signMessage', JSON.stringify(message));
+      // @ts-ignore
+      message.sig = [sig];
       const result = await client.request('vote', { message });
       commit('VOTE_SUCCESS');
       dispatch('notify', ['green', 'Your vote is in!']);
