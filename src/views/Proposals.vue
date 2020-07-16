@@ -85,7 +85,10 @@ export default {
       return Object.fromEntries(
         Object.entries(this.proposals)
           .filter(proposal => {
-            if (this.selectedState === 'All') return true;
+            if (this.selectedState === 'All')
+              return (
+                proposal[1].payload.endBlock > this.web3.currentBlockNumber
+              );
             if (
               this.selectedState === 'Active' &&
               proposal[1].payload.startBlock <= this.web3.currentBlockNumber &&

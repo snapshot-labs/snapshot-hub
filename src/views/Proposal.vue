@@ -111,7 +111,13 @@
               </span>
             </div>
           </Block>
-          <Block title="Current results">
+          <Block
+            :title="
+              web3.currentBlockNumber >= proposal.payload.endBlock
+                ? 'Results'
+                : 'Current results'
+            "
+          >
             <div v-for="(choice, i) in proposal.payload.choices" :key="i">
               <div class="text-white mb-1">
                 <span v-text="choice" class="mr-1" />
