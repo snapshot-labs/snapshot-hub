@@ -10,10 +10,10 @@
             </a>
           </div>
           <div class="d-flex flex-items-center flex-auto">
-            <h3 class="mr-2">
+            <h2 class="mr-2">
               Proposals
               <UiCounter :counter="totalProposals" class="ml-1" />
-            </h3>
+            </h2>
           </div>
         </div>
         <router-link v-if="web3.account" :to="{ name: 'create' }">

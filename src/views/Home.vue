@@ -1,7 +1,7 @@
 <template>
   <div>
     <Container>
-      <h1 class="mb-3">Explore</h1>
+      <h2 class="mb-3">Dashboard</h2>
     </Container>
     <Container :slim="true">
       <router-link
@@ -12,8 +12,11 @@
         <Block class="text-center">
           <Token :address="token.token" size="128" class="mb-4" />
           <div>
-            <h2>{{ token.name }}</h2>
-            <h3>{{ token.symbol }}</h3>
+            <h2>{{ token.name }} {{ token.symbol }}</h2>
+            <div v-if="token.verified.length > 0">
+              <Icon name="user" size="22" class="v-align-middle" />
+              {{ $n(token.verified.length) }}
+            </div>
           </div>
         </Block>
       </router-link>
