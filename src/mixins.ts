@@ -14,7 +14,7 @@ export default {
       return shorten(str);
     },
     _ipfsUrl(ipfsHash: string): string {
-      return `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+      return `https://${process.env.VUE_APP_IPFS_NODE}/ipfs/${ipfsHash}`;
     },
     _etherscanLink(str: string, type: string): string {
       return etherscanLink(str, type);

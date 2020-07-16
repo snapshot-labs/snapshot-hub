@@ -1,4 +1,5 @@
 import client from '@/helpers/client';
+import ipfs from '@/helpers/ipfs';
 import { ethers } from 'ethers';
 import config from '@/helpers/config';
 import abi from '@/helpers/abi';
@@ -117,7 +118,10 @@ const actions = {
   getProposal: async ({ commit, dispatch }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
-      const result = await client.request(
+      const result: any = {};
+      result.proposal = await ipfs.get(payload.id);
+      result.proposal.ipfsHash = payload.id;
+      result.votes = await client.request(
         `${payload.token}/proposal/${payload.id}`
       );
       const votes = await dispatch('getVotersBalances', {

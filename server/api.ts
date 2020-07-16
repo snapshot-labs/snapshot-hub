@@ -18,18 +18,13 @@ router.get('/:token/proposals', async (req, res) => {
 
 router.get('/:token/proposal/:id', async (req, res) => {
   const { token, id } = req.params;
-  const proposal = await redis.hgetAsync(`token:${token}:proposals`, id);
-  const votes = await redis.hgetallAsync(`token:${token}:proposal:${id}:votes`);
-  const result = {
-    proposal: JSON.parse(proposal),
-    votes: {}
-  }
+  let votes = await redis.hgetallAsync(`token:${token}:proposal:${id}:votes`) || {};
   if (votes)
-    result.votes = Object.fromEntries(Object.entries(votes).map((vote: any) => {
+    votes = Object.fromEntries(Object.entries(votes).map((vote: any) => {
       vote[1] = JSON.parse(vote[1]);
       return vote;
     }));
-  return res.json(result);
+  return res.json(votes);
 });
 
 router.post('/proposal', async (req, res) => {
@@ -39,6 +34,7 @@ router.post('/proposal', async (req, res) => {
   message.relayerSig = await relayer.signMessage(JSON.stringify(message));
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;
+  delete message.payload.body;
   const result = await redis.hmsetAsync(
     `token:${token}:proposals`,
     IpfsHash,
