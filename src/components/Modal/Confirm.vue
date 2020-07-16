@@ -1,8 +1,8 @@
 <template>
-  <UiModal :open="open" @close="$emit('close')">
-    <form @submit.prevent="handleSubmit">
+  <UiModal :open="open" @close="$emit('close')" class="d-flex">
+    <form @submit.prevent="handleSubmit" class="d-flex flex-column flex-auto">
       <h3 class="m-4 mb-0 text-center">Confirm vote</h3>
-      <div class="m-4 text-center">
+      <div class="m-4 flex-auto text-center">
         <h4>Are you sure you want to vote for this option?</h4>
         <h4>This action <b>cannot</b> be undone.</h4>
         <h4 class="p-3 my-3 border rounded-2 text-white">

@@ -1,5 +1,13 @@
 <template>
-  <div class="container-lg px-4 mx-auto">
+  <div :class="slim ? 'px-0 px-md-4' : 'px-4'" class="container-lg mx-auto">
     <slot />
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    slim: Boolean
+  }
+};
+</script>

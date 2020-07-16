@@ -1,6 +1,6 @@
 <template>
-  <Container>
-    <div class="mb-3">
+  <Container :slim="true">
+    <div class="px-4 px-md-0 mb-3">
       <router-link :to="{ name: 'home' }">
         <Icon name="back" size="22" class="v-align-middle" />
         {{ token.name || _shorten(token.token) }}
@@ -8,21 +8,23 @@
     </div>
     <div>
       <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
-        <div class="d-flex flex-column mb-6">
-          <input
-            v-autofocus
-            v-model="name"
-            class="h1 mb-2 input"
-            placeholder="Question"
-          />
-          <textarea-autosize
-            v-model="body"
-            class="input"
-            placeholder="What is your proposal?"
-          />
+        <div class="px-4 px-md-0">
+          <div class="d-flex flex-column mb-6">
+            <input
+              v-autofocus
+              v-model="name"
+              class="h1 mb-2 input"
+              placeholder="Question"
+            />
+            <textarea-autosize
+              v-model="body"
+              class="input"
+              placeholder="What is your proposal?"
+            />
+          </div>
         </div>
         <Block title="Choices">
-          <div class="overflow-hidden mb-2">
+          <div v-if="choices.length > 0" class="overflow-hidden mb-2">
             <div v-for="(choice, i) in choices" :key="i" class="d-flex mb-2">
               <UiButton class="d-flex width-full">
                 <span class="mr-4">{{ i + 1 }}</span>
@@ -30,7 +32,9 @@
                   v-model="choices[i]"
                   class="input height-full flex-auto"
                 />
-                <span @click="removeChoice(i)">x</span>
+                <span @click="removeChoice(i)">
+                  <Icon name="close" size="12" />
+                </span>
               </UiButton>
             </div>
           </div>

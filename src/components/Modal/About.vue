@@ -4,7 +4,7 @@
     <div class="m-4 mb-0 p-4 border rounded-2 text-white">
       <div class="d-flex">
         <span v-text="'Network'" class="flex-auto text-gray mr-1" />
-        {{ network }}
+        {{ network === 'homestead' ? 'mainnet' : network }}
       </div>
       <div class="d-flex">
         <span v-text="'IPFS server'" class="flex-auto text-gray mr-1" />

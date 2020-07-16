@@ -1,7 +1,7 @@
 <template>
-  <Container>
+  <Container :slim="true">
     <template v-if="loaded">
-      <div class="mb-3">
+      <div class="px-4 px-md-0 mb-3">
         <router-link :to="{ name: 'proposals' }">
           <Icon name="back" size="22" class="v-align-middle" />
           {{ token.name || _shorten(token.token) }}
@@ -9,15 +9,17 @@
       </div>
       <div>
         <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
-          <h1 class="mb-2">
-            {{ proposal.payload.name }}
-            <span v-text="`#${_shorten(id)}`" class="text-gray" />
-          </h1>
-          <State :proposal="proposal" class="mb-4" />
-          <p
-            v-html="proposal.payload.body.replace(/\n/g, '<br />')"
-            class="mb-6"
-          />
+          <div class="px-4 px-md-0">
+            <h1 class="mb-2">
+              {{ proposal.payload.name }}
+              <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
+            </h1>
+            <State :proposal="proposal" class="mb-4" />
+            <p
+              v-html="proposal.payload.body.replace(/\n/g, '<br />')"
+              class="mb-6"
+            />
+          </div>
           <Block
             v-if="
               web3.currentBlockNumber >= proposal.payload.startBlock &&
@@ -92,7 +94,7 @@
                 target="_blank"
                 class="float-right text-white"
               >
-                {{ _shorten(proposal.ipfsHash) }}
+                #{{ proposal.ipfsHash.slice(0, 7) }}
                 <Icon name="external-link" class="ml-1" />
               </a>
             </div>
@@ -155,7 +157,9 @@
         :selectedChoice="selectedChoice"
       />
     </template>
-    <VueLoadingIndicator v-else class="big" />
+    <div v-else class="text-center">
+      <VueLoadingIndicator class="big" />
+    </div>
   </Container>
 </template>
 
