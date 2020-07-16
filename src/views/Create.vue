@@ -110,6 +110,7 @@ export default {
         this.startBlock >= this.web3.currentBlockNumber &&
         this.endBlock &&
         this.endBlock >= this.web3.currentBlockNumber + minBlock &&
+        this.endBlock > this.startBlock &&
         this.choices.length >= 2 &&
         this.choices.reduce((a, b) => (!a ? false : b), true)
       );

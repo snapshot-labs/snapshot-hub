@@ -1,9 +1,11 @@
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
-import { ethers } from 'ethers';
 import config from '@/helpers/config';
 import abi from '@/helpers/abi';
-import { formatEther, Interface } from 'ethers/utils';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Contract } from '@ethersproject/contracts';
+import { Interface } from '@ethersproject/abi';
+import { formatEther } from '@ethersproject/units';
 
 const mutations = {
   POST_REQUEST() {
@@ -115,7 +117,7 @@ const actions = {
       commit('GET_PROPOSALS_FAILURE', e);
     }
   },
-  getProposal: async ({ commit, dispatch }, payload) => {
+  getProposal: async ({ commit, dispatch, rootState }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
       const result: any = {};
@@ -124,11 +126,16 @@ const actions = {
       result.votes = await client.request(
         `${payload.token}/proposal/${payload.id}`
       );
+      const { currentBlockNumber } = rootState.web3;
+      const { endBlock } = result.proposal.payload;
+      const blockTag =
+        endBlock > currentBlockNumber ? currentBlockNumber : parseInt(endBlock);
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map(
           (vote: any) => vote.authors[0]
-        )
+        ),
+        blockTag
       });
       result.votes = Object.fromEntries(
         Object.entries(result.votes)
@@ -162,27 +169,26 @@ const actions = {
       commit('GET_PROPOSAL_FAILURE', e);
     }
   },
-  getVotersBalances: async ({ commit }, { token, addresses }) => {
+  getVotersBalances: async ({ commit }, { token, addresses, blockTag }) => {
     commit('GET_VOTERS_BALANCES_REQUEST');
-    const multi = new ethers.Contract(
+    const multi = new Contract(
       config.addresses.multicall,
       abi['Multicall'],
-      ethers.getDefaultProvider()
+      new JsonRpcProvider(
+        'https://mainnet.infura.io/v3/c00cb7215b614b0282964cf1a9b117c0'
+      )
     );
     const calls = [];
     const testToken = new Interface(abi.TestToken);
     addresses.forEach(address => {
       // @ts-ignore
-      calls.push([token, testToken.functions.balanceOf.encode([address])]);
+      calls.push([token, testToken.encodeFunctionData('balanceOf', [address])]);
     });
     const balances: any = {};
     try {
-      const [, response] = await multi.aggregate(calls);
+      const [, response] = await multi.aggregate(calls, { blockTag });
       response.forEach((value, i) => {
-        const tokenBalance = testToken.functions.balanceOf.decode(value);
-        balances[addresses[i]] = parseFloat(
-          formatEther(tokenBalance.toString())
-        );
+        balances[addresses[i]] = parseFloat(formatEther(value.toString()));
       });
       commit('GET_VOTERS_BALANCES_SUCCESS');
       return balances;

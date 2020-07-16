@@ -1,6 +1,11 @@
 import Vue from 'vue';
-import { ethers } from 'ethers';
-import { getAddress } from 'ethers/utils';
+import {
+  getDefaultProvider,
+  JsonRpcProvider,
+  Web3Provider
+} from '@ethersproject/providers';
+import { Contract } from '@ethersproject/contracts';
+import { getAddress } from '@ethersproject/address';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import connectors from '@/helpers/connectors';
@@ -141,7 +146,7 @@ const actions = {
     const options = config.connectors[connector].options || {};
     provider = await connectors[connector].connect(options);
     if (provider) {
-      web3 = new ethers.providers.Web3Provider(provider);
+      web3 = new Web3Provider(provider);
       await dispatch('loadWeb3');
       if (state.account) lsSet('connector', connector);
     }
@@ -217,9 +222,7 @@ const actions = {
   },
   loadBackupProvider: async ({ commit }) => {
     try {
-      const web3 = new ethers.providers.JsonRpcProvider(
-        backupUrls[config.chainId]
-      );
+      const web3 = new JsonRpcProvider(backupUrls[config.chainId]);
       const network = await web3.getNetwork();
       commit('LOAD_BACKUP_PROVIDER_SUCCESS', {
         injectedActive: false,
@@ -261,7 +264,7 @@ const actions = {
     commit('SEND_TRANSACTION_REQUEST');
     try {
       const signer = web3.getSigner();
-      const contract = new ethers.Contract(
+      const contract = new Contract(
         getAddress(contractAddress),
         abi[contractType],
         web3
@@ -294,9 +297,9 @@ const actions = {
   getBlockNumber: async ({ commit }) => {
     commit('GET_BLOCK_NUMBER_REQUEST');
     try {
-      const defaultProvider = ethers.getDefaultProvider();
-      const blockNumber = await defaultProvider.getBlockNumber();
-      commit('GET_BLOCK_NUMBER_SUCCESS', blockNumber);
+      const defaultProvider = getDefaultProvider();
+      const blockNumber: any = await defaultProvider.getBlockNumber();
+      commit('GET_BLOCK_NUMBER_SUCCESS', parseInt(blockNumber));
       return blockNumber;
     } catch (e) {
       commit('GET_BLOCK_NUMBER_FAILURE', e);
