@@ -24,15 +24,19 @@
     <Container :slim="true">
       <Block :slim="true">
         <div class="px-4 py-3 bg-gray-dark">
-          <span class="mr-3">All</span>
-          <span class="mr-3">Active</span>
-          <span class="mr-3">Pending</span>
-          <span class="mr-3">Closed</span>
+          <a
+            v-for="state in ['All', 'Active', 'Pending', 'Closed']"
+            :key="state"
+            v-text="state"
+            @click="selectedState = state"
+            :class="selectedState === state && 'text-white'"
+            class="mr-3"
+          />
         </div>
         <RowLoading v-if="loading" />
         <div v-if="loaded">
           <RowProposal
-            v-for="(proposal, i) in proposals"
+            v-for="(proposal, i) in proposalsWithFilter"
             :key="i"
             :proposal="proposal"
             :token="key"
@@ -41,8 +45,8 @@
           />
         </div>
         <div
-          v-if="loaded && Object.keys(proposals).length === 0"
-          class="px-4 py-3 border-top d-block"
+          v-if="loaded && Object.keys(proposalsWithFilter).length === 0"
+          class="p-4 border-top d-block"
         >
           There isn't any proposal here yet!
         </div>
@@ -60,7 +64,8 @@ export default {
     return {
       loading: false,
       loaded: false,
-      proposals: {}
+      proposals: {},
+      selectedState: 'All'
     };
   },
   computed: {
@@ -73,7 +78,36 @@ export default {
         : { token: this.key, verified: [] };
     },
     totalProposals() {
-      return Object.entries(this.proposals).length;
+      return Object.keys(this.proposals).length;
+    },
+    proposalsWithFilter() {
+      if (this.totalProposals === 0) return {};
+      return Object.fromEntries(
+        Object.entries(this.proposals)
+          .filter(proposal => {
+            if (this.selectedState === 'All') return true;
+            if (
+              this.selectedState === 'Active' &&
+              proposal[1].payload.startBlock <= this.web3.currentBlockNumber &&
+              proposal[1].payload.endBlock > this.web3.currentBlockNumber
+            ) {
+              return true;
+            }
+            if (
+              this.selectedState === 'Closed' &&
+              proposal[1].payload.endBlock <= this.web3.currentBlockNumber
+            ) {
+              return true;
+            }
+            if (
+              this.selectedState === 'Pending' &&
+              proposal[1].payload.startBlock > this.web3.currentBlockNumber
+            ) {
+              return true;
+            }
+          })
+          .sort((a, b) => a[1].payload.startBlock - b[1].payload.startBlock, 0)
+      );
     }
   },
   methods: {
