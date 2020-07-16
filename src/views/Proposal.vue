@@ -82,7 +82,7 @@
             <div class="mb-1">
               <b>Author</b>
               <User
-                :address="proposal.authors[0]"
+                :address="proposal.authors[0].address"
                 :verified="token.verified"
                 class="float-right"
               />

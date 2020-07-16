@@ -9,7 +9,7 @@
     </div>
     <div>
       <span v-text="`#${i.slice(0, 7)}`" class="text-gray" />
-      By {{ _shorten(proposal.authors[0]) }}
+      By {{ _shorten(proposal.authors[0].address) }}
       <Icon v-if="isVerified" name="check" title="Verified" />
       start block
       {{ $n(proposal.payload.startBlock) }}
@@ -32,7 +32,7 @@ export default {
       return (
         Array.isArray(this.verified) &&
         this.verified.length > 0 &&
-        this.verified.includes(this.proposal.authors[0])
+        this.verified.includes(this.proposal.authors[0].address)
       );
     }
   }

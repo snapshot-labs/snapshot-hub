@@ -6,6 +6,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { Interface } from '@ethersproject/abi';
 import { formatEther } from '@ethersproject/units';
+import pkg from '@/../package.json';
 
 const mutations = {
   POST_REQUEST() {
@@ -59,11 +60,16 @@ const actions = {
   post: async ({ commit, dispatch, rootState }, payload) => {
     commit('POST_REQUEST');
     try {
-      const message = {
+      const message: any = {
+        version: pkg.version,
         token: payload.token,
         type: 'proposal',
-        authors: [rootState.web3.account],
-        timestamp: new Date().getTime(),
+        authors: [
+          {
+            address: rootState.web3.account,
+            timestamp: (new Date().getTime() / 1e3).toFixed(0)
+          }
+        ],
         payload: {
           name: payload.name,
           body: payload.body,
@@ -72,9 +78,10 @@ const actions = {
           endBlock: payload.endBlock
         }
       };
-      const sig = await dispatch('signMessage', JSON.stringify(message));
-      // @ts-ignore
-      message.sig = [sig];
+      message.authors[0].sig = await dispatch(
+        'signMessage',
+        JSON.stringify(message)
+      );
       const result = await client.request('proposal', { message });
       commit('POST_SUCCESS');
       dispatch('notify', ['green', 'Your proposal is in!']);
@@ -86,19 +93,25 @@ const actions = {
   vote: async ({ commit, dispatch, rootState }, payload) => {
     commit('VOTE_REQUEST');
     try {
-      const message = {
+      const message: any = {
+        version: pkg.version,
         token: payload.token,
         type: 'vote',
-        authors: [rootState.web3.account],
-        timestamp: new Date().getTime(),
+        authors: [
+          {
+            address: rootState.web3.account,
+            timestamp: (new Date().getTime() / 1e3).toFixed(0)
+          }
+        ],
         payload: {
           proposal: payload.proposal,
           choice: payload.choice
         }
       };
-      const sig = await dispatch('signMessage', JSON.stringify(message));
-      // @ts-ignore
-      message.sig = [sig];
+      message.authors[0].sig = await dispatch(
+        'signMessage',
+        JSON.stringify(message)
+      );
       const result = await client.request('vote', { message });
       commit('VOTE_SUCCESS');
       dispatch('notify', ['green', 'Your vote is in!']);
@@ -133,14 +146,14 @@ const actions = {
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map(
-          (vote: any) => vote.authors[0]
+          (vote: any) => vote.authors[0].address
         ),
         blockTag
       });
       result.votes = Object.fromEntries(
         Object.entries(result.votes)
           .map((vote: any) => {
-            vote[1].balance = votes[vote[1].authors[0]];
+            vote[1].balance = votes[vote[1].authors[0].address];
             return vote;
           })
           .sort((a, b) => b[1].balance - a[1].balance)

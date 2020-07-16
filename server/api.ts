@@ -53,7 +53,7 @@ router.post('/vote', async (req, res) => {
   message.ipfsHash = IpfsHash;
   const result = await redis.hmsetAsync(
     `token:${token}:proposal:${proposalId}:votes`,
-    message.authors[0],
+    message.authors[0].address,
     JSON.stringify(message)
   );
   return res.json({ result });

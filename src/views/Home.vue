@@ -14,7 +14,7 @@
           <div>
             <h2>{{ token.name }} {{ token.symbol }}</h2>
             <div v-if="token.verified.length > 0">
-              <Icon name="user" size="22" class="v-align-middle" />
+              <Icon name="check" size="22" class="v-align-middle mr-1" />
               {{ $n(token.verified.length) }}
             </div>
           </div>
