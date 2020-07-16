@@ -144,9 +144,11 @@ const actions = {
         `${payload.token}/proposal/${payload.id}`
       );
       const { currentBlockNumber } = rootState.web3;
-      const { endBlock } = result.proposal.payload;
+      const { startBlock } = result.proposal.payload;
       const blockTag =
-        endBlock > currentBlockNumber ? currentBlockNumber : parseInt(endBlock);
+        startBlock > currentBlockNumber
+          ? currentBlockNumber
+          : parseInt(startBlock);
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map(

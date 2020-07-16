@@ -122,7 +122,7 @@
               <div class="text-white mb-1">
                 <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalBalances[i]" class="mr-1">
-                  {{ $n(results.totalBalances[i]) }}
+                  {{ $n(results.totalBalances[i].toFixed(0)) }}
                   {{ token.symbol || _shorten(token.token) }}
                 </span>
                 <span v-if="results.totalVotes[i]" class="text-gray mr-1">
