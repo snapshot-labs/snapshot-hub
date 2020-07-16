@@ -88,6 +88,8 @@ const actions = {
       return result;
     } catch (e) {
       commit('POST_FAILURE', e);
+      dispatch('notify', ['red', 'Oops, something went wrong!']);
+      return;
     }
   },
   vote: async ({ commit, dispatch, rootState }, payload) => {
@@ -118,6 +120,8 @@ const actions = {
       return result;
     } catch (e) {
       commit('VOTE_FAILURE', e);
+      dispatch('notify', ['red', 'Oops, something went wrong!']);
+      return;
     }
   },
   getProposals: async ({ commit }, payload) => {

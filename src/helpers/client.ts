@@ -12,7 +12,12 @@ class Client {
         body: JSON.stringify(body)
       };
     }
-    return fetch(url, init).then(res => res.json());
+    return new Promise((resolve, reject) => {
+      fetch(url, init).then(res => {
+        if (res.ok) return resolve(res.json());
+        return reject();
+      });
+    });
   }
 }
 

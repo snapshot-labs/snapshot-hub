@@ -1,7 +1,7 @@
 import express from 'express';
 import redis from './redis';
 import pinata from './pinata';
-import { counterSign } from './utils';
+import { verify, counterSign } from './utils';
 
 const router = express.Router();
 
@@ -31,6 +31,11 @@ router.post('/proposal', async (req, res) => {
   let { message } = req.body;
   const { token } = message;
   // @TODO message validation
+  const sigIsValid = await verify(message, message.authors[0].sig, message.authors[0].address);
+  if (!sigIsValid) {
+    console.log('unauthorized');
+    return res.status(500).json({ error: 'unauthorized' });
+  }
   message = await counterSign(message);
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;
@@ -48,6 +53,11 @@ router.post('/vote', async (req, res) => {
   const { token } = message;
   const proposalId = message.payload.proposal;
   // @TODO message validation
+  const sigIsValid = await verify(message, message.authors[0].sig, message.authors[0].address);
+  if (!sigIsValid) {
+    console.log('unauthorized');
+    return res.status(500).json({ error: 'unauthorized' });
+  }
   message = await counterSign(message);
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;

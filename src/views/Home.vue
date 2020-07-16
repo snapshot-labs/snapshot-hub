@@ -18,8 +18,8 @@
                 v-for="verified in token.verified.slice(0, 5)"
                 :key="verified"
                 :address="verified"
-                :size="18"
-                class="ml-n1 circle border"
+                size="16"
+                class="ml-2"
               />
               <Icon name="check" size="22" class="v-align-middle ml-2 mr-1" />
               {{ $n(token.verified.length) }}
