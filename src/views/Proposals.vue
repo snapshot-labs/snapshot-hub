@@ -85,6 +85,8 @@ export default {
       return Object.fromEntries(
         Object.entries(this.proposals)
           .filter(proposal => {
+            if (!this.token.verified.includes(proposal[1].authors[0].address))
+              return false;
             if (this.selectedState === 'All')
               return (
                 proposal[1].payload.endBlock > this.web3.currentBlockNumber

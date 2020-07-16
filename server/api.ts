@@ -40,12 +40,12 @@ router.post('/proposal', async (req, res) => {
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;
   delete message.payload.body;
-  const result = await redis.hmsetAsync(
+  await redis.hmsetAsync(
     `token:${token}:proposals`,
     IpfsHash,
     JSON.stringify(message)
   );
-  return res.json({ result });
+  return res.json({ ipfsHash: IpfsHash });
 });
 
 router.post('/vote', async (req, res) => {
@@ -61,12 +61,12 @@ router.post('/vote', async (req, res) => {
   message = await counterSign(message);
   const { IpfsHash } = await pinata.pinJSONToIPFS(message);
   message.ipfsHash = IpfsHash;
-  const result = await redis.hmsetAsync(
+  await redis.hmsetAsync(
     `token:${token}:proposal:${proposalId}:votes`,
     message.authors[0].address,
     JSON.stringify(message)
   );
-  return res.json({ result });
+  return res.json({ ipfsHash: IpfsHash });
 });
 
 export default router;

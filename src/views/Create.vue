@@ -128,15 +128,26 @@ export default {
     },
     async handleSubmit() {
       this.loading = true;
-      await this.post({
-        token: this.token.token,
-        name: this.name,
-        body: this.body,
-        choices: this.choices,
-        startBlock: this.startBlock,
-        endBlock: this.endBlock
-      });
-      this.$router.push({ name: 'proposals' });
+      try {
+        const { ipfsHash } = await this.post({
+          token: this.token.token,
+          name: this.name,
+          body: this.body,
+          choices: this.choices,
+          startBlock: this.startBlock,
+          endBlock: this.endBlock
+        });
+        this.$router.push({
+          name: 'proposal',
+          params: {
+            key: this.key,
+            id: ipfsHash
+          }
+        });
+      } catch (e) {
+        console.error(e);
+        this.loading = false;
+      }
     }
   }
 };
