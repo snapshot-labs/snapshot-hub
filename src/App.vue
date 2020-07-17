@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="overflow-hidden">
-    <VueLoadingIndicator v-if="ui.loading || !ui.init" class="overlay big" />
+    <UiLoading v-if="ui.loading || !ui.init" class="overlay big" />
     <div v-else>
       <Topnav />
       <div class="pb-6 overflow-hidden">

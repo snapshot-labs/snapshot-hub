@@ -1,4 +1,3 @@
-@import '~@vue/ui/dist/vue-ui.css';
 @import './fonts';
 @import './vars';
 @import "~@primer/css/index.scss";
@@ -83,21 +82,6 @@ textarea {
 
 .line-height-0 {
   line-height: 0;
-}
-
-.vue-ui-loading-indicator {
-  display: inline-block;
-  vertical-align: middle;
-
-  &.overlay {
-    display: flex;
-    background-color: transparent !important;
-  }
-
-  .animation {
-    border-color: transparentize($white, 0.8);
-    border-right-color: $white;
-  }
 }
 
 .bg-black {

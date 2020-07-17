@@ -5,7 +5,7 @@
     class="button"
     :disabled="loading"
   >
-    <VueLoadingIndicator v-if="loading" />
+    <UiLoading v-if="loading" />
     <slot v-else />
   </button>
 </template>

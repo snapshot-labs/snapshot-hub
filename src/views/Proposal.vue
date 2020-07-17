@@ -164,7 +164,7 @@
       />
     </template>
     <div v-else class="text-center">
-      <VueLoadingIndicator class="big" />
+      <UiLoading class="big" />
     </div>
   </Container>
 </template>
