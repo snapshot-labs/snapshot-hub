@@ -11,10 +11,16 @@
       <span v-text="`#${i.slice(0, 7)}`" class="text-gray" />
       By {{ _shorten(proposal.address) }}
       <Icon v-if="isVerified" name="check" title="Verified" />
-      start block
-      {{ $n(proposal.msg.payload.startBlock) }}
-      end block
-      {{ $n(proposal.msg.payload.endBlock) }}
+      start
+      <span
+        :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
+        v-text="$d(_blockNumberToTs(proposal.msg.payload.startBlock))"
+      />
+      end
+      <span
+        :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
+        v-text="$d(_blockNumberToTs(proposal.msg.payload.endBlock))"
+      />
     </div>
   </router-link>
 </template>

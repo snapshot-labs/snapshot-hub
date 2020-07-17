@@ -105,16 +105,20 @@
               </a>
             </div>
             <div class="mb-1">
-              <b>Starting block</b>
-              <span class="float-right text-white">
-                {{ $n(proposal.msg.payload.startBlock) }}
-              </span>
+              <b>Start date</b>
+              <span
+                :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
+                v-text="$d(_blockNumberToTs(proposal.msg.payload.startBlock), 'long')"
+                class="float-right text-white"
+              />
             </div>
             <div class="mb-1">
-              <b>Ending block</b>
-              <span class="float-right text-white">
-                {{ $n(proposal.msg.payload.endBlock) }}
-              </span>
+              <b>End date</b>
+              <span
+                :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
+                v-text="$d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')"
+                class="float-right text-white"
+              />
             </div>
           </Block>
           <Block

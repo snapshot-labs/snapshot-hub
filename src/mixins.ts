@@ -10,6 +10,13 @@ export default {
     ...mapState(modules)
   },
   methods: {
+    _blockNumberToTs(blockNumber) {
+      // @ts-ignore
+      const currentBlockNumber = this.web3.blockNumber;
+      const blockTimestampDiff = (currentBlockNumber - blockNumber) * 15;
+      // @ts-ignore
+      return new Date((this.web3.blockTimestamp - blockTimestampDiff) * 1e3);
+    },
     _shorten(str: string): string {
       return shorten(str);
     },
