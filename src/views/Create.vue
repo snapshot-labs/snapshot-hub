@@ -13,11 +13,13 @@
             <input
               v-autofocus
               v-model="name"
+              maxlength="128"
               class="h1 mb-2 input"
               placeholder="Question"
             />
             <textarea-autosize
               v-model="body"
+              maxlength="10240"
               class="input"
               placeholder="What is your proposal?"
             />

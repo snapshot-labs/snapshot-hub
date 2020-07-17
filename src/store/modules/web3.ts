@@ -294,7 +294,7 @@ const actions = {
     }
   },
   loadAccount: async ({ dispatch }) => {
-    await Promise.all([dispatch('lookupAddress'), dispatch('getMyPoolShares')]);
+    await dispatch('lookupAddress');
   },
   getBlockNumber: async ({ commit }) => {
     commit('GET_BLOCK_REQUEST');

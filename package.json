@@ -1,5 +1,5 @@
 {
-  "name": "gang",
+  "name": "balancer-gov",
   "version": "0.1.0",
   "scripts": {
     "serve": "vue-cli-service serve",

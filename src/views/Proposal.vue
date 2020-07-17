@@ -65,16 +65,16 @@
               <div class="flex-auto text-center">
                 <span
                   v-text="
-                  proposal.msg.payload.choices[vote.msg.payload.choice - 1]
-                "
+                    proposal.msg.payload.choices[vote.msg.payload.choice - 1]
+                  "
                   class="text-white ml-2 column"
                 />
                 <a
-                  :href="_ipfsUrl(vote.authorIpfsHash)"
+                  @click="openReceiptModal(vote)"
                   target="_blank"
                   class="ml-3 column"
                 >
-                  <Icon name="signature"/>
+                  <Icon name="signature" />
                 </a>
               </div>
               <div
@@ -179,6 +179,12 @@
         :id="id"
         :selectedChoice="selectedChoice"
       />
+      <ModalReceipt
+        :open="modalReceiptOpen"
+        @close="modalReceiptOpen = false"
+        :authorIpfsHash="authorIpfsHash"
+        :relayerIpfsHash="relayerIpfsHash"
+      />
     </template>
     <div v-else class="text-center">
       <UiLoading class="big" />
@@ -202,6 +208,9 @@ export default {
       votes: {},
       results: [],
       modalOpen: false,
+      modalReceiptOpen: false,
+      authorIpfsHash: '',
+      relayerIpfsHash: '',
       selectedChoice: 0
     };
   },
@@ -222,6 +231,11 @@ export default {
       this.proposal = proposalObj.proposal;
       this.votes = proposalObj.votes;
       this.results = proposalObj.results;
+    },
+    openReceiptModal(vote) {
+      this.authorIpfsHash = vote.authorIpfsHash;
+      this.relayerIpfsHash = vote.relayerIpfsHash;
+      this.modalReceiptOpen = true;
     }
   },
   async created() {

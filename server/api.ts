@@ -32,10 +32,36 @@ router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
 
-  // @TODO msg validation
-
-  const sigIsValid = await verify(body.address, body.msg, body.sig);
-  if (!sigIsValid) {
+  if (
+    !body ||
+    !body.address ||
+    !body.msg ||
+    !body.sig ||
+    Object.keys(msg).length !== 4 ||
+    !msg.version ||
+    !msg.token ||
+    !msg.type ||
+    !['proposal', 'vote'].includes(msg.type) ||
+    Object.keys(msg.payload).length === 0 ||
+    msg.type === 'proposal' && (
+      Object.keys(msg.payload).length !== 5 ||
+      !msg.payload.name ||
+      msg.payload.name.length > 128 ||
+      !msg.payload.body ||
+      msg.payload.body.length > 10240 ||
+      !msg.payload.choices ||
+      msg.payload.choices.length < 2 ||
+      !msg.payload.startBlock ||
+      !msg.payload.endBlock ||
+      msg.payload.startBlock >= msg.payload.endBlock
+    ) ||
+    msg.type === 'vote' && (
+      Object.keys(msg.payload).length !== 2 ||
+      !msg.payload.proposal ||
+      !msg.payload.choice
+    ) ||
+    !await verify(body.address, body.msg, body.sig)
+  ) {
     console.log('unauthorized');
     return res.status(500).json({ error: 'unauthorized' });
   }
