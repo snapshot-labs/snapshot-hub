@@ -10,7 +10,8 @@ export async function counterSign(message) {
   return message;
 }
 
-export async function verify(message, sig, address) {
+export async function verify(signedMessage, sig, address) {
+  const message = JSON.parse(JSON.stringify(signedMessage));
   delete message.authors[0].sig;
   const recovered = await verifyMessage(JSON.stringify(message), sig);
   return recovered === address;

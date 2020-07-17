@@ -22,8 +22,8 @@
           </div>
           <Block
             v-if="
-              web3.currentBlockNumber >= proposal.payload.startBlock &&
-                web3.currentBlockNumber < proposal.payload.endBlock
+              web3.blockNumber >= proposal.payload.startBlock &&
+                web3.blockNumber < proposal.payload.endBlock
             "
             class="mb-4"
             title="Cast your vote"
@@ -113,7 +113,7 @@
           </Block>
           <Block
             :title="
-              web3.currentBlockNumber >= proposal.payload.endBlock
+              web3.blockNumber >= proposal.payload.endBlock
                 ? 'Results'
                 : 'Current results'
             "

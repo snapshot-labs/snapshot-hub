@@ -26,7 +26,8 @@ const state = {
   name: null,
   active: false,
   balances: {},
-  currentBlockNumber: 0
+  blockNumber: 0,
+  blockTimestamp: 0
 };
 
 const mutations = {
@@ -129,15 +130,16 @@ const mutations = {
   SIGN_MESSAGE_FAILURE(_state, payload) {
     console.debug('SIGN_MESSAGE_FAILURE', payload);
   },
-  GET_BLOCK_NUMBER_REQUEST() {
-    console.debug('GET_BLOCK_NUMBER_REQUEST');
+  GET_BLOCK_REQUEST() {
+    console.debug('GET_BLOCK_REQUEST');
   },
-  GET_BLOCK_NUMBER_SUCCESS(_state, payload) {
-    Vue.set(_state, 'currentBlockNumber', payload);
-    console.debug('GET_BLOCK_NUMBER_SUCCESS', payload);
+  GET_BLOCK_SUCCESS(_state, payload) {
+    Vue.set(_state, 'blockNumber', payload.blockNumber);
+    Vue.set(_state, 'blockTimestamp', payload.blockTimestamp);
+    console.debug('GET_BLOCK_SUCCESS', payload);
   },
-  GET_BLOCK_NUMBER_FAILURE(_state, payload) {
-    console.debug('GET_BLOCK_NUMBER_FAILURE', payload);
+  GET_BLOCK_FAILURE(_state, payload) {
+    console.debug('GET_BLOCK_FAILURE', payload);
   }
 };
 
@@ -295,14 +297,18 @@ const actions = {
     await Promise.all([dispatch('lookupAddress'), dispatch('getMyPoolShares')]);
   },
   getBlockNumber: async ({ commit }) => {
-    commit('GET_BLOCK_NUMBER_REQUEST');
+    commit('GET_BLOCK_REQUEST');
     try {
       const defaultProvider = getDefaultProvider();
       const blockNumber: any = await defaultProvider.getBlockNumber();
-      commit('GET_BLOCK_NUMBER_SUCCESS', parseInt(blockNumber));
+      const block: any = await defaultProvider.getBlock(blockNumber);
+      commit('GET_BLOCK_SUCCESS', {
+        blockNumber: parseInt(blockNumber),
+        blockTimestamp: block.timestamp
+      });
       return blockNumber;
     } catch (e) {
-      commit('GET_BLOCK_NUMBER_FAILURE', e);
+      commit('GET_BLOCK_FAILURE', e);
       return Promise.reject();
     }
   }

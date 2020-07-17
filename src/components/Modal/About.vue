@@ -8,7 +8,7 @@
       </div>
       <div class="d-flex">
         <span v-text="'Block number'" class="flex-auto text-gray mr-1" />
-        {{ web3.currentBlockNumber }}
+        {{ web3.blockNumber }}
       </div>
       <div class="d-flex">
         <span v-text="'IPFS server'" class="flex-auto text-gray mr-1" />
