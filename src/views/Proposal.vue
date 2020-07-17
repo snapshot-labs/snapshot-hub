@@ -108,7 +108,9 @@
               <b>Start date</b>
               <span
                 :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
-                v-text="$d(_blockNumberToTs(proposal.msg.payload.startBlock), 'long')"
+                v-text="
+                  $d(_blockNumberToTs(proposal.msg.payload.startBlock), 'long')
+                "
                 class="float-right text-white"
               />
             </div>
@@ -116,7 +118,9 @@
               <b>End date</b>
               <span
                 :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
-                v-text="$d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')"
+                v-text="
+                  $d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')
+                "
                 class="float-right text-white"
               />
             </div>

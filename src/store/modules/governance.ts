@@ -9,6 +9,12 @@ import { formatEther } from '@ethersproject/units';
 import pkg from '@/../package.json';
 import { jsonParse } from '@/helpers/utils';
 
+const infuraId = process.env.VUE_APP_INFURA_ID;
+const backupUrls = {
+  1: `https://mainnet.infura.io/v3/${infuraId}`,
+  42: `https://kovan.infura.io/v3/${infuraId}`
+};
+
 const mutations = {
   POST_REQUEST() {
     console.debug('POST_REQUEST');
@@ -184,9 +190,7 @@ const actions = {
     const multi = new Contract(
       config.addresses.multicall,
       abi['Multicall'],
-      new JsonRpcProvider(
-        'https://mainnet.infura.io/v3/c00cb7215b614b0282964cf1a9b117c0'
-      )
+      new JsonRpcProvider(backupUrls[config.chainId])
     );
     const calls = [];
     const testToken = new Interface(abi.TestToken);
