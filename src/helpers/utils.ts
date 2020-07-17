@@ -6,7 +6,7 @@ export function shorten(str = '') {
   return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
 }
 
-export function jsonParse(input, fallback) {
+export function jsonParse(input, fallback?) {
   try {
     return JSON.parse(input);
   } catch (err) {

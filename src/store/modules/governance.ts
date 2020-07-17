@@ -7,6 +7,7 @@ import { Contract } from '@ethersproject/contracts';
 import { Interface } from '@ethersproject/abi';
 import { formatEther } from '@ethersproject/units';
 import pkg from '@/../package.json';
+import { jsonParse } from '@/helpers/utils';
 
 const mutations = {
   POST_REQUEST() {
@@ -60,29 +61,23 @@ const actions = {
   post: async ({ commit, dispatch, rootState }, payload) => {
     commit('POST_REQUEST');
     try {
-      const message: any = {
-        version: pkg.version,
-        token: payload.token,
-        type: 'proposal',
-        authors: [
-          {
-            address: rootState.web3.account,
-            timestamp: (new Date().getTime() / 1e3).toFixed(0)
+      const msg: any = {
+        address: rootState.web3.account,
+        msg: JSON.stringify({
+          version: pkg.version,
+          token: payload.token,
+          type: 'proposal',
+          payload: {
+            name: payload.name,
+            body: payload.body,
+            choices: payload.choices,
+            startBlock: payload.startBlock,
+            endBlock: payload.endBlock
           }
-        ],
-        payload: {
-          name: payload.name,
-          body: payload.body,
-          choices: payload.choices,
-          startBlock: payload.startBlock,
-          endBlock: payload.endBlock
-        }
+        })
       };
-      message.authors[0].sig = await dispatch(
-        'signMessage',
-        JSON.stringify(message)
-      );
-      const result = await client.request('proposal', { message });
+      msg.sig = await dispatch('signMessage', msg.msg);
+      const result = await client.request('message', msg);
       commit('POST_SUCCESS');
       dispatch('notify', ['green', 'Your proposal is in!']);
       return result;
@@ -95,26 +90,20 @@ const actions = {
   vote: async ({ commit, dispatch, rootState }, payload) => {
     commit('VOTE_REQUEST');
     try {
-      const message: any = {
-        version: pkg.version,
-        token: payload.token,
-        type: 'vote',
-        authors: [
-          {
-            address: rootState.web3.account,
-            timestamp: (new Date().getTime() / 1e3).toFixed(0)
+      const msg: any = {
+        address: rootState.web3.account,
+        msg: JSON.stringify({
+          version: pkg.version,
+          token: payload.token,
+          type: 'vote',
+          payload: {
+            proposal: payload.proposal,
+            choice: payload.choice
           }
-        ],
-        payload: {
-          proposal: payload.proposal,
-          choice: payload.choice
-        }
+        })
       };
-      message.authors[0].sig = await dispatch(
-        'signMessage',
-        JSON.stringify(message)
-      );
-      const result = await client.request('vote', { message });
+      msg.sig = await dispatch('signMessage', msg.msg);
+      const result = await client.request('message', msg);
       commit('VOTE_SUCCESS');
       dispatch('notify', ['green', 'Your vote is in!']);
       return result;
@@ -127,9 +116,14 @@ const actions = {
   getProposals: async ({ commit }, payload) => {
     commit('GET_PROPOSALS_REQUEST');
     try {
-      const result = await client.request(`${payload}/proposals`);
+      const result: any = await client.request(`${payload}/proposals`);
       commit('GET_PROPOSALS_SUCCESS');
-      return result;
+      return Object.fromEntries(
+        Object.entries(result).map((item: any) => {
+          item.msg = jsonParse(item.msg, {});
+          return item;
+        })
+      );
     } catch (e) {
       commit('GET_PROPOSALS_FAILURE', e);
     }
@@ -139,40 +133,39 @@ const actions = {
     try {
       const result: any = {};
       result.proposal = await ipfs.get(payload.id);
+      result.proposal.msg = jsonParse(result.proposal.msg);
       result.proposal.ipfsHash = payload.id;
       result.votes = await client.request(
         `${payload.token}/proposal/${payload.id}`
       );
       const { blockNumber } = rootState.web3;
-      const { startBlock } = result.proposal.payload;
+      const { startBlock } = result.proposal.msg.payload;
       const blockTag =
         startBlock > blockNumber ? blockNumber : parseInt(startBlock);
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
-        addresses: Object.values(result.votes).map(
-          (vote: any) => vote.authors[0].address
-        ),
+        addresses: Object.values(result.votes).map((vote: any) => vote.address),
         blockTag
       });
       result.votes = Object.fromEntries(
         Object.entries(result.votes)
           .map((vote: any) => {
-            vote[1].balance = votes[vote[1].authors[0].address];
+            vote[1].balance = votes[vote[1].address];
             return vote;
           })
           .sort((a, b) => b[1].balance - a[1].balance)
           .filter(vote => vote[1].balance > 0)
       );
       result.results = {
-        totalVotes: result.proposal.payload.choices.map(
+        totalVotes: result.proposal.msg.payload.choices.map(
           (choice, i) =>
             Object.values(result.votes).filter(
-              (vote: any) => vote.payload.choice === i + 1
+              (vote: any) => vote.msg.payload.choice === i + 1
             ).length
         ),
-        totalBalances: result.proposal.payload.choices.map((choice, i) =>
+        totalBalances: result.proposal.msg.payload.choices.map((choice, i) =>
           Object.values(result.votes)
-            .filter((vote: any) => vote.payload.choice === i + 1)
+            .filter((vote: any) => vote.msg.payload.choice === i + 1)
             .reduce((a, b: any) => a + b.balance, 0)
         ),
         totalVotesBalances: Object.values(result.votes).reduce(

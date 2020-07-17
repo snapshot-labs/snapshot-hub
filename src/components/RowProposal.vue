@@ -5,16 +5,16 @@
   >
     <div>
       <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />
-      <h3 v-text="proposal.payload.name" class="d-inline-block mb-1" />
+      <h3 v-text="proposal.msg.payload.name" class="d-inline-block mb-1" />
     </div>
     <div>
       <span v-text="`#${i.slice(0, 7)}`" class="text-gray" />
-      By {{ _shorten(proposal.authors[0].address) }}
+      By {{ _shorten(proposal.address) }}
       <Icon v-if="isVerified" name="check" title="Verified" />
       start block
-      {{ $n(proposal.payload.startBlock) }}
+      {{ $n(proposal.msg.payload.startBlock) }}
       end block
-      {{ $n(proposal.payload.endBlock) }}
+      {{ $n(proposal.msg.payload.endBlock) }}
     </div>
   </router-link>
 </template>
@@ -32,7 +32,7 @@ export default {
       return (
         Array.isArray(this.verified) &&
         this.verified.length > 0 &&
-        this.verified.includes(this.proposal.authors[0].address)
+        this.verified.includes(this.proposal.address)
       );
     }
   }

@@ -7,7 +7,7 @@
         <h4>This action <b>cannot</b> be undone.</h4>
         <h4 class="p-3 my-3 border rounded-2 text-white">
           Option {{ selectedChoice }}:
-          {{ proposal.payload.choices[selectedChoice - 1] }}
+          {{ proposal.msg.payload.choices[selectedChoice - 1] }}
         </h4>
       </div>
       <div class="p-4 overflow-hidden text-center border-top">

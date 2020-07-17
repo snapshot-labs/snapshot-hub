@@ -85,31 +85,34 @@ export default {
       return Object.fromEntries(
         Object.entries(this.proposals)
           .filter(proposal => {
-            if (!this.token.verified.includes(proposal[1].authors[0].address))
+            if (!this.token.verified.includes(proposal[1].address))
               return false;
             if (this.selectedState === 'All')
-              return proposal[1].payload.endBlock > this.web3.blockNumber;
+              return proposal[1].msg.payload.endBlock > this.web3.blockNumber;
             if (
               this.selectedState === 'Active' &&
-              proposal[1].payload.startBlock <= this.web3.blockNumber &&
-              proposal[1].payload.endBlock > this.web3.blockNumber
+              proposal[1].msg.payload.startBlock <= this.web3.blockNumber &&
+              proposal[1].msg.payload.endBlock > this.web3.blockNumber
             ) {
               return true;
             }
             if (
               this.selectedState === 'Closed' &&
-              proposal[1].payload.endBlock <= this.web3.blockNumber
+              proposal[1].msg.payload.endBlock <= this.web3.blockNumber
             ) {
               return true;
             }
             if (
               this.selectedState === 'Pending' &&
-              proposal[1].payload.startBlock > this.web3.blockNumber
+              proposal[1].msg.payload.startBlock > this.web3.blockNumber
             ) {
               return true;
             }
           })
-          .sort((a, b) => a[1].payload.startBlock - b[1].payload.startBlock, 0)
+          .sort(
+            (a, b) => a[1].msg.payload.startBlock - b[1].msg.payload.startBlock,
+            0
+          )
       );
     }
   },

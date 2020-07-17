@@ -11,26 +11,26 @@
         <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
           <div class="px-4 px-md-0">
             <h1 class="mb-2">
-              {{ proposal.payload.name }}
+              {{ proposal.msg.payload.name }}
               <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
             </h1>
             <State :proposal="proposal" class="mb-4" />
             <p
-              v-html="proposal.payload.body.replace(/\n/g, '<br />')"
+              v-html="proposal.msg.payload.body.replace(/\n/g, '<br />')"
               class="mb-6"
             />
           </div>
           <Block
             v-if="
-              web3.blockNumber >= proposal.payload.startBlock &&
-                web3.blockNumber < proposal.payload.endBlock
+              web3.blockNumber >= proposal.msg.payload.startBlock &&
+                web3.blockNumber < proposal.msg.payload.endBlock
             "
             class="mb-4"
             title="Cast your vote"
           >
             <div class="mb-3">
               <UiButton
-                v-for="(choice, i) in proposal.payload.choices"
+                v-for="(choice, i) in proposal.msg.payload.choices"
                 :key="i"
                 v-text="choice"
                 @click="selectedChoice = i + 1"
@@ -67,10 +67,16 @@
               />
               <User :address="address" :verified="token.verified" />
               <span
-                v-text="proposal.payload.choices[vote.payload.choice - 1]"
+                v-text="
+                  proposal.msg.payload.choices[vote.msg.payload.choice - 1]
+                "
                 class="text-white ml-2"
               />
-              <a :href="_ipfsUrl(vote.ipfsHash)" target="_blank" class="ml-2">
+              <a
+                :href="_ipfsUrl(vote.authorIpfsHash)"
+                target="_blank"
+                class="ml-2"
+              >
                 IPFS
                 <Icon name="external-link" />
               </a>
@@ -82,7 +88,7 @@
             <div class="mb-1">
               <b>Author</b>
               <User
-                :address="proposal.authors[0].address"
+                :address="proposal.address"
                 :verified="token.verified"
                 class="float-right"
               />
@@ -101,24 +107,24 @@
             <div class="mb-1">
               <b>Starting block</b>
               <span class="float-right text-white">
-                {{ $n(proposal.payload.startBlock) }}
+                {{ $n(proposal.msg.payload.startBlock) }}
               </span>
             </div>
             <div class="mb-1">
               <b>Ending block</b>
               <span class="float-right text-white">
-                {{ $n(proposal.payload.endBlock) }}
+                {{ $n(proposal.msg.payload.endBlock) }}
               </span>
             </div>
           </Block>
           <Block
             :title="
-              web3.blockNumber >= proposal.payload.endBlock
+              web3.blockNumber >= proposal.msg.payload.endBlock
                 ? 'Results'
                 : 'Current results'
             "
           >
-            <div v-for="(choice, i) in proposal.payload.choices" :key="i">
+            <div v-for="(choice, i) in proposal.msg.payload.choices" :key="i">
               <div class="text-white mb-1">
                 <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalBalances[i]" class="mr-1">

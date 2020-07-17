@@ -1,7 +1,8 @@
 import express from 'express';
 import redis from './redis';
 import pinata from './pinata';
-import { verify, counterSign } from './utils';
+import relayer from "./relayer";
+import { verify, jsonParse } from './utils';
 
 const router = express.Router();
 
@@ -27,46 +28,69 @@ router.get('/:token/proposal/:id', async (req, res) => {
   return res.json(votes);
 });
 
-router.post('/proposal', async (req, res) => {
-  let { message } = req.body;
-  const { token } = message;
-  // @TODO message validation
-  const sigIsValid = await verify(message, message.authors[0].sig, message.authors[0].address);
-  if (!sigIsValid) {
-    console.log('unauthorized');
-    return res.status(500).json({ error: 'unauthorized' });
-  }
-  message = await counterSign(message);
-  const { IpfsHash } = await pinata.pinJSONToIPFS(message);
-  message.ipfsHash = IpfsHash;
-  delete message.payload.body;
-  await redis.hmsetAsync(
-    `token:${token}:proposals`,
-    IpfsHash,
-    JSON.stringify(message)
-  );
-  return res.json({ ipfsHash: IpfsHash });
-});
+router.post('/message', async (req, res) => {
+  const body = req.body;
+  const msg = jsonParse(body.msg);
 
-router.post('/vote', async (req, res) => {
-  let { message } = req.body;
-  const { token } = message;
-  const proposalId = message.payload.proposal;
-  // @TODO message validation
-  const sigIsValid = await verify(message, message.authors[0].sig, message.authors[0].address);
+  // @TODO msg validation
+
+  const sigIsValid = await verify(body.address, body.msg, body.sig);
   if (!sigIsValid) {
     console.log('unauthorized');
     return res.status(500).json({ error: 'unauthorized' });
   }
-  message = await counterSign(message);
-  const { IpfsHash } = await pinata.pinJSONToIPFS(message);
-  message.ipfsHash = IpfsHash;
-  await redis.hmsetAsync(
-    `token:${token}:proposal:${proposalId}:votes`,
-    message.authors[0].address,
-    JSON.stringify(message)
+
+  const authorIpfsRes = await pinata.pinJSONToIPFS({
+    address: body.address,
+    msg: body.msg,
+    sig: body.sig,
+    version: '2'
+  });
+
+  const relayerIpfsRes = await pinata.pinJSONToIPFS({
+    address: relayer.address,
+    msg: authorIpfsRes.IpfsHash,
+    sig: await relayer.signMessage(authorIpfsRes.IpfsHash),
+    version: '2'
+  });
+
+  if (msg.type === 'proposal') {
+    await redis.hmsetAsync(
+      `token:${msg.token}:proposals`,
+      authorIpfsRes.IpfsHash,
+      JSON.stringify({
+        address: body.address,
+        msg,
+        sig: body.sig,
+        authorIpfsHash: authorIpfsRes.IpfsHash,
+        relayerIpfsHash: relayerIpfsRes.IpfsHash
+      })
+    );
+  }
+
+  if (msg.type === 'vote') {
+    const proposalId = msg.payload.proposal;
+    await redis.hmsetAsync(
+      `token:${msg.token}:proposal:${proposalId}:votes`,
+      body.address,
+      JSON.stringify({
+        address: body.address,
+        msg,
+        sig: body.sig,
+        authorIpfsHash: authorIpfsRes.IpfsHash,
+        relayerIpfsHash: relayerIpfsRes.IpfsHash
+      })
+    );
+  }
+
+  console.log(
+    `Address "${body.address}"\n`,
+    `Token "${msg.token}"\n`,
+    `Type "${msg.type}"\n`,
+    `IPFS hash "${authorIpfsRes.IpfsHash}"`
   );
-  return res.json({ ipfsHash: IpfsHash });
+
+  return res.json({ ipfsHash: authorIpfsRes.IpfsHash });
 });
 
 export default router;

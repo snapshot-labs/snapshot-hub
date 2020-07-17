@@ -1,18 +1,18 @@
 import { verifyMessage } from '@ethersproject/wallet';
-import relayer from './relayer';
 
-export async function counterSign(message) {
-  message.relayers = [{
-    address: relayer.address,
-    timestamp: (new Date().getTime() / 1e3).toFixed(0)
-  }];
-  message.relayers[0].sig = await relayer.signMessage(JSON.stringify(message));
-  return message;
+export function jsonParse(input, fallback?) {
+  try {
+    return JSON.parse(input);
+  } catch (err) {
+    return fallback || {};
+  }
 }
 
-export async function verify(signedMessage, sig, address) {
-  const message = JSON.parse(JSON.stringify(signedMessage));
-  delete message.authors[0].sig;
-  const recovered = await verifyMessage(JSON.stringify(message), sig);
+export async function verify(address, msg, sig) {
+  const recovered = await verifyMessage(msg, sig);
   return recovered === address;
+}
+
+export function clone(item) {
+  return JSON.parse(JSON.stringify(item));
 }
