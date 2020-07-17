@@ -18,6 +18,7 @@
                 v-for="verified in token.verified.slice(0, 5)"
                 :key="verified"
                 :address="verified"
+                :title="verified"
                 size="16"
                 class="ml-2"
               />
