@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "11399282",
+      "name": "signature",
+      "font_class": "signature",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "15617545",
+      "name": "receipt-outlined",
+      "font_class": "receipt-outlined",
+      "unicode": "e8eb",
+      "unicode_decimal": 59627
+    },
+    {
       "icon_id": "10561798",
       "name": "Check, label",
       "font_class": "check",

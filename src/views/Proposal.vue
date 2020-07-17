@@ -57,29 +57,32 @@
               v-for="(vote, address, i) in votes"
               :key="i"
               :style="i === 0 && 'border: 0 !important;'"
-              class="px-4 py-3 border-top"
+              class="px-4 py-3 border-top d-flex"
             >
-              <span
+              <div class="column">
+                <User :address="address" :verified="token.verified" />
+              </div>
+              <div class="flex-auto text-center">
+                <span
+                  v-text="
+                  proposal.msg.payload.choices[vote.msg.payload.choice - 1]
+                "
+                  class="text-white ml-2 column"
+                />
+                <a
+                  :href="_ipfsUrl(vote.authorIpfsHash)"
+                  target="_blank"
+                  class="ml-3 column"
+                >
+                  <Icon name="signature"/>
+                </a>
+              </div>
+              <div
                 v-text="
                   `${$n(vote.balance)} ${token.symbol || _shorten(token.token)}`
                 "
-                class="float-right text-white"
+                class="text-white text-right column"
               />
-              <User :address="address" :verified="token.verified" />
-              <span
-                v-text="
-                  proposal.msg.payload.choices[vote.msg.payload.choice - 1]
-                "
-                class="text-white ml-2"
-              />
-              <a
-                :href="_ipfsUrl(vote.authorIpfsHash)"
-                target="_blank"
-                class="ml-2"
-              >
-                IPFS
-                <Icon name="external-link" />
-              </a>
             </div>
           </Block>
         </div>
