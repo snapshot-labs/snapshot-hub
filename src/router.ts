@@ -8,10 +8,10 @@ import Create from '@/views/Create.vue';
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
-  { path: '/', name: 'home', component: Home },
   { path: '/:key/proposal/:id', name: 'proposal', component: Proposal },
   { path: '/:key/create', name: 'create', component: Create },
   { path: '/:key', name: 'proposals', component: Proposals },
+  { path: '/', name: 'home', component: Home },
   { path: '/*', name: 'error-404', beforeEnter: (to, from, next) => next('/') }
 ];
 
