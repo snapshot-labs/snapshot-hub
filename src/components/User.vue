@@ -3,7 +3,7 @@
     <a @click="modalOpen = true" target="_blank" class="text-white">
       <Avatar :address="address" size="16" class="mr-1" />
       {{ name }}
-      <Icon v-if="isVerified" name="check" class="mr-1" title="Verified" />
+      <Icon v-if="isVerified" name="check" class="ml-1" title="Verified" />
     </a>
     <ModalUser
       :open="modalOpen"

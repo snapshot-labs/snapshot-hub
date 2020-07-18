@@ -75,7 +75,7 @@
               <div class="column text-right">
                 <span
                   v-text="
-                    `${$n(vote.balance)} ${token.symbol ||
+                    `${_numeral(vote.balance)} ${token.symbol ||
                       _shorten(token.token)}`
                   "
                   class="text-white"
@@ -129,7 +129,9 @@
                   v-text="`${$d((1595088005 + 86400) * 1e3, 'long')}*`"
                   class="float-right text-white"
                 />
-                <div class="mt-2 text-right">*: Estimated dates</div>
+              </div>
+              <div>
+                <em>*: Estimated dates</em>
               </div>
             </div>
             <div v-else>
@@ -169,11 +171,11 @@
               <div class="text-white mb-1">
                 <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalBalances[i]" class="mr-1">
-                  {{ $n(results.totalBalances[i].toFixed(0)) }}
+                  {{ _numeral(results.totalBalances[i].toFixed(0)) }}
                   {{ token.symbol || _shorten(token.token) }}
                 </span>
                 <span v-if="results.totalVotes[i]" class="text-gray mr-1">
-                  {{ $n(results.totalVotes[i]) }} vote{{
+                  {{ _numeral(results.totalVotes[i]) }} vote{{
                     results.totalVotes[i] > 1 ? 's' : ''
                   }}
                 </span>

@@ -1,5 +1,6 @@
-import store from '@/store';
 import { mapState } from 'vuex';
+import numeral from 'numeral';
+import store from '@/store';
 import { shorten, etherscanLink } from '@/helpers/utils';
 
 // @ts-ignore
@@ -16,6 +17,9 @@ export default {
       const blockTimestampDiff = (currentBlockNumber - blockNumber) * 14;
       // @ts-ignore
       return new Date((this.web3.blockTimestamp - blockTimestampDiff) * 1e3);
+    },
+    _numeral(number, format = '(0.[0]a)') {
+      return numeral(number).format(format);
     },
     _shorten(str: string): string {
       return shorten(str);
