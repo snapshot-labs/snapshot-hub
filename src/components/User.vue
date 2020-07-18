@@ -1,10 +1,16 @@
 <template>
-  <a :href="_etherscanLink(address)" target="_blank" class="text-white">
-    <Avatar :address="address" size="16" class="mr-1" />
-    {{ name }}
-    <Icon v-if="isVerified" name="check" class="mr-1" title="Verified" />
-    <Icon name="external-link" class="ml-1" />
-  </a>
+  <span>
+    <a @click="modalOpen = true" target="_blank" class="text-white">
+      <Avatar :address="address" size="16" class="mr-1" />
+      {{ name }}
+      <Icon v-if="isVerified" name="check" class="mr-1" title="Verified" />
+    </a>
+    <ModalUser
+      :open="modalOpen"
+      @close="modalOpen = false"
+      :address="address"
+    />
+  </span>
 </template>
 
 <script>
@@ -12,6 +18,11 @@ export default {
   props: {
     address: String,
     verified: Array
+  },
+  data() {
+    return {
+      modalOpen: false
+    }
   },
   computed: {
     name() {
