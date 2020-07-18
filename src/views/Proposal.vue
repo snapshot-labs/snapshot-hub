@@ -17,7 +17,7 @@
             <State :proposal="proposal" class="mb-4" />
             <p
               v-html="proposal.msg.payload.body.replace(/\n/g, '<br />')"
-              class="mb-6"
+              class="mb-6 break-word"
             />
           </div>
           <Block

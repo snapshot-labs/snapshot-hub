@@ -13,7 +13,7 @@ export default {
     _blockNumberToTs(blockNumber) {
       // @ts-ignore
       const currentBlockNumber = this.web3.blockNumber;
-      const blockTimestampDiff = (currentBlockNumber - blockNumber) * 15;
+      const blockTimestampDiff = (currentBlockNumber - blockNumber) * 14;
       // @ts-ignore
       return new Date((this.web3.blockTimestamp - blockTimestampDiff) * 1e3);
     },
