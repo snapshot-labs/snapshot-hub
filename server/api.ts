@@ -74,8 +74,13 @@ router.post('/message', async (req, res) => {
     ) ||
     !await verify(body.address, body.msg, body.sig)
   ) {
-    console.log('unauthorized');
+    console.log('unauthorized', body);
     return res.status(500).json({ error: 'unauthorized' });
+  }
+
+  if (!await verify(body.address, body.msg, body.sig)) {
+    console.log('wrong signature', body);
+    return res.status(500).json({ error: 'wrong signature' });
   }
 
   if (msg.type === 'vote') {
@@ -86,7 +91,7 @@ router.post('/message', async (req, res) => {
       currentBlockNumber > proposal.msg.payload.endBlock ||
       proposal.msg.payload.startBlock > currentBlockNumber
     ) {
-      console.log('unauthorized');
+      console.log('wrong vote', body);
       return res.status(500).json({ error: 'unauthorized' });
     }
   }
