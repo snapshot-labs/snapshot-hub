@@ -59,9 +59,11 @@
               :style="i === 0 && 'border: 0 !important;'"
               class="px-4 py-3 border-top d-flex"
             >
-              <div class="column">
-                <User :address="address" :verified="token.verified" />
-              </div>
+              <User
+                :address="address"
+                :verified="token.verified"
+                class="column"
+              />
               <div class="flex-auto text-center">
                 <span
                   v-text="
@@ -69,20 +71,24 @@
                   "
                   class="text-white ml-2 column"
                 />
+              </div>
+              <div class="column text-right">
+                <span
+                  v-text="
+                    `${$n(vote.balance)} ${token.symbol ||
+                      _shorten(token.token)}`
+                  "
+                  class="text-white"
+                />
                 <a
                   @click="openReceiptModal(vote)"
                   target="_blank"
-                  class="ml-3 column"
+                  class="ml-3"
+                  title="Receipt"
                 >
                   <Icon name="signature" />
                 </a>
               </div>
-              <div
-                v-text="
-                  `${$n(vote.balance)} ${token.symbol || _shorten(token.token)}`
-                "
-                class="text-white text-right column"
-              />
             </div>
           </Block>
         </div>

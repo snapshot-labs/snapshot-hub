@@ -1,9 +1,6 @@
 <template>
   <UiModal :open="open" @close="$emit('close')">
-    <h3
-      v-text="_shorten(address)"
-      class="m-4 text-center"
-    />
+    <h3 v-text="_shorten(address)" class="m-4 text-center" />
   </UiModal>
 </template>
 

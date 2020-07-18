@@ -32,16 +32,16 @@
                 <span class="mr-4">{{ i + 1 }}</span>
                 <input
                   v-model="choices[i]"
-                  class="input height-full flex-auto"
+                  class="input height-full flex-auto text-center"
                 />
-                <span @click="removeChoice(i)">
+                <span @click="removeChoice(i)" class="ml-4">
                   <Icon name="close" size="12" />
                 </span>
               </UiButton>
             </div>
           </div>
           <UiButton @click="addChoice" class="d-block width-full">
-            + Add choice
+            Add choice
           </UiButton>
         </Block>
       </div>
