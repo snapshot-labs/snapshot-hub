@@ -1,6 +1,8 @@
 {
   "name": "balancer-gov",
   "version": "0.1.0",
+  "repository": "balancer-labs/balancer-gov",
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -66,8 +68,5 @@
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
-  },
-  "repository": "bonustrack/gang",
-  "author": "Bonustrack",
-  "license": "MIT"
+  }
 }
