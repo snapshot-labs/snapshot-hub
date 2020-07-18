@@ -48,7 +48,7 @@ router.post('/message', async (req, res) => {
     !body.address ||
     !body.msg ||
     !body.sig ||
-    Object.keys(msg).length !== 4 ||
+    Object.keys(msg).length !== 5 ||
     !msg.version ||
     !msg.token ||
     !msg.type ||
@@ -61,14 +61,17 @@ router.post('/message', async (req, res) => {
       !msg.payload.body ||
       msg.payload.body.length > 10240 ||
       !msg.payload.choices ||
-      msg.payload.choices.length < 2
+      msg.payload.choices.length < 2 ||
+      !msg.payload.startBlock ||
+      currentBlockNumber > msg.payload.startBlock ||
+      !msg.payload.endBlock ||
+      msg.payload.startBlock >= msg.payload.endBlock
     ) ||
     msg.type === 'vote' && (
       Object.keys(msg.payload).length !== 2 ||
       !msg.payload.proposal ||
       !msg.payload.choice
-    ) ||
-    !await verify(body.address, body.msg, body.sig)
+    )
   ) {
     console.log('unauthorized', body);
     return res.status(500).json({ error: 'unauthorized' });
