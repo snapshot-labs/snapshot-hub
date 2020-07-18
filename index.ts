@@ -13,6 +13,5 @@ export default (app, server) => {
   app.use(cors());
   app.use('/api', api);
   // @ts-ignore
-  app.get('/', (req, res) => res.sendFile(`${__dirname}/dist/index.html`));
-  app.get('*', (req, res) => res.redirect('/'));
+  app.get('/*', (req, res) => res.sendFile(`${__dirname}/dist/index.html`));
 }

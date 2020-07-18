@@ -91,7 +91,7 @@ router.post('/message', async (req, res) => {
       proposal.msg.payload.startBlock > currentBlockNumber
     ) {
       console.log('wrong vote', body);
-      return res.status(500).json({ error: 'unauthorized' });
+      return res.status(500).json({ error: 'wrong vote' });
     }
   }
 
