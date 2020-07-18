@@ -61,11 +61,7 @@ router.post('/message', async (req, res) => {
       !msg.payload.body ||
       msg.payload.body.length > 10240 ||
       !msg.payload.choices ||
-      msg.payload.choices.length < 2 ||
-      !msg.payload.startBlock ||
-      currentBlockNumber > msg.payload.startBlock ||
-      !msg.payload.endBlock ||
-      msg.payload.startBlock >= msg.payload.endBlock
+      msg.payload.choices.length < 2
     ) ||
     msg.type === 'vote' && (
       Object.keys(msg.payload).length !== 2 ||
