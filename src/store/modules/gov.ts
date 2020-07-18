@@ -73,6 +73,7 @@ const actions = {
           version: pkg.version,
           token: payload.token,
           type: 'proposal',
+          timestamp: (new Date().getTime() / 1e3).toFixed(),
           payload: {
             name: payload.name,
             body: payload.body,
@@ -102,6 +103,7 @@ const actions = {
           version: pkg.version,
           token: payload.token,
           type: 'vote',
+          timestamp: (new Date().getTime() / 1e3).toFixed(),
           payload: {
             proposal: payload.proposal,
             choice: payload.choice
