@@ -113,25 +113,49 @@
                 <Icon name="external-link" class="ml-1" />
               </a>
             </div>
-            <div class="mb-1">
-              <b>Start date</b>
-              <span
-                :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
-                v-text="
-                  $d(_blockNumberToTs(proposal.msg.payload.startBlock), 'long')
-                "
-                class="float-right text-white"
-              />
+            <div v-if="1 === 1">
+              <div class="mb-1">
+                <b>Start date</b>
+                <span
+                  :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
+                  v-text="`${$d(1595088005 * 1e3, 'long')}*`"
+                  class="float-right text-white"
+                />
+              </div>
+              <div class="mb-1">
+                <b>End date</b>
+                <span
+                  :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
+                  v-text="`${$d((1595088005 + 86400) * 1e3, 'long')}*`"
+                  class="float-right text-white"
+                />
+                <div class="mt-2 text-right">*: Estimated dates</div>
+              </div>
             </div>
-            <div class="mb-1">
-              <b>End date</b>
-              <span
-                :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
-                v-text="
-                  $d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')
-                "
-                class="float-right text-white"
-              />
+            <div v-else>
+              <div class="mb-1">
+                <b>Start date</b>
+                <span
+                  :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
+                  v-text="
+                    $d(
+                      _blockNumberToTs(proposal.msg.payload.startBlock),
+                      'long'
+                    )
+                  "
+                  class="float-right text-white"
+                />
+              </div>
+              <div class="mb-1">
+                <b>End date</b>
+                <span
+                  :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
+                  v-text="
+                    $d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')
+                  "
+                  class="float-right text-white"
+                />
+              </div>
             </div>
           </Block>
           <Block
