@@ -14,7 +14,7 @@ setInterval(async () => {
   currentBlockNumber = parseInt(blockNumber);
   await redis.setAsync('currentBlockNumber', currentBlockNumber);
   console.log('Block number', currentBlockNumber);
-}, 4e3)
+}, 8e3)
 
 router.get('/:token/proposals', async (req, res) => {
   const { token } = req.params;
