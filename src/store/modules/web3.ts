@@ -22,7 +22,7 @@ let web3;
 
 setInterval(() => {
   store.dispatch('getBlockNumber');
-}, 4e3);
+}, 8e3);
 
 const state = {
   injectedLoaded: false,
