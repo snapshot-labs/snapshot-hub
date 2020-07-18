@@ -1,10 +1,20 @@
 import express from 'express';
+import { getDefaultProvider } from '@ethersproject/providers';
 import redis from './redis';
 import pinata from './pinata';
-import relayer from "./relayer";
+import relayer from './relayer';
 import { verify, jsonParse } from './utils';
-
 const router = express.Router();
+
+let currentBlockNumber: number = 0;
+
+setInterval(async () => {
+  const defaultProvider = getDefaultProvider();
+  const blockNumber: any = await defaultProvider.getBlockNumber();
+  currentBlockNumber = parseInt(blockNumber);
+  await redis.setAsync('currentBlockNumber', currentBlockNumber);
+  console.log('Block number', currentBlockNumber);
+}, 4e3)
 
 router.get('/:token/proposals', async (req, res) => {
   const { token } = req.params;
@@ -33,6 +43,7 @@ router.post('/message', async (req, res) => {
   const msg = jsonParse(body.msg);
 
   if (
+    !currentBlockNumber ||
     !body ||
     !body.address ||
     !body.msg ||
@@ -52,6 +63,7 @@ router.post('/message', async (req, res) => {
       !msg.payload.choices ||
       msg.payload.choices.length < 2 ||
       !msg.payload.startBlock ||
+      currentBlockNumber > msg.payload.startBlock ||
       !msg.payload.endBlock ||
       msg.payload.startBlock >= msg.payload.endBlock
     ) ||
@@ -64,6 +76,19 @@ router.post('/message', async (req, res) => {
   ) {
     console.log('unauthorized');
     return res.status(500).json({ error: 'unauthorized' });
+  }
+
+  if (msg.type === 'vote') {
+    const proposalRedis = await redis.hgetAsync(`token:${msg.token}:proposals`, msg.payload.proposal);
+    const proposal = jsonParse(proposalRedis);
+    if (
+      !proposalRedis ||
+      currentBlockNumber > proposal.msg.payload.endBlock ||
+      proposal.msg.payload.startBlock > currentBlockNumber
+    ) {
+      console.log('unauthorized');
+      return res.status(500).json({ error: 'unauthorized' });
+    }
   }
 
   const authorIpfsRes = await pinata.pinJSONToIPFS({

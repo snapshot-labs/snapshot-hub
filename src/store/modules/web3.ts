@@ -6,6 +6,7 @@ import {
 } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { getAddress } from '@ethersproject/address';
+import store from '@/store';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import connectors from '@/helpers/connectors';
@@ -18,6 +19,10 @@ const backupUrls = {
 };
 let provider;
 let web3;
+
+setInterval(() => {
+  store.dispatch('getBlockNumber');
+}, 4e3);
 
 const state = {
   injectedLoaded: false,
