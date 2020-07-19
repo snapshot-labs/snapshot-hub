@@ -13,12 +13,16 @@
       },
       "walletconnect": {
         "id": "walletconnect",
-        "name": "WalletConnect"
+        "name": "WalletConnect",
+        "options": {
+          "infuraId": "c00cb7215b614b0282964cf1a9b117c0"
+        }
       },
       "portis": {
         "id": "portis",
         "name": "Portis",
         "options": {
+          "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
           "network": "kovan"
         }
       }
@@ -38,12 +42,16 @@
       },
       "walletconnect": {
         "id": "walletconnect",
-        "name": "WalletConnect"
+        "name": "WalletConnect",
+        "options": {
+          "infuraId": "c00cb7215b614b0282964cf1a9b117c0"
+        }
       },
       "portis": {
         "id": "portis",
         "name": "Portis",
         "options": {
+          "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
           "network": "mainnet"
         }
       }

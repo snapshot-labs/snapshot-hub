@@ -9,8 +9,8 @@ import { getAddress } from '@ethersproject/address';
 import store from '@/store';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
-import connectors from '@/helpers/connectors';
-import { lsSet, lsRemove } from '@/helpers/utils';
+import lock from '@/helpers/lock';
+import { lsSet, lsGet, lsRemove } from '@/helpers/utils';
 
 const infuraId = process.env.VUE_APP_INFURA_ID;
 const backupUrls = {
@@ -150,8 +150,8 @@ const mutations = {
 
 const actions = {
   login: async ({ dispatch }, connector = 'injected') => {
-    const options = config.connectors[connector].options || {};
-    provider = await connectors[connector].connect(options);
+    const lockConnector = lock.getConnector(connector);
+    provider = await lockConnector.connect();
     if (provider) {
       web3 = new Web3Provider(provider);
       await dispatch('loadWeb3');
@@ -159,7 +159,12 @@ const actions = {
     }
   },
   logout: async ({ commit }) => {
-    lsRemove('connector');
+    const connector = lsGet('connector');
+    if (connector) {
+      const lockConnector = lock.getConnector(connector);
+      await lockConnector.logout();
+      lsRemove('connector');
+    }
     commit('LOGOUT');
   },
   loadWeb3: async ({ commit, dispatch }) => {
