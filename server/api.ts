@@ -68,6 +68,7 @@ router.post('/message', async (req, res) => {
       msg.payload.startBlock >= msg.payload.endBlock
     ) ||
     msg.type === 'vote' && (
+      1 === 1 || // Block votes
       Object.keys(msg.payload).length !== 2 ||
       !msg.payload.proposal ||
       !msg.payload.choice

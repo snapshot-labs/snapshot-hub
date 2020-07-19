@@ -21,7 +21,7 @@
             />
           </div>
           <Block
-            v-if="
+            v-if="1 !== 1 && // Block votes
               web3.blockNumber >= proposal.msg.payload.startBlock &&
                 web3.blockNumber < proposal.msg.payload.endBlock
             "
