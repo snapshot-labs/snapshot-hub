@@ -136,7 +136,7 @@ const actions = {
       commit('GET_PROPOSALS_FAILURE', e);
     }
   },
-  getProposal: async ({ commit, dispatch, rootState }, payload) => {
+  getProposal: async ({ commit, dispatch }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
       const result: any = {};
@@ -146,10 +146,10 @@ const actions = {
       result.votes = await client.request(
         `${payload.token}/proposal/${payload.id}`
       );
-      const { blockNumber } = rootState.web3;
-      const { startBlock } = result.proposal.msg.payload;
-      const blockTag =
-        startBlock > blockNumber ? blockNumber : parseInt(startBlock);
+      // const { blockNumber } = rootState.web3;
+      // const { startBlock } = result.proposal.msg.payload;
+      // const blockTag = startBlock > blockNumber ? blockNumber : parseInt(startBlock);
+      const blockTag = 10484400; // Hardcode snapshot block
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map((vote: any) => vote.address),
