@@ -47,50 +47,7 @@
               Vote
             </UiButton>
           </Block>
-          <Block
-            v-if="Object.keys(votes).length > 0"
-            title="Votes"
-            :counter="Object.keys(votes).length"
-            :slim="true"
-          >
-            <div
-              v-for="(vote, address, i) in votes"
-              :key="i"
-              :style="i === 0 && 'border: 0 !important;'"
-              class="px-4 py-3 border-top d-flex"
-            >
-              <User
-                :address="address"
-                :verified="token.verified"
-                class="column"
-              />
-              <div class="flex-auto text-center">
-                <span
-                  v-text="
-                    proposal.msg.payload.choices[vote.msg.payload.choice - 1]
-                  "
-                  class="text-white ml-2 column"
-                />
-              </div>
-              <div class="column text-right">
-                <span
-                  v-text="
-                    `${_numeral(vote.balance)} ${token.symbol ||
-                      _shorten(token.token)}`
-                  "
-                  class="text-white"
-                />
-                <a
-                  @click="openReceiptModal(vote)"
-                  target="_blank"
-                  class="ml-3"
-                  title="Receipt"
-                >
-                  <Icon name="signature" />
-                </a>
-              </div>
-            </div>
-          </Block>
+          <BlockVotes :token="token" :proposal="proposal" :votes="votes" />
         </div>
         <div class="col-12 col-lg-4 float-left">
           <Block title="Informations">
@@ -197,12 +154,6 @@
         :id="id"
         :selectedChoice="selectedChoice"
       />
-      <ModalReceipt
-        :open="modalReceiptOpen"
-        @close="modalReceiptOpen = false"
-        :authorIpfsHash="authorIpfsHash"
-        :relayerIpfsHash="relayerIpfsHash"
-      />
     </template>
     <div v-else class="text-center">
       <UiLoading class="big" />
@@ -228,9 +179,6 @@ export default {
       votes: {},
       results: [],
       modalOpen: false,
-      modalReceiptOpen: false,
-      authorIpfsHash: '',
-      relayerIpfsHash: '',
       selectedChoice: 0
     };
   },
@@ -251,11 +199,6 @@ export default {
       this.proposal = proposalObj.proposal;
       this.votes = proposalObj.votes;
       this.results = proposalObj.results;
-    },
-    openReceiptModal(vote) {
-      this.authorIpfsHash = vote.authorIpfsHash;
-      this.relayerIpfsHash = vote.relayerIpfsHash;
-      this.modalReceiptOpen = true;
     },
     async downloadReport() {
       const obj = Object.entries(this.votes)
