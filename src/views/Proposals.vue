@@ -87,8 +87,7 @@ export default {
           .filter(proposal => {
             if (!this.token.verified.includes(proposal[1].address))
               return false;
-            if (this.selectedState === 'All')
-              return proposal[1].msg.payload.endBlock > this.web3.blockNumber;
+            if (this.selectedState === 'All') return true;
             if (
               this.selectedState === 'Active' &&
               proposal[1].msg.payload.startBlock <= this.web3.blockNumber &&
