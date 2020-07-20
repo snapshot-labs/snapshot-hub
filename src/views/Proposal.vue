@@ -22,8 +22,7 @@
           </div>
           <Block
             v-if="
-              1 !== 1 && // Block votes
-                web3.blockNumber >= proposal.msg.payload.startBlock &&
+              web3.blockNumber >= proposal.msg.payload.startBlock &&
                 web3.blockNumber < proposal.msg.payload.endBlock
             "
             class="mb-4"
@@ -114,28 +113,7 @@
                 <Icon name="external-link" class="ml-1" />
               </a>
             </div>
-            <div v-if="1 === 1">
-              <div class="mb-1">
-                <b>Start date</b>
-                <span
-                  :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
-                  v-text="`${$d(1595088005 * 1e3, 'long')}*`"
-                  class="float-right text-white"
-                />
-              </div>
-              <div class="mb-1">
-                <b>End date</b>
-                <span
-                  :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
-                  v-text="`${$d((1595088005 + 86400) * 1e3, 'long')}*`"
-                  class="float-right text-white"
-                />
-              </div>
-              <div>
-                <em>*: Estimated dates</em>
-              </div>
-            </div>
-            <div v-else>
+            <div>
               <div class="mb-1">
                 <b>Start date</b>
                 <span
@@ -200,6 +178,13 @@
                 class="mb-3"
               />
             </div>
+            <UiButton
+              @click="downloadReport"
+              v-if="web3.blockNumber >= proposal.msg.payload.endBlock"
+              class="width-full mt-2"
+            >
+              Download report
+            </UiButton>
           </Block>
         </div>
       </div>
@@ -227,7 +212,9 @@
 
 <script>
 import { mapActions } from 'vuex';
+import * as jsonexport from 'jsonexport/dist';
 import tokens from '@/helpers/tokens.json';
+import pkg from '@/../package.json';
 
 export default {
   data() {
@@ -269,6 +256,31 @@ export default {
       this.authorIpfsHash = vote.authorIpfsHash;
       this.relayerIpfsHash = vote.relayerIpfsHash;
       this.modalReceiptOpen = true;
+    },
+    async downloadReport() {
+      const obj = Object.entries(this.votes)
+        .map(vote => {
+          return {
+            address: vote[0],
+            choice: vote[1].msg.payload.choice,
+            balance: vote[1].balance,
+            timestamp: vote[1].msg.timestamp,
+            dateUtc: new Date(parseInt(vote[1].msg.timestamp) * 1e3).toUTCString(),
+            authorIpfsHash: vote[1].authorIpfsHash,
+            relayerIpfsHash: vote[1].relayerIpfsHash
+          };
+        })
+        .sort((a, b) => a.timestamp - b.timestamp, 0);
+      try {
+        const csv = await jsonexport(obj);
+        const link = document.createElement('a');
+        link.setAttribute('href', `data:text/csv;charset=utf-8,${csv}`);
+        link.setAttribute('download', `${pkg.name}-report-${this.id}.csv`);
+        document.body.appendChild(link);
+        link.click();
+      } catch (e) {
+        console.error(e);
+      }
     }
   },
   async created() {
