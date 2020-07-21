@@ -1,7 +1,7 @@
 <template>
   <Container :slim="true">
     <div class="px-4 px-md-0 mb-3">
-      <router-link :to="{ name: 'home' }">
+      <router-link :to="{ name: 'home' }" class="text-gray">
         <Icon name="back" size="22" class="v-align-middle" />
         {{ token.name || _shorten(token.token) }}
       </router-link>
@@ -12,13 +12,13 @@
           <div class="d-flex flex-column mb-6">
             <input
               v-autofocus
-              v-model="name"
+              v-model="form.name"
               maxlength="128"
               class="h1 mb-2 input"
               placeholder="Question"
             />
             <textarea-autosize
-              v-model="body"
+              v-model="form.body"
               maxlength="10240"
               class="input"
               placeholder="What is your proposal?"
@@ -26,12 +26,16 @@
           </div>
         </div>
         <Block title="Choices">
-          <div v-if="choices.length > 0" class="overflow-hidden mb-2">
-            <div v-for="(choice, i) in choices" :key="i" class="d-flex mb-2">
+          <div v-if="form.choices.length > 0" class="overflow-hidden mb-2">
+            <div
+              v-for="(choice, i) in form.choices"
+              :key="i"
+              class="d-flex mb-2"
+            >
               <UiButton class="d-flex width-full">
                 <span class="mr-4">{{ i + 1 }}</span>
                 <input
-                  v-model="choices[i]"
+                  v-model="form.choices[i]"
                   class="input height-full flex-auto text-center"
                 />
                 <span @click="removeChoice(i)" class="ml-4">
@@ -50,18 +54,28 @@
           <div class="mb-2">
             <UiButton class="width-full mb-2">
               <input
-                v-model="startBlock"
+                v-model="form.start"
+                @click="[(modalOpen = true), (selectedDate = 'start')]"
                 type="number"
                 class="input width-full"
-                placeholder="Start at block number"
+                placeholder="Start at"
               />
             </UiButton>
             <UiButton class="width-full mb-2">
               <input
-                v-model="endBlock"
+                v-model="form.end"
+                @click="[(modalOpen = true), (selectedDate = 'end')]"
                 type="number"
                 class="input width-full"
-                placeholder="End at block number"
+                placeholder="End at"
+              />
+            </UiButton>
+            <UiButton class="width-full mb-2">
+              <input
+                v-model="form.snapshot"
+                type="number"
+                class="input width-full"
+                placeholder="Snapshot block number"
               />
             </UiButton>
           </div>
@@ -76,23 +90,33 @@
         </Block>
       </div>
     </div>
+    <ModalSelectDate
+      :open="modalOpen"
+      @close="modalOpen = false"
+      @input="setDate"
+    />
   </Container>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
-import tokens from '@/helpers/tokens.json';
+import tokens from '@/namespaces.json';
 
 export default {
   data() {
     return {
       key: this.$route.params.key,
       loading: false,
-      name: '',
-      body: '',
-      choices: ['', ''],
-      startBlock: '',
-      endBlock: ''
+      form: {
+        name: '',
+        body: '',
+        choices: ['', ''],
+        start: '',
+        end: '',
+        snapshot: ''
+      },
+      modalOpen: false,
+      selectedDate: ''
     };
   },
   computed: {
@@ -102,42 +126,45 @@ export default {
         : { token: this.key, verified: [] };
     },
     isValid() {
+      const ts = (Date.now() / 1e3).toFixed();
       const minBlock = (3600 * 24) / 15;
       return (
         !this.loading &&
         this.web3.account &&
-        this.name &&
-        this.body &&
-        this.startBlock &&
-        this.startBlock >= this.web3.blockNumber &&
-        this.endBlock &&
-        this.endBlock >= this.web3.blockNumber + minBlock &&
-        this.endBlock > this.startBlock &&
-        this.choices.length >= 2 &&
-        this.choices.reduce((a, b) => (!a ? false : b), true)
+        this.form.name &&
+        this.form.body &&
+        this.form.start &&
+        this.form.start >= ts &&
+        this.form.end &&
+        this.form.end >= ts + minBlock &&
+        this.form.end > this.form.start &&
+        this.form.choices.length >= 2 &&
+        this.form.choices.reduce((a, b) => (!a ? false : b), true)
       );
     }
   },
   methods: {
-    ...mapActions(['post']),
+    ...mapActions(['send']),
     addChoice() {
-      this.choices.push('');
+      this.form.choices.push('');
     },
-
     removeChoice(i) {
-      delete this.choices[i];
-      this.choices = this.choices.filter(String);
+      delete this.form.choices[i];
+      this.form.choices = this.form.choices.filter(String);
+    },
+    setDate(date) {
+      if (this.selectedDate) {
+        date = (new Date(date).getTime() / 1e3).toFixed();
+        this.form[this.selectedDate] = date;
+      }
     },
     async handleSubmit() {
       this.loading = true;
       try {
-        const { ipfsHash } = await this.post({
+        const { ipfsHash } = await this.send({
           token: this.token.token,
-          name: this.name,
-          body: this.body,
-          choices: this.choices,
-          startBlock: this.startBlock,
-          endBlock: this.endBlock
+          type: 'proposal',
+          payload: this.form
         });
         this.$router.push({
           name: 'proposal',

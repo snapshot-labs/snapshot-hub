@@ -5,7 +5,7 @@
       <div class="m-4 flex-auto text-center">
         <h4>Are you sure you want to vote for this option?</h4>
         <h4>This action <b>cannot</b> be undone.</h4>
-        <h4 class="p-3 my-3 border rounded-2 text-white">
+        <h4 class="p-3 my-3 border rounded-2">
           Option {{ selectedChoice }}:
           {{ proposal.msg.payload.choices[selectedChoice - 1] }}
         </h4>
@@ -42,13 +42,16 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['vote']),
+    ...mapActions(['send']),
     async handleSubmit() {
       this.loading = true;
-      await this.vote({
+      await this.send({
         token: this.token,
-        proposal: this.id,
-        choice: this.selectedChoice
+        type: 'vote',
+        payload: {
+          proposal: this.id,
+          choice: this.selectedChoice
+        }
       });
       this.$emit('reload');
       this.$emit('close');

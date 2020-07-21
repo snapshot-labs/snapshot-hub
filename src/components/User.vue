@@ -1,6 +1,6 @@
 <template>
   <span>
-    <a @click="modalOpen = true" target="_blank" class="text-white">
+    <a @click="modalOpen = true" target="_blank">
       <Avatar :address="address" size="16" class="mr-1" />
       {{ name }}
       <Icon v-if="isVerified" name="check" class="ml-1" title="Verified" />

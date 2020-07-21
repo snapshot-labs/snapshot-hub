@@ -14,11 +14,10 @@ export default {
   },
   computed: {
     state() {
-      const { blockNumber } = this.web3;
-      const { startBlock, endBlock } = this.proposal.msg.payload;
-      if (blockNumber > endBlock) return { name: 'Closed', class: 'bg-purple' };
-      if (blockNumber > startBlock)
-        return { name: 'Active', class: 'bg-green' };
+      const ts = (Date.now() / 1e3).toFixed();
+      const { start, end } = this.proposal.msg.payload;
+      if (ts > end) return { name: 'Closed', class: 'bg-purple' };
+      if (ts > start) return { name: 'Active', class: 'bg-green' };
       return { name: 'Pending' };
     }
   }

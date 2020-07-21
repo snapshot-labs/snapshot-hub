@@ -1,20 +1,11 @@
 import express from 'express';
-import { getDefaultProvider } from '@ethersproject/providers';
 import redis from './redis';
 import pinata from './pinata';
 import relayer from './relayer';
-import { verify, jsonParse } from './utils';
+import { verify, jsonParse, sendError } from './utils';
+import pkg from '../package.json';
+
 const router = express.Router();
-
-let currentBlockNumber: number = 0;
-
-setInterval(async () => {
-  const defaultProvider = getDefaultProvider();
-  const blockNumber: any = await defaultProvider.getBlockNumber();
-  currentBlockNumber = parseInt(blockNumber);
-  await redis.setAsync('currentBlockNumber', currentBlockNumber);
-  console.log('Block number', currentBlockNumber);
-}, 8e3)
 
 router.get('/:token/proposals', async (req, res) => {
   const { token } = req.params;
@@ -41,58 +32,65 @@ router.get('/:token/proposal/:id', async (req, res) => {
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
+  const ts = (Date.now() / 1e3).toFixed();
+  const minBlock = (3600 * 24) / 15;
+
+  if (!body || !body.address || !body.msg || !body.sig)
+    return sendError(res, 'wrong message body');
 
   if (
-    !currentBlockNumber ||
-    !body ||
-    !body.address ||
-    !body.msg ||
-    !body.sig ||
     Object.keys(msg).length !== 5 ||
-    !msg.version ||
     !msg.token ||
-    !msg.type ||
-    !['proposal', 'vote'].includes(msg.type) ||
-    Object.keys(msg.payload).length === 0 ||
-    msg.type === 'proposal' && (
-      Object.keys(msg.payload).length !== 5 ||
+    !msg.payload ||
+    Object.keys(msg.payload).length === 0
+  ) return sendError(res, 'wrong signed message');
+
+  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > ts)
+    return sendError(res, 'wrong timestamp');
+
+  if (!msg.version || msg.version !== pkg.version)
+    return sendError(res, 'wrong version');
+
+  if (!msg.type || !['proposal', 'vote'].includes(msg.type))
+    return sendError(res, 'wrong message type');
+
+  if (!await verify(body.address, body.msg, body.sig))
+    return sendError(res, 'wrong signature');
+
+  if (msg.type === 'proposal') {
+    if (
+      Object.keys(msg.payload).length !== 6 ||
       !msg.payload.name ||
       msg.payload.name.length > 128 ||
       !msg.payload.body ||
-      msg.payload.body.length > 10240 ||
+      msg.payload.body.length > 5120 ||
       !msg.payload.choices ||
       msg.payload.choices.length < 2 ||
-      !msg.payload.startBlock ||
-      currentBlockNumber > msg.payload.startBlock ||
-      !msg.payload.endBlock ||
-      msg.payload.startBlock >= msg.payload.endBlock
-    ) ||
-    msg.type === 'vote' && (
-      Object.keys(msg.payload).length !== 2 ||
-      !msg.payload.proposal ||
-      !msg.payload.choice
-    )
-  ) {
-    console.log('unauthorized', body);
-    return res.status(500).json({ error: 'unauthorized' });
-  }
+      !msg.payload.snapshot
+    ) return sendError(res, 'wrong format proposal');
 
-  if (!await verify(body.address, body.msg, body.sig)) {
-    console.log('wrong signature', body);
-    return res.status(500).json({ error: 'wrong signature' });
+    if (
+      !msg.payload.start ||
+      ts > msg.payload.start ||
+      !msg.payload.end ||
+      msg.payload.start >= msg.payload.end
+    ) return sendError(res, 'wrong proposal period');
   }
 
   if (msg.type === 'vote') {
+    if (
+      Object.keys(msg.payload).length !== 2 ||
+      !msg.payload.proposal ||
+      !msg.payload.choice
+    ) return sendError(res, 'wrong format vote');
+
     const proposalRedis = await redis.hgetAsync(`token:${msg.token}:proposals`, msg.payload.proposal);
     const proposal = jsonParse(proposalRedis);
     if (
       !proposalRedis ||
-      currentBlockNumber > proposal.msg.payload.endBlock ||
-      proposal.msg.payload.startBlock > currentBlockNumber
-    ) {
-      console.log('wrong vote', body);
-      return res.status(500).json({ error: 'wrong vote' });
-    }
+      ts > proposal.msg.payload.end ||
+      proposal.msg.payload.start > ts
+    ) return sendError(res, 'wrong vote');
   }
 
   const authorIpfsRes = await pinata.pinJSONToIPFS({

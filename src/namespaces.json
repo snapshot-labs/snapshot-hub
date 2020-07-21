@@ -7,6 +7,17 @@
     "verified": [
       "0x24A12Fa313F57aF541d447c594072A992c605DCf",
       "0x8BBE4Ac64246d600BC2889ef5d83809D138F03DF"
-    ]
+    ],
+    "visible": true
+  },
+  "dai": {
+    "key": "dai",
+    "symbol": "DAI",
+    "name": "DAI",
+    "token": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "verified": [
+      "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7"
+    ],
+    "visible": false
   }
 }

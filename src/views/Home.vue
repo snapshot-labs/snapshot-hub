@@ -33,12 +33,14 @@
 </template>
 
 <script>
-import tokens from '@/helpers/tokens.json';
+import tokens from '@/namespaces.json';
 
 export default {
   data() {
     return {
-      tokens
+      tokens: Object.fromEntries(
+        Object.entries(tokens).filter(token => token[1].visible)
+      )
     };
   }
 };

@@ -12,12 +12,10 @@
       class="px-4 py-3 border-top d-flex"
     >
       <User :address="address" :verified="token.verified" class="column" />
-      <div class="flex-auto text-center">
-        <span
-          v-text="proposal.msg.payload.choices[vote.msg.payload.choice - 1]"
-          class="text-white ml-2 column"
-        />
-      </div>
+      <div
+        v-text="proposal.msg.payload.choices[vote.msg.payload.choice - 1]"
+        class="flex-auto text-center text-white"
+      />
       <div class="column text-right">
         <span
           v-text="
@@ -28,7 +26,7 @@
         <a
           @click="openReceiptModal(vote)"
           target="_blank"
-          class="ml-3"
+          class="ml-3 text-gray"
           title="Receipt"
         >
           <Icon name="signature" />
@@ -38,7 +36,7 @@
     <a
       v-if="!showAllVotes && Object.keys(votes).length > 10"
       @click="showAllVotes = true"
-      class="px-4 py-3 border-top text-center d-block text-white bg-gray-dark"
+      class="px-4 py-3 border-top text-center d-block bg-gray-dark"
     >
       See more
     </a>

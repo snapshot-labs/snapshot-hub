@@ -1,28 +1,20 @@
 import Vue from 'vue';
-import {
-  getDefaultProvider,
-  JsonRpcProvider,
-  Web3Provider
-} from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { getAddress } from '@ethersproject/address';
 import store from '@/store';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import lock from '@/helpers/lock';
+import wsProvider from '@/helpers/ws';
 import { lsSet, lsGet, lsRemove } from '@/helpers/utils';
 
-const infuraId = process.env.VUE_APP_INFURA_ID;
-const backupUrls = {
-  1: `https://mainnet.infura.io/v3/${infuraId}`,
-  42: `https://kovan.infura.io/v3/${infuraId}`
-};
 let provider;
 let web3;
 
-setInterval(() => {
-  store.dispatch('getBlockNumber');
-}, 8e3);
+wsProvider.on('block', blockNumber => {
+  store.commit('GET_BLOCK_SUCCESS', blockNumber);
+});
 
 const state = {
   injectedLoaded: false,
@@ -31,8 +23,7 @@ const state = {
   name: null,
   active: false,
   balances: {},
-  blockNumber: 0,
-  blockTimestamp: 0
+  blockNumber: 0
 };
 
 const mutations = {
@@ -139,8 +130,7 @@ const mutations = {
     console.debug('GET_BLOCK_REQUEST');
   },
   GET_BLOCK_SUCCESS(_state, payload) {
-    Vue.set(_state, 'blockNumber', payload.blockNumber);
-    Vue.set(_state, 'blockTimestamp', payload.blockTimestamp);
+    Vue.set(_state, 'blockNumber', payload);
     console.debug('GET_BLOCK_SUCCESS', payload);
   },
   GET_BLOCK_FAILURE(_state, payload) {
@@ -234,8 +224,8 @@ const actions = {
   },
   loadBackupProvider: async ({ commit }) => {
     try {
-      const web3 = new JsonRpcProvider(backupUrls[config.chainId]);
-      const network = await web3.getNetwork();
+      web3 = wsProvider;
+      const network = await wsProvider.getNetwork();
       commit('LOAD_BACKUP_PROVIDER_SUCCESS', {
         injectedActive: false,
         backUpLoaded: true,
@@ -309,13 +299,8 @@ const actions = {
   getBlockNumber: async ({ commit }) => {
     commit('GET_BLOCK_REQUEST');
     try {
-      const defaultProvider = getDefaultProvider();
-      const blockNumber: any = await defaultProvider.getBlockNumber();
-      const block: any = await defaultProvider.getBlock(blockNumber);
-      commit('GET_BLOCK_SUCCESS', {
-        blockNumber: parseInt(blockNumber),
-        blockTimestamp: block.timestamp
-      });
+      const blockNumber: any = await wsProvider.getBlockNumber();
+      commit('GET_BLOCK_SUCCESS', parseInt(blockNumber));
       return blockNumber;
     } catch (e) {
       commit('GET_BLOCK_FAILURE', e);

@@ -3,9 +3,7 @@
     "network": "kovan",
     "chainId": 42,
     "subgraphUrl": "https://api.thegraph.com/subgraphs/name/bonustrack/balancer-kovan",
-    "addresses": {
-      "multicall": "0x2cc8688C5f75E365aaEEb4ea8D6a480405A48D2A"
-    },
+    "multicall": "0x2cc8688C5f75E365aaEEb4ea8D6a480405A48D2A",
     "connectors": {
       "injected": {
         "id": "injected",
@@ -32,9 +30,7 @@
     "network": "homestead",
     "chainId": 1,
     "subgraphUrl": "https://api.thegraph.com/subgraphs/name/bonustrack/balancer",
-    "addresses": {
-      "multicall": "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441"
-    },
+    "multicall": "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441",
     "connectors": {
       "injected": {
         "id": "injected",

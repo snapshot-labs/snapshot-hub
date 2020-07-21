@@ -4,7 +4,11 @@
       <div class="mb-3 d-flex">
         <div class="flex-auto">
           <div>
-            <a :href="_etherscanLink(token.token)" target="_blank">
+            <a
+              :href="_etherscanLink(token.token)"
+              target="_blank"
+              class="text-gray"
+            >
               {{ token.name || _shorten(key) }}
               <Icon name="external-link" class="ml-1" />
             </a>
@@ -29,7 +33,7 @@
             :key="state"
             v-text="state"
             @click="selectedState = state"
-            :class="selectedState === state && 'text-white'"
+            :class="selectedState !== state && 'text-gray'"
             class="mr-3"
           />
         </div>
@@ -44,12 +48,12 @@
             :i="i"
           />
         </div>
-        <div
+        <p
           v-if="loaded && Object.keys(proposalsWithFilter).length === 0"
-          class="p-4 border-top d-block"
+          class="p-4 m-0 border-top d-block"
         >
           There isn't any proposal here yet!
-        </div>
+        </p>
       </Block>
     </Container>
   </div>
@@ -57,7 +61,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import tokens from '@/helpers/tokens.json';
+import tokens from '@/namespaces.json';
 
 export default {
   data() {
@@ -81,6 +85,7 @@ export default {
       return Object.keys(this.proposals).length;
     },
     proposalsWithFilter() {
+      const ts = (Date.now() / 1e3).toFixed();
       if (this.totalProposals === 0) return {};
       return Object.fromEntries(
         Object.entries(this.proposals)
@@ -90,28 +95,25 @@ export default {
             if (this.selectedState === 'All') return true;
             if (
               this.selectedState === 'Active' &&
-              proposal[1].msg.payload.startBlock <= this.web3.blockNumber &&
-              proposal[1].msg.payload.endBlock > this.web3.blockNumber
+              proposal[1].msg.payload.start <= ts &&
+              proposal[1].msg.payload.end > ts
             ) {
               return true;
             }
             if (
               this.selectedState === 'Closed' &&
-              proposal[1].msg.payload.endBlock <= this.web3.blockNumber
+              proposal[1].msg.payload.end <= ts
             ) {
               return true;
             }
             if (
               this.selectedState === 'Pending' &&
-              proposal[1].msg.payload.startBlock > this.web3.blockNumber
+              proposal[1].msg.payload.start > ts
             ) {
               return true;
             }
           })
-          .sort(
-            (a, b) => a[1].msg.payload.startBlock - b[1].msg.payload.startBlock,
-            0
-          )
+          .sort((a, b) => a[1].msg.payload.start - b[1].msg.payload.start, 0)
       );
     }
   },

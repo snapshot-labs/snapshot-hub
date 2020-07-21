@@ -2,7 +2,7 @@
   <Container :slim="true">
     <template v-if="loaded">
       <div class="px-4 px-md-0 mb-3">
-        <router-link :to="{ name: 'proposals' }">
+        <router-link :to="{ name: 'proposals' }" class="text-gray">
           <Icon name="back" size="22" class="v-align-middle" />
           {{ token.name || _shorten(token.token) }}
         </router-link>
@@ -11,26 +11,20 @@
         <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
           <div class="px-4 px-md-0">
             <h1 class="mb-2">
-              {{ proposal.msg.payload.name }}
+              {{ payload.name }}
               <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
             </h1>
             <State :proposal="proposal" class="mb-4" />
-            <p
-              v-html="proposal.msg.payload.body.replace(/\n/g, '<br />')"
-              class="mb-6 break-word"
-            />
+            <UiMarkdown :body="payload.body" class="mb-6" />
           </div>
           <Block
-            v-if="
-              web3.blockNumber >= proposal.msg.payload.startBlock &&
-                web3.blockNumber < proposal.msg.payload.endBlock
-            "
+            v-if="ts >= payload.start && ts < payload.end"
             class="mb-4"
             title="Cast your vote"
           >
             <div class="mb-3">
               <UiButton
-                v-for="(choice, i) in proposal.msg.payload.choices"
+                v-for="(choice, i) in payload.choices"
                 :key="i"
                 v-text="choice"
                 @click="selectedChoice = i + 1"
@@ -52,6 +46,10 @@
         <div class="col-12 col-lg-4 float-left">
           <Block title="Informations">
             <div class="mb-1">
+              <b>Token</b>
+              <Token :address="proposal.msg.token" class="float-right" />
+            </div>
+            <div class="mb-1">
               <b>Author</b>
               <User
                 :address="proposal.address"
@@ -64,7 +62,7 @@
               <a
                 :href="_ipfsUrl(proposal.ipfsHash)"
                 target="_blank"
-                class="float-right text-white"
+                class="float-right"
               >
                 #{{ proposal.ipfsHash.slice(0, 7) }}
                 <Icon name="external-link" class="ml-1" />
@@ -74,46 +72,37 @@
               <div class="mb-1">
                 <b>Start date</b>
                 <span
-                  :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
-                  v-text="
-                    $d(
-                      _blockNumberToTs(proposal.msg.payload.startBlock),
-                      'long'
-                    )
-                  "
+                  v-text="$d(payload.start * 1e3, 'long')"
                   class="float-right text-white"
                 />
               </div>
               <div class="mb-1">
                 <b>End date</b>
                 <span
-                  :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
-                  v-text="
-                    $d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')
-                  "
+                  v-text="$d(payload.end * 1e3, 'long')"
                   class="float-right text-white"
                 />
               </div>
+              <div class="mb-1">
+                <b>Snapshot</b>
+                <a
+                  :href="_etherscanLink(payload.snapshot, 'block')"
+                  target="_blank"
+                  class="float-right"
+                >
+                  {{ $n(payload.snapshot) }}
+                  <Icon name="external-link" class="ml-1" />
+                </a>
+              </div>
             </div>
           </Block>
-          <Block
-            :title="
-              web3.blockNumber >= proposal.msg.payload.endBlock
-                ? 'Results'
-                : 'Current results'
-            "
-          >
-            <div v-for="(choice, i) in proposal.msg.payload.choices" :key="i">
+          <Block :title="ts >= payload.end ? 'Results' : 'Current results'">
+            <div v-for="(choice, i) in payload.choices" :key="i">
               <div class="text-white mb-1">
                 <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalBalances[i]" class="mr-1">
                   {{ _numeral(results.totalBalances[i].toFixed(0)) }}
                   {{ token.symbol || _shorten(token.token) }}
-                </span>
-                <span v-if="results.totalVotes[i]" class="text-gray mr-1">
-                  {{ _numeral(results.totalVotes[i]) }} vote{{
-                    results.totalVotes[i] > 1 ? 's' : ''
-                  }}
                 </span>
                 <span
                   class="float-right"
@@ -137,7 +126,7 @@
             </div>
             <UiButton
               @click="downloadReport"
-              v-if="web3.blockNumber >= proposal.msg.payload.endBlock"
+              v-if="ts >= payload.end"
               class="width-full mt-2"
             >
               Download report
@@ -164,7 +153,7 @@
 <script>
 import { mapActions } from 'vuex';
 import * as jsonexport from 'jsonexport/dist';
-import tokens from '@/helpers/tokens.json';
+import tokens from '@/namespaces.json';
 import pkg from '@/../package.json';
 
 export default {
@@ -187,6 +176,12 @@ export default {
       return tokens[this.key]
         ? tokens[this.key]
         : { token: this.key, verified: [] };
+    },
+    payload() {
+      return this.proposal.msg.payload;
+    },
+    ts() {
+      return (Date.now() / 1e3).toFixed();
     }
   },
   methods: {

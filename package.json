@@ -1,6 +1,6 @@
 {
   "name": "balancer-gov",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "balancer-labs/balancer-gov",
   "license": "GPL-3.0",
   "scripts": {
@@ -42,6 +42,8 @@
     "numeral": "^2.0.4",
     "primer-support": "^5.0.0",
     "redis": "^3.0.2",
+    "remarkable": "^2.0.1",
+    "sanitize-html": "^1.27.1",
     "serve-static": "^1.14.1",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",

@@ -6,9 +6,6 @@ module.exports = {
     },
     webpackBundleAnalyzer: {
       openAnalyzer: false
-    },
-    gitDescribe: {
-      variableName: 'GIT_DESCRIBE'
     }
   }
 };

@@ -1,38 +1,23 @@
+import { Contract } from '@ethersproject/contracts';
+import { Interface } from '@ethersproject/abi';
+import { formatEther } from '@ethersproject/units';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
 import config from '@/helpers/config';
 import abi from '@/helpers/abi';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { Contract } from '@ethersproject/contracts';
-import { Interface } from '@ethersproject/abi';
-import { formatEther } from '@ethersproject/units';
-import pkg from '@/../package.json';
-import { jsonParse } from '@/helpers/utils';
-
-const infuraId = process.env.VUE_APP_INFURA_ID;
-const backupUrls = {
-  1: `https://mainnet.infura.io/v3/${infuraId}`,
-  42: `https://kovan.infura.io/v3/${infuraId}`
-};
+import wsProvider from '@/helpers/ws';
+import { formatProposal, formatProposals } from '@/helpers/utils';
+import { version } from '@/../package.json';
 
 const mutations = {
-  POST_REQUEST() {
-    console.debug('POST_REQUEST');
+  SEND_REQUEST() {
+    console.debug('SEND_REQUEST');
   },
-  POST_SUCCESS() {
-    console.debug('POST_SUCCESS');
+  SEND_SUCCESS() {
+    console.debug('SEND_SUCCESS');
   },
-  POST_FAILURE(_state, payload) {
-    console.debug('POST_FAILURE', payload);
-  },
-  VOTE_REQUEST() {
-    console.debug('VOTE_REQUEST');
-  },
-  VOTE_SUCCESS() {
-    console.debug('VOTE_SUCCESS');
-  },
-  VOTE_FAILURE(_state, payload) {
-    console.debug('VOTE_FAILURE', payload);
+  SEND_FAILURE(_state, payload) {
+    console.debug('SEND_FAILURE', payload);
   },
   GET_PROPOSALS_REQUEST() {
     console.debug('GET_PROPOSALS_REQUEST');
@@ -64,59 +49,26 @@ const mutations = {
 };
 
 const actions = {
-  post: async ({ commit, dispatch, rootState }, payload) => {
-    commit('POST_REQUEST');
+  send: async ({ commit, dispatch, rootState }, { token, type, payload }) => {
+    commit('SEND_REQUEST');
     try {
       const msg: any = {
         address: rootState.web3.account,
         msg: JSON.stringify({
-          version: pkg.version,
-          token: payload.token,
-          type: 'proposal',
-          timestamp: (new Date().getTime() / 1e3).toFixed(),
-          payload: {
-            name: payload.name,
-            body: payload.body,
-            choices: payload.choices,
-            startBlock: payload.startBlock,
-            endBlock: payload.endBlock
-          }
+          version,
+          timestamp: (Date.now() / 1e3).toFixed(),
+          token,
+          type,
+          payload
         })
       };
       msg.sig = await dispatch('signMessage', msg.msg);
       const result = await client.request('message', msg);
-      commit('POST_SUCCESS');
-      dispatch('notify', ['green', 'Your proposal is in!']);
+      commit('SEND_SUCCESS');
+      dispatch('notify', ['green', `Your ${type} is in!`]);
       return result;
     } catch (e) {
-      commit('POST_FAILURE', e);
-      dispatch('notify', ['red', 'Oops, something went wrong!']);
-      return;
-    }
-  },
-  vote: async ({ commit, dispatch, rootState }, payload) => {
-    commit('VOTE_REQUEST');
-    try {
-      const msg: any = {
-        address: rootState.web3.account,
-        msg: JSON.stringify({
-          version: pkg.version,
-          token: payload.token,
-          type: 'vote',
-          timestamp: (new Date().getTime() / 1e3).toFixed(),
-          payload: {
-            proposal: payload.proposal,
-            choice: payload.choice
-          }
-        })
-      };
-      msg.sig = await dispatch('signMessage', msg.msg);
-      const result = await client.request('message', msg);
-      commit('VOTE_SUCCESS');
-      dispatch('notify', ['green', 'Your vote is in!']);
-      return result;
-    } catch (e) {
-      commit('VOTE_FAILURE', e);
+      commit('SEND_FAILURE', e);
       dispatch('notify', ['red', 'Oops, something went wrong!']);
       return;
     }
@@ -124,32 +76,28 @@ const actions = {
   getProposals: async ({ commit }, payload) => {
     commit('GET_PROPOSALS_REQUEST');
     try {
-      const result: any = await client.request(`${payload}/proposals`);
+      const proposals: any = await client.request(`${payload}/proposals`);
       commit('GET_PROPOSALS_SUCCESS');
-      return Object.fromEntries(
-        Object.entries(result).map((item: any) => {
-          item.msg = jsonParse(item.msg, {});
-          return item;
-        })
-      );
+      return formatProposals(proposals);
     } catch (e) {
       commit('GET_PROPOSALS_FAILURE', e);
     }
   },
-  getProposal: async ({ commit, dispatch }, payload) => {
+  getProposal: async ({ commit, dispatch, rootState }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
       const result: any = {};
-      result.proposal = await ipfs.get(payload.id);
-      result.proposal.msg = jsonParse(result.proposal.msg);
+      const proposal = await ipfs.get(payload.id);
+      result.proposal = formatProposal(proposal);
       result.proposal.ipfsHash = payload.id;
       result.votes = await client.request(
         `${payload.token}/proposal/${payload.id}`
       );
-      // const { blockNumber } = rootState.web3;
-      // const { startBlock } = result.proposal.msg.payload;
-      // const blockTag = startBlock > blockNumber ? blockNumber : parseInt(startBlock);
-      const blockTag = 10484400; // Hardcode snapshot block
+      const { snapshot } = result.proposal.msg.payload;
+      const blockTag =
+        snapshot > rootState.web3.blockNumber
+          ? rootState.web3.blockNumber
+          : parseInt(snapshot);
       const votes = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map((vote: any) => vote.address),
@@ -189,11 +137,7 @@ const actions = {
   },
   getVotersBalances: async ({ commit }, { token, addresses, blockTag }) => {
     commit('GET_VOTERS_BALANCES_REQUEST');
-    const multi = new Contract(
-      config.addresses.multicall,
-      abi['Multicall'],
-      new JsonRpcProvider(backupUrls[config.chainId])
-    );
+    const multi = new Contract(config.multicall, abi['Multicall'], wsProvider);
     const calls = [];
     const testToken = new Interface(abi.TestToken);
     addresses.forEach(address => {
