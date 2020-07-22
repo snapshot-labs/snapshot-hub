@@ -47,7 +47,10 @@
           <Block title="Informations">
             <div class="mb-1">
               <b>Token</b>
-              <Token :address="proposal.msg.token" class="float-right" />
+              <span class="float-right text-white">
+                <Token :address="proposal.msg.token" class="mr-1" />
+                {{ token.symbol }}
+              </span>
             </div>
             <div class="mb-1">
               <b>Author</b>
@@ -138,10 +141,12 @@
         :open="modalOpen"
         @close="modalOpen = false"
         @reload="loadProposal"
-        :token="token.token"
+        :token="token"
         :proposal="proposal"
         :id="id"
         :selectedChoice="selectedChoice"
+        :votingPower="votingPower"
+        :snapshot="payload.snapshot"
       />
     </template>
     <div v-else class="text-center">
@@ -153,7 +158,7 @@
 <script>
 import { mapActions } from 'vuex';
 import * as jsonexport from 'jsonexport/dist';
-import tokens from '@/namespaces.json';
+import namespaces from '@/namespaces.json';
 import pkg from '@/../package.json';
 
 export default {
@@ -168,13 +173,14 @@ export default {
       votes: {},
       results: [],
       modalOpen: false,
-      selectedChoice: 0
+      selectedChoice: 0,
+      votingPower: 0
     };
   },
   computed: {
     token() {
-      return tokens[this.key]
-        ? tokens[this.key]
+      return namespaces[this.key]
+        ? namespaces[this.key]
         : { token: this.key, verified: [] };
     },
     payload() {
@@ -185,7 +191,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposal']),
+    ...mapActions(['getProposal', 'getVotingPower']),
     async loadProposal() {
       const proposalObj = await this.getProposal({
         token: this.token.token,
@@ -194,6 +200,12 @@ export default {
       this.proposal = proposalObj.proposal;
       this.votes = proposalObj.votes;
       this.results = proposalObj.results;
+    },
+    async loadVotingPower() {
+      this.votingPower = await this.getVotingPower({
+        token: this.token.token,
+        snapshot: this.payload.snapshot
+      });
     },
     async downloadReport() {
       const obj = Object.entries(this.votes)
@@ -226,6 +238,7 @@ export default {
   async created() {
     this.loading = true;
     await this.loadProposal();
+    await this.loadVotingPower();
     this.loading = false;
     this.loaded = true;
   }

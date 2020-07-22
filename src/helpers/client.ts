@@ -13,10 +13,12 @@ class Client {
       };
     }
     return new Promise((resolve, reject) => {
-      fetch(url, init).then(res => {
-        if (res.ok) return resolve(res.json());
-        return reject();
-      });
+      fetch(url, init)
+        .then(res => {
+          if (res.ok) return resolve(res.json());
+          throw res;
+        })
+        .catch(e => e.json().then(json => reject(json)));
     });
   }
 }

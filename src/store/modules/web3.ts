@@ -2,12 +2,14 @@ import Vue from 'vue';
 import { Web3Provider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { getAddress } from '@ethersproject/address';
+import { formatEther } from '@ethersproject/units';
 import store from '@/store';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import lock from '@/helpers/lock';
 import wsProvider from '@/helpers/ws';
 import { lsSet, lsGet, lsRemove } from '@/helpers/utils';
+import { Interface } from '@ethersproject/abi';
 
 let provider;
 let web3;
@@ -135,6 +137,15 @@ const mutations = {
   },
   GET_BLOCK_FAILURE(_state, payload) {
     console.debug('GET_BLOCK_FAILURE', payload);
+  },
+  GET_BALANCE_REQUEST() {
+    console.debug('GET_BALANCE_REQUEST');
+  },
+  GET_BALANCE_SUCCESS() {
+    console.debug('GET_BALANCE_SUCCESS');
+  },
+  GET_BALANCE_FAILURE(_state, payload) {
+    console.debug('GET_BALANCE_FAILURE', payload);
   }
 };
 
@@ -290,11 +301,11 @@ const actions = {
       return sig;
     } catch (e) {
       commit('SIGN_MESSAGE_FAILURE', e);
-      return Promise.reject();
+      return Promise.reject(e);
     }
   },
   loadAccount: async ({ dispatch }) => {
-    await dispatch('lookupAddress');
+    await Promise.all([dispatch('lookupAddress')]);
   },
   getBlockNumber: async ({ commit }) => {
     commit('GET_BLOCK_REQUEST');
@@ -304,6 +315,26 @@ const actions = {
       return blockNumber;
     } catch (e) {
       commit('GET_BLOCK_FAILURE', e);
+      return Promise.reject();
+    }
+  },
+  getBalance: async ({ commit }, { snapshot, token }) => {
+    commit('GET_BALANCE_REQUEST');
+    const address = state.account;
+    const multi = new Contract(config.multicall, abi['Multicall'], wsProvider);
+    const testToken = new Interface(abi.TestToken);
+    const calls = [
+      [token, testToken.encodeFunctionData('balanceOf', [address])]
+    ];
+    try {
+      const [, response] = await multi.aggregate(calls, {
+        blockTag: parseInt(snapshot)
+      });
+      const balance = parseFloat(formatEther(response[0].toString()));
+      commit('GET_BALANCE_SUCCESS');
+      return balance;
+    } catch (e) {
+      commit('GET_BALANCE_FAILURE', e);
       return Promise.reject();
     }
   }

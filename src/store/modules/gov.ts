@@ -69,7 +69,11 @@ const actions = {
       return result;
     } catch (e) {
       commit('SEND_FAILURE', e);
-      dispatch('notify', ['red', 'Oops, something went wrong!']);
+      const errorMessage =
+        e && e.error_description
+          ? `Oops, ${e.error_description}`
+          : 'Oops, something went wrong!';
+      dispatch('notify', ['red', errorMessage]);
       return;
     }
   },
@@ -87,26 +91,37 @@ const actions = {
     commit('GET_PROPOSAL_REQUEST');
     try {
       const result: any = {};
-      const proposal = await ipfs.get(payload.id);
+      const [proposal, votes] = await Promise.all([
+        ipfs.get(payload.id),
+        client.request(`${payload.token}/proposal/${payload.id}`)
+      ]);
       result.proposal = formatProposal(proposal);
       result.proposal.ipfsHash = payload.id;
-      result.votes = await client.request(
-        `${payload.token}/proposal/${payload.id}`
-      );
+      result.votes = votes;
       const { snapshot } = result.proposal.msg.payload;
       const blockTag =
         snapshot > rootState.web3.blockNumber
           ? rootState.web3.blockNumber
           : parseInt(snapshot);
-      const votes = await dispatch('getVotersBalances', {
+      const votersBalances = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map((vote: any) => vote.address),
         blockTag
       });
+      // @ts-ignore
+      const addresses = Object.keys(votes);
+      const votingPowers = await dispatch('getVotingPowers', {
+        token: result.proposal.msg.token,
+        snapshot: blockTag,
+        addresses
+      });
       result.votes = Object.fromEntries(
         Object.entries(result.votes)
           .map((vote: any) => {
-            vote[1].balance = votes[vote[1].address];
+            vote[1].balance =
+              votersBalances[vote[1].address] + votingPowers[vote[1].address];
+            vote[1].bptBalance = votingPowers[vote[1].address];
+            vote[1].walletBalance = votersBalances[vote[1].address];
             return vote;
           })
           .sort((a, b) => b[1].balance - a[1].balance)

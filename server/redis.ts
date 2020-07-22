@@ -9,4 +9,9 @@ client.on('error', (error) => {
   console.error(error);
 });
 
+setInterval(() => {
+  console.log('heartbeat');
+  client.get('key');
+}, 2e4)
+
 export default client;

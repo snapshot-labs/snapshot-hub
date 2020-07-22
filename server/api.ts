@@ -33,7 +33,7 @@ router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
   const ts = (Date.now() / 1e3).toFixed();
-  const minBlock = (3600 * 24) / 15;
+  // const minBlock = (3600 * 24) / 15;
 
   if (!body || !body.address || !body.msg || !body.sig)
     return sendError(res, 'wrong message body');
@@ -67,7 +67,7 @@ router.post('/message', async (req, res) => {
       !msg.payload.choices ||
       msg.payload.choices.length < 2 ||
       !msg.payload.snapshot
-    ) return sendError(res, 'wrong format proposal');
+    ) return sendError(res, 'wrong proposal format');
 
     if (
       !msg.payload.start ||
@@ -82,15 +82,16 @@ router.post('/message', async (req, res) => {
       Object.keys(msg.payload).length !== 2 ||
       !msg.payload.proposal ||
       !msg.payload.choice
-    ) return sendError(res, 'wrong format vote');
+    ) return sendError(res, 'wrong vote format');
 
     const proposalRedis = await redis.hgetAsync(`token:${msg.token}:proposals`, msg.payload.proposal);
     const proposal = jsonParse(proposalRedis);
+    if (!proposalRedis)
+      return sendError(res, 'unknown proposal');
     if (
-      !proposalRedis ||
       ts > proposal.msg.payload.end ||
       proposal.msg.payload.start > ts
-    ) return sendError(res, 'wrong vote');
+    ) return sendError(res, 'not in voting window');
   }
 
   const authorIpfsRes = await pinata.pinJSONToIPFS({
