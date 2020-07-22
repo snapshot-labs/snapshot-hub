@@ -202,6 +202,7 @@ export default {
       this.results = proposalObj.results;
     },
     async loadVotingPower() {
+      if (!this.web3.account) return;
       this.votingPower = await this.getVotingPower({
         token: this.token.token,
         snapshot: this.payload.snapshot

@@ -5,7 +5,10 @@
       class="shell overflow-hidden anim-scale-in position-relative rounded-0 rounded-md-2"
     >
       <slot />
-      <a @click="$emit('close')" class="position-absolute right-0 top-1 p-4">
+      <a
+        @click="$emit('close')"
+        class="position-absolute right-0 top-1 p-4 text-gray"
+      >
         <Icon name="close" />
       </a>
     </div>

@@ -52,29 +52,25 @@
       <div class="col-12 col-lg-4 float-left">
         <Block title="Actions">
           <div class="mb-2">
-            <UiButton class="width-full mb-2">
-              <input
-                v-model="form.start"
-                @click="[(modalOpen = true), (selectedDate = 'start')]"
-                type="number"
-                class="input width-full"
-                placeholder="Start at"
-              />
+            <UiButton
+              @click="[(modalOpen = true), (selectedDate = 'start')]"
+              class="width-full mb-2"
+            >
+              <span v-if="!form.start">Select start date</span>
+              <span v-else v-text="$d(form.start * 1e3, 'long')" />
             </UiButton>
-            <UiButton class="width-full mb-2">
-              <input
-                v-model="form.end"
-                @click="[(modalOpen = true), (selectedDate = 'end')]"
-                type="number"
-                class="input width-full"
-                placeholder="End at"
-              />
+            <UiButton
+              @click="[(modalOpen = true), (selectedDate = 'end')]"
+              class="width-full mb-2"
+            >
+              <span v-if="!form.end">Select end date</span>
+              <span v-else v-text="$d(form.end * 1e3, 'long')" />
             </UiButton>
             <UiButton class="width-full mb-2">
               <input
                 v-model="form.snapshot"
                 type="number"
-                class="input width-full"
+                class="input width-full text-center"
                 placeholder="Snapshot block number"
               />
             </UiButton>
@@ -91,6 +87,7 @@
       </div>
     </div>
     <ModalSelectDate
+      :value="form[selectedDate]"
       :open="modalOpen"
       @close="modalOpen = false"
       @input="setDate"
@@ -127,7 +124,6 @@ export default {
     },
     isValid() {
       const ts = (Date.now() / 1e3).toFixed();
-      const minBlock = (3600 * 24) / 15;
       return (
         !this.loading &&
         this.web3.account &&
@@ -136,7 +132,6 @@ export default {
         this.form.start &&
         this.form.start >= ts &&
         this.form.end &&
-        this.form.end >= ts + minBlock &&
         this.form.end > this.form.start &&
         this.form.choices.length >= 2 &&
         this.form.choices.reduce((a, b) => (!a ? false : b), true)
@@ -152,10 +147,9 @@ export default {
       delete this.form.choices[i];
       this.form.choices = this.form.choices.filter(String);
     },
-    setDate(date) {
+    setDate(ts) {
       if (this.selectedDate) {
-        date = (new Date(date).getTime() / 1e3).toFixed();
-        this.form[this.selectedDate] = date;
+        this.form[this.selectedDate] = ts;
       }
     },
     async handleSubmit() {

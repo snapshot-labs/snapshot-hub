@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import lock from '@/helpers/lock';
 import { lsGet } from '@/helpers/utils';
-import config from "@/helpers/config";
+import config from '@/helpers/config';
 
 const state = {
   init: false,

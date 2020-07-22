@@ -1,9 +1,15 @@
 <template>
   <div class="calendar">
     <div class="mb-2 d-flex">
-      <a class="col-3 iconfont iconback text-left h3" @click="month--" />
+      <a
+        class="col-3 iconfont iconback text-left h3 text-gray"
+        @click="month--"
+      />
       <h4 class="mb-3 flex-auto text-center">{{ monthName }} {{ year }}</h4>
-      <a class="col-3 iconfont icongo text-right h3" @click="month++" />
+      <a
+        class="col-3 iconfont icongo text-right h3 text-gray"
+        @click="month++"
+      />
     </div>
     <div class="border-left border-top overflow-hidden">
       <div

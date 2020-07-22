@@ -2,21 +2,23 @@
   <UiModal :open="open" @close="$emit('close')">
     <div v-if="!web3.account || step === 'connect'">
       <h3 class="m-4 mb-0 text-center">Connect wallet</h3>
-      <div class="m-4 border rounded-2">
+      <div class="m-4 mb-5">
         <a
           v-for="(connector, id, i) in connectors"
           :key="i"
-          class="d-flex flex-items-center px-3 py-2"
-          :class="i !== 0 && 'border-top'"
           @click="$emit('login', connector.id)"
+          target="_blank"
+          class="mb-2 d-block"
         >
-          <img
-            :src="require(`@/assets/connectors/${connector.id}.svg`)"
-            width="48"
-            height="48"
-            class="mr-3"
-          />
-          <h4 v-text="connector.name" />
+          <UiButton class="button-outline width-full v-align-middle">
+            <img
+              :src="require(`@/assets/connectors/${connector.id}.svg`)"
+              width="32"
+              height="32"
+              class="mr-2 v-align-middle"
+            />
+            {{ connector.name }}
+          </UiButton>
         </a>
       </div>
     </div>
