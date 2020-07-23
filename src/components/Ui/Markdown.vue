@@ -29,7 +29,9 @@ export default {
 @import '../../vars';
 
 .markdown-body {
+  h1,
   h2 {
+    font-size: $h2-size;
     border-bottom: 0;
   }
 

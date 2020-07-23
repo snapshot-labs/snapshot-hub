@@ -30,7 +30,7 @@ const actions = {
     const address = rootState.web3.account;
     commit('GET_VOTING_POWER_REQUEST');
     try {
-      const { poolShares } = await request('getVotingPower', {
+      const result = await request('getVotingPower', {
         poolShares: {
           __args: {
             block: {
@@ -42,18 +42,23 @@ const actions = {
           }
         }
       });
-      const bptBalances: any = {};
-      poolShares.forEach(poolShare =>
-        poolShare.poolId.tokens.map(token => {
-          const [, address] = token.id.split('-');
-          const shares =
-            (token.balance / poolShare.poolId.totalShares) * poolShare.balance;
-          bptBalances[address] = bptBalances[address]
-            ? bptBalances[address] + shares
-            : shares;
-        })
-      );
-      const bptBalance = bptBalances[token.toLowerCase()] || 0;
+      let bptBalance = 0;
+      if (result && result.poolShares) {
+        const bptBalances: any = {};
+        result.poolShares.forEach(poolShare =>
+          poolShare.poolId.tokens.map(token => {
+            const [, address] = token.id.split('-');
+            const shares =
+              (token.balance / poolShare.poolId.totalShares) *
+              poolShare.balance;
+            bptBalances[address] = bptBalances[address]
+              ? bptBalances[address] + shares
+              : shares;
+          })
+        );
+        if (bptBalances[token.toLowerCase()])
+          bptBalance = bptBalances[token.toLowerCase()];
+      }
       const balance = parseFloat(
         await dispatch('getBalance', { snapshot, token })
       );

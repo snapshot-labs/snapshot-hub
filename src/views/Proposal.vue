@@ -4,7 +4,7 @@
       <div class="px-4 px-md-0 mb-3">
         <router-link :to="{ name: 'proposals' }" class="text-gray">
           <Icon name="back" size="22" class="v-align-middle" />
-          {{ token.name || _shorten(token.token) }}
+          {{ namespace.name || _shorten(namespace.token) }}
         </router-link>
       </div>
       <div>
@@ -41,7 +41,7 @@
               Vote
             </UiButton>
           </Block>
-          <BlockVotes :token="token" :proposal="proposal" :votes="votes" />
+          <BlockVotes :token="namespace" :proposal="proposal" :votes="votes" />
         </div>
         <div class="col-12 col-lg-4 float-left">
           <Block title="Informations">
@@ -49,14 +49,14 @@
               <b>Token</b>
               <span class="float-right text-white">
                 <Token :address="proposal.msg.token" class="mr-1" />
-                {{ token.symbol }}
+                {{ namespace.symbol }}
               </span>
             </div>
             <div class="mb-1">
               <b>Author</b>
               <User
                 :address="proposal.address"
-                :verified="token.verified"
+                :verified="namespace.verified"
                 class="float-right"
               />
             </div>
@@ -105,7 +105,7 @@
                 <span v-text="choice" class="mr-1" />
                 <span v-if="results.totalBalances[i]" class="mr-1">
                   {{ _numeral(results.totalBalances[i].toFixed(0)) }}
-                  {{ token.symbol || _shorten(token.token) }}
+                  {{ namespace.symbol || _shorten(namespace.token) }}
                 </span>
                 <span
                   class="float-right"
@@ -141,7 +141,7 @@
         :open="modalOpen"
         @close="modalOpen = false"
         @reload="loadProposal"
-        :token="token"
+        :token="namespace"
         :proposal="proposal"
         :id="id"
         :selectedChoice="selectedChoice"
@@ -178,7 +178,7 @@ export default {
     };
   },
   computed: {
-    token() {
+    namespace() {
       return namespaces[this.key]
         ? namespaces[this.key]
         : { token: this.key, verified: [] };
@@ -194,7 +194,7 @@ export default {
     ...mapActions(['getProposal', 'getVotingPower']),
     async loadProposal() {
       const proposalObj = await this.getProposal({
-        token: this.token.token,
+        token: this.namespace.token,
         id: this.id
       });
       this.proposal = proposalObj.proposal;
@@ -203,9 +203,13 @@ export default {
     },
     async loadVotingPower() {
       if (!this.web3.account) return;
+      const snapshot =
+        this.payload.snapshot > this.web3.blockNumber
+          ? this.web3.blockNumber
+          : parseInt(this.payload.snapshot);
       this.votingPower = await this.getVotingPower({
-        token: this.token.token,
-        snapshot: this.payload.snapshot
+        token: this.namespace.token,
+        snapshot
       });
     },
     async downloadReport() {

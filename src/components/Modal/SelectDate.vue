@@ -9,34 +9,12 @@
       </div>
       <div v-else>
         <h3 class="m-4 mb-0 text-center">Select a time UTC</h3>
-        <div class="d-flex m-4 mx-auto" style="max-width: 360px;">
-          <div class="col-4 px-0 pr-2">
-            <UiButton class="px-0 width-fit">
-              <input
-                v-model="form.h"
-                max="24"
-                class="input text-center width-fit"
-              />
-            </UiButton>
-          </div>
-          <div class="col-4 px-0 pr-2">
-            <UiButton class="px-0 width-fit">
-              <input
-                v-model="form.m"
-                max="60"
-                class="input text-center width-fit"
-              />
-            </UiButton>
-          </div>
-          <div class="col-4 px-0 pr-2">
-            <UiButton class="px-0 width-fit">
-              <input
-                v-model="form.s"
-                max="60"
-                class="input text-center width-fit"
-              />
-            </UiButton>
-          </div>
+        <div class="d-flex m-4 mx-auto" style="max-width: 160px;">
+          <UiButton class="px-0 width-fit">
+            <input v-model="form.h" max="24" class="input text-center col-5" />
+            <span class="col-2">:</span>
+            <input v-model="form.m" max="60" class="input text-center col-5" />
+          </UiButton>
         </div>
       </div>
       <div class="p-4 overflow-hidden text-center border-top">
@@ -64,16 +42,15 @@ export default {
       input: '',
       step: 0,
       form: {
-        h: '00',
-        m: '00',
-        s: '00'
+        h: '12',
+        m: '00'
       }
     };
   },
   watch: {
     open() {
       this.step = 0;
-      this.form = { h: '00', m: '00', s: '00' };
+      this.form = { h: '12', m: '00' };
       this.input = this.value;
     }
   },
@@ -81,14 +58,7 @@ export default {
     handleSubmit() {
       if (this.step === 0) return (this.step = 1);
       const [year, month, day] = this.input.split('-');
-      let input = Date.UTC(
-        year,
-        month - 1,
-        day,
-        this.form.h,
-        this.form.m,
-        this.form.s
-      );
+      let input = Date.UTC(year, month - 1, day, this.form.h, this.form.m, 0);
       input = new Date(input).getTime() / (1e3).toFixed();
       this.$emit('input', input);
       this.$emit('close');
