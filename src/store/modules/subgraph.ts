@@ -138,7 +138,6 @@ const actions = {
         })
       );
       commit('GET_VOTING_POWERS_SUCCESS');
-      console.log(votingPowers);
       return votingPowers;
     } catch (e) {
       commit('GET_VOTING_POWERS_FAILURE', e);

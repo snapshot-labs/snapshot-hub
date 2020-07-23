@@ -10,13 +10,6 @@
         "id": "injected",
         "name": "MetaMask"
       },
-      "walletconnect": {
-        "id": "walletconnect",
-        "name": "WalletConnect",
-        "options": {
-          "infuraId": "c00cb7215b614b0282964cf1a9b117c0"
-        }
-      },
       "portis": {
         "id": "portis",
         "name": "Portis",
@@ -45,13 +38,6 @@
         "id": "injected",
         "name": "MetaMask"
       },
-      "walletconnect": {
-        "id": "walletconnect",
-        "name": "WalletConnect",
-        "options": {
-          "infuraId": "c00cb7215b614b0282964cf1a9b117c0"
-        }
-      },
       "portis": {
         "id": "portis",
         "name": "Portis",
@@ -79,13 +65,6 @@
       "injected": {
         "id": "injected",
         "name": "MetaMask"
-      },
-      "walletconnect": {
-        "id": "walletconnect",
-        "name": "WalletConnect",
-        "options": {
-          "infuraId": "c00cb7215b614b0282964cf1a9b117c0"
-        }
       },
       "portis": {
         "id": "portis",
