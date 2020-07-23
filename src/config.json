@@ -24,6 +24,13 @@
           "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
           "network": "mainnet"
         }
+      },
+      "magic": {
+        "id": "magic",
+        "name": "Magic",
+        "options": {
+          "apiKey": "pk_live_9CE8FD92E54684ED"
+        }
       }
     }
   },
@@ -52,6 +59,13 @@
           "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
           "network": "mainnet"
         }
+      },
+      "magic": {
+        "id": "magic",
+        "name": "Magic",
+        "options": {
+          "apiKey": "pk_live_9CE8FD92E54684ED"
+        }
       }
     }
   },
@@ -79,6 +93,13 @@
         "options": {
           "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
           "network": "mainnet"
+        }
+      },
+      "magic": {
+        "id": "magic",
+        "name": "Magic",
+        "options": {
+          "apiKey": "pk_live_9CE8FD92E54684ED"
         }
       }
     }
