@@ -9,6 +9,10 @@ import wsProvider from '@/helpers/ws';
 import { formatProposal, formatProposals } from '@/helpers/utils';
 import { version } from '@/../package.json';
 
+const state = {
+  votingPower: 0
+};
+
 const mutations = {
   SEND_REQUEST() {
     console.debug('SEND_REQUEST');
@@ -45,6 +49,15 @@ const mutations = {
   },
   GET_VOTERS_BALANCES_FAILURE(_state, payload) {
     console.debug('GET_VOTERS_BALANCES_FAILURE', payload);
+  },
+  GET_MY_VOTING_POWER_REQUEST() {
+    console.debug('GET_MY_VOTING_POWER_REQUEST');
+  },
+  GET_MY_VOTING_POWER_SUCCESS() {
+    console.debug('GET_MY_VOTING_POWER_SUCCESS');
+  },
+  GET_MY_VOTING_POWER_FAILURE(_state, payload) {
+    console.debug('GET_MY_VOTING_POWER_FAILURE', payload);
   }
 };
 
@@ -182,10 +195,29 @@ const actions = {
       commit('GET_VOTERS_BALANCES_FAILURE', e);
       return Promise.reject();
     }
+  },
+  getMyVotingPower: async (
+    { commit, dispatch, rootState },
+    { snapshot, token }
+  ) => {
+    commit('GET_MY_VOTING_POWER_REQUEST');
+    const address = rootState.web3.account;
+    try {
+      const myVotingPower = await dispatch('getVotingPowers', {
+        snapshot,
+        token,
+        addresses: [address]
+      });
+      commit('GET_MY_VOTING_POWER_SUCCESS');
+      return myVotingPower;
+    } catch (e) {
+      commit('GET_MY_VOTING_POWER_FAILURE', e);
+    }
   }
 };
 
 export default {
+  state,
   mutations,
   actions
 };

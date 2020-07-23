@@ -71,7 +71,7 @@ router.post('/message', async (req, res) => {
 
     if (
       !msg.payload.start ||
-      ts > msg.payload.start ||
+      // ts > msg.payload.start ||
       !msg.payload.end ||
       msg.payload.start >= msg.payload.end
     ) return sendError(res, 'wrong proposal period');

@@ -4,7 +4,7 @@
       <h3 class="m-4 mb-0 text-center">Connect wallet</h3>
       <div class="m-4 mb-5">
         <a
-          v-for="(connector, id, i) in connectors"
+          v-for="(connector, id, i) in config.connectors"
           :key="i"
           @click="$emit('login', connector.id)"
           target="_blank"
@@ -56,14 +56,12 @@
 
 <script>
 import { mapActions } from 'vuex';
-import config from '@/helpers/config';
 
 export default {
   props: ['open'],
   data() {
     return {
-      step: null,
-      connectors: config.connectors
+      step: null
     };
   },
   watch: {

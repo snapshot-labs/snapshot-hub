@@ -61,7 +61,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import config from '@/helpers/config';
+import namespaces from '@/namespaces.json';
 
 export default {
   data() {
@@ -72,8 +72,11 @@ export default {
     };
   },
   computed: {
+    namespace() {
+      return namespaces['balancer'];
+    },
     wrongNetwork() {
-      return config.chainId !== this.web3.injectedChainId;
+      return this.config.chainId !== this.web3.injectedChainId;
     },
     showLogin() {
       return (

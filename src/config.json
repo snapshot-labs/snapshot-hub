@@ -1,9 +1,10 @@
 {
-  "kovan": {
-    "network": "kovan",
-    "chainId": 42,
-    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/bonustrack/balancer-kovan",
-    "multicall": "0x2cc8688C5f75E365aaEEb4ea8D6a480405A48D2A",
+  "master": {
+    "network": "homestead",
+    "chainId": 1,
+    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer",
+    "hubUrl": "https://vote.balancer.finance",
+    "multicall": "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441",
     "connectors": {
       "injected": {
         "id": "injected",
@@ -21,15 +22,44 @@
         "name": "Portis",
         "options": {
           "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
-          "network": "kovan"
+          "network": "mainnet"
         }
       }
     }
   },
-  "homestead": {
+  "develop": {
     "network": "homestead",
     "chainId": 1,
-    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/bonustrack/balancer",
+    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer",
+    "hubUrl": "https://beta.vote.balancer.finance",
+    "multicall": "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441",
+    "connectors": {
+      "injected": {
+        "id": "injected",
+        "name": "MetaMask"
+      },
+      "walletconnect": {
+        "id": "walletconnect",
+        "name": "WalletConnect",
+        "options": {
+          "infuraId": "c00cb7215b614b0282964cf1a9b117c0"
+        }
+      },
+      "portis": {
+        "id": "portis",
+        "name": "Portis",
+        "options": {
+          "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
+          "network": "mainnet"
+        }
+      }
+    }
+  },
+  "local": {
+    "network": "homestead",
+    "chainId": 1,
+    "subgraphUrl": "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer",
+    "hubUrl": "http://localhost:3000",
     "multicall": "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441",
     "connectors": {
       "injected": {

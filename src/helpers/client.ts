@@ -1,6 +1,14 @@
+let defaultRestApi = 'http://localhost:3000';
+const domainName = window.location.hostname;
+if (domainName === 'beta.vote.balancer.finance')
+  defaultRestApi = 'https://beta.vote.balancer.finance';
+if (domainName === 'vote.balancer.finance')
+  defaultRestApi = 'https://vote.balancer.finance';
+const restApi = process.env.VUE_APP_REST_API || defaultRestApi;
+
 class Client {
   request(command, body?) {
-    const url = `${process.env.VUE_APP_REST_API}/api/${command}`;
+    const url = `${restApi}/api/${command}`;
     let init;
     if (body) {
       init = {

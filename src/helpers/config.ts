@@ -1,5 +1,8 @@
 import config from '@/config.json';
 
-const networkId = process.env.VUE_APP_NETWORK || 'kovan';
+let id = 'master';
+const domainName = window.location.hostname;
+if (domainName.includes('localhost:')) id = 'local';
+if (domainName === 'beta.vote.balancer.finance') id = 'beta';
 
-export default config[networkId];
+export default config[id];

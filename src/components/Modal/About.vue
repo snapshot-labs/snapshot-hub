@@ -12,7 +12,7 @@
       </div>
       <div class="d-flex">
         <span v-text="'Network'" class="flex-auto text-gray mr-1" />
-        {{ network === 'homestead' ? 'mainnet' : network }}
+        {{ config.network === 'homestead' ? 'mainnet' : config.network }}
       </div>
       <div class="d-flex">
         <span v-text="'Block number'" class="flex-auto text-gray mr-1" />
@@ -30,8 +30,8 @@
         {{ ipfsNode }}
       </div>
       <div class="d-flex">
-        <span v-text="'Matching API'" class="flex-auto text-gray mr-1" />
-        {{ api }}
+        <span v-text="'Hub'" class="flex-auto text-gray mr-1" />
+        {{ config.hubUrl }}
       </div>
     </div>
     <div class="m-4">
@@ -58,9 +58,7 @@ export default {
   data() {
     return {
       pkg,
-      network: process.env.VUE_APP_NETWORK,
-      ipfsNode: process.env.VUE_APP_IPFS_NODE,
-      api: process.env.VUE_APP_REST_API
+      ipfsNode: process.env.VUE_APP_IPFS_NODE
     };
   }
 };
