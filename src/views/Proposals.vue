@@ -5,11 +5,11 @@
         <div class="flex-auto">
           <div>
             <a
-              :href="_etherscanLink(token.token)"
+              :href="_etherscanLink(namespace.token)"
               target="_blank"
               class="text-gray"
             >
-              {{ token.name || _shorten(key) }}
+              {{ namespace.name || _shorten(key) }}
               <Icon name="external-link" class="ml-1" />
             </a>
           </div>
@@ -44,7 +44,7 @@
             :key="i"
             :proposal="proposal"
             :token="key"
-            :verified="token.verified"
+            :verified="namespace.verified"
             :i="i"
           />
         </div>
@@ -61,7 +61,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import tokens from '@/namespaces.json';
+import namespaces from '@/namespaces.json';
 
 export default {
   data() {
@@ -76,9 +76,9 @@ export default {
     key() {
       return this.$route.params.key;
     },
-    token() {
-      return tokens[this.key]
-        ? tokens[this.key]
+    namespace() {
+      return namespaces[this.key]
+        ? namespaces[this.key]
         : { token: this.key, verified: [] };
     },
     totalProposals() {
@@ -90,7 +90,7 @@ export default {
       return Object.fromEntries(
         Object.entries(this.proposals)
           .filter(proposal => {
-            if (!this.token.verified.includes(proposal[1].address))
+            if (!this.namespace.verified.includes(proposal[1].address))
               return false;
             if (this.selectedState === 'All') return true;
             if (
@@ -122,7 +122,7 @@ export default {
   },
   async created() {
     this.loading = true;
-    this.proposals = await this.getProposals(this.token.token);
+    this.proposals = await this.getProposals(this.namespace.token);
     this.loading = false;
     this.loaded = true;
   }

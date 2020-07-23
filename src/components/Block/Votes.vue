@@ -11,7 +11,7 @@
       :style="i === 0 && 'border: 0 !important;'"
       class="px-4 py-3 border-top d-flex"
     >
-      <User :address="address" :verified="token.verified" class="column" />
+      <User :address="address" :verified="namespace.verified" class="column" />
       <div
         v-text="proposal.msg.payload.choices[vote.msg.payload.choice - 1]"
         class="flex-auto text-center text-white"
@@ -19,7 +19,8 @@
       <div class="column text-right">
         <span
           v-text="
-            `${_numeral(vote.balance)} ${token.symbol || _shorten(token.token)}`
+            `${_numeral(vote.balance)} ${namespace.symbol ||
+              _shorten(namespace.token)}`
           "
           class="text-white"
         />
@@ -51,7 +52,7 @@
 
 <script>
 export default {
-  props: ['token', 'proposal', 'votes'],
+  props: ['namespace', 'proposal', 'votes'],
   data() {
     return {
       showAllVotes: false,

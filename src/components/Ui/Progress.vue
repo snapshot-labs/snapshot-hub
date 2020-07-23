@@ -1,17 +1,24 @@
 <template>
-  <span class="Progress Progress--small overflow-hidden">
+  <span class="Progress Progress--small overflow-hidden anim-scale-in">
     <span
-      class="bg-blue anim-scale-in"
-      :style="`width: ${parseInt((100 / max) * value)}%;`"
+      v-for="(bar, i) in bars"
+      :key="i"
+      :style="`width: ${parseInt((100 / max) * bar)}%;`"
+      class="bg-blue"
     />
   </span>
 </template>
 
 <script>
 export default {
-  props: {
-    value: Number,
-    max: Number
+  props: ['value', 'max'],
+  computed: {
+    bars() {
+      return Array.isArray(this.value) ? this.value : [this.value];
+    },
+    total() {
+      return this.bars.reduce((a, b) => a + b, 0);
+    }
   }
 };
 </script>
@@ -24,8 +31,10 @@ export default {
   height: 8px;
   border-radius: 4px;
 
-  span {
-    border-radius: 4px;
+  span:last-child {
+    background-color: transparentize($blue, 0.4) !important;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
 }
 </style>

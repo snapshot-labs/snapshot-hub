@@ -3,7 +3,7 @@
     <div class="px-4 px-md-0 mb-3">
       <router-link :to="{ name: 'home' }" class="text-gray">
         <Icon name="back" size="22" class="v-align-middle" />
-        {{ token.name || _shorten(token.token) }}
+        {{ namespace.name || _shorten(namespace.token) }}
       </router-link>
     </div>
     <div>
@@ -97,7 +97,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import tokens from '@/namespaces.json';
+import namespaces from '@/namespaces.json';
 
 export default {
   data() {
@@ -117,9 +117,9 @@ export default {
     };
   },
   computed: {
-    token() {
-      return tokens[this.key]
-        ? tokens[this.key]
+    namespace() {
+      return namespaces[this.key]
+        ? namespaces[this.key]
         : { token: this.key, verified: [] };
     },
     isValid() {
@@ -156,7 +156,7 @@ export default {
       this.loading = true;
       try {
         const { ipfsHash } = await this.send({
-          token: this.token.token,
+          token: this.namespace.token,
           type: 'proposal',
           payload: this.form
         });

@@ -139,6 +139,17 @@ const actions = {
             .filter((vote: any) => vote.msg.payload.choice === i + 1)
             .reduce((a, b: any) => a + b.balance, 0)
         ),
+        totalBptBalances: result.proposal.msg.payload.choices.map((choice, i) =>
+          Object.values(result.votes)
+            .filter((vote: any) => vote.msg.payload.choice === i + 1)
+            .reduce((a, b: any) => a + b.bptBalance, 0)
+        ),
+        totalWalletBalances: result.proposal.msg.payload.choices.map(
+          (choice, i) =>
+            Object.values(result.votes)
+              .filter((vote: any) => vote.msg.payload.choice === i + 1)
+              .reduce((a, b: any) => a + b.walletBalance, 0)
+        ),
         totalVotesBalances: Object.values(result.votes).reduce(
           (a, b: any) => a + b.balance,
           0
