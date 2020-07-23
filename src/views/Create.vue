@@ -130,7 +130,7 @@ export default {
         this.form.name &&
         this.form.body &&
         this.form.start &&
-        this.form.start >= ts &&
+        // this.form.start >= ts &&
         this.form.end &&
         this.form.end > this.form.start &&
         this.form.choices.length >= 2 &&
