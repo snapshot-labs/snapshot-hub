@@ -28,18 +28,18 @@
             v-text="'Total voting power'"
             class="flex-auto text-gray mr-1"
           />
-          {{ $n(votingPower.total) }} {{ tokenName }}
+          {{ $n(votingPower.total) }} {{ symbol }}
         </div>
         <div
           v-if="votingPower.balance && votingPower.bptBalance"
           class="d-flex"
         >
           <span v-text="'Voting power'" class="flex-auto text-gray mr-1" />
-          {{ $n(votingPower.balance) }} {{ tokenName }}
+          {{ $n(votingPower.balance) }} {{ symbol }}
         </div>
         <div v-if="votingPower.bptBalance" class="d-flex">
           <span v-text="'BPT voting power'" class="flex-auto text-gray mr-1" />
-          {{ $n(votingPower.bptBalance) }} {{ tokenName }}
+          {{ $n(votingPower.bptBalance) }} {{ symbol }}
         </div>
       </div>
       <div class="p-4 overflow-hidden text-center border-top">
@@ -70,7 +70,7 @@ import namespaces from '@/namespaces.json';
 export default {
   props: [
     'open',
-    'token',
+    'namespace',
     'proposal',
     'id',
     'selectedChoice',
@@ -84,8 +84,8 @@ export default {
     };
   },
   computed: {
-    tokenName() {
-      return this.token.symbol || this._shorten(this.token.token);
+    symbol() {
+      return this.namespace.symbol || this._shorten(this.namespace.token);
     }
   },
   methods: {
@@ -93,7 +93,7 @@ export default {
     async handleSubmit() {
       this.loading = true;
       await this.send({
-        token: this.token.token,
+        token: this.namespace.token,
         type: 'vote',
         payload: {
           proposal: this.id,

@@ -82,13 +82,16 @@ export default {
       this.input = this.formatDate(year, month, day);
       this.$emit('input', this.input);
     },
-    isSelectable(year, month, day) {
+    isSelectable() {
+      return true;
+      /*
       const in30Days = new Date();
       in30Days.setDate(in30Days.getDate() + 30);
       return (
         new Date(year, month, day) > new Date() &&
         new Date(year, month, day) < in30Days
       );
+      */
     }
   }
 };
