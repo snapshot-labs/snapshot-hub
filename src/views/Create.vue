@@ -88,6 +88,7 @@
     </div>
     <ModalSelectDate
       :value="form[selectedDate]"
+      :selectedDate="selectedDate"
       :open="modalOpen"
       @close="modalOpen = false"
       @input="setDate"
@@ -123,7 +124,7 @@ export default {
         : { token: this.key, verified: [] };
     },
     isValid() {
-      const ts = (Date.now() / 1e3).toFixed();
+      // const ts = (Date.now() / 1e3).toFixed();
       return (
         !this.loading &&
         this.web3.account &&

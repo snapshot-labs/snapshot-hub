@@ -26,7 +26,10 @@
       <div v-for="day in days" :key="day">
         <a
           class="day border-bottom border-right selectable"
-          :class="{ selected: input.includes(formatDate(year, month, day)) }"
+          :class="{
+            'bg-gray-dark': formatDate(year, month, day) === today,
+            selected: input.includes(formatDate(year, month, day))
+          }"
           v-if="isSelectable(year, month, day)"
           v-text="day"
           @click="toggleDay(year, month, day)"
@@ -49,6 +52,13 @@ export default {
     };
   },
   computed: {
+    today() {
+      return this.formatDate(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate()
+      );
+    },
     daysOfWeek() {
       const sunday = new Date(2017, 0, 0);
       return [...Array(7)].map(() => {
@@ -76,7 +86,7 @@ export default {
   },
   methods: {
     formatDate(year, month, day) {
-      return new Date(year, month, day + 1).toISOString().split('T')[0];
+      return new Date(year, month, day).toISOString().split('T')[0];
     },
     toggleDay(year, month, day) {
       this.input = this.formatDate(year, month, day);
@@ -125,8 +135,8 @@ export default {
     }
 
     &.selected {
-      background-color: $white;
-      color: $black;
+      background-color: $white !important;
+      color: $black !important;
     }
   }
 }

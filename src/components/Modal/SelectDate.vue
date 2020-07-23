@@ -2,13 +2,13 @@
   <UiModal :open="open" @close="$emit('close')">
     <form @submit.prevent="handleSubmit" class="modal-body">
       <div v-if="step === 0">
-        <h3 class="m-4 text-center">Select a date</h3>
+        <h3 class="m-4 text-center">Select {{ selectedDate }} date UTC</h3>
         <div class="modal-body m-4">
           <UiCalendar v-model="input" class="mx-auto mb-2" />
         </div>
       </div>
       <div v-else>
-        <h3 class="m-4 mb-0 text-center">Select a time UTC</h3>
+        <h3 class="m-4 mb-0 text-center">Select {{ selectedDate }} time UTC</h3>
         <div class="d-flex m-4 mx-auto" style="max-width: 160px;">
           <UiButton class="px-0 width-fit">
             <input v-model="form.h" max="24" class="input text-center col-5" />
@@ -36,7 +36,7 @@
 
 <script>
 export default {
-  props: ['open', 'value'],
+  props: ['open', 'value', 'selectedDate'],
   data() {
     return {
       input: '',
