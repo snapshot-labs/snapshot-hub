@@ -27,7 +27,10 @@
         </a>
       </div>
       <div class="d-flex mt-3">
-        <span v-text="'Snapshot block number'" class="flex-auto text-gray mr-1" />
+        <span
+          v-text="'Snapshot block number'"
+          class="flex-auto text-gray mr-1"
+        />
         <a :href="_etherscanLink(gov.snapshot, 'block')" target="_blank">
           {{ $n(gov.snapshot) }}
           <Icon name="external-link" class="ml-1" />
