@@ -59,9 +59,7 @@ const actions = {
         if (bptBalances[token.toLowerCase()])
           bptBalance = bptBalances[token.toLowerCase()];
       }
-      const balance = parseFloat(
-        await dispatch('getBalance', { snapshot, token })
-      );
+      const balance = await dispatch('getBalance', { snapshot, token });
       const total = bptBalance + balance;
       commit('GET_VOTING_POWER_SUCCESS');
       return { balance, bptBalance, total };
@@ -100,6 +98,47 @@ const actions = {
         })
       );
       commit('GET_VOTING_POWERS_SUCCESS');
+      return votingPowers;
+    } catch (e) {
+      commit('GET_VOTING_POWERS_FAILURE', e);
+    }
+  },
+  getVotingPowersByPools: async (
+    { commit },
+    { snapshot, token, addresses }
+  ) => {
+    commit('GET_VOTING_POWERS_REQUEST');
+    try {
+      const { poolShares } = await request('getVotingPowers', {
+        poolShares: {
+          __args: {
+            block: {
+              number: parseInt(snapshot)
+            },
+            where: {
+              userAddress_in: addresses.map(address => address.toLowerCase())
+            }
+          }
+        }
+      });
+      const votingPowers: any = Object.fromEntries(
+        addresses.map(address => [address, 0])
+      );
+      poolShares.forEach(poolShare =>
+        poolShare.poolId.tokens.map(poolToken => {
+          const [poolId, tokenAddress] = poolToken.id.split('-');
+          if (tokenAddress === token.toLowerCase()) {
+            const userAddress = getAddress(poolShare.userAddress.id);
+            const poolAddress = getAddress(poolId);
+            if (!votingPowers[userAddress]) votingPowers[userAddress] = {};
+            votingPowers[userAddress][poolAddress] =
+              (poolToken.balance / poolShare.poolId.totalShares) *
+              poolShare.balance;
+          }
+        })
+      );
+      commit('GET_VOTING_POWERS_SUCCESS');
+      console.log(votingPowers);
       return votingPowers;
     } catch (e) {
       commit('GET_VOTING_POWERS_FAILURE', e);

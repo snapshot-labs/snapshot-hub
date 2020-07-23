@@ -34,11 +34,11 @@
           v-if="votingPower.balance && votingPower.bptBalance"
           class="d-flex"
         >
-          <span v-text="'Voting power'" class="flex-auto text-gray mr-1" />
+          <span v-text="'Wallet balance'" class="flex-auto text-gray mr-1" />
           {{ $n(votingPower.balance) }} {{ symbol }}
         </div>
         <div v-if="votingPower.bptBalance" class="d-flex">
-          <span v-text="'BPT voting power'" class="flex-auto text-gray mr-1" />
+          <span v-text="'Balancer pools'" class="flex-auto text-gray mr-1" />
           {{ $n(votingPower.bptBalance) }} {{ symbol }}
         </div>
       </div>

@@ -4,7 +4,7 @@
       <div class="text-white mb-1">
         <span v-text="choice" class="mr-1" />
         <span v-if="results.totalBalances[i]" class="mr-1">
-          {{ _numeral(results.totalBalances[i].toFixed(0)) }}
+          {{ _numeral(results.totalBalances[i]) }}
           {{ namespace.symbol || _shorten(namespace.token) }}
         </span>
         <span

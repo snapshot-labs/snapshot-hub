@@ -17,7 +17,7 @@ export default {
     ...mapState(modules)
   },
   methods: {
-    _numeral(number, format = '(0.[0]a)') {
+    _numeral(number, format = '(0.[00]a)') {
       return numeral(number).format(format);
     },
     _shorten(str: string): string {

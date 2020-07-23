@@ -20,6 +20,14 @@
           <div :key="web3.account">
             <template v-if="web3.account && !wrongNetwork">
               <UiButton
+                @click="modalVotingPowerOpen = true"
+                :loading="loading"
+                class="button-outline mr-2"
+              >
+                {{ _numeral(gov.votingPower) }}
+                {{ gov.namespace.symbol }}
+              </UiButton>
+              <UiButton
                 @click="modalOpen = true"
                 class="button-outline"
                 :loading="loading"
@@ -54,6 +62,10 @@
           @login="handleLogin"
         />
         <ModalAbout :open="modalAboutOpen" @close="modalAboutOpen = false" />
+        <ModalVotingPower
+          :open="modalVotingPowerOpen"
+          @close="modalVotingPowerOpen = false"
+        />
       </Container>
     </nav>
   </Sticky>
@@ -61,20 +73,17 @@
 
 <script>
 import { mapActions } from 'vuex';
-import namespaces from '@/namespaces.json';
 
 export default {
   data() {
     return {
       loading: false,
       modalOpen: false,
-      modalAboutOpen: false
+      modalAboutOpen: false,
+      modalVotingPowerOpen: false
     };
   },
   computed: {
-    namespace() {
-      return namespaces['balancer'];
-    },
     wrongNetwork() {
       return this.config.chainId !== this.web3.injectedChainId;
     },

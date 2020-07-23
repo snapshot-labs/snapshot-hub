@@ -3,13 +3,13 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { getAddress } from '@ethersproject/address';
 import { formatEther } from '@ethersproject/units';
+import { Interface } from '@ethersproject/abi';
 import store from '@/store';
 import abi from '@/helpers/abi';
 import config from '@/helpers/config';
 import lock from '@/helpers/lock';
 import wsProvider from '@/helpers/ws';
 import { lsSet, lsGet, lsRemove } from '@/helpers/utils';
-import { Interface } from '@ethersproject/abi';
 
 let provider;
 let web3;
@@ -305,7 +305,10 @@ const actions = {
     }
   },
   loadAccount: async ({ dispatch }) => {
-    await Promise.all([dispatch('lookupAddress')]);
+    await Promise.all([
+      dispatch('lookupAddress'),
+      dispatch('getMyVotingPower')
+    ]);
   },
   getBlockNumber: async ({ commit }) => {
     commit('GET_BLOCK_REQUEST');

@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { Contract } from '@ethersproject/contracts';
 import { Interface } from '@ethersproject/abi';
 import { formatEther } from '@ethersproject/units';
@@ -8,9 +9,14 @@ import abi from '@/helpers/abi';
 import wsProvider from '@/helpers/ws';
 import { formatProposal, formatProposals } from '@/helpers/utils';
 import { version } from '@/../package.json';
+import namespaces from '@/namespaces.json';
 
 const state = {
-  votingPower: 0
+  namespace: namespaces['balancer'],
+  votingPower: 0,
+  votingPowerByPools: {},
+  walletBalance: 0,
+  snapshot: 10516514
 };
 
 const mutations = {
@@ -53,7 +59,10 @@ const mutations = {
   GET_MY_VOTING_POWER_REQUEST() {
     console.debug('GET_MY_VOTING_POWER_REQUEST');
   },
-  GET_MY_VOTING_POWER_SUCCESS() {
+  GET_MY_VOTING_POWER_SUCCESS(_state, payload) {
+    Vue.set(_state, 'walletBalance', payload.walletBalance);
+    Vue.set(_state, 'votingPower', payload.votingPower);
+    Vue.set(_state, 'votingPowerByPools', payload.votingPowerByPools);
     console.debug('GET_MY_VOTING_POWER_SUCCESS');
   },
   GET_MY_VOTING_POWER_FAILURE(_state, payload) {
@@ -196,19 +205,27 @@ const actions = {
       return Promise.reject();
     }
   },
-  getMyVotingPower: async (
-    { commit, dispatch, rootState },
-    { snapshot, token }
-  ) => {
+  getMyVotingPower: async ({ commit, dispatch, rootState }) => {
     commit('GET_MY_VOTING_POWER_REQUEST');
     const address = rootState.web3.account;
     try {
-      const myVotingPower = await dispatch('getVotingPowers', {
-        snapshot,
-        token,
+      const myVotingPower = await dispatch('getVotingPowersByPools', {
+        snapshot: state.snapshot,
+        token: state.namespace.token,
         addresses: [address]
       });
-      commit('GET_MY_VOTING_POWER_SUCCESS');
+      const walletBalance = await dispatch('getBalance', {
+        snapshot: state.snapshot,
+        token: state.namespace.token
+      });
+      commit('GET_MY_VOTING_POWER_SUCCESS', {
+        walletBalance,
+        votingPower: Object.values(myVotingPower[address]).reduce(
+          (a: any, b: any) => a + b,
+          walletBalance
+        ),
+        votingPowerByPools: myVotingPower[address]
+      });
       return myVotingPower;
     } catch (e) {
       commit('GET_MY_VOTING_POWER_FAILURE', e);
