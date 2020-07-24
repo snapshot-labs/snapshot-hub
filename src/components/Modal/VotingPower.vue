@@ -1,7 +1,7 @@
 <template>
   <UiModal :open="open" @close="$emit('close')">
     <h3 class="m-4 mb-0 text-center">Your voting power</h3>
-    <div class="m-4 p-4 border rounded-2 text-white">
+    <div class="m-4 mb-5 p-4 border rounded-2 text-white">
       <div class="d-flex mb-3 pb-2 border-bottom" style="font-size: 22px;">
         <b v-text="'Total voting power'" class="flex-auto text-gray mr-1" />
         <b>{{ _numeral(gov.votingPower) }} {{ gov.namespace.symbol }} </b>
