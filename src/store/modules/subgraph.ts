@@ -1,5 +1,5 @@
-import { request } from '@/helpers/subgraph';
 import { getAddress } from '@ethersproject/address';
+import { request } from '@/helpers/subgraph';
 
 const mutations = {
   GET_VOTING_POWER_REQUEST() {
