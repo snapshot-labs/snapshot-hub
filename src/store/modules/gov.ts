@@ -226,10 +226,8 @@ const actions = {
         ),
         votingPowerByPools: myVotingPower[address]
       });
-      console.log('My voting power', myVotingPower, address, state.snapshot, state.namespace.token);
       return myVotingPower;
     } catch (e) {
-      console.log('Failed to get my voting power', e, address, state.snapshot, state.namespace.token);
       commit('GET_MY_VOTING_POWER_FAILURE', e);
     }
   }

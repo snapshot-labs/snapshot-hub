@@ -192,7 +192,7 @@ const actions = {
   loadProvider: async ({ commit, dispatch }) => {
     commit('LOAD_PROVIDER_REQUEST');
     try {
-      // @TODO Remove any old listeners
+      provider.removeAllListeners();
       if (provider.on) {
         provider.on('chainChanged', async () => {
           commit('HANDLE_CHAIN_CHANGED');
@@ -205,7 +205,7 @@ const actions = {
             if (state.active) await dispatch('loadWeb3');
           } else {
             commit('HANDLE_ACCOUNTS_CHANGED', accounts[0]);
-            await dispatch('loadAccount');
+            await dispatch('loadWeb3');
           }
         });
         provider.on('close', async () => {
