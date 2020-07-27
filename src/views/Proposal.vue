@@ -163,7 +163,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposal', 'getVotingPower']),
+    ...mapActions(['getProposal']),
     async loadProposal() {
       const proposalObj = await this.getProposal({
         token: this.namespace.token,
@@ -172,23 +172,11 @@ export default {
       this.proposal = proposalObj.proposal;
       this.votes = proposalObj.votes;
       this.results = proposalObj.results;
-    },
-    async loadVotingPower() {
-      if (!this.web3.account) return;
-      const snapshot =
-        this.payload.snapshot > this.web3.blockNumber
-          ? this.web3.blockNumber
-          : parseInt(this.payload.snapshot);
-      this.votingPower = await this.getVotingPower({
-        token: this.namespace.token,
-        snapshot
-      });
     }
   },
   async created() {
     this.loading = true;
     await this.loadProposal();
-    await this.loadVotingPower();
     this.loading = false;
     this.loaded = true;
   }
