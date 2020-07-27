@@ -16,7 +16,7 @@ const state = {
   votingPower: 0,
   votingPowerByPools: {},
   walletBalance: 0,
-  snapshot: 10516514
+  snapshot: 10541900
 };
 
 const mutations = {
@@ -120,11 +120,10 @@ const actions = {
       result.proposal = formatProposal(proposal);
       result.proposal.ipfsHash = payload.id;
       result.votes = votes;
+      const bptDisabled = !!result.proposal.bpt_voting_disabled;
       const { snapshot } = result.proposal.msg.payload;
       const blockTag =
-        snapshot > rootState.web3.blockNumber
-          ? rootState.web3.blockNumber
-          : parseInt(snapshot);
+        snapshot > rootState.web3.blockNumber ? 'latest' : parseInt(snapshot);
       const votersBalances = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map((vote: any) => vote.address),
@@ -132,17 +131,20 @@ const actions = {
       });
       // @ts-ignore
       const addresses = Object.keys(votes);
-      const votingPowers = await dispatch('getVotingPowers', {
-        token: result.proposal.msg.token,
-        snapshot: blockTag,
-        addresses
-      });
+      let votingPowers = {};
+      if (!bptDisabled) {
+        votingPowers = await dispatch('getVotingPowers', {
+          token: result.proposal.msg.token,
+          blockTag,
+          addresses
+        });
+      }
       result.votes = Object.fromEntries(
         Object.entries(result.votes)
           .map((vote: any) => {
-            vote[1].balance =
-              votersBalances[vote[1].address] + votingPowers[vote[1].address];
-            vote[1].bptBalance = votingPowers[vote[1].address];
+            const bptBalance = bptDisabled ? 0 : votingPowers[vote[1].address];
+            vote[1].balance = votersBalances[vote[1].address] + bptBalance;
+            vote[1].bptBalance = bptBalance;
             vote[1].walletBalance = votersBalances[vote[1].address];
             return vote;
           })
@@ -161,11 +163,13 @@ const actions = {
             .filter((vote: any) => vote.msg.payload.choice === i + 1)
             .reduce((a, b: any) => a + b.balance, 0)
         ),
-        totalBptBalances: result.proposal.msg.payload.choices.map((choice, i) =>
-          Object.values(result.votes)
-            .filter((vote: any) => vote.msg.payload.choice === i + 1)
-            .reduce((a, b: any) => a + b.bptBalance, 0)
-        ),
+        totalBptBalances: bptDisabled
+          ? 0
+          : result.proposal.msg.payload.choices.map((choice, i) =>
+              Object.values(result.votes)
+                .filter((vote: any) => vote.msg.payload.choice === i + 1)
+                .reduce((a, b: any) => a + b.bptBalance, 0)
+            ),
         totalWalletBalances: result.proposal.msg.payload.choices.map(
           (choice, i) =>
             Object.values(result.votes)
@@ -208,14 +212,17 @@ const actions = {
   getMyVotingPower: async ({ commit, dispatch, rootState }) => {
     commit('GET_MY_VOTING_POWER_REQUEST');
     const address = rootState.web3.account;
+    const blockTag =
+      state.snapshot > rootState.web3.blockNumber ? 'latest' : state.snapshot;
     try {
-      const myVotingPower = await dispatch('getVotingPowersByPools', {
-        snapshot: state.snapshot,
-        token: state.namespace.token,
-        addresses: [address]
-      });
+      const myVotingPower =
+        (await dispatch('getVotingPowersByPools', {
+          blockTag,
+          token: state.namespace.token,
+          addresses: [address]
+        })) || {};
       const walletBalance = await dispatch('getBalance', {
-        snapshot: state.snapshot,
+        blockTag,
         token: state.namespace.token
       });
       commit('GET_MY_VOTING_POWER_SUCCESS', {
