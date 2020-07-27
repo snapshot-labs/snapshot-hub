@@ -25,7 +25,7 @@ const mutations = {
 const actions = {
   getVotingPower: async (
     { commit, rootState, dispatch },
-    { snapshot, token }
+    { blockTag, token }
   ) => {
     const address = rootState.web3.account;
     commit('GET_VOTING_POWER_REQUEST');
@@ -34,7 +34,7 @@ const actions = {
         poolShares: {
           __args: {
             block: {
-              number: parseInt(snapshot)
+              number: blockTag
             },
             where: {
               userAddress: address.toLowerCase()
@@ -59,7 +59,7 @@ const actions = {
         if (bptBalances[token.toLowerCase()])
           bptBalance = bptBalances[token.toLowerCase()];
       }
-      const balance = await dispatch('getBalance', { snapshot, token });
+      const balance = await dispatch('getBalance', { blockTag, token });
       const total = bptBalance + balance;
       commit('GET_VOTING_POWER_SUCCESS');
       return { balance, bptBalance, total };
@@ -67,14 +67,14 @@ const actions = {
       commit('GET_VOTING_POWER_FAILURE', e);
     }
   },
-  getVotingPowers: async ({ commit }, { snapshot, token, addresses }) => {
+  getVotingPowers: async ({ commit }, { blockTag, token, addresses }) => {
     commit('GET_VOTING_POWERS_REQUEST');
     try {
       const { poolShares } = await request('getVotingPowers', {
         poolShares: {
           __args: {
             block: {
-              number: parseInt(snapshot)
+              number: blockTag
             },
             where: {
               userAddress_in: addresses.map(address => address.toLowerCase())
@@ -105,16 +105,14 @@ const actions = {
   },
   getVotingPowersByPools: async (
     { commit },
-    { snapshot, token, addresses }
+    { blockTag, token, addresses }
   ) => {
     commit('GET_VOTING_POWERS_REQUEST');
     try {
-      const { poolShares } = await request('getVotingPowers', {
+      const result = await request('getVotingPowers', {
         poolShares: {
           __args: {
-            block: {
-              number: parseInt(snapshot)
-            },
+            block: blockTag === 'latest' ? undefined : { number: blockTag },
             where: {
               userAddress_in: addresses.map(address => address.toLowerCase())
             }
@@ -122,21 +120,22 @@ const actions = {
         }
       });
       const votingPowers: any = Object.fromEntries(
-        addresses.map(address => [address, 0])
+        addresses.map(address => [address, {}])
       );
-      poolShares.forEach(poolShare =>
-        poolShare.poolId.tokens.map(poolToken => {
-          const [poolId, tokenAddress] = poolToken.id.split('-');
-          if (tokenAddress === token.toLowerCase()) {
-            const userAddress = getAddress(poolShare.userAddress.id);
-            const poolAddress = getAddress(poolId);
-            if (!votingPowers[userAddress]) votingPowers[userAddress] = {};
-            votingPowers[userAddress][poolAddress] =
-              (poolToken.balance / poolShare.poolId.totalShares) *
-              poolShare.balance;
-          }
-        })
-      );
+      if (result && result.poolShares) {
+        result.poolShares.forEach(poolShare =>
+          poolShare.poolId.tokens.map(poolToken => {
+            const [poolId, tokenAddress] = poolToken.id.split('-');
+            if (tokenAddress === token.toLowerCase()) {
+              const userAddress = getAddress(poolShare.userAddress.id);
+              const poolAddress = getAddress(poolId);
+              votingPowers[userAddress][poolAddress] =
+                (poolToken.balance / poolShare.poolId.totalShares) *
+                poolShare.balance;
+            }
+          })
+        );
+      }
       commit('GET_VOTING_POWERS_SUCCESS');
       return votingPowers;
     } catch (e) {

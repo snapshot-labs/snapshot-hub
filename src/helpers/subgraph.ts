@@ -20,5 +20,5 @@ export async function request(key: string | null, params: any = {}) {
     body: JSON.stringify({ query })
   });
   const { data } = await res.json();
-  return data;
+  return data || {};
 }

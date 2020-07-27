@@ -41,10 +41,13 @@ export function lsRemove(key: string) {
 export function formatProposal(proposal) {
   proposal.msg = jsonParse(proposal.msg, proposal.msg);
 
-  // v0.1.1
-  proposal.msg.payload.start = proposal.msg.payload.start || 1595088000;
-  proposal.msg.payload.end = proposal.msg.payload.end || 1595174400;
-  proposal.msg.payload.snapshot = proposal.msg.payload.snapshot || 10484400;
+  // v0.1.0
+  if (proposal.msg.version === '0.1.0') {
+    proposal.msg.payload.start = 1595088000;
+    proposal.msg.payload.end = 1595174400;
+    proposal.msg.payload.snapshot = 10484400;
+    proposal.bpt_voting_disabled = '1';
+  }
 
   return proposal;
 }

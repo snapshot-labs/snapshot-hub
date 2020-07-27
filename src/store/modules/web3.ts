@@ -321,18 +321,16 @@ const actions = {
       return Promise.reject();
     }
   },
-  getBalance: async ({ commit }, { snapshot, token }) => {
+  getBalance: async ({ commit }, { blockTag, token }) => {
     commit('GET_BALANCE_REQUEST');
     const address = state.account;
-    const multi = new Contract(config.multicall, abi['Multicall'], wsProvider);
+    const multi = new Contract(config.multicall, abi['Multicall'], web3);
     const testToken = new Interface(abi.TestToken);
     const calls = [
       [token, testToken.encodeFunctionData('balanceOf', [address])]
     ];
     try {
-      const [, response] = await multi.aggregate(calls, {
-        blockTag: parseInt(snapshot)
-      });
+      const [, response] = await multi.aggregate(calls, { blockTag });
       const balance = parseFloat(formatEther(response[0].toString()));
       commit('GET_BALANCE_SUCCESS');
       return balance;
