@@ -28,18 +28,9 @@
             v-text="'Total voting power'"
             class="flex-auto text-gray mr-1"
           />
-          {{ $n(votingPower.total) }} {{ symbol }}
-        </div>
-        <div
-          v-if="votingPower.balance && votingPower.bptBalance"
-          class="d-flex"
-        >
-          <span v-text="'Wallet balance'" class="flex-auto text-gray mr-1" />
-          {{ $n(votingPower.balance) }} {{ symbol }}
-        </div>
-        <div v-if="votingPower.bptBalance" class="d-flex">
-          <span v-text="'Balancer pools'" class="flex-auto text-gray mr-1" />
-          {{ $n(votingPower.bptBalance) }} {{ symbol }}
+          <span
+            v-text="`${_numeral(gov.votingPower)} ${gov.namespace.symbol}`"
+          />
         </div>
       </div>
       <div class="p-4 overflow-hidden text-center border-top">
@@ -68,15 +59,7 @@ import { mapActions } from 'vuex';
 import namespaces from '@/namespaces.json';
 
 export default {
-  props: [
-    'open',
-    'namespace',
-    'proposal',
-    'id',
-    'selectedChoice',
-    'votingPower',
-    'snapshot'
-  ],
+  props: ['open', 'namespace', 'proposal', 'id', 'selectedChoice', 'snapshot'],
   data() {
     return {
       loading: false,
