@@ -1,38 +1,33 @@
+import Vue from 'vue';
+import { Contract } from '@ethersproject/contracts';
+import { Interface } from '@ethersproject/abi';
+import { formatEther } from '@ethersproject/units';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
 import config from '@/helpers/config';
 import abi from '@/helpers/abi';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { Contract } from '@ethersproject/contracts';
-import { Interface } from '@ethersproject/abi';
-import { formatEther } from '@ethersproject/units';
-import pkg from '@/../package.json';
-import { jsonParse } from '@/helpers/utils';
+import wsProvider from '@/helpers/ws';
+import { formatProposal, formatProposals } from '@/helpers/utils';
+import { version } from '@/../package.json';
+import namespaces from '@/namespaces.json';
 
-const infuraId = process.env.VUE_APP_INFURA_ID;
-const backupUrls = {
-  1: `https://mainnet.infura.io/v3/${infuraId}`,
-  42: `https://kovan.infura.io/v3/${infuraId}`
+const state = {
+  namespace: namespaces['balancer'],
+  votingPower: 0,
+  votingPowerByPools: {},
+  walletBalance: 0,
+  snapshot: 10541900
 };
 
 const mutations = {
-  POST_REQUEST() {
-    console.debug('POST_REQUEST');
+  SEND_REQUEST() {
+    console.debug('SEND_REQUEST');
   },
-  POST_SUCCESS() {
-    console.debug('POST_SUCCESS');
+  SEND_SUCCESS() {
+    console.debug('SEND_SUCCESS');
   },
-  POST_FAILURE(_state, payload) {
-    console.debug('POST_FAILURE', payload);
-  },
-  VOTE_REQUEST() {
-    console.debug('VOTE_REQUEST');
-  },
-  VOTE_SUCCESS() {
-    console.debug('VOTE_SUCCESS');
-  },
-  VOTE_FAILURE(_state, payload) {
-    console.debug('VOTE_FAILURE', payload);
+  SEND_FAILURE(_state, payload) {
+    console.debug('SEND_FAILURE', payload);
   },
   GET_PROPOSALS_REQUEST() {
     console.debug('GET_PROPOSALS_REQUEST');
@@ -60,105 +55,97 @@ const mutations = {
   },
   GET_VOTERS_BALANCES_FAILURE(_state, payload) {
     console.debug('GET_VOTERS_BALANCES_FAILURE', payload);
+  },
+  GET_MY_VOTING_POWER_REQUEST() {
+    console.debug('GET_MY_VOTING_POWER_REQUEST');
+  },
+  GET_MY_VOTING_POWER_SUCCESS(_state, payload) {
+    Vue.set(_state, 'walletBalance', payload.walletBalance);
+    Vue.set(_state, 'votingPower', payload.votingPower);
+    Vue.set(_state, 'votingPowerByPools', payload.votingPowerByPools);
+    console.debug('GET_MY_VOTING_POWER_SUCCESS');
+  },
+  GET_MY_VOTING_POWER_FAILURE(_state, payload) {
+    console.debug('GET_MY_VOTING_POWER_FAILURE', payload);
   }
 };
 
 const actions = {
-  post: async ({ commit, dispatch, rootState }, payload) => {
-    commit('POST_REQUEST');
+  send: async ({ commit, dispatch, rootState }, { token, type, payload }) => {
+    commit('SEND_REQUEST');
     try {
       const msg: any = {
         address: rootState.web3.account,
         msg: JSON.stringify({
-          version: pkg.version,
-          token: payload.token,
-          type: 'proposal',
-          timestamp: (new Date().getTime() / 1e3).toFixed(),
-          payload: {
-            name: payload.name,
-            body: payload.body,
-            choices: payload.choices,
-            startBlock: payload.startBlock,
-            endBlock: payload.endBlock
-          }
+          version,
+          timestamp: (Date.now() / 1e3).toFixed(),
+          token,
+          type,
+          payload
         })
       };
       msg.sig = await dispatch('signMessage', msg.msg);
       const result = await client.request('message', msg);
-      commit('POST_SUCCESS');
-      dispatch('notify', ['green', 'Your proposal is in!']);
+      commit('SEND_SUCCESS');
+      dispatch('notify', ['green', `Your ${type} is in!`]);
       return result;
     } catch (e) {
-      commit('POST_FAILURE', e);
-      dispatch('notify', ['red', 'Oops, something went wrong!']);
-      return;
-    }
-  },
-  vote: async ({ commit, dispatch, rootState }, payload) => {
-    commit('VOTE_REQUEST');
-    try {
-      const msg: any = {
-        address: rootState.web3.account,
-        msg: JSON.stringify({
-          version: pkg.version,
-          token: payload.token,
-          type: 'vote',
-          timestamp: (new Date().getTime() / 1e3).toFixed(),
-          payload: {
-            proposal: payload.proposal,
-            choice: payload.choice
-          }
-        })
-      };
-      msg.sig = await dispatch('signMessage', msg.msg);
-      const result = await client.request('message', msg);
-      commit('VOTE_SUCCESS');
-      dispatch('notify', ['green', 'Your vote is in!']);
-      return result;
-    } catch (e) {
-      commit('VOTE_FAILURE', e);
-      dispatch('notify', ['red', 'Oops, something went wrong!']);
+      commit('SEND_FAILURE', e);
+      const errorMessage =
+        e && e.error_description
+          ? `Oops, ${e.error_description}`
+          : 'Oops, something went wrong!';
+      dispatch('notify', ['red', errorMessage]);
       return;
     }
   },
   getProposals: async ({ commit }, payload) => {
     commit('GET_PROPOSALS_REQUEST');
     try {
-      const result: any = await client.request(`${payload}/proposals`);
+      const proposals: any = await client.request(`${payload}/proposals`);
       commit('GET_PROPOSALS_SUCCESS');
-      return Object.fromEntries(
-        Object.entries(result).map((item: any) => {
-          item.msg = jsonParse(item.msg, {});
-          return item;
-        })
-      );
+      return formatProposals(proposals);
     } catch (e) {
       commit('GET_PROPOSALS_FAILURE', e);
     }
   },
-  getProposal: async ({ commit, dispatch }, payload) => {
+  getProposal: async ({ commit, dispatch, rootState }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
       const result: any = {};
-      result.proposal = await ipfs.get(payload.id);
-      result.proposal.msg = jsonParse(result.proposal.msg);
+      const [proposal, votes] = await Promise.all([
+        ipfs.get(payload.id),
+        client.request(`${payload.token}/proposal/${payload.id}`)
+      ]);
+      result.proposal = formatProposal(proposal);
       result.proposal.ipfsHash = payload.id;
-      result.votes = await client.request(
-        `${payload.token}/proposal/${payload.id}`
-      );
-      // const { blockNumber } = rootState.web3;
-      // const { startBlock } = result.proposal.msg.payload;
-      // const blockTag = startBlock > blockNumber ? blockNumber : parseInt(startBlock);
-      const blockTag = 10484400; // Hardcode snapshot block
-      const votes = await dispatch('getVotersBalances', {
+      result.votes = votes;
+      const bptDisabled = !!result.proposal.bpt_voting_disabled;
+      const { snapshot } = result.proposal.msg.payload;
+      const blockTag =
+        snapshot > rootState.web3.blockNumber ? 'latest' : parseInt(snapshot);
+      const votersBalances = await dispatch('getVotersBalances', {
         token: payload.token,
         addresses: Object.values(result.votes).map((vote: any) => vote.address),
         blockTag
       });
+      // @ts-ignore
+      const addresses = Object.keys(votes);
+      let votingPowers = {};
+      if (!bptDisabled) {
+        votingPowers = await dispatch('getVotingPowers', {
+          token: result.proposal.msg.token,
+          blockTag,
+          addresses
+        });
+      }
       result.votes = Object.fromEntries(
         Object.entries(result.votes)
           .map((vote: any) => {
-            vote[1].balance = votes[vote[1].address];
+            const bptBalance = bptDisabled ? 0 : votingPowers[vote[1].address];
+            vote[1].balance = votersBalances[vote[1].address] + bptBalance;
+            vote[1].bptBalance = bptBalance;
+            vote[1].walletBalance = votersBalances[vote[1].address];
             return vote;
           })
           .sort((a, b) => b[1].balance - a[1].balance)
@@ -176,6 +163,19 @@ const actions = {
             .filter((vote: any) => vote.msg.payload.choice === i + 1)
             .reduce((a, b: any) => a + b.balance, 0)
         ),
+        totalBptBalances: bptDisabled
+          ? 0
+          : result.proposal.msg.payload.choices.map((choice, i) =>
+              Object.values(result.votes)
+                .filter((vote: any) => vote.msg.payload.choice === i + 1)
+                .reduce((a, b: any) => a + b.bptBalance, 0)
+            ),
+        totalWalletBalances: result.proposal.msg.payload.choices.map(
+          (choice, i) =>
+            Object.values(result.votes)
+              .filter((vote: any) => vote.msg.payload.choice === i + 1)
+              .reduce((a, b: any) => a + b.walletBalance, 0)
+        ),
         totalVotesBalances: Object.values(result.votes).reduce(
           (a, b: any) => a + b.balance,
           0
@@ -189,11 +189,7 @@ const actions = {
   },
   getVotersBalances: async ({ commit }, { token, addresses, blockTag }) => {
     commit('GET_VOTERS_BALANCES_REQUEST');
-    const multi = new Contract(
-      config.addresses.multicall,
-      abi['Multicall'],
-      new JsonRpcProvider(backupUrls[config.chainId])
-    );
+    const multi = new Contract(config.multicall, abi['Multicall'], wsProvider);
     const calls = [];
     const testToken = new Interface(abi.TestToken);
     addresses.forEach(address => {
@@ -212,10 +208,40 @@ const actions = {
       commit('GET_VOTERS_BALANCES_FAILURE', e);
       return Promise.reject();
     }
+  },
+  getMyVotingPower: async ({ commit, dispatch, rootState }) => {
+    commit('GET_MY_VOTING_POWER_REQUEST');
+    const address = rootState.web3.account;
+    const blockTag =
+      state.snapshot > rootState.web3.blockNumber ? 'latest' : state.snapshot;
+    try {
+      const myVotingPower =
+        (await dispatch('getVotingPowersByPools', {
+          blockTag,
+          token: state.namespace.token,
+          addresses: [address]
+        })) || {};
+      const walletBalance = await dispatch('getBalance', {
+        blockTag,
+        token: state.namespace.token
+      });
+      commit('GET_MY_VOTING_POWER_SUCCESS', {
+        walletBalance,
+        votingPower: Object.values(myVotingPower[address]).reduce(
+          (a: any, b: any) => a + b,
+          walletBalance
+        ),
+        votingPowerByPools: myVotingPower[address]
+      });
+      return myVotingPower;
+    } catch (e) {
+      commit('GET_MY_VOTING_POWER_FAILURE', e);
+    }
   }
 };
 
 export default {
+  state,
   mutations,
   actions
 };

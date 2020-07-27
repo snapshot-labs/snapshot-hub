@@ -16,3 +16,10 @@ export async function verify(address, msg, sig) {
 export function clone(item) {
   return JSON.parse(JSON.stringify(item));
 }
+
+export function sendError(res, description) {
+  return res.status(500).json({
+    error: 'unauthorized',
+    error_description: description
+  });
+}

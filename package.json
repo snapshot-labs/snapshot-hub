@@ -1,6 +1,6 @@
 {
   "name": "balancer-gov",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "balancer-labs/balancer-gov",
   "license": "GPL-3.0",
   "scripts": {
@@ -12,7 +12,7 @@
     "start": "vue-cli-service express:run"
   },
   "dependencies": {
-    "@bonustrack/lock": "github:bonustrack/lock#6e43125d1d7ffbf90e7723ba605d3444bbff0616",
+    "@bonustrack/lock": "github:bonustrack/lock#0ec9a1ef0af8774e076aa42e175f7a80885e55f4",
     "@ethersproject/abi": "^5.0.1",
     "@ethersproject/address": "^5.0.1",
     "@ethersproject/constants": "^5.0.1",
@@ -21,7 +21,7 @@
     "@ethersproject/units": "^5.0.1",
     "@ethersproject/wallet": "^5.0.1",
     "@pinata/sdk": "^1.1.10",
-    "@portis/web3": "^2.0.0-beta.56",
+    "@portis/web3": "2.0.0-beta.49",
     "@primer/css": "^14.4.0",
     "@vue/cli-plugin-babel": "^4.4.0",
     "@vue/cli-plugin-eslint": "^4.4.0",
@@ -34,14 +34,16 @@
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "eslint": "^6.7.2",
+    "fortmatic": "^2.0.6",
     "frameguard": "^3.1.0",
-    "install": "^0.13.0",
     "json-to-graphql-query": "^2.0.0",
     "jsonexport": "^3.0.1",
     "lodash": "^4.17.15",
     "numeral": "^2.0.4",
     "primer-support": "^5.0.0",
     "redis": "^3.0.2",
+    "remarkable": "^2.0.1",
+    "sanitize-html": "^1.27.1",
     "serve-static": "^1.14.1",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",

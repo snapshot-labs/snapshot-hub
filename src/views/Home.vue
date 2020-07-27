@@ -5,17 +5,17 @@
     </Container>
     <Container :slim="true">
       <router-link
-        v-for="token in tokens"
-        :key="token.token"
-        :to="{ name: 'proposals', params: { key: token.key } }"
+        v-for="namespace in namespaces"
+        :key="namespace.token"
+        :to="{ name: 'proposals', params: { key: namespace.key } }"
       >
         <Block class="text-center">
-          <Token :address="token.token" size="128" class="mb-4" />
+          <Token :address="namespace.token" size="128" class="mb-4" />
           <div>
-            <h2>{{ token.name }} {{ token.symbol }}</h2>
-            <div v-if="token.verified.length > 0">
+            <h2>{{ namespace.name }} {{ namespace.symbol }}</h2>
+            <div v-if="namespace.verified.length > 0">
               <Avatar
-                v-for="verified in token.verified.slice(0, 5)"
+                v-for="verified in namespace.verified.slice(0, 5)"
                 :key="verified"
                 :address="verified"
                 :title="verified"
@@ -23,7 +23,7 @@
                 class="ml-2"
               />
               <Icon name="check" size="22" class="v-align-middle ml-2 mr-1" />
-              {{ $n(token.verified.length) }}
+              {{ $n(namespace.verified.length) }}
             </div>
           </div>
         </Block>
@@ -33,12 +33,14 @@
 </template>
 
 <script>
-import tokens from '@/helpers/tokens.json';
+import namespaces from '@/namespaces.json';
 
 export default {
   data() {
     return {
-      tokens
+      namespaces: Object.fromEntries(
+        Object.entries(namespaces).filter(namespace => namespace[1].visible)
+      )
     };
   }
 };

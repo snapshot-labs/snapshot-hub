@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import lock from '@/helpers/lock';
 import { lsGet } from '@/helpers/utils';
+import config from '@/helpers/config';
 
 const state = {
   init: false,
@@ -20,7 +21,7 @@ const actions = {
     commit('SET', { loading: true });
     await dispatch('getBlockNumber');
     const connector = lsGet('connector');
-    if (connector) {
+    if (Object.keys(config.connectors).includes(connector)) {
       const lockConnector = lock.getConnector(connector);
       const isLoggedIn = await lockConnector.isLoggedIn();
       if (isLoggedIn) await dispatch('login', connector);

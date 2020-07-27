@@ -32,9 +32,10 @@ p {
 }
 
 a {
-  color: $gray;
+  color: $white;
 
   &:hover {
+    color: $white !important;
     cursor: pointer;
     text-decoration: none !important;
   }

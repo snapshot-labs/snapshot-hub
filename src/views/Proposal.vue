@@ -2,35 +2,29 @@
   <Container :slim="true">
     <template v-if="loaded">
       <div class="px-4 px-md-0 mb-3">
-        <router-link :to="{ name: 'proposals' }">
+        <router-link :to="{ name: 'proposals' }" class="text-gray">
           <Icon name="back" size="22" class="v-align-middle" />
-          {{ token.name || _shorten(token.token) }}
+          {{ namespace.name || _shorten(namespace.token) }}
         </router-link>
       </div>
       <div>
         <div class="col-12 col-lg-8 float-left pr-0 pr-lg-5">
           <div class="px-4 px-md-0">
             <h1 class="mb-2">
-              {{ proposal.msg.payload.name }}
+              {{ payload.name }}
               <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
             </h1>
             <State :proposal="proposal" class="mb-4" />
-            <p
-              v-html="proposal.msg.payload.body.replace(/\n/g, '<br />')"
-              class="mb-6 break-word"
-            />
+            <UiMarkdown :body="payload.body" class="mb-6" />
           </div>
           <Block
-            v-if="
-              web3.blockNumber >= proposal.msg.payload.startBlock &&
-                web3.blockNumber < proposal.msg.payload.endBlock
-            "
+            v-if="ts >= payload.start && ts < payload.end"
             class="mb-4"
             title="Cast your vote"
           >
             <div class="mb-3">
               <UiButton
-                v-for="(choice, i) in proposal.msg.payload.choices"
+                v-for="(choice, i) in payload.choices"
                 :key="i"
                 v-text="choice"
                 @click="selectedChoice = i + 1"
@@ -47,15 +41,26 @@
               Vote
             </UiButton>
           </Block>
-          <BlockVotes :token="token" :proposal="proposal" :votes="votes" />
+          <BlockVotes
+            :namespace="namespace"
+            :proposal="proposal"
+            :votes="votes"
+          />
         </div>
         <div class="col-12 col-lg-4 float-left">
           <Block title="Informations">
             <div class="mb-1">
+              <b>Token</b>
+              <span class="float-right text-white">
+                <Token :address="proposal.msg.token" class="mr-1" />
+                {{ namespace.symbol }}
+              </span>
+            </div>
+            <div class="mb-1">
               <b>Author</b>
               <User
                 :address="proposal.address"
-                :verified="token.verified"
+                :verified="namespace.verified"
                 class="float-right"
               />
             </div>
@@ -64,7 +69,7 @@
               <a
                 :href="_ipfsUrl(proposal.ipfsHash)"
                 target="_blank"
-                class="float-right text-white"
+                class="float-right"
               >
                 #{{ proposal.ipfsHash.slice(0, 7) }}
                 <Icon name="external-link" class="ml-1" />
@@ -74,85 +79,48 @@
               <div class="mb-1">
                 <b>Start date</b>
                 <span
-                  :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
-                  v-text="
-                    $d(
-                      _blockNumberToTs(proposal.msg.payload.startBlock),
-                      'long'
-                    )
-                  "
+                  v-text="$d(payload.start * 1e3, 'long')"
                   class="float-right text-white"
                 />
               </div>
               <div class="mb-1">
                 <b>End date</b>
                 <span
-                  :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
-                  v-text="
-                    $d(_blockNumberToTs(proposal.msg.payload.endBlock), 'long')
-                  "
+                  v-text="$d(payload.end * 1e3, 'long')"
                   class="float-right text-white"
                 />
               </div>
-            </div>
-          </Block>
-          <Block
-            :title="
-              web3.blockNumber >= proposal.msg.payload.endBlock
-                ? 'Results'
-                : 'Current results'
-            "
-          >
-            <div v-for="(choice, i) in proposal.msg.payload.choices" :key="i">
-              <div class="text-white mb-1">
-                <span v-text="choice" class="mr-1" />
-                <span v-if="results.totalBalances[i]" class="mr-1">
-                  {{ _numeral(results.totalBalances[i].toFixed(0)) }}
-                  {{ token.symbol || _shorten(token.token) }}
-                </span>
-                <span v-if="results.totalVotes[i]" class="text-gray mr-1">
-                  {{ _numeral(results.totalVotes[i]) }} vote{{
-                    results.totalVotes[i] > 1 ? 's' : ''
-                  }}
-                </span>
-                <span
+              <div class="mb-1">
+                <b>Snapshot</b>
+                <a
+                  :href="_etherscanLink(payload.snapshot, 'block')"
+                  target="_blank"
                   class="float-right"
-                  v-text="
-                    $n(
-                      !results.totalVotesBalances
-                        ? 0
-                        : ((100 / results.totalVotesBalances) *
-                            results.totalBalances[i]) /
-                            1e2,
-                      'percent'
-                    )
-                  "
-                />
+                >
+                  {{ $n(payload.snapshot) }}
+                  <Icon name="external-link" class="ml-1" />
+                </a>
               </div>
-              <UiProgress
-                :value="results.totalBalances[i]"
-                :max="results.totalVotesBalances"
-                class="mb-3"
-              />
             </div>
-            <UiButton
-              @click="downloadReport"
-              v-if="web3.blockNumber >= proposal.msg.payload.endBlock"
-              class="width-full mt-2"
-            >
-              Download report
-            </UiButton>
           </Block>
+          <BlockResults
+            :namespace="namespace"
+            :payload="payload"
+            :results="results"
+            :votes="votes"
+          />
         </div>
       </div>
       <ModalConfirm
         :open="modalOpen"
         @close="modalOpen = false"
         @reload="loadProposal"
-        :token="token.token"
+        :namespace="namespace"
         :proposal="proposal"
         :id="id"
         :selectedChoice="selectedChoice"
+        :votingPower="votingPower"
+        :snapshot="payload.snapshot"
       />
     </template>
     <div v-else class="text-center">
@@ -163,9 +131,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import * as jsonexport from 'jsonexport/dist';
-import tokens from '@/helpers/tokens.json';
-import pkg from '@/../package.json';
+import namespaces from '@/namespaces.json';
 
 export default {
   data() {
@@ -179,58 +145,50 @@ export default {
       votes: {},
       results: [],
       modalOpen: false,
-      selectedChoice: 0
+      selectedChoice: 0,
+      votingPower: 0
     };
   },
   computed: {
-    token() {
-      return tokens[this.key]
-        ? tokens[this.key]
+    namespace() {
+      return namespaces[this.key]
+        ? namespaces[this.key]
         : { token: this.key, verified: [] };
+    },
+    payload() {
+      return this.proposal.msg.payload;
+    },
+    ts() {
+      return (Date.now() / 1e3).toFixed();
     }
   },
   methods: {
-    ...mapActions(['getProposal']),
+    ...mapActions(['getProposal', 'getVotingPower']),
     async loadProposal() {
       const proposalObj = await this.getProposal({
-        token: this.token.token,
+        token: this.namespace.token,
         id: this.id
       });
       this.proposal = proposalObj.proposal;
       this.votes = proposalObj.votes;
       this.results = proposalObj.results;
     },
-    async downloadReport() {
-      const obj = Object.entries(this.votes)
-        .map(vote => {
-          return {
-            address: vote[0],
-            choice: vote[1].msg.payload.choice,
-            balance: vote[1].balance,
-            timestamp: vote[1].msg.timestamp,
-            dateUtc: new Date(
-              parseInt(vote[1].msg.timestamp) * 1e3
-            ).toUTCString(),
-            authorIpfsHash: vote[1].authorIpfsHash,
-            relayerIpfsHash: vote[1].relayerIpfsHash
-          };
-        })
-        .sort((a, b) => a.timestamp - b.timestamp, 0);
-      try {
-        const csv = await jsonexport(obj);
-        const link = document.createElement('a');
-        link.setAttribute('href', `data:text/csv;charset=utf-8,${csv}`);
-        link.setAttribute('download', `${pkg.name}-report-${this.id}.csv`);
-        document.body.appendChild(link);
-        link.click();
-      } catch (e) {
-        console.error(e);
-      }
+    async loadVotingPower() {
+      if (!this.web3.account) return;
+      const snapshot =
+        this.payload.snapshot > this.web3.blockNumber
+          ? this.web3.blockNumber
+          : parseInt(this.payload.snapshot);
+      this.votingPower = await this.getVotingPower({
+        token: this.namespace.token,
+        snapshot
+      });
     }
   },
   async created() {
     this.loading = true;
     await this.loadProposal();
+    await this.loadVotingPower();
     this.loading = false;
     this.loaded = true;
   }

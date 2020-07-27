@@ -3,20 +3,35 @@
     <h3 class="m-4 mb-0 text-center">About</h3>
     <div class="m-4 mb-0 p-4 border rounded-2 text-white">
       <div class="d-flex">
+        <span v-text="'Version'" class="flex-auto text-gray mr-1" />
+        {{ pkg.version }}
+      </div>
+      <div class="d-flex">
+        <span v-text="'License'" class="flex-auto text-gray mr-1" />
+        {{ pkg.license }}
+      </div>
+      <div class="d-flex">
         <span v-text="'Network'" class="flex-auto text-gray mr-1" />
-        {{ network === 'homestead' ? 'mainnet' : network }}
+        {{ config.network === 'homestead' ? 'mainnet' : config.network }}
       </div>
       <div class="d-flex">
         <span v-text="'Block number'" class="flex-auto text-gray mr-1" />
-        {{ web3.blockNumber }}
+        <a
+          :href="_etherscanLink(web3.blockNumber, 'block')"
+          target="_blank"
+          class="float-right"
+        >
+          {{ $n(web3.blockNumber) }}
+          <Icon name="external-link" class="ml-1" />
+        </a>
       </div>
       <div class="d-flex">
         <span v-text="'IPFS server'" class="flex-auto text-gray mr-1" />
         {{ ipfsNode }}
       </div>
       <div class="d-flex">
-        <span v-text="'Matching API'" class="flex-auto text-gray mr-1" />
-        {{ api }}
+        <span v-text="'Hub'" class="flex-auto text-gray mr-1" />
+        {{ config.hubUrl }}
       </div>
     </div>
     <div class="m-4">
@@ -43,9 +58,7 @@ export default {
   data() {
     return {
       pkg,
-      network: process.env.VUE_APP_NETWORK,
-      ipfsNode: process.env.VUE_APP_IPFS_NODE,
-      api: process.env.VUE_APP_REST_API
+      ipfsNode: process.env.VUE_APP_IPFS_NODE
     };
   }
 };

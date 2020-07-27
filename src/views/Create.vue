@@ -1,9 +1,9 @@
 <template>
   <Container :slim="true">
     <div class="px-4 px-md-0 mb-3">
-      <router-link :to="{ name: 'home' }">
+      <router-link :to="{ name: 'home' }" class="text-gray">
         <Icon name="back" size="22" class="v-align-middle" />
-        {{ token.name || _shorten(token.token) }}
+        {{ namespace.name || _shorten(namespace.token) }}
       </router-link>
     </div>
     <div>
@@ -12,13 +12,13 @@
           <div class="d-flex flex-column mb-6">
             <input
               v-autofocus
-              v-model="name"
+              v-model="form.name"
               maxlength="128"
               class="h1 mb-2 input"
               placeholder="Question"
             />
             <textarea-autosize
-              v-model="body"
+              v-model="form.body"
               maxlength="10240"
               class="input"
               placeholder="What is your proposal?"
@@ -26,12 +26,16 @@
           </div>
         </div>
         <Block title="Choices">
-          <div v-if="choices.length > 0" class="overflow-hidden mb-2">
-            <div v-for="(choice, i) in choices" :key="i" class="d-flex mb-2">
+          <div v-if="form.choices.length > 0" class="overflow-hidden mb-2">
+            <div
+              v-for="(choice, i) in form.choices"
+              :key="i"
+              class="d-flex mb-2"
+            >
               <UiButton class="d-flex width-full">
                 <span class="mr-4">{{ i + 1 }}</span>
                 <input
-                  v-model="choices[i]"
+                  v-model="form.choices[i]"
                   class="input height-full flex-auto text-center"
                 />
                 <span @click="removeChoice(i)" class="ml-4">
@@ -48,20 +52,26 @@
       <div class="col-12 col-lg-4 float-left">
         <Block title="Actions">
           <div class="mb-2">
-            <UiButton class="width-full mb-2">
-              <input
-                v-model="startBlock"
-                type="number"
-                class="input width-full"
-                placeholder="Start at block number"
-              />
+            <UiButton
+              @click="[(modalOpen = true), (selectedDate = 'start')]"
+              class="width-full mb-2"
+            >
+              <span v-if="!form.start">Select start date</span>
+              <span v-else v-text="$d(form.start * 1e3, 'long')" />
+            </UiButton>
+            <UiButton
+              @click="[(modalOpen = true), (selectedDate = 'end')]"
+              class="width-full mb-2"
+            >
+              <span v-if="!form.end">Select end date</span>
+              <span v-else v-text="$d(form.end * 1e3, 'long')" />
             </UiButton>
             <UiButton class="width-full mb-2">
               <input
-                v-model="endBlock"
+                v-model="form.snapshot"
                 type="number"
-                class="input width-full"
-                placeholder="End at block number"
+                class="input width-full text-center"
+                placeholder="Snapshot block number"
               />
             </UiButton>
           </div>
@@ -76,68 +86,80 @@
         </Block>
       </div>
     </div>
+    <ModalSelectDate
+      :value="form[selectedDate]"
+      :selectedDate="selectedDate"
+      :open="modalOpen"
+      @close="modalOpen = false"
+      @input="setDate"
+    />
   </Container>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
-import tokens from '@/helpers/tokens.json';
+import namespaces from '@/namespaces.json';
 
 export default {
   data() {
     return {
       key: this.$route.params.key,
       loading: false,
-      name: '',
-      body: '',
-      choices: ['', ''],
-      startBlock: '',
-      endBlock: ''
+      form: {
+        name: '',
+        body: '',
+        choices: ['', ''],
+        start: '',
+        end: '',
+        snapshot: ''
+      },
+      modalOpen: false,
+      selectedDate: ''
     };
   },
   computed: {
-    token() {
-      return tokens[this.key]
-        ? tokens[this.key]
+    namespace() {
+      return namespaces[this.key]
+        ? namespaces[this.key]
         : { token: this.key, verified: [] };
     },
     isValid() {
-      const minBlock = (3600 * 24) / 15;
+      // const ts = (Date.now() / 1e3).toFixed();
       return (
         !this.loading &&
         this.web3.account &&
-        this.name &&
-        this.body &&
-        this.startBlock &&
-        this.startBlock >= this.web3.blockNumber &&
-        this.endBlock &&
-        this.endBlock >= this.web3.blockNumber + minBlock &&
-        this.endBlock > this.startBlock &&
-        this.choices.length >= 2 &&
-        this.choices.reduce((a, b) => (!a ? false : b), true)
+        this.form.name &&
+        this.form.body &&
+        this.form.start &&
+        // this.form.start >= ts &&
+        this.form.end &&
+        this.form.end > this.form.start &&
+        this.form.choices.length >= 2 &&
+        this.form.choices.reduce((a, b) => (!a ? false : b), true)
       );
     }
   },
   methods: {
-    ...mapActions(['post']),
+    ...mapActions(['send']),
     addChoice() {
-      this.choices.push('');
+      this.form.choices.push('');
     },
-
     removeChoice(i) {
-      delete this.choices[i];
-      this.choices = this.choices.filter(String);
+      delete this.form.choices[i];
+      this.form.choices = this.form.choices.filter(String);
+    },
+    setDate(ts) {
+      if (this.selectedDate) {
+        this.form[this.selectedDate] = ts;
+      }
     },
     async handleSubmit() {
       this.loading = true;
       try {
-        const { ipfsHash } = await this.post({
-          token: this.token.token,
-          name: this.name,
-          body: this.body,
-          choices: this.choices,
-          startBlock: this.startBlock,
-          endBlock: this.endBlock
+        const { ipfsHash } = await this.send({
+          token: this.namespace.token,
+          type: 'proposal',
+          payload: this.form
         });
         this.$router.push({
           name: 'proposal',

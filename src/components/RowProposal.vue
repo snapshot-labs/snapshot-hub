@@ -1,6 +1,6 @@
 <template>
   <router-link
-    class="px-4 py-3 border-top d-block"
+    class="px-4 py-3 border-top d-block text-gray"
     :to="{ name: 'proposal', params: { key: token, id: i } }"
   >
     <div>
@@ -8,19 +8,13 @@
       <h3 v-text="proposal.msg.payload.name" class="d-inline-block mb-1" />
     </div>
     <div>
-      <span v-text="`#${i.slice(0, 7)}`" class="text-gray" />
+      <span v-text="`#${i.slice(0, 7)}`" />
       By {{ _shorten(proposal.address) }}
       <Icon v-if="isVerified" name="check" title="Verified" />
       start
-      <span
-        :title="`Block ${$n(proposal.msg.payload.startBlock)}`"
-        v-text="$d(_blockNumberToTs(proposal.msg.payload.startBlock))"
-      />
+      <span v-text="$d(proposal.msg.payload.start * 1e3)" />
       end
-      <span
-        :title="`Block ${$n(proposal.msg.payload.endBlock)}`"
-        v-text="$d(_blockNumberToTs(proposal.msg.payload.endBlock))"
-      />
+      <span v-text="$d(proposal.msg.payload.end * 1e3)" />
     </div>
   </router-link>
 </template>

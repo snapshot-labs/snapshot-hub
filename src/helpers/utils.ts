@@ -1,4 +1,3 @@
-import { getAddress } from '@ethersproject/address';
 import config from '@/helpers/config';
 import pkg from '@/../package.json';
 
@@ -7,6 +6,9 @@ export function shorten(str = '') {
 }
 
 export function jsonParse(input, fallback?) {
+  if (typeof input !== 'string') {
+    return fallback || {};
+  }
   try {
     return JSON.parse(input);
   } catch (err) {
@@ -14,26 +16,8 @@ export function jsonParse(input, fallback?) {
   }
 }
 
-export function isValidAddress(str) {
-  try {
-    getAddress(str);
-  } catch (e) {
-    return false;
-  }
-  return true;
-}
-
-export function delay(ms) {
-  return new Promise(resolve => setTimeout(() => resolve(), ms));
-}
-
 export function clone(item) {
   return JSON.parse(JSON.stringify(item));
-}
-
-export function trunc(value: number, decimals = 0) {
-  const mutiplier = 10 ** decimals;
-  return Math.trunc(value * mutiplier) / mutiplier;
 }
 
 export function etherscanLink(str: string, type = 'address'): string {
@@ -52,4 +36,27 @@ export function lsGet(key: string) {
 
 export function lsRemove(key: string) {
   return localStorage.removeItem(`${pkg.name}.${key}`);
+}
+
+export function formatProposal(proposal) {
+  proposal.msg = jsonParse(proposal.msg, proposal.msg);
+
+  // v0.1.0
+  if (proposal.msg.version === '0.1.0') {
+    proposal.msg.payload.start = 1595088000;
+    proposal.msg.payload.end = 1595174400;
+    proposal.msg.payload.snapshot = 10484400;
+    proposal.bpt_voting_disabled = '1';
+  }
+
+  return proposal;
+}
+
+export function formatProposals(proposals) {
+  return Object.fromEntries(
+    Object.entries(proposals).map(proposal => [
+      proposal[0],
+      formatProposal(proposal[1])
+    ])
+  );
 }
