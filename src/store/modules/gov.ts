@@ -16,7 +16,7 @@ const state = {
   votingPower: 0,
   votingPowerByPools: {},
   walletBalance: 0,
-  snapshot: 10541900
+  snapshot: 10574500
 };
 
 const mutations = {
