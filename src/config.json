@@ -12,7 +12,7 @@
       },
       "portis": {
         "id": "portis",
-        "name": "Portis",
+        "name": "Portis wallet",
         "options": {
           "dappId": "3f1c3cfc-7dd5-4e8a-aa03-71ff7396d9fe",
           "network": "mainnet"
