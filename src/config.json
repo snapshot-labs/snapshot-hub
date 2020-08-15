@@ -18,9 +18,9 @@
           "network": "mainnet"
         }
       },
-      "magic": {
-        "id": "magic",
-        "name": "Magic",
+      "fortmatic": {
+        "id": "fortmatic",
+        "name": "Fortmatic",
         "options": {
           "apiKey": "pk_live_9CE8FD92E54684ED"
         }
@@ -46,9 +46,9 @@
           "network": "mainnet"
         }
       },
-      "magic": {
-        "id": "magic",
-        "name": "Magic",
+      "fortmatic": {
+        "id": "fortmatic",
+        "name": "Fortmatic",
         "options": {
           "apiKey": "pk_live_9CE8FD92E54684ED"
         }
