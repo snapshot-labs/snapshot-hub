@@ -60,14 +60,17 @@ router.post('/message', async (req, res) => {
   if (msg.type === 'proposal') {
     if (
       Object.keys(msg.payload).length !== 6 ||
-      !msg.payload.name ||
-      msg.payload.name.length > 128 ||
-      !msg.payload.body ||
-      msg.payload.body.length > 5120 ||
       !msg.payload.choices ||
       msg.payload.choices.length < 2 ||
       !msg.payload.snapshot
     ) return sendError(res, 'wrong proposal format');
+
+    if (
+      !msg.payload.name ||
+      msg.payload.name.length > 256 ||
+      !msg.payload.body ||
+      msg.payload.body.length > 10240
+    ) return sendError(res, 'wrong proposal size');
 
     if (
       !msg.payload.start ||
