@@ -3,7 +3,6 @@ import autofocus from 'vue-autofocus-directive';
 import infiniteScroll from 'vue-infinite-scroll';
 import TextareaAutosize from 'vue-textarea-autosize';
 import Jazzicon from 'vue-jazzicon';
-import VueLoadingIndicator from '@vue/ui/src/components/VueLoadingIndicator.vue';
 import upperFirst from 'lodash/upperFirst';
 import camelCase from 'lodash/camelCase';
 import App from '@/App.vue';
@@ -26,7 +25,6 @@ requireComponent.keys().forEach(fileName => {
 });
 
 Vue.component('jazzicon', Jazzicon);
-Vue.component('VueLoadingIndicator', VueLoadingIndicator);
 Vue.mixin(mixins);
 Vue.directive('autofocus', autofocus);
 
