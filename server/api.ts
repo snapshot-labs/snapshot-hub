@@ -69,7 +69,7 @@ router.post('/message', async (req, res) => {
       !msg.payload.name ||
       msg.payload.name.length > 256 ||
       !msg.payload.body ||
-      msg.payload.body.length > 10240
+      msg.payload.body.length > 5e4
     ) return sendError(res, 'wrong proposal size');
 
     if (
