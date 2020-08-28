@@ -1,7 +1,7 @@
 import express from 'express';
 import redis from './redis';
-import pinata from './pinata';
 import relayer from './relayer';
+import { pinJson } from './ipfs';
 import { verify, jsonParse, sendError } from './utils';
 import pkg from '../package.json';
 
@@ -97,30 +97,31 @@ router.post('/message', async (req, res) => {
     ) return sendError(res, 'not in voting window');
   }
 
-  const authorIpfsRes = await pinata.pinJSONToIPFS({
+  const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
     address: body.address,
     msg: body.msg,
     sig: body.sig,
     version: '2'
   });
 
-  const relayerIpfsRes = await pinata.pinJSONToIPFS({
+  const relayerSig = await relayer.signMessage(authorIpfsRes);
+  const relayerIpfsRes = await pinJson(`snapshot/${relayerSig}`, {
     address: relayer.address,
-    msg: authorIpfsRes.IpfsHash,
-    sig: await relayer.signMessage(authorIpfsRes.IpfsHash),
+    msg: authorIpfsRes,
+    sig: relayerSig,
     version: '2'
   });
 
   if (msg.type === 'proposal') {
     await redis.hmsetAsync(
       `token:${msg.token}:proposals`,
-      authorIpfsRes.IpfsHash,
+      authorIpfsRes,
       JSON.stringify({
         address: body.address,
         msg,
         sig: body.sig,
-        authorIpfsHash: authorIpfsRes.IpfsHash,
-        relayerIpfsHash: relayerIpfsRes.IpfsHash
+        authorIpfsHash: authorIpfsRes,
+        relayerIpfsHash: relayerIpfsRes
       })
     );
   }
@@ -134,8 +135,8 @@ router.post('/message', async (req, res) => {
         address: body.address,
         msg,
         sig: body.sig,
-        authorIpfsHash: authorIpfsRes.IpfsHash,
-        relayerIpfsHash: relayerIpfsRes.IpfsHash
+        authorIpfsHash: authorIpfsRes,
+        relayerIpfsHash: relayerIpfsRes
       })
     );
   }
@@ -144,10 +145,10 @@ router.post('/message', async (req, res) => {
     `Address "${body.address}"\n`,
     `Token "${msg.token}"\n`,
     `Type "${msg.type}"\n`,
-    `IPFS hash "${authorIpfsRes.IpfsHash}"`
+    `IPFS hash "${authorIpfsRes}"`
   );
 
-  return res.json({ ipfsHash: authorIpfsRes.IpfsHash });
+  return res.json({ ipfsHash: authorIpfsRes });
 });
 
 export default router;
