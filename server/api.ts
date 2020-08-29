@@ -126,12 +126,11 @@ router.post('/message', async (req, res) => {
       })
     );
 
-    sendMessage(`
-      #${msg.token}:\n
-      **${msg.payload.name}**\n
-      ${msg.payload.body}\n
-      <https://ipfs.fleek.co/ipfs/${authorIpfsRes}>\n
-    `);
+    let message = `#${msg.token}\n`;
+    message += `**${msg.payload.name}**\n`;
+    message += `${msg.payload.body}\n`;
+    message += `<https://ipfs.fleek.co/ipfs/${authorIpfsRes}>`;
+    sendMessage(message);
   }
 
   if (msg.type === 'vote') {
