@@ -126,9 +126,9 @@ router.post('/message', async (req, res) => {
       })
     );
 
-    let message = `#${msg.token}\n`;
-    message += `**${msg.payload.name}**\n`;
-    message += `${msg.payload.body}\n`;
+    let message = `#${msg.token}\n\n`;
+    message += `**${msg.payload.name}**\n\n`;
+    message += `${msg.payload.body}\n\n`;
     message += `<https://ipfs.fleek.co/ipfs/${authorIpfsRes}>`;
     sendMessage(message);
   }
