@@ -3,6 +3,7 @@ import redis from './redis';
 import relayer from './relayer';
 import { pinJson } from './ipfs';
 import { verify, jsonParse, sendError } from './utils';
+import { sendMessage } from './discord';
 import pkg from '../package.json';
 
 const router = express.Router();
@@ -124,6 +125,13 @@ router.post('/message', async (req, res) => {
         relayerIpfsHash: relayerIpfsRes
       })
     );
+
+    sendMessage(`
+      #${msg.token}:\n
+      **${msg.payload.name}**\n
+      ${msg.payload.body}\n
+      <https://ipfs.fleek.co/ipfs/${authorIpfsRes}>\n
+    `);
   }
 
   if (msg.type === 'vote') {
