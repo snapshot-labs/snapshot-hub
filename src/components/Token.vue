@@ -1,7 +1,7 @@
 <template>
   <img
     :src="
-      `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+      `https://www.stakerdao.com/assets/media/misc_governance.png`
     "
     class="d-inline-block bg-gray-9 v-align-middle line-height-0 circle"
     :style="{
