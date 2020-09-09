@@ -1,8 +1,8 @@
 {
-  "balancer": {
-    "key": "balancer",
-    "symbol": "BAL",
-    "name": "Balancer",
+  "staker": {
+    "key": "staker",
+    "symbol": "STKR",
+    "name": "StakerDAO",
     "token": "0xba100000625a3754423978a60c9317c58a424e3D",
     "verified": [
       "0x24A12Fa313F57aF541d447c594072A992c605DCf",
