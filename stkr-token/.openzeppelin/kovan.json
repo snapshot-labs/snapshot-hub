@@ -1,0 +1,14 @@
+{
+  "contracts": {},
+  "solidityLibs": {},
+  "proxies": {
+    "@openzeppelin/contracts-ethereum-package/ERC20PresetMinterPauserUpgradeSafe": [
+      {
+        "address": "0xdf7fA5d39FB0188ae3DBb11FF925D43271d0cA12",
+        "kind": "NonProxy",
+        "bytecodeHash": "52be0b883a223d287defa9bdaccdf9070af147d6b45366a9e8996d4b698512af"
+      }
+    ]
+  },
+  "manifestVersion": "2.2"
+}

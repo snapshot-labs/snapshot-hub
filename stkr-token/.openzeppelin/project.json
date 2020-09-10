@@ -1,0 +1,24 @@
+{
+  "manifestVersion": "2.2",
+  "contracts": {},
+  "dependencies": {
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0"
+  },
+  "name": "stkr",
+  "version": "0.0.1",
+  "compiler": {
+    "compilerSettings": {
+      "optimizer": {
+        "enabled": false,
+        "runs": "200"
+      }
+    },
+    "typechain": {
+      "enabled": false
+    },
+    "manager": "openzeppelin",
+    "artifactsDir": "build/contracts",
+    "contractsDir": "contracts"
+  },
+  "telemetryOptIn": false
+}

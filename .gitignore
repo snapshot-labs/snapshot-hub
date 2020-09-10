@@ -1,3 +1,6 @@
+# Ignore secrests
+secrets.json
+
 .DS_Store
 node_modules
 /dist
