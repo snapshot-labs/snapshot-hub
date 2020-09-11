@@ -111,7 +111,8 @@ export default {
         choices: ['', ''],
         start: '',
         end: '',
-        snapshot: ''
+        snapshot: '',
+        metadata: {}
       },
       modalOpen: false,
       selectedDate: ''
