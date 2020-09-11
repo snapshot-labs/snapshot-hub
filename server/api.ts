@@ -60,18 +60,24 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'proposal') {
     if (
-      Object.keys(msg.payload).length !== 6 ||
+      Object.keys(msg.payload).length !== 7 ||
       !msg.payload.choices ||
       msg.payload.choices.length < 2 ||
-      !msg.payload.snapshot
+      !msg.payload.snapshot ||
+      !msg.payload.metadata
     ) return sendError(res, 'wrong proposal format');
 
     if (
       !msg.payload.name ||
       msg.payload.name.length > 256 ||
       !msg.payload.body ||
-      msg.payload.body.length > 5e4
+      msg.payload.body.length > 4e4
     ) return sendError(res, 'wrong proposal size');
+
+    if (
+      typeof msg.payload.metadata !== 'object' ||
+      JSON.stringify(msg.payload.metadata).length > 2e4
+    ) return sendError(res, 'wrong proposal metadata');
 
     if (
       !msg.payload.start ||
@@ -83,10 +89,16 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'vote') {
     if (
-      Object.keys(msg.payload).length !== 2 ||
+      Object.keys(msg.payload).length !== 3 ||
       !msg.payload.proposal ||
-      !msg.payload.choice
+      !msg.payload.choice ||
+      !msg.payload.metadata
     ) return sendError(res, 'wrong vote format');
+
+    if (
+      typeof msg.payload.metadata !== 'object' ||
+      JSON.stringify(msg.payload.metadata).length > 1e4
+    ) return sendError(res, 'wrong vote metadata');
 
     const proposalRedis = await redis.hgetAsync(`token:${msg.token}:proposals`, msg.payload.proposal);
     const proposal = jsonParse(proposalRedis);

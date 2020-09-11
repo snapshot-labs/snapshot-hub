@@ -1,8 +1,8 @@
 {
-  "name": "balancer-gov",
-  "version": "0.1.1",
-  "repository": "balancer-labs/balancer-gov",
-  "license": "GPL-3.0",
+  "name": "snapshot-hub",
+  "version": "0.1.2",
+  "repository": "balancer-labs/snapshot-hub",
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
