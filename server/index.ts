@@ -1,12 +1,20 @@
 import express from 'express';
-import redis from './redis';
-import relayer from './relayer';
-import { pinJson } from './ipfs';
-import { verify, jsonParse, sendError } from './utils';
-import { sendMessage } from './discord';
+import redis from './helpers/redis';
+import relayer from './helpers/relayer';
+import { pinJson } from './helpers/ipfs';
+import { verify, jsonParse, sendError } from './helpers/utils';
+import { sendMessage } from './helpers/discord';
 import pkg from '../package.json';
+import './helpers/mysql';
 
 const router = express.Router();
+
+router.get('/', (req, res) => {
+  return res.json({
+    name: pkg.name,
+    version: pkg.version
+  });
+});
 
 router.get('/:token/proposals', async (req, res) => {
   const { token } = req.params;
