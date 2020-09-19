@@ -5,7 +5,14 @@ import { pinJson } from './helpers/ipfs';
 import { verify, jsonParse, sendError } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
 import pkg from '../package.json';
-import './helpers/mysql';
+import {
+  storeProposal as redisStoreProposal,
+  storeVote as redisStoreVote
+} from './helpers/connectors/redis';
+import {
+  storeProposal as mysqlStoreProposal,
+  storeVote as mysqlStoreVote
+} from './helpers/connectors/mysql';
 
 const router = express.Router();
 
@@ -134,17 +141,10 @@ router.post('/message', async (req, res) => {
   });
 
   if (msg.type === 'proposal') {
-    await redis.hmsetAsync(
-      `token:${msg.token}:proposals`,
-      authorIpfsRes,
-      JSON.stringify({
-        address: body.address,
-        msg,
-        sig: body.sig,
-        authorIpfsHash: authorIpfsRes,
-        relayerIpfsHash: relayerIpfsRes
-      })
-    );
+    await Promise.all([
+      redisStoreProposal(msg.token, body, authorIpfsRes, relayerIpfsRes),
+      mysqlStoreProposal(msg.token, body, authorIpfsRes, relayerIpfsRes),
+    ]);
 
     let message = `#${msg.token}\n\n`;
     message += `**${msg.payload.name}**\n\n`;
@@ -154,18 +154,10 @@ router.post('/message', async (req, res) => {
   }
 
   if (msg.type === 'vote') {
-    const proposalId = msg.payload.proposal;
-    await redis.hmsetAsync(
-      `token:${msg.token}:proposal:${proposalId}:votes`,
-      body.address,
-      JSON.stringify({
-        address: body.address,
-        msg,
-        sig: body.sig,
-        authorIpfsHash: authorIpfsRes,
-        relayerIpfsHash: relayerIpfsRes
-      })
-    );
+    await Promise.all([
+      redisStoreVote(msg.token, body, authorIpfsRes, relayerIpfsRes),
+      mysqlStoreVote(msg.token, body, authorIpfsRes, relayerIpfsRes),
+    ]);
   }
 
   console.log(
