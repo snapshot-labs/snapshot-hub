@@ -19,7 +19,8 @@ const router = express.Router();
 router.get('/', (req, res) => {
   return res.json({
     name: pkg.name,
-    version: pkg.version
+    version: pkg.version,
+    relayer: relayer.address
   });
 });
 
