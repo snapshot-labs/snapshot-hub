@@ -7,7 +7,7 @@ CREATE TABLE messages (
   token VARCHAR(64),
   type VARCHAR(12) NOT NULL,
   payload JSON,
-  sig VARCHAR(64) NOT NULL,
+  sig VARCHAR(256) NOT NULL,
   metadata JSON,
   PRIMARY KEY (`id`),
   KEY address (address),
