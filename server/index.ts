@@ -49,6 +49,30 @@ router.get('/:token/proposal/:id', async (req, res) => {
   return res.json(votes);
 });
 
+router.get('/:token/power/:date', async (req, res) => {
+  const { token, date } = req.params;
+  let ipfsHash = await redis.hgetallAsync(`token:${token}:power:${date}`);
+  if (!ipfsHash) { return res.json({}); }
+  return res.json({ipfsHash: ipfsHash});
+});
+
+router.post('/:token/power/:date', async (req, res) => {
+  const { token, date } = req.params;
+
+  const sig = await relayer.signMessage(`${token}/power/${date}`);
+  const ipfsHash = await pinJson(`${ns}/${token}/${sig}`, req.body);
+  await redis.hmsetAsync(`token:${token}:power:${date}`,ipfsHash);
+
+  let message = `# New Snapshot\n`;
+  message += `Token: ${token}\n`;
+  message += `Date: ${date}\n`;
+  message += `<https://ipfs.io/ipfs/${ipfsHash}>`;
+  sendMessage(message);
+  console.log(message);
+
+  return res.json({ ipfsHash: ipfsHash });
+});
+
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);

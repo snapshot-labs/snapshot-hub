@@ -1,9 +1,9 @@
 import redis from '../redis';
 
-export async function storeProposal(space, body, authorIpfsHash, relayerIpfsHash) {
+export async function storeProposal(token, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   await redis.hmsetAsync(
-    `token:${space}:proposals`,
+    `token:${token}:proposals`,
     authorIpfsHash,
     JSON.stringify({
       address: body.address,
@@ -15,10 +15,10 @@ export async function storeProposal(space, body, authorIpfsHash, relayerIpfsHash
   );
 }
 
-export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
+export async function storeVote(token, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   return await redis.hmsetAsync(
-    `token:${space}:proposal:${msg.payload.proposal}:votes`,
+    `token:${token}:proposal:${msg.payload.proposal}:votes`,
     body.address,
     JSON.stringify({
       address: body.address,
