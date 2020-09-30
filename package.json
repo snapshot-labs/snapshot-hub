@@ -1,7 +1,7 @@
 {
-  "name": "snapshot-hub",
-  "version": "0.1.2",
-  "repository": "balancer-labs/snapshot-hub",
+  "name": "beefy-vote-api",
+  "version": "0.1.0",
+  "repository": "beefyfinance/beefy-vote-api",
   "license": "MIT",
   "scripts": {
     "lint": "vue-cli-service lint",
@@ -17,7 +17,6 @@
     "@ethersproject/providers": "^5.0.4",
     "@ethersproject/units": "^5.0.1",
     "@ethersproject/wallet": "^5.0.1",
-    "@fleekhq/fleek-storage-js": "^1.0.2",
     "@pinata/sdk": "^1.1.11",
     "@vue/cli-plugin-babel": "^4.4.0",
     "@vue/cli-plugin-eslint": "^4.4.0",
