@@ -17,13 +17,3 @@ CREATE TABLE messages (
   KEY token (token),
   KEY type (type)
 );
-
-CREATE TABLE hubs (
-  host VARCHAR(64) NOT NULL,
-  address VARCHAR(64),
-  is_self INT DEFAULT 0,
-  is_active INT DEFAULT 1,
-  PRIMARY KEY (`host`),
-  KEY address (address),
-  KEY is_self (is_self)
-);

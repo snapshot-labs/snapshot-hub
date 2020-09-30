@@ -1,4 +1,3 @@
-import fleek from '@fleekhq/fleek-storage-js';
 import pinataSDK from '@pinata/sdk';
 
 const pinata = pinataSDK(process.env.PINATA_KEY, process.env.PINATA_SECRET);

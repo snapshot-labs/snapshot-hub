@@ -4,7 +4,6 @@ import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 
-// @ts-ignore
 const config = parse(process.env.JAWSDB_URL);
 config.connectionLimit = 25;
 config.multipleStatements = true;
