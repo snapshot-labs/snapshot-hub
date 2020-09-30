@@ -14,6 +14,7 @@ import {
   storeVote as mysqlStoreVote
 } from './helpers/connectors/mysql';
 
+const ns = process.env.NAMESPACE;
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -116,24 +117,26 @@ router.post('/message', async (req, res) => {
       !msg.payload.proposal ||
       !msg.payload.choice ||
       !msg.payload.metadata
-    ) return sendError(res, 'wrong vote format');
+    ) { return sendError(res, 'wrong vote format'); }
 
     if (
       typeof msg.payload.metadata !== 'object' ||
       JSON.stringify(msg.payload.metadata).length > 1e4
-    ) return sendError(res, 'wrong vote metadata');
+    ) { return sendError(res, 'wrong vote metadata'); }
 
     const proposalRedis = await redis.hgetAsync(`token:${msg.token}:proposals`, msg.payload.proposal);
     const proposal = jsonParse(proposalRedis);
-    if (!proposalRedis)
+    if (!proposalRedis) {
       return sendError(res, 'unknown proposal');
+    }
+
     if (
       ts > proposal.msg.payload.end ||
       proposal.msg.payload.start > ts
-    ) return sendError(res, 'not in voting window');
+    ) { return sendError(res, 'not in voting window'); }
   }
 
-  const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
+  const authorIpfsRes = await pinJson(`${ns}/${body.sig}`, {
     address: body.address,
     msg: body.msg,
     sig: body.sig,
@@ -141,7 +144,7 @@ router.post('/message', async (req, res) => {
   });
 
   const relayerSig = await relayer.signMessage(authorIpfsRes);
-  const relayerIpfsRes = await pinJson(`snapshot/${relayerSig}`, {
+  const relayerIpfsRes = await pinJson(`${ns}/${relayerSig}`, {
     address: relayer.address,
     msg: authorIpfsRes,
     sig: relayerSig,
@@ -157,7 +160,7 @@ router.post('/message', async (req, res) => {
     let message = `#${msg.token}\n\n`;
     message += `**${msg.payload.name}**\n\n`;
     message += `${msg.payload.body}\n\n`;
-    message += `<https://ipfs.fleek.co/ipfs/${authorIpfsRes}>`;
+    message += `<https://ipfs.io/ipfs/${authorIpfsRes}>`;
     sendMessage(message);
   }
 
