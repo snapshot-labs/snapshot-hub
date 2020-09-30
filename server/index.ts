@@ -52,57 +52,62 @@ router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
   const ts = (Date.now() / 1e3).toFixed();
-  // const minBlock = (3600 * 24) / 15;
-
-  if (!body || !body.address || !body.msg || !body.sig)
+  
+  if (!body || !body.address || !body.msg || !body.sig){
     return sendError(res, 'wrong message body');
+  }
 
   if (
     Object.keys(msg).length !== 5 ||
     !msg.token ||
     !msg.payload ||
     Object.keys(msg.payload).length === 0
-  ) return sendError(res, 'wrong signed message');
+  ) { return sendError(res, 'wrong signed message'); }
 
-  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 30))
+  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 30)) {
     return sendError(res, 'wrong timestamp');
+  }
 
-  if (!msg.version || msg.version !== pkg.version)
+  if (!msg.version || msg.version !== pkg.version) {
     return sendError(res, 'wrong version');
+  }
 
-  if (!msg.type || !['proposal', 'vote'].includes(msg.type))
+  if (!msg.type || !['proposal', 'vote'].includes(msg.type)){
     return sendError(res, 'wrong message type');
+  }
 
-  if (!await verify(body.address, body.msg, body.sig))
+  if (!await verify(body.address, body.msg, body.sig)){
     return sendError(res, 'wrong signature');
-
+  }
+  
   if (msg.type === 'proposal') {
-    if (
-      Object.keys(msg.payload).length !== 7 ||
-      !msg.payload.choices ||
-      msg.payload.choices.length < 2 ||
-      !msg.payload.snapshot ||
-      !msg.payload.metadata
-    ) return sendError(res, 'wrong proposal format');
+    const proposal = msg.payload;
 
     if (
-      !msg.payload.name ||
-      msg.payload.name.length > 256 ||
-      !msg.payload.body ||
-      msg.payload.body.length > 4e4
-    ) return sendError(res, 'wrong proposal size');
+      Object.keys(proposal).length !== 6 ||
+      !proposal.choices ||
+      proposal.choices.length < 2 ||
+      !proposal.metadata
+    ) { return sendError(res, 'wrong proposal format'); }
+    
+    if (
+      !proposal.name ||
+      proposal.name.length > 256 ||
+      !proposal.body ||
+      proposal.body.length > 4e4
+    ) { return sendError(res, 'wrong proposal size'); }
 
     if (
-      typeof msg.payload.metadata !== 'object' ||
-      JSON.stringify(msg.payload.metadata).length > 2e4
-    ) return sendError(res, 'wrong proposal metadata');
+      typeof proposal.metadata !== 'object' ||
+      JSON.stringify(proposal.metadata).length > 2e4
+    ) { return sendError(res, 'wrong proposal metadata'); }
 
     if (
-      !msg.payload.start ||
-      // ts > msg.payload.start ||
-      !msg.payload.end ||
-      msg.payload.start >= msg.payload.end
-    ) return sendError(res, 'wrong proposal period');
+      !proposal.start ||
+      ts > proposal.start ||
+      !proposal.end ||
+      proposal.start >= proposal.end
+    ) { return sendError(res, 'wrong proposal period'); }
   }
 
   if (msg.type === 'vote') {
