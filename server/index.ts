@@ -1,6 +1,5 @@
 import express from 'express';
 import redis from './helpers/redis';
-import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
 import { verify, jsonParse, sendError } from './helpers/utils';
@@ -27,28 +26,15 @@ router.get('/', (req, res) => {
 
 router.get('/:token/proposals', async (req, res) => {
   const { token } = req.params;
-  const query = "SELECT * FROM messages WHERE type = 'proposal' AND token = ? ORDER BY timestamp DESC";
-  db.queryAsync(query, [token]).then(messages => {
-    const proposals = Object.fromEntries(
-      messages.map(message => {
-        const metadata = JSON.parse(message.metadata);
-        return [message.id, {
-          address: message.address,
-          msg: {
-            version: message.version,
-            timestamp: message.timestamp.toString(),
-            token: message.token,
-            type: message.type,
-            payload: JSON.parse(message.payload)
-          },
-          sig: message.sig,
-          authorIpfsHash: message.id,
-          relayerIpfsHash: metadata.relayer_ipfs_hash
-        }];
-      })
-    );
-    res.json(proposals);
-  });
+  let proposals = await redis.hgetallAsync(`token:${token}:proposals`);
+  if (!proposals) { return res.json({}); }
+
+  proposals = Object.fromEntries(Object.entries(proposals).map((proposal: any) => {
+    proposal[1] = JSON.parse(proposal[1]);
+    return proposal;
+  }))
+  
+  return res.json(proposals);
 });
 
 router.get('/:token/proposal/:id', async (req, res) => {
