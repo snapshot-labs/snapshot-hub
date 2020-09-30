@@ -30,7 +30,7 @@
     "discord.js": "^12.3.1",
     "eslint": "^6.7.2",
     "frameguard": "^3.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "mysql": "^2.18.1",
     "redis": "^3.0.2",
     "typescript": "~3.9.3",
