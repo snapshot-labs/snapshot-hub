@@ -4,17 +4,20 @@ Backend api for beefy-vote
 
 ## Dependencies
 
-### yarn  
+### yarn
+
 https://yarnpkg.com/
 
 Safe, stable, reproducible projects
 
-### prettier  
+### prettier
+
 https://prettier.io/
 
 Opinionated Code Formatter
 
-## Env  
+## Env
+
 Required env vars:
 
 ```
@@ -32,4 +35,3 @@ NAMESPACE=project_name
 ## License
 
 [MIT](LICENSE).
-

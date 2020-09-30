@@ -9,7 +9,7 @@ export default (app, server) => {
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
   app.use(serveStatic(`${__dirname}/dist`));
   app.use(frameguard({ action: 'deny' }));
-  app.use(cors({origin: '*'}));
+  app.use(cors({ origin: '*' }));
   app.use('/api', api);
   app.get('/*', (req, res) => res.redirect('https://vote.beefy.finance'));
-}
+};
