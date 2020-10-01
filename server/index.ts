@@ -39,13 +39,14 @@ router.get('/:token/proposals', async (req, res) => {
 router.get('/:token/proposal/:id', async (req, res) => {
   const { token, id } = req.params;
   let votes = (await redis.hgetallAsync(`token:${token}:proposal:${id}:votes`)) || {};
-  if (votes)
+  if (votes) {
     votes = Object.fromEntries(
       Object.entries(votes).map((vote: any) => {
         vote[1] = JSON.parse(vote[1]);
         return vote;
       })
     );
+  }
   return res.json(votes);
 });
 
@@ -62,22 +63,10 @@ router.post('/:token/snapshot/:date', async (req, res) => {
   const { token, date } = req.params;
 
   const sig = await relayer.signMessage(`${token}/snapshot/${date}`);
-  
-  console.log('>>>>>', 'sig', sig);
-  console.log('>>>>>', 'path', `${ns}/${sig}`);
-
   const ipfsHash = await pinJson(`${ns}/${sig}`, req.body);
-
-  console.log('>>>>>', 'ipfsHash', ipfsHash);
-  console.log('>>>>>', 'key', `token:${token}:snapshot:${date}`);
-
-  try {
-    await redis.hsetAsync(`token:${token}:snapshot:${date}`, ipfsHash);
-  } catch(err) {
-    console.error(err);
-  }
-
-  let message = `# New Snapshot\n`;
+  await redis.hmsetAsync(`token:${token}:snapshot:${date}`, `${date}`, ipfsHash);
+  
+  let message = `**New Snapshot**\n`;
   message += `Token: ${token}\n`;
   message += `Date: ${date}\n`;
   message += `<https://ipfs.io/ipfs/${ipfsHash}>`;
