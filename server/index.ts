@@ -62,7 +62,15 @@ router.post('/:token/power/:date', async (req, res) => {
   const { token, date } = req.params;
 
   const sig = await relayer.signMessage(`${token}/power/${date}`);
+  
+  console.log('>>>>>', 'sig', sig);
+  console.log('>>>>>', 'path', `${ns}/${token}/${sig}`);
+
   const ipfsHash = await pinJson(`${ns}/${token}/${sig}`, req.body);
+
+  console.log('>>>>>', 'ipfsHash', ipfsHash);
+  console.log('>>>>>', 'key', `token:${token}:power:${date}`);
+
   await redis.hmsetAsync(`token:${token}:power:${date}`, ipfsHash);
 
   let message = `# New Snapshot\n`;
