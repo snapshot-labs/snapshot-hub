@@ -56,7 +56,7 @@ router.get('/:token/snapshot/:date', async (req, res) => {
   if (!ipfsHash) {
     return res.json({});
   }
-  return res.json({ ipfsHash: ipfsHash });
+  return res.json(ipfsHash);
 });
 
 router.post('/:token/snapshot/:date', async (req, res) => {
