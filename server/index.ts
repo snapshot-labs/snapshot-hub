@@ -49,29 +49,29 @@ router.get('/:token/proposal/:id', async (req, res) => {
   return res.json(votes);
 });
 
-router.get('/:token/power/:date', async (req, res) => {
+router.get('/:token/snapshot/:date', async (req, res) => {
   const { token, date } = req.params;
-  let ipfsHash = await redis.hgetallAsync(`token:${token}:power:${date}`);
+  let ipfsHash = await redis.hgetallAsync(`token:${token}:snapshot:${date}`);
   if (!ipfsHash) {
     return res.json({});
   }
   return res.json({ ipfsHash: ipfsHash });
 });
 
-router.post('/:token/power/:date', async (req, res) => {
+router.post('/:token/snapshot/:date', async (req, res) => {
   const { token, date } = req.params;
 
-  const sig = await relayer.signMessage(`${token}/power/${date}`);
+  const sig = await relayer.signMessage(`${token}/snapshot/${date}`);
   
   console.log('>>>>>', 'sig', sig);
-  console.log('>>>>>', 'path', `${ns}/${token}/${sig}`);
+  console.log('>>>>>', 'path', `${ns}/${sig}`);
 
-  const ipfsHash = await pinJson(`${ns}/${token}/${sig}`, req.body);
+  const ipfsHash = await pinJson(`${ns}/${sig}`, req.body);
 
   console.log('>>>>>', 'ipfsHash', ipfsHash);
-  console.log('>>>>>', 'key', `token:${token}:power:${date}`);
+  console.log('>>>>>', 'key', `token:${token}:snapshot:${date}`);
 
-  await redis.hmsetAsync(`token:${token}:power:${date}`, ipfsHash);
+  await redis.hsetAsync(`token:${token}:snapshot:${date}`, ipfsHash);
 
   let message = `# New Snapshot\n`;
   message += `Token: ${token}\n`;
