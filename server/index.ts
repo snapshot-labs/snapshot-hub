@@ -71,7 +71,11 @@ router.post('/:token/snapshot/:date', async (req, res) => {
   console.log('>>>>>', 'ipfsHash', ipfsHash);
   console.log('>>>>>', 'key', `token:${token}:snapshot:${date}`);
 
-  await redis.hsetAsync(`token:${token}:snapshot:${date}`, ipfsHash);
+  try {
+    await redis.hsetAsync(`token:${token}:snapshot:${date}`, ipfsHash);
+  } catch(err) {
+    console.error(err);
+  }
 
   let message = `# New Snapshot\n`;
   message += `Token: ${token}\n`;
