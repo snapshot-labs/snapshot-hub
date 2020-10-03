@@ -24,13 +24,10 @@ export async function pinJson(key: string, body) {
     ipfsHash = result.IpfsHash;
   }
 
-  fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
-  })
+  fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`)
     .then(res => res.json())
-    .then(json => console.log(json))
-    .catch(result => console.error(result));
+    .then(json => console.log('Arweave success', json))
+    .catch(e => console.error('Arweave error', e));
 
   return ipfsHash;
 }
