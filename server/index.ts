@@ -1,4 +1,5 @@
 import express from 'express';
+import fetch from 'node-fetch';
 import redis from './helpers/redis';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
@@ -176,6 +177,19 @@ router.post('/message', async (req, res) => {
       mysqlStoreVote(msg.token, body, authorIpfsRes, relayerIpfsRes),
     ]);
   }
+
+  fetch('https://snapshot.collab.land/api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      body,
+      authorIpfsRes,
+      relayerIpfsRes
+    })
+  })
+    .then(res => res.json())
+    .then(json => console.log('Webhook success', json))
+    .catch(result => console.error('Webhook error', result));
 
   console.log(
     `Address "${body.address}"\n`,
