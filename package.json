@@ -33,6 +33,7 @@
     "frameguard": "^3.1.0",
     "lodash": "^4.17.15",
     "mysql": "^2.18.1",
+    "node-fetch": "^2.6.1",
     "redis": "^3.0.2",
     "typescript": "~3.9.3",
     "vue": "^2.6.11",
