@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import fleek from '@fleekhq/fleek-storage-js';
 import pinataSDK from '@pinata/sdk';
 
@@ -10,15 +11,26 @@ const config: any = {
 };
 
 export async function pinJson(key: string, body) {
-  // @ts-ignore
+  let ipfsHash: string;
+
   if (service === 'fleek') {
     const input = config;
     input.key = key;
     input.data = JSON.stringify(body);
     const result = await fleek.upload(input);
-    return result.hashV0;
+    ipfsHash = result.hashV0;
   } else {
     const result = await pinata.pinJSONToIPFS(body);
-    return result.IpfsHash;
+    ipfsHash = result.IpfsHash;
   }
+
+  fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(json => console.log(json))
+    .catch(result => console.error(result));
+
+  return ipfsHash;
 }
