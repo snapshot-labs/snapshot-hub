@@ -1,4 +1,5 @@
 import express from 'express';
+import fetch from 'node-fetch';
 import redis from './helpers/redis';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
@@ -15,11 +16,13 @@ import {
   storeVote as mysqlStoreVote
 } from './helpers/connectors/mysql';
 
+const network = process.env.NETWORK || 'testnet';
 const router = express.Router();
 
 router.get('/', (req, res) => {
   return res.json({
     name: pkg.name,
+    network,
     version: pkg.version,
     relayer: relayer.address
   });
@@ -176,6 +179,20 @@ router.post('/message', async (req, res) => {
       mysqlStoreVote(msg.token, body, authorIpfsRes, relayerIpfsRes),
     ]);
   }
+
+  fetch('https://snapshot.collab.land/api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      network,
+      body,
+      authorIpfsRes,
+      relayerIpfsRes
+    })
+  })
+    .then(res => res.json())
+    .then(json => console.log('Webhook success', json))
+    .catch(result => console.error('Webhook error', result));
 
   console.log(
     `Address "${body.address}"\n`,
