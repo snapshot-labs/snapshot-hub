@@ -16,11 +16,13 @@ import {
   storeVote as mysqlStoreVote
 } from './helpers/connectors/mysql';
 
+const network = process.env.NETWORK || 'testnet';
 const router = express.Router();
 
 router.get('/', (req, res) => {
   return res.json({
     name: pkg.name,
+    network,
     version: pkg.version,
     relayer: relayer.address
   });
@@ -182,6 +184,7 @@ router.post('/message', async (req, res) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      network,
       body,
       authorIpfsRes,
       relayerIpfsRes
