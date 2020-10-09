@@ -1,26 +1,26 @@
 version: "3.7"
 services:
 
-  # Snapshot Hub
-  snap-hub:
+  # Snapshot hub
+  snapshot-hub:
     build: .
-    container_name: snap-hub
+    container_name: snapshot-hub
     env_file:
       - .env.local
     depends_on:
-      - snap-redis
+      - snapshot-redis
     ports:
       - "8080:8080"
 
-  # Snapshot Redis Instance
-  snap-redis:
+  # Snapshot Redis instance
+  snapshot-redis:
     image: redis:6.0
-    container_name: snap-redis
-  
-  # Snapshot MySQL Instance 
-  snap-mysql:
+    container_name: snapshot-redis
+
+  # Snapshot MySQL instance
+  snapshot-mysql:
     image: mysql:8.0.21
-    container_name: snap-mysql
+    container_name: snapshot-mysql
     environment:
       MYSQL_USER: "admin"
       MYSQL_PASSWORD: "admin"
@@ -28,4 +28,4 @@ services:
 
 networks:
   default:
-    name: snap-network
+    name: snapshot-network

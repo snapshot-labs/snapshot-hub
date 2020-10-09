@@ -10,6 +10,7 @@
     "start": "vue-cli-service express:run"
   },
   "dependencies": {
+    "@bonustrack/snapshot-spaces": "github:bonustrack/snapshot-spaces#master",
     "@ethersproject/abi": "^5.0.1",
     "@ethersproject/address": "^5.0.1",
     "@ethersproject/constants": "^5.0.1",
@@ -35,6 +36,7 @@
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
     "redis": "^3.0.2",
+    "require-context": "^1.1.0",
     "typescript": "~3.9.3",
     "vue": "^2.6.11",
     "vue-cli-plugin-express": "^1.0.2"

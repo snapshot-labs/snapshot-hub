@@ -1,5 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import spaces from '@bonustrack/snapshot-spaces';
 import redis from './helpers/redis';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
@@ -26,6 +27,11 @@ router.get('/', (req, res) => {
     version: pkg.version,
     relayer: relayer.address
   });
+});
+
+router.get('/spaces/:key?', (req, res) => {
+  const { key } = req.params;
+  return res.json(key ? spaces[key] : spaces);
 });
 
 router.get('/:token/proposals', async (req, res) => {
