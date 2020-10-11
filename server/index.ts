@@ -24,6 +24,7 @@ router.get('/', (req, res) => {
     name: pkg.name,
     network,
     version: pkg.version,
+    tag: 'alpha',
     relayer: relayer.address
   });
 });
