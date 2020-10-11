@@ -1,7 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import spaces from '@bonustrack/snapshot-spaces';
-import redis from './helpers/redis';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
@@ -25,6 +24,7 @@ router.get('/', (req, res) => {
     name: pkg.name,
     network,
     version: pkg.version,
+    tag: 'alpha',
     relayer: relayer.address
   });
 });
@@ -38,7 +38,7 @@ router.get('/:token/proposals', async (req, res) => {
   const { token } = req.params;
   const query = "SELECT * FROM messages WHERE type = 'proposal' AND token = ? ORDER BY timestamp DESC";
   db.queryAsync(query, [token]).then(messages => {
-    const proposals = Object.fromEntries(
+    res.json(Object.fromEntries(
       messages.map(message => {
         const metadata = JSON.parse(message.metadata);
         return [message.id, {
@@ -55,20 +55,33 @@ router.get('/:token/proposals', async (req, res) => {
           relayerIpfsHash: metadata.relayer_ipfs_hash
         }];
       })
-    );
-    res.json(proposals);
+    ));
   });
 });
 
 router.get('/:token/proposal/:id', async (req, res) => {
   const { token, id } = req.params;
-  let votes = await redis.hgetallAsync(`token:${token}:proposal:${id}:votes`) || {};
-  if (votes)
-    votes = Object.fromEntries(Object.entries(votes).map((vote: any) => {
-      vote[1] = JSON.parse(vote[1]);
-      return vote;
-    }));
-  return res.json(votes);
+  const query = `SELECT * FROM messages WHERE type = 'vote' AND token = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
+  db.queryAsync(query, [token, id]).then(messages => {
+    res.json(Object.fromEntries(
+      messages.map(message => {
+        const metadata = JSON.parse(message.metadata);
+        return [message.address, {
+          address: message.address,
+          msg: {
+            version: message.version,
+            timestamp: message.timestamp.toString(),
+            token: message.token,
+            type: message.type,
+            payload: JSON.parse(message.payload)
+          },
+          sig: message.sig,
+          authorIpfsHash: message.id,
+          relayerIpfsHash: metadata.relayer_ipfs_hash
+        }];
+      })
+    ));
+  });
 });
 
 router.post('/message', async (req, res) => {
@@ -141,14 +154,13 @@ router.post('/message', async (req, res) => {
       JSON.stringify(msg.payload.metadata).length > 1e4
     ) return sendError(res, 'wrong vote metadata');
 
-    const proposalRedis = await redis.hgetAsync(`token:${msg.token}:proposals`, msg.payload.proposal);
-    const proposal = jsonParse(proposalRedis);
-    if (!proposalRedis)
+    const query = `SELECT * FROM messages WHERE token = ? AND id = ? AND type = 'proposal'`;
+    const proposals = await db.queryAsync(query, [msg.token, msg.payload.proposal]);
+    if (!proposals[0])
       return sendError(res, 'unknown proposal');
-    if (
-      ts > proposal.msg.payload.end ||
-      proposal.msg.payload.start > ts
-    ) return sendError(res, 'not in voting window');
+    const payload = jsonParse(proposals[0].payload);
+    if (ts > payload.end || payload.start > ts)
+      return sendError(res, 'not in voting window');
   }
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
