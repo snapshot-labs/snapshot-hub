@@ -19,7 +19,7 @@ services:
     environment:
       MYSQL_USER: "admin"
       MYSQL_PASSWORD: "admin"
-      MYSQL_DATABASE: "testdb"
+      MYSQL_DATABASE: "snapshot"
 
 networks:
   default:
