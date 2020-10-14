@@ -4,7 +4,10 @@ import pinataSDK from '@pinata/sdk';
 
 const service = process.env.PINNING_SERVICE || 'pinata';
 
-const pinata = pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_SECRET_API_KEY);
+const pinata = pinataSDK(
+  process.env.PINATA_API_KEY,
+  process.env.PINATA_SECRET_API_KEY
+);
 const config: any = {
   apiKey: process.env.FLEEK_API_KEY,
   apiSecret: process.env.FLEEK_API_SECRET

@@ -8,14 +8,9 @@ services:
     env_file:
       - .env.local
     depends_on:
-      - snapshot-redis
+      - snapshot-mysql
     ports:
       - "8080:8080"
-
-  # Snapshot Redis instance
-  snapshot-redis:
-    image: redis:6.0
-    container_name: snapshot-redis
 
   # Snapshot MySQL instance
   snapshot-mysql:
@@ -24,7 +19,10 @@ services:
     environment:
       MYSQL_USER: "admin"
       MYSQL_PASSWORD: "admin"
-      MYSQL_DATABASE: "testdb"
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "snapshot"
+    volumes:
+        - ./server/helpers/database/:/docker-entrypoint-initdb.d
 
 networks:
   default:

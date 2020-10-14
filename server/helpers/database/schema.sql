@@ -9,13 +9,13 @@ CREATE TABLE messages (
   payload JSON,
   sig VARCHAR(256) NOT NULL,
   metadata JSON,
-  PRIMARY KEY (`id`),
-  KEY address (address),
-  KEY version (version),
-  KEY timestamp (timestamp),
-  KEY space (space),
-  KEY token (token),
-  KEY type (type)
+  PRIMARY KEY (id),
+  INDEX address (address),
+  INDEX version (version),
+  INDEX timestamp (timestamp),
+  INDEX space (space),
+  INDEX token (token),
+  INDEX type (type)
 );
 
 CREATE TABLE hubs (
@@ -23,7 +23,7 @@ CREATE TABLE hubs (
   address VARCHAR(64),
   is_self INT DEFAULT 0,
   is_active INT DEFAULT 1,
-  PRIMARY KEY (`host`),
-  KEY address (address),
-  KEY is_self (is_self)
+  PRIMARY KEY (host),
+  INDEX address (address),
+  INDEX is_self (is_self)
 );

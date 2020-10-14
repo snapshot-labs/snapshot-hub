@@ -6,15 +6,8 @@ import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
 import { verify, jsonParse, sendError } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
+import { storeProposal, storeVote } from './helpers/adapters/mysql';
 import pkg from '../package.json';
-import {
-  storeProposal as redisStoreProposal,
-  storeVote as redisStoreVote
-} from './helpers/connectors/redis';
-import {
-  storeProposal as mysqlStoreProposal,
-  storeVote as mysqlStoreVote
-} from './helpers/connectors/mysql';
 
 const network = process.env.NETWORK || 'testnet';
 const router = express.Router();
@@ -179,23 +172,16 @@ router.post('/message', async (req, res) => {
   });
 
   if (msg.type === 'proposal') {
-    await Promise.all([
-      redisStoreProposal(msg.token, body, authorIpfsRes, relayerIpfsRes),
-      mysqlStoreProposal(msg.token, body, authorIpfsRes, relayerIpfsRes),
-    ]);
+    await storeProposal(msg.token, body, authorIpfsRes, relayerIpfsRes);
 
-    let message = `#${msg.token}\n\n`;
-    message += `**${msg.payload.name}**\n\n`;
-    message += `${msg.payload.body}\n\n`;
+    let message = `[${network}] ${msg.token}\n`;
+    message += `**${msg.payload.name}**\n`;
     message += `<https://ipfs.fleek.co/ipfs/${authorIpfsRes}>`;
     sendMessage(message);
   }
 
   if (msg.type === 'vote') {
-    await Promise.all([
-      redisStoreVote(msg.token, body, authorIpfsRes, relayerIpfsRes),
-      mysqlStoreVote(msg.token, body, authorIpfsRes, relayerIpfsRes),
-    ]);
+    await storeVote(msg.token, body, authorIpfsRes, relayerIpfsRes);
   }
 
   fetch('https://snapshot.collab.land/api', {
