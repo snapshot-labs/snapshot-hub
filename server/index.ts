@@ -1,6 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
-import spaces from '@bonustrack/snapshot-spaces';
+import spaces from '@snapshot-labs/snapshot-spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
