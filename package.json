@@ -10,7 +10,7 @@
     "start": "vue-cli-service express:run"
   },
   "dependencies": {
-    "@bonustrack/snapshot-spaces": "github:bonustrack/snapshot-spaces#master",
+    "@snapshot-labs/snapshot-spaces": "github:snapshot-labs/snapshot-spaces#master",
     "@ethersproject/abi": "^5.0.1",
     "@ethersproject/address": "^5.0.1",
     "@ethersproject/constants": "^5.0.1",
