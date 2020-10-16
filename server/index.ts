@@ -28,7 +28,8 @@ router.get('/spaces/:key?', (req, res) => {
 });
 
 router.get('/:token/proposals', async (req, res) => {
-  const { token } = req.params;
+  let { token } = req.params;
+  if (spaces[token]) token = spaces[token].token;
   const query = "SELECT * FROM messages WHERE type = 'proposal' AND token = ? ORDER BY timestamp DESC";
   db.queryAsync(query, [token]).then(messages => {
     res.json(Object.fromEntries(
@@ -53,7 +54,8 @@ router.get('/:token/proposals', async (req, res) => {
 });
 
 router.get('/:token/proposal/:id', async (req, res) => {
-  const { token, id } = req.params;
+  let { token, id } = req.params;
+  if (spaces[token]) token = spaces[token].token;
   const query = `SELECT * FROM messages WHERE type = 'vote' AND token = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
   db.queryAsync(query, [token, id]).then(messages => {
     res.json(Object.fromEntries(
