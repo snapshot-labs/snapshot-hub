@@ -4,7 +4,7 @@ import spaces from '@snapshot-labs/snapshot-spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
-import { verify, jsonParse, sendError } from './helpers/utils';
+import { verifySignature, jsonParse, sendError, hashPersonalMessage } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
 import { storeProposal, storeVote } from './helpers/adapters/mysql';
 import pkg from '../package.json';
@@ -104,7 +104,7 @@ router.post('/message', async (req, res) => {
   if (!msg.type || !['proposal', 'vote'].includes(msg.type))
     return sendError(res, 'wrong message type');
 
-  if (!await verify(body.address, body.msg, body.sig))
+  if (!await verifySignature(body.address, body.sig, hashPersonalMessage(body.msg)))
     return sendError(res, 'wrong signature');
 
   if (msg.type === 'proposal') {
