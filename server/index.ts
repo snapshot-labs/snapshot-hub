@@ -30,11 +30,10 @@ router.get('/spaces/:key?', (req, res) => {
   return res.json(key ? spaces[key] : spaces);
 });
 
-router.get('/:token/proposals', async (req, res) => {
-  let { token } = req.params;
-  if (spaces[token]) token = spaces[token].token;
-  const query = "SELECT * FROM messages WHERE type = 'proposal' AND token = ? ORDER BY timestamp DESC";
-  db.queryAsync(query, [token]).then(messages => {
+router.get('/:space/proposals', async (req, res) => {
+  const { space } = req.params;
+  const query = "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC";
+  db.queryAsync(query, [space]).then(messages => {
     res.json(Object.fromEntries(
       messages.map(message => {
         const metadata = JSON.parse(message.metadata);
@@ -56,11 +55,10 @@ router.get('/:token/proposals', async (req, res) => {
   });
 });
 
-router.get('/:token/proposal/:id', async (req, res) => {
-  let { token, id } = req.params;
-  if (spaces[token]) token = spaces[token].token;
-  const query = `SELECT * FROM messages WHERE type = 'vote' AND token = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
-  db.queryAsync(query, [token, id]).then(messages => {
+router.get('/:space/proposal/:id', async (req, res) => {
+  const { space, id } = req.params;
+  const query = `SELECT * FROM messages WHERE type = 'vote' AND space = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
+  db.queryAsync(query, [space, id]).then(messages => {
     res.json(Object.fromEntries(
       messages.map(message => {
         const metadata = JSON.parse(message.metadata);
