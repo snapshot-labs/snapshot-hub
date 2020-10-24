@@ -99,8 +99,7 @@ router.post('/message', async (req, res) => {
     Object.keys(msg.payload).length === 0
   ) return sendError(res, 'wrong signed message');
 
-  if (!tokens[msg.token])
-    return sendError(res, 'unknown space');
+  // if (!tokens[msg.token]) return sendError(res, 'unknown space');
 
   if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 30))
     return sendError(res, 'wrong timestamp');
@@ -165,7 +164,8 @@ router.post('/message', async (req, res) => {
       return sendError(res, 'not in voting window');
   }
 
-  const space = tokens[msg.token];
+  const space = tokens[msg.token] || '';
+  console.log('Space', space);
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
     address: body.address,
