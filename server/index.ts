@@ -1,7 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import spaces from '@snapshot-labs/snapshot-spaces';
-import { getAddress } from '@ethersproject/address';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
@@ -12,7 +11,7 @@ import pkg from '../package.json';
 
 const network = process.env.NETWORK || 'testnet';
 const tokens = Object.fromEntries(
-  Object.entries(spaces).map(space => [getAddress(space[1].token), space[0]])
+  Object.entries(spaces).map(space => [space[1].token, space[0]])
 );
 const router = express.Router();
 
