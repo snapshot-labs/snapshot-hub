@@ -1,6 +1,7 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import spaces from '@snapshot-labs/snapshot-spaces';
+import { getAddress } from '@ethersproject/address';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
@@ -10,6 +11,9 @@ import { storeProposal, storeVote } from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
 const network = process.env.NETWORK || 'testnet';
+const tokens = Object.fromEntries(
+  Object.entries(spaces).map(space => [getAddress(space[1].token), space[0]])
+);
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -95,6 +99,9 @@ router.post('/message', async (req, res) => {
     Object.keys(msg.payload).length === 0
   ) return sendError(res, 'wrong signed message');
 
+  if (!tokens[msg.token])
+    return sendError(res, 'unknown space');
+
   if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 30))
     return sendError(res, 'wrong timestamp');
 
@@ -158,6 +165,8 @@ router.post('/message', async (req, res) => {
       return sendError(res, 'not in voting window');
   }
 
+  const space = tokens[msg.token];
+
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
     address: body.address,
     msg: body.msg,
@@ -174,16 +183,17 @@ router.post('/message', async (req, res) => {
   });
 
   if (msg.type === 'proposal') {
-    await storeProposal(msg.token, body, authorIpfsRes, relayerIpfsRes);
+    await storeProposal(space, msg.token, body, authorIpfsRes, relayerIpfsRes);
 
+    const networkStr = network === 'testnet' ? 'demo.' : '';
     let message = `[${network}] ${msg.token}\n`;
     message += `**${msg.payload.name}**\n`;
-    message += `<https://ipfs.fleek.co/ipfs/${authorIpfsRes}>`;
+    message += `<https://${networkStr}snapshot.page/${space}/proposal/${authorIpfsRes}>`;
     sendMessage(message);
   }
 
   if (msg.type === 'vote') {
-    await storeVote(msg.token, body, authorIpfsRes, relayerIpfsRes);
+    await storeVote(space, msg.token, body, authorIpfsRes, relayerIpfsRes);
   }
 
   fetch('https://snapshot.collab.land/api', {
