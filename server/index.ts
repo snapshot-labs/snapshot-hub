@@ -1,6 +1,7 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import spaces from '@snapshot-labs/snapshot-spaces';
+import { getAddress } from '@ethersproject/address';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
