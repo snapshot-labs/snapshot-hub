@@ -185,9 +185,9 @@ router.post('/message', async (req, res) => {
     await storeProposal(space, msg.token, body, authorIpfsRes, relayerIpfsRes);
 
     const networkStr = network === 'testnet' ? 'demo.' : '';
-    let message = `[${network}] ${msg.token}\n`;
+    let message = `${space} (${network})\n`;
     message += `**${msg.payload.name}**\n`;
-    message += `<https://${networkStr}snapshot.page/${space}/proposal/${authorIpfsRes}>`;
+    message += `<https://${networkStr}snapshot.page/#/${space}/proposal/${authorIpfsRes}>`;
     sendMessage(message);
   }
 
