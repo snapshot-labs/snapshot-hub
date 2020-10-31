@@ -1,6 +1,6 @@
 {
   "name": "snapshot-hub",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": "balancer-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
@@ -40,7 +40,6 @@
     "node-fetch": "^2.6.1",
     "require-context": "^1.1.0",
     "typescript": "~3.9.3",
-    "vue": "^2.6.11",
     "vue-cli-plugin-express": "^1.0.2"
   },
   "devDependencies": {
