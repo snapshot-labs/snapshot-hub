@@ -9,8 +9,8 @@ import { sendMessage } from './helpers/discord';
 import { storeProposal, storeVote } from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
-const network = process.env.NETWORK || 'testnet';
 const router = express.Router();
+const network = process.env.NETWORK || 'testnet';
 
 router.get('/', (req, res) => {
   return res.json({
@@ -24,6 +24,17 @@ router.get('/', (req, res) => {
 
 router.get('/spaces/:key?', (req, res) => {
   const { key } = req.params;
+  const ts = (Date.now() / 1e3).toFixed();
+  db.queryAsync(`
+    SELECT space, COUNT(id) AS count FROM messages WHERE
+    type = 'proposal' 
+    AND space != ''
+    AND JSON_EXTRACT(payload, "$.start") <= 1604223349
+    AND JSON_EXTRACT(payload, "$.end") >= 1604223349 
+    GROUP BY space`, [ts, ts]).then(result => result.forEach(count => {
+      if (spaces[count.space])
+        spaces[count.space]._activeProposals = count.count
+  }));
   return res.json(key ? spaces[key] : spaces);
 });
 
