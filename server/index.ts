@@ -6,7 +6,7 @@ import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
 import { verifySignature, jsonParse, sendError, hashPersonalMessage } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
-import { storeProposal, storeVote } from './helpers/adapters/mysql';
+import { getActiveProposals, storeProposal, storeVote } from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
 const router = express.Router();
@@ -24,16 +24,8 @@ router.get('/', (req, res) => {
 
 router.get('/spaces/:key?', (req, res) => {
   const { key } = req.params;
-  const ts = (Date.now() / 1e3).toFixed();
-  db.queryAsync(`
-    SELECT space, COUNT(id) AS count FROM messages WHERE
-    type = 'proposal' 
-    AND space != ''
-    AND JSON_EXTRACT(payload, "$.start") <= 1604223349
-    AND JSON_EXTRACT(payload, "$.end") >= 1604223349 
-    GROUP BY space`, [ts, ts]).then(result => result.forEach(count => {
-      if (spaces[count.space])
-        spaces[count.space]._activeProposals = count.count
+  getActiveProposals(spaces).then((result: any) => result.forEach(count => {
+    if (spaces[count.space]) spaces[count.space]._activeProposals = count.count
   }));
   return res.json(key ? spaces[key] : spaces);
 });
