@@ -68,7 +68,7 @@ export async function getActiveProposals(spaces) {
     if (
       space[1].filters
       && Array.isArray(space[1].filters.invalids)
-      && space[1].filters.invalids > 0
+      && space[1].filters.invalids.length > 0
     ) {
       query += ' AND id NOT IN (?)';
       params.push(space[1].filters.invalids);
