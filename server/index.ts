@@ -1,12 +1,18 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import spaces from '@snapshot-labs/snapshot-spaces';
+import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
 import { verifySignature, jsonParse, sendError, hashPersonalMessage } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
-import { getActiveProposals, storeProposal, storeVote } from './helpers/adapters/mysql';
+import {
+  getActiveProposals,
+  storeProposal,
+  storeVote,
+  storeSettings
+} from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
 const router = express.Router();
@@ -96,7 +102,7 @@ router.post('/message', async (req, res) => {
     Object.keys(msg.payload).length === 0
   ) return sendError(res, 'wrong signed message');
 
-  if (!spaces[msg.space])
+  if (!spaces[msg.space] && msg.type !== 'settings')
     return sendError(res, 'unknown space');
 
   if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 30))
@@ -105,7 +111,7 @@ router.post('/message', async (req, res) => {
   if (!msg.version || msg.version !== pkg.version)
     return sendError(res, 'wrong version');
 
-  if (!msg.type || !['proposal', 'vote'].includes(msg.type))
+  if (!msg.type || !['proposal', 'vote', 'settings'].includes(msg.type))
     return sendError(res, 'wrong message type');
 
   if (!await verifySignature(body.address, body.sig, hashPersonalMessage(body.msg)))
@@ -162,6 +168,11 @@ router.post('/message', async (req, res) => {
       return sendError(res, 'not in voting window');
   }
 
+  if (msg.type === 'settings') {
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, msg.payload) !== true)
+      return sendError(res, 'wrong space format');
+  }
+
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
     address: body.address,
     msg: body.msg,
@@ -189,6 +200,10 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'vote') {
     await storeVote(msg.space, body, authorIpfsRes, relayerIpfsRes);
+  }
+
+  if (msg.type === 'settings') {
+    await storeSettings(msg.space, body);
   }
 
   fetch('https://snapshot.collab.land/api', {

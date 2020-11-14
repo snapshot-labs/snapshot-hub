@@ -20,6 +20,7 @@
     "@fleekhq/fleek-storage-js": "^1.0.2",
     "@pinata/sdk": "^1.1.11",
     "@snapshot-labs/snapshot-spaces": "github:snapshot-labs/snapshot-spaces#master",
+    "@snapshot-labs/snapshot.js": "github:snapshot-labs/snapshot.js#fabien/dist",
     "@vue/cli-plugin-babel": "^4.4.0",
     "@vue/cli-plugin-eslint": "^4.4.0",
     "@vue/cli-plugin-typescript": "^4.4.0",

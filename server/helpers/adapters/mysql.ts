@@ -1,4 +1,5 @@
-import { isAddress, getAddress } from "@ethersproject/address";
+import fleek from '@fleekhq/fleek-storage-js';
+import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
 
 export async function storeProposal(space, body, authorIpfsHash, relayerIpfsHash) {
@@ -35,6 +36,25 @@ export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
       relayer_ipfs_hash: relayerIpfsHash
     })
   }]);
+}
+
+export async function storeSettings(space, body) {
+  const msg = JSON.parse(body.msg);
+
+  const key = `registry/${body.address}/${space}`;
+  const result = await fleek.upload({
+    apiKey: process.env.FLEEK_API_KEY,
+    apiSecret: process.env.FLEEK_API_SECRET,
+    bucket: 'snapshot-team-bucket',
+    key,
+    data: JSON.stringify(msg.payload)
+  });
+  const ipfsHash = result.hashV0;
+  console.log('Settings updated', ipfsHash);
+
+  const ts = (Date.now() / 1e3).toFixed();
+  let query = 'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
+  await db.queryAsync(query, [{ id: space, created_at: ts, updated_at: ts}, ts]);
 }
 
 export async function getActiveProposals(spaces) {

@@ -27,3 +27,12 @@ CREATE TABLE hubs (
   INDEX address (address),
   INDEX is_self (is_self)
 );
+
+CREATE TABLE spaces (
+  id VARCHAR(64) NOT NULL,
+  created_at BIGINT NOT NULL,
+  updated_at BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  INDEX address (created_at),
+  INDEX is_self (updated_at)
+);
