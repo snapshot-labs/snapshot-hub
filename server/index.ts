@@ -89,7 +89,7 @@ router.post('/message', async (req, res) => {
     return sendError(res, 'wrong signed message');
   }
 
-  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > ts + 3000) {
+  if (!msg.timestamp || typeof msg.timestamp !== 'string') {
     return sendError(res, 'wrong timestamp');
   }
 
