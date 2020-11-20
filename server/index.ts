@@ -105,7 +105,7 @@ router.post('/message', async (req, res) => {
   if (!spaces[msg.space] && msg.type !== 'settings')
     return sendError(res, 'unknown space');
 
-  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 30))
+  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 300))
     return sendError(res, 'wrong timestamp');
 
   if (!msg.version || msg.version !== pkg.version)
