@@ -1,6 +1,11 @@
+import snapshot from '@snapshot-labs/snapshot.js';
+import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 import fleek from '@fleekhq/fleek-storage-js';
 import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
+import getProvider from '../provider';
+import resolveENSContentHash from '../resolveENSContentHash';
+import { decodeContenthash } from '../content';
 
 export async function storeProposal(space, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
@@ -43,8 +48,8 @@ export async function storeSettings(space, body) {
 
   const key = `registry/${body.address}/${space}`;
   const result = await fleek.upload({
-    apiKey: process.env.FLEEK_API_KEY,
-    apiSecret: process.env.FLEEK_API_SECRET,
+    apiKey: process.env.FLEEK_API_KEY || '',
+    apiSecret: process.env.FLEEK_API_SECRET || '',
     bucket: 'snapshot-team-bucket',
     key,
     data: JSON.stringify(msg.payload)
@@ -98,4 +103,28 @@ export async function getActiveProposals(spaces) {
   });
   query += ') GROUP BY space';
   return await db.queryAsync(query, params);
+}
+
+export async function loadSpaces() {
+  const query = 'SELECT id FROM spaces';
+  const result = await db.queryAsync(query);
+  const ids = result.map(space => space.id);
+  const spaces = {};
+  for (const id of ids) {
+    try {
+      const { protocolType, decoded } = await resolveContent(getProvider('1'), id);
+      const ts = (Date.now() / 1e3).toFixed();
+      const space = await snapshot.utils.ipfsGet(gateways[0], `${decoded}?cb=${ts}`, protocolType);
+      if (snapshot.utils.validateSchema(snapshot.schemas.space, space))
+        spaces[id] = space;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  return spaces;
+}
+
+export async function resolveContent(provider, name) {
+  const contentHash = await resolveENSContentHash(name, provider);
+  return decodeContenthash(contentHash);
 }
