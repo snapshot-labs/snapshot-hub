@@ -109,9 +109,9 @@ export async function loadSpaces() {
   const spaces = {};
   for (const id of ids) {
     try {
-      const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
       const ts = (Date.now() / 1e3).toFixed();
-      const space = await snapshot.utils.ipfsGet(gateways[2], `${decoded}?cb=${ts}`, protocolType);
+      const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
+      const space = await snapshot.utils.ipfsGet(gateways[0], `${decoded}?cb=${ts}`, protocolType);
       if (snapshot.utils.validateSchema(snapshot.schemas.space, space))
         spaces[id] = space;
     } catch (e) {

@@ -216,6 +216,10 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'settings') {
     await storeSettings(msg.space, body);
+    loadSpaces().then(ensSpaces => {
+      spaces = { ...spaces, ...ensSpaces };
+      console.log('Updated spaces', Object.keys(spaces).length);
+    });
   }
 
   fetch('https://snapshot.collab.land/api', {
