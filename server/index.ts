@@ -1,22 +1,34 @@
+global['fetch'] = require('node-fetch');
 import express from 'express';
-import fetch from 'node-fetch';
-import spaces from '@snapshot-labs/snapshot-spaces';
+import legacySpaces from '@snapshot-labs/snapshot-spaces';
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
-import { pinJson } from './helpers/ipfs';
-import { verifySignature, jsonParse, sendError, hashPersonalMessage } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
+import { pinJson } from './helpers/ipfs';
+import {
+  verifySignature,
+  jsonParse,
+  sendError,
+  hashPersonalMessage
+} from './helpers/utils';
 import {
   getActiveProposals,
   storeProposal,
   storeVote,
-  storeSettings
+  storeSettings,
+  loadSpaces
 } from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
+
+let spaces = legacySpaces;
+loadSpaces().then(ensSpaces => {
+  spaces = { ...spaces, ...ensSpaces };
+  console.log('Spaces', Object.keys(spaces).length);
+});
 
 router.get('/', (req, res) => {
   return res.json({
@@ -204,6 +216,10 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'settings') {
     await storeSettings(msg.space, body);
+    loadSpaces().then(ensSpaces => {
+      spaces = { ...spaces, ...ensSpaces };
+      console.log('Updated spaces', Object.keys(spaces).length);
+    });
   }
 
   fetch('https://snapshot.collab.land/api', {
