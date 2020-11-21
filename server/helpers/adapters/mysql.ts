@@ -3,9 +3,6 @@ import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 import fleek from '@fleekhq/fleek-storage-js';
 import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
-import getProvider from '../provider';
-import resolveENSContentHash from '../resolveENSContentHash';
-import { decodeContenthash } from '../content';
 
 export async function storeProposal(space, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
@@ -112,9 +109,9 @@ export async function loadSpaces() {
   const spaces = {};
   for (const id of ids) {
     try {
-      const { protocolType, decoded } = await resolveContent(getProvider('1'), id);
+      const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
       const ts = (Date.now() / 1e3).toFixed();
-      const space = await snapshot.utils.ipfsGet(gateways[0], `${decoded}?cb=${ts}`, protocolType);
+      const space = await snapshot.utils.ipfsGet(gateways[2], `${decoded}?cb=${ts}`, protocolType);
       if (snapshot.utils.validateSchema(snapshot.schemas.space, space))
         spaces[id] = space;
     } catch (e) {
@@ -125,6 +122,6 @@ export async function loadSpaces() {
 }
 
 export async function resolveContent(provider, name) {
-  const contentHash = await resolveENSContentHash(name, provider);
-  return decodeContenthash(contentHash);
+  const contentHash = await snapshot.utils.resolveENSContentHash(name, provider);
+  return snapshot.utils.decodeContenthash(contentHash);
 }
