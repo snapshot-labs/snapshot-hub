@@ -17,7 +17,8 @@ import {
   storeProposal,
   storeVote,
   storeSettings,
-  loadSpaces
+  loadSpaces,
+  loadSpace
 } from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
@@ -216,10 +217,11 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'settings') {
     await storeSettings(msg.space, body);
-    loadSpaces().then(ensSpaces => {
-      spaces = { ...spaces, ...ensSpaces };
-      console.log('Updated spaces', Object.keys(spaces).length);
-    });
+    setTimeout(async () => {
+      const space = await loadSpace(msg.space);
+      console.log('Updated space', msg.space, space);
+      if (space) spaces[msg.space] = space;
+    }, 75e3);
   }
 
   fetch('https://snapshot.collab.land/api', {

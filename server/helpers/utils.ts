@@ -81,3 +81,9 @@ export function hashPersonalMessage(msg: string): string {
   const hash = ethUtil.keccak256(buf);
   return ethUtil.bufferToHex(hash);
 }
+
+export async function sleep(time) {
+  return new Promise(resolve => {
+    setTimeout(resolve, time);
+  });
+}

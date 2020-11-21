@@ -108,17 +108,25 @@ export async function loadSpaces() {
   const ids = result.map(space => space.id);
   const spaces = {};
   for (const id of ids) {
-    try {
-      const ts = (Date.now() / 1e3).toFixed();
-      const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
-      const space = await snapshot.utils.ipfsGet(gateways[0], `${decoded}?cb=${ts}`, protocolType);
-      if (snapshot.utils.validateSchema(snapshot.schemas.space, space))
-        spaces[id] = space;
-    } catch (e) {
-      console.log(e);
-    }
+    const space = await loadSpace(id);
+    if (space) spaces[id] = space;
   }
   return spaces;
+}
+
+export async function loadSpace(id) {
+  let space = false;
+  // const ts = (Date.now() / 1e3).toFixed();
+  try {
+    const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
+    const result = await snapshot.utils.ipfsGet(gateways[0], decoded, protocolType);
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
+      space = result;
+  } catch (e) {
+    console.log(e);
+  }
+  console.log('Load space', id, space);
+  return space;
 }
 
 export async function resolveContent(provider, name) {
