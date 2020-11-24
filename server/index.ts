@@ -102,7 +102,9 @@ router.get('/:space/proposal/:id', async (req, res) => {
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
-  const ts = (Date.now() / 1e3).toFixed();
+  const now = Date.now() / 1e3;
+  const ts = now.toFixed();
+  const upts = (now + 300).toFixed();
   // const minBlock = (3600 * 24) / 15;
 
   if (!body || !body.address || !body.msg || !body.sig)
@@ -118,7 +120,7 @@ router.post('/message', async (req, res) => {
   if (!spaces[msg.space] && msg.type !== 'settings')
     return sendError(res, 'unknown space');
 
-  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > (ts + 300))
+  if (!msg.timestamp || typeof msg.timestamp !== 'string' || msg.timestamp > upts)
     return sendError(res, 'wrong timestamp');
 
   if (!msg.version || msg.version !== pkg.version)
