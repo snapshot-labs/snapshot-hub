@@ -1,5 +1,5 @@
+import snapshot from '@snapshot-labs/snapshot.js';
 import { verifyMessage } from '@ethersproject/wallet';
-import { providers } from 'ethers';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import * as ethUtil from 'ethereumjs-util';
 import { isValidSignature } from './eip1271';
@@ -45,9 +45,7 @@ export async function verifySignature(
   hash: string
   // chainId: number
 ): Promise<boolean> {
-  const rpcUrl =
-    'https://eth-mainnet.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv';
-  const provider = new providers.JsonRpcProvider(rpcUrl);
+  const provider = snapshot.utils.getProvider('1');
   const bytecode = await provider.getCode(address);
   if (
     !bytecode ||
