@@ -31,6 +31,15 @@ loadSpaces().then(ensSpaces => {
   console.log('Spaces', Object.keys(spaces).length);
 });
 
+setInterval(() => {
+  getActiveProposals(spaces)
+    .then((result: any) =>
+      result.forEach(count => {
+        if (spaces[count.space])
+          spaces[count.space]._activeProposals = count.count;
+  }));
+}, 30e3);
+
 router.get('/', (req, res) => {
   return res.json({
     name: pkg.name,
@@ -43,9 +52,6 @@ router.get('/', (req, res) => {
 
 router.get('/spaces/:key?', (req, res) => {
   const { key } = req.params;
-  getActiveProposals(spaces).then((result: any) => result.forEach(count => {
-    if (spaces[count.space]) spaces[count.space]._activeProposals = count.count
-  }));
   return res.json(key ? spaces[key] : spaces);
 });
 
