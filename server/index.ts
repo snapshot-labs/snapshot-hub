@@ -105,6 +105,15 @@ router.get('/:space/proposal/:id', async (req, res) => {
   });
 });
 
+router.get('/voters', async (req, res) => {
+  const { from, to } = req.query;
+  const spacesArr = req.query.spaces ? req.query.spaces.split(',') : [];
+  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
+  const query = `SELECT address, timestamp, space FROM messages WHERE type = 'vote' AND timestamp >= ? AND timestamp <= ? ${spacesStr} GROUP BY address ORDER BY timestamp DESC`;
+  const messages = await db.queryAsync(query, [from, to, spacesArr]);
+  res.json(messages);
+});
+
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
