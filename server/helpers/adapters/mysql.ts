@@ -103,14 +103,22 @@ export async function getActiveProposals(spaces) {
 }
 
 export async function loadSpaces() {
+  console.time('loadSpaces');
   const query = 'SELECT id FROM spaces';
   const result = await db.queryAsync(query);
   const ids = result.map(space => space.id);
+  console.log('Spaces', ids.length);
   const spaces = {};
-  for (const id of ids) {
-    const space = await loadSpace(id);
-    if (space) spaces[id] = space;
+  const max = 50;
+  const pages = Math.ceil(ids.length / max);
+  for (let i = 0; i < pages; i++) {
+    const pageIds = ids.slice(max * i, max * (i + 1));
+    const pageSpaces = await Promise.all(pageIds.map(id => loadSpace(id)));
+    pageIds.forEach((id, index) => {
+      if (pageSpaces[index]) spaces[id] = pageSpaces[index];
+    });
   }
+  console.timeEnd('loadSpaces');
   return spaces;
 }
 
@@ -123,9 +131,9 @@ export async function loadSpace(id) {
     if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
       space = result;
   } catch (e) {
-    console.log(e);
+    // console.log(e);
   }
-  console.log('Load space', id, space);
+  // console.log('Load space', id, space);
   return space;
 }
 
