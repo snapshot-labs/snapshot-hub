@@ -10,7 +10,8 @@ import {
   verifySignature,
   jsonParse,
   sendError,
-  hashPersonalMessage
+  hashPersonalMessage,
+  formatMessage
 } from './helpers/utils';
 import {
   getActiveProposals,
@@ -60,22 +61,16 @@ router.get('/:space/proposals', async (req, res) => {
   const query = "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC";
   db.queryAsync(query, [space]).then(messages => {
     res.json(Object.fromEntries(
-      messages.map(message => {
-        const metadata = JSON.parse(message.metadata);
-        return [message.id, {
-          address: message.address,
-          msg: {
-            version: message.version,
-            timestamp: message.timestamp.toString(),
-            space: message.space,
-            type: message.type,
-            payload: JSON.parse(message.payload)
-          },
-          sig: message.sig,
-          authorIpfsHash: message.id,
-          relayerIpfsHash: metadata.relayer_ipfs_hash
-        }];
-      })
+      messages.map(message => formatMessage(message))
+    ));
+  });
+});
+
+router.get('/timeline', async (req, res) => {
+  const query = "SELECT * FROM messages WHERE type = 'proposal' ORDER BY timestamp DESC LIMIT 30";
+  db.queryAsync(query).then(messages => {
+    res.json(Object.fromEntries(
+      messages.map(message => formatMessage(message))
     ));
   });
 });
