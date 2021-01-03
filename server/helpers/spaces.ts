@@ -1,7 +1,8 @@
 import legacySpaces from '@snapshot-labs/snapshot-spaces';
 import { getActiveProposals, loadSpaces } from './adapters/mysql';
 
-let spaces = legacySpaces;
+export let spaces = legacySpaces;
+
 loadSpaces().then(ensSpaces => {
 	spaces = { ...spaces, ...ensSpaces };
 	console.log('Spaces', Object.keys(spaces).length);
@@ -16,4 +17,3 @@ setInterval(() => {
 			}));
 }, 30e3);
 
-export default spaces;

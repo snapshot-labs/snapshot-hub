@@ -1,7 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
-import spaces from './helpers/spaces';
+import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { sendMessage } from './helpers/discord';
