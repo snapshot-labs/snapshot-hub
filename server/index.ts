@@ -1,7 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
-import legacySpaces from '@snapshot-labs/snapshot-spaces';
 import snapshot from '@snapshot-labs/snapshot.js';
+import spaces from './helpers/spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { sendMessage } from './helpers/discord';
@@ -14,32 +14,15 @@ import {
   formatMessage
 } from './helpers/utils';
 import {
-  getActiveProposals,
   storeProposal,
   storeVote,
   storeSettings,
-  loadSpaces,
   loadSpace
 } from './helpers/adapters/mysql';
 import pkg from '../package.json';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
-
-let spaces = legacySpaces;
-loadSpaces().then(ensSpaces => {
-  spaces = { ...spaces, ...ensSpaces };
-  console.log('Spaces', Object.keys(spaces).length);
-});
-
-setInterval(() => {
-  getActiveProposals(spaces)
-    .then((result: any) =>
-      result.forEach(count => {
-        if (spaces[count.space])
-          spaces[count.space]._activeProposals = count.count;
-  }));
-}, 30e3);
 
 router.get('/', (req, res) => {
   return res.json({
