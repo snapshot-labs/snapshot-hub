@@ -63,7 +63,7 @@ export async function getActiveProposals(spaces) {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   let query = `
     SELECT space, COUNT(id) AS count FROM messages WHERE
-    type = 'proposal' 
+    type = 'proposal'
     AND space != ''
     AND JSON_EXTRACT(payload, "$.start") <= ?
     AND JSON_EXTRACT(payload, "$.end") >= ?
@@ -105,8 +105,13 @@ export async function getActiveProposals(spaces) {
 export async function loadSpaces() {
   console.time('loadSpaces');
   const query = 'SELECT id FROM spaces';
-  const result = await db.queryAsync(query);
-  const ids = result.map(space => space.id);
+  let result = [];
+  try {
+    result = await db.queryAsync(query);
+  } catch (e) {
+    console.log(e);
+  }
+  const ids = result.map((space: any) => space.id);
   console.log('Spaces', ids.length);
   const spaces = {};
   const max = 50;
