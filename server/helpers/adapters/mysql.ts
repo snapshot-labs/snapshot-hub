@@ -114,7 +114,7 @@ export async function loadSpaces() {
   const ids = result.map((space: any) => space.id);
   console.log('Spaces', ids.length);
   const spaces = {};
-  const max = 50;
+  const max = 200;
   const pages = Math.ceil(ids.length / max);
   for (let i = 0; i < pages; i++) {
     const pageIds = ids.slice(max * i, max * (i + 1));
@@ -136,10 +136,10 @@ export async function loadSpace(id) {
     const result = await snapshot.utils.ipfsGet(gateways[0], key, protocolType);
     if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
       space = result;
+    console.log('Load space', id);
   } catch (e) {
-    console.log(e);
+    console.log('Load space failed', id);
   }
-  console.log('Load space', id, space);
   return space;
 }
 
