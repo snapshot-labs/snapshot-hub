@@ -132,7 +132,8 @@ export async function loadSpace(id) {
   // const ts = (Date.now() / 1e3).toFixed();
   try {
     const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
-    const result = await snapshot.utils.ipfsGet(gateways[0], decoded, protocolType);
+    const key = decoded.replace('storage.snapshot.page', 'snapshot-team-bucket.storage');
+    const result = await snapshot.utils.ipfsGet(gateways[0], key, protocolType);
     if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
       space = result;
   } catch (e) {
