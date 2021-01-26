@@ -36,3 +36,7 @@ CREATE TABLE spaces (
   INDEX address (created_at),
   INDEX is_self (updated_at)
 );
+
+INSERT INTO spaces (id, created_at, updated_at) VALUES
+  ('bonustrack.eth', 1605387647, 1605955059),
+  ('samuv.eth', 1610006388, 1610377573);
