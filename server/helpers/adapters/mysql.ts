@@ -30,7 +30,7 @@ export async function storeProposal(
 }
 
 export async function archiveProposal(authorIpfsHash) {
-  let query = 'UPDATE messages SET type = ? WHERE id = ?';
+  let query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
   await db.queryAsync(query, ['archive-proposal', authorIpfsHash]);
 }
 
