@@ -145,16 +145,6 @@ router.post('/message', async (req, res) => {
   )
     return sendError(res, 'wrong signature');
 
-  if (msg.type === 'delete-proposal') {
-    let query = 'SELECT address FROM messages WHERE id = ?';
-    let propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
-    if (
-      propasalSigner[0].address.toLowerCase() !== body.address.toLowerCase()
-    ) {
-      return sendError(res, 'wrong signer');
-    }
-  }
-
   if (msg.type === 'proposal') {
     if (
       Object.keys(msg.payload).length !== 7 ||
@@ -238,6 +228,13 @@ router.post('/message', async (req, res) => {
   });
 
   if (msg.type === 'delete-proposal') {
+    let query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
+    let propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
+    if (
+      propasalSigner[0].address.toLowerCase() !== body.address.toLowerCase()
+    ) {
+      return sendError(res, 'wrong signer');
+    }
     await archiveProposal(msg.payload.proposal);
   }
 
