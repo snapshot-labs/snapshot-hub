@@ -209,12 +209,17 @@ router.post('/message', async (req, res) => {
   }
 
   if (msg.type === 'settings') {
-    await storeSettings(msg.space, body);
-    setTimeout(async () => {
-      const space = await loadSpace(msg.space);
-      console.log('Updated space', msg.space, space);
-      if (space) spaces[msg.space] = space;
-    }, 75e3);
+    try {
+      await storeSettings(msg.space, body);
+      spaces[msg.space] = msg.payload;
+      setTimeout(async () => {
+        const space = await loadSpace(msg.space);
+        console.log('Updated space', msg.space, space);
+        if (space) spaces[msg.space] = space;
+      }, 75e3);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   fetch('https://snapshot.collab.land/api', {

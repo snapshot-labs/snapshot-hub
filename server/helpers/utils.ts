@@ -88,17 +88,20 @@ export async function sleep(time) {
 
 export function formatMessage(message) {
   const metadata = JSON.parse(message.metadata);
-  return [message.id, {
-    address: message.address,
-    msg: {
-      version: message.version,
-      timestamp: message.timestamp.toString(),
-      space: message.space,
-      type: message.type,
-      payload: JSON.parse(message.payload)
-    },
-    sig: message.sig,
-    authorIpfsHash: message.id,
-    relayerIpfsHash: metadata.relayer_ipfs_hash
-  }];
+  return [
+    message.id,
+    {
+      address: message.address,
+      msg: {
+        version: message.version,
+        timestamp: message.timestamp.toString(),
+        space: message.space,
+        type: message.type,
+        payload: JSON.parse(message.payload)
+      },
+      sig: message.sig,
+      authorIpfsHash: message.id,
+      relayerIpfsHash: metadata.relayer_ipfs_hash
+    }
+  ];
 }

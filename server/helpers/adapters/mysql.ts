@@ -52,7 +52,7 @@ export async function storeSettings(space, body) {
     data: JSON.stringify(msg.payload)
   });
   const ipfsHash = result.hashV0;
-  console.log('Settings updated', ipfsHash);
+  console.log('Settings updated', space, ipfsHash);
 
   const ts = (Date.now() / 1e3).toFixed();
   let query = 'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
