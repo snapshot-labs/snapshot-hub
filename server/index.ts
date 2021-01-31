@@ -230,9 +230,8 @@ router.post('/message', async (req, res) => {
   if (msg.type === 'delete-proposal') {
     let query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
     let propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
-    if (
-      propasalSigner[0].address.toLowerCase() !== body.address.toLowerCase()
-    ) {
+    console.log('add:', propasalSigner[0].address, body.address);
+    if (propasalSigner[0].address !== body.address) {
       return sendError(res, 'wrong signer');
     }
     await archiveProposal(msg.payload.proposal);
