@@ -4,40 +4,54 @@ import fleek from '@fleekhq/fleek-storage-js';
 import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
 
-export async function storeProposal(space, body, authorIpfsHash, relayerIpfsHash) {
+export async function storeProposal(
+  space,
+  body,
+  authorIpfsHash,
+  relayerIpfsHash
+) {
   const msg = JSON.parse(body.msg);
   let query = 'INSERT IGNORE INTO messages SET ?;';
-  await db.queryAsync(query, [{
-    id: authorIpfsHash,
-    address: body.address,
-    version: msg.version,
-    timestamp: msg.timestamp,
-    space,
-    type: 'proposal',
-    payload: JSON.stringify(msg.payload),
-    sig: body.sig,
-    metadata: JSON.stringify({
-      relayer_ipfs_hash: relayerIpfsHash
-    })
-  }]);
+  await db.queryAsync(query, [
+    {
+      id: authorIpfsHash,
+      address: body.address,
+      version: msg.version,
+      timestamp: msg.timestamp,
+      space,
+      type: 'proposal',
+      payload: JSON.stringify(msg.payload),
+      sig: body.sig,
+      metadata: JSON.stringify({
+        relayer_ipfs_hash: relayerIpfsHash
+      })
+    }
+  ]);
+}
+
+export async function archiveProposal(authorIpfsHash) {
+  let query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
+  await db.queryAsync(query, ['archive-proposal', authorIpfsHash]);
 }
 
 export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   let query = 'INSERT IGNORE INTO messages SET ?;';
-  await db.queryAsync(query, [{
-    id: authorIpfsHash,
-    address: body.address,
-    version: msg.version,
-    timestamp: msg.timestamp,
-    space,
-    type: 'vote',
-    payload: JSON.stringify(msg.payload),
-    sig: body.sig,
-    metadata: JSON.stringify({
-      relayer_ipfs_hash: relayerIpfsHash
-    })
-  }]);
+  await db.queryAsync(query, [
+    {
+      id: authorIpfsHash,
+      address: body.address,
+      version: msg.version,
+      timestamp: msg.timestamp,
+      space,
+      type: 'vote',
+      payload: JSON.stringify(msg.payload),
+      sig: body.sig,
+      metadata: JSON.stringify({
+        relayer_ipfs_hash: relayerIpfsHash
+      })
+    }
+  ]);
 }
 
 export async function storeSettings(space, body) {
@@ -55,8 +69,12 @@ export async function storeSettings(space, body) {
   console.log('Settings updated', space, ipfsHash);
 
   const ts = (Date.now() / 1e3).toFixed();
-  let query = 'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
-  await db.queryAsync(query, [{ id: space, created_at: ts, updated_at: ts}, ts]);
+  let query =
+    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
+  await db.queryAsync(query, [
+    { id: space, created_at: ts, updated_at: ts },
+    ts
+  ]);
 }
 
 export async function getActiveProposals(spaces) {
@@ -83,14 +101,14 @@ export async function getActiveProposals(spaces) {
       query += ' AND address IN (?)';
       params.push(members);
     } else {
-      query += ' AND address = 1'
+      query += ' AND address = 1';
     }
 
     // Filter out invalids proposals
     if (
-      space[1].filters
-      && Array.isArray(space[1].filters.invalids)
-      && space[1].filters.invalids.length > 0
+      space[1].filters &&
+      Array.isArray(space[1].filters.invalids) &&
+      space[1].filters.invalids.length > 0
     ) {
       query += ' AND id NOT IN (?)';
       params.push(space[1].filters.invalids);
@@ -131,8 +149,14 @@ export async function loadSpace(id) {
   let space = false;
   // const ts = (Date.now() / 1e3).toFixed();
   try {
-    const { protocolType, decoded } = await resolveContent(snapshot.utils.getProvider('1'), id);
-    const key = decoded.replace('storage.snapshot.page', 'snapshot-team-bucket.storage.fleek.co');
+    const { protocolType, decoded } = await resolveContent(
+      snapshot.utils.getProvider('1'),
+      id
+    );
+    const key = decoded.replace(
+      'storage.snapshot.page',
+      'snapshot-team-bucket.storage.fleek.co'
+    );
     const result = await snapshot.utils.ipfsGet(gateways[0], key, protocolType);
     if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
       space = result;
@@ -144,6 +168,9 @@ export async function loadSpace(id) {
 }
 
 export async function resolveContent(provider, name) {
-  const contentHash = await snapshot.utils.resolveENSContentHash(name, provider);
+  const contentHash = await snapshot.utils.resolveENSContentHash(
+    name,
+    provider
+  );
   return snapshot.utils.decodeContenthash(contentHash);
 }
