@@ -10,6 +10,7 @@
     "start": "vue-cli-service express:run"
   },
   "dependencies": {
+    "@ensdomains/ensjs": "^2.0.0",
     "@ethersproject/abi": "^5.0.1",
     "@ethersproject/address": "^5.0.1",
     "@ethersproject/constants": "^5.0.1",
