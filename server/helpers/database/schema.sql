@@ -30,6 +30,7 @@ CREATE TABLE hubs (
 
 CREATE TABLE spaces (
   id VARCHAR(64) NOT NULL,
+  settings JSON,
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
   PRIMARY KEY (id),

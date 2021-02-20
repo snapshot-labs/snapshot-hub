@@ -4,6 +4,18 @@ import fleek from '@fleekhq/fleek-storage-js';
 import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
 
+export async function uriGet(
+  gateway: string,
+  ipfsHash: string,
+  protocolType: string = 'ipfs'
+) {
+  let url = `https://${gateway}/${protocolType}/${ipfsHash}`;
+  if (['https', 'http'].includes(protocolType)) {
+    url = `${protocolType}://${ipfsHash}`;
+    return fetch(url).then((res) => res.json());
+  }
+}
+
 export async function storeProposal(
   space,
   body,
@@ -147,17 +159,17 @@ export async function loadSpaces() {
 
 export async function loadSpace(id) {
   let space = false;
-  // const ts = (Date.now() / 1e3).toFixed();
   try {
-    const { protocolType, decoded } = await resolveContent(
+    let { protocolType, decoded } = await resolveContent(
       snapshot.utils.getProvider('1'),
       id
     );
     const key = decoded.replace(
       'storage.snapshot.page',
-      'snapshot-team-bucket.storage.fleek.co'
+      'storageapi.fleek.co/snapshot-team-bucket'
     );
-    const result = await snapshot.utils.ipfsGet(gateways[0], key, protocolType);
+    if (key.includes('storageapi.fleek.co')) protocolType = 'https';
+    const result = await uriGet(gateways[0], key, protocolType);
     if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
       space = result;
     console.log('Load space', id);
