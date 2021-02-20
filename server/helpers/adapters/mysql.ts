@@ -10,10 +10,9 @@ export async function uriGet(
   protocolType: string = 'ipfs'
 ) {
   let url = `https://${gateway}/${protocolType}/${ipfsHash}`;
-  if (['https', 'http'].includes(protocolType)) {
+  if (['https', 'http'].includes(protocolType))
     url = `${protocolType}://${ipfsHash}`;
-    return fetch(url).then((res) => res.json());
-  }
+  return fetch(url).then((res) => res.json());
 }
 
 export async function storeProposal(
