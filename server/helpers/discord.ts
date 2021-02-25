@@ -1,7 +1,7 @@
 import Discord from 'discord.js';
 
 const token = process.env.DISCORD_TOKEN;
-const channel = '747525655960354920';
+const channel = '814466963047841792';
 let lastMessage;
 const client: any = new Discord.Client();
 let speaker;
