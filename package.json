@@ -32,6 +32,7 @@
     "connection-string": "^1.0.1",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
+    "cross-fetch": "^3.0.6",
     "discord.js": "^12.3.1",
     "eslint": "^6.7.2",
     "ethereumjs-util": "^7.0.6",
