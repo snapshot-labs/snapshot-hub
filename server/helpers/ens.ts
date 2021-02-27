@@ -24,11 +24,10 @@ export async function getSpaceUriFromContentHash(id) {
   let uri: any = false;
   const provider = snapshot.utils.getProvider('1');
   try {
-    const { protocolType, decoded } = await snapshot.utils.resolveContent(
-      provider,
-      id
-    );
-    if (protocolType && decoded) uri = `${protocolType}://${decoded}`;
+    const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e';
+    const ens = new ENS({ provider, ensAddress });
+    uri = await ens.name(id).getContent();
+    uri = uri.value;
   } catch (e) {
     console.log('getSpaceUriFromContentHash failed', id, e);
   }
