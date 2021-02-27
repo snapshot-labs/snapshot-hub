@@ -3,6 +3,7 @@ import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
+import { getSpaceUri } from './helpers/ens';
 import relayer from './helpers/relayer';
 import { sendMessage } from './helpers/discord';
 import { pinJson } from './helpers/ipfs';
@@ -218,6 +219,10 @@ router.post('/message', async (req, res) => {
       true
     )
       return sendError(res, 'wrong space format');
+
+    const spaceUri = await getSpaceUri(msg.space);
+    if (!spaceUri.includes(body.address))
+      return sendError(res, 'not allowed');
   }
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {

@@ -4,9 +4,9 @@ import { getActiveProposals, loadSpaces } from './adapters/mysql';
 export let spaces = legacySpaces;
 
 loadSpaces().then(ensSpaces => {
-  spaces = { ...spaces, ...ensSpaces };
-  console.log('ENS spaces', Object.keys(ensSpaces).length);
   console.log('GitHub spaces', Object.keys(spaces).length);
+  console.log('ENS spaces', Object.keys(ensSpaces).length);
+  spaces = { ...spaces, ...ensSpaces };
 });
 
 setInterval(() => {
