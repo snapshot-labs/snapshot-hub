@@ -30,9 +30,14 @@ CREATE TABLE hubs (
 
 CREATE TABLE spaces (
   id VARCHAR(64) NOT NULL,
+  settings JSON,
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
   PRIMARY KEY (id),
   INDEX address (created_at),
   INDEX is_self (updated_at)
 );
+
+INSERT INTO spaces (id, created_at, updated_at) VALUES
+  ('bonustrack.eth', 1605387647, 1605955059),
+  ('samuv.eth', 1610006388, 1610377573);

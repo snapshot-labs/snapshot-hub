@@ -9,6 +9,5 @@ export default (app, server) => {
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
   app.use('/api', api);
-  // @ts-ignore
   app.get('/*', (req, res) => res.redirect('https://snapshot.page/#/balancer'));
 }
