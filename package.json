@@ -1,13 +1,15 @@
 {
   "name": "snapshot-hub",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "repository": "balancer-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
-    "lint": "vue-cli-service lint ./server/**/*.ts",
-    "express": "vue-cli-service express:watch",
-    "express:run": "vue-cli-service express:run",
-    "start": "vue-cli-service express:run"
+    "lint": "eslint ./server/**/*.ts --fix",
+    "express": "npm run watch",
+    "watch": "nodemon -e ts -w ./server -x npm run watch:serve",
+    "watch:serve": "ts-node index.ts",
+    "express:run": "npm run watch:serve",
+    "start": "npm run watch:serve"
   },
   "dependencies": {
     "@ensdomains/ensjs": "^2.0.0",
@@ -22,10 +24,6 @@
     "@pinata/sdk": "^1.1.11",
     "@snapshot-labs/snapshot-spaces": "github:snapshot-labs/snapshot-spaces#master",
     "@snapshot-labs/snapshot.js": "^0.1.6",
-    "@vue/cli-plugin-babel": "^4.4.0",
-    "@vue/cli-plugin-eslint": "^4.4.0",
-    "@vue/cli-plugin-typescript": "^4.4.0",
-    "@vue/cli-service": "^4.4.0",
     "@walletconnect/utils": "^1.3.1",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
@@ -34,6 +32,7 @@
     "cors": "^2.8.5",
     "cross-fetch": "^3.0.6",
     "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
     "eslint": "^6.7.2",
     "ethereumjs-util": "^7.0.6",
     "ethers": "^5.0.17",
@@ -42,20 +41,16 @@
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
     "require-context": "^1.1.0",
-    "typescript": "~3.9.3",
-    "vue-cli-plugin-express": "^1.0.2"
+    "typescript": "~3.9.3"
   },
   "devDependencies": {
+    "@types/express": "^4.17.11",
     "@types/node": "^14.0.13",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
-    "@vue/cli-plugin-router": "^4.4.0",
-    "@vue/cli-plugin-vuex": "^4.4.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "@vue/eslint-config-typescript": "^5.0.2",
     "eslint-plugin-prettier": "^3.1.3",
-    "eslint-plugin-vue": "^6.2.2",
+    "nodemon": "^2.0.7",
     "prettier": "^1.19.1",
-    "vue-template-compiler": "^2.6.11"
+    "ts-node": "^9.1.1"
   }
 }

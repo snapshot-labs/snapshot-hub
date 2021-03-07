@@ -1,4 +1,5 @@
-import legacySpaces from '@snapshot-labs/snapshot-spaces';
+// @ts-ignore
+import legacySpaces from '@snapshot-labs/snapshot-spaces/mod';
 import { getActiveProposals, loadSpaces } from './adapters/mysql';
 
 export let spaces = legacySpaces;
