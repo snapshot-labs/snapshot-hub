@@ -10,4 +10,4 @@ export default (app, server) => {
   app.use(cors());
   app.use('/api', api);
   app.get('/*', (req, res) => res.redirect('https://snapshot.page/#/balancer'));
-}
+};

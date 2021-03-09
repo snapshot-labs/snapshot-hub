@@ -124,7 +124,7 @@ router.post('/message', async (req, res) => {
     return sendError(res, 'unknown space');
 
   if (
-    !msg.timestamp || 
+    !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
     msg.timestamp > upts
   )
@@ -149,8 +149,8 @@ router.post('/message', async (req, res) => {
     return sendError(res, 'wrong signature');
 
   if (msg.type === 'delete-proposal') {
-    let query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
-    let propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
+    const query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
+    const propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
     if (propasalSigner[0].address !== body.address) {
       return sendError(res, 'wrong signer');
     }
@@ -223,8 +223,7 @@ router.post('/message', async (req, res) => {
       return sendError(res, 'wrong space format');
 
     const spaceUri = await getSpaceUri(msg.space);
-    if (!spaceUri.includes(body.address))
-      return sendError(res, 'not allowed');
+    if (!spaceUri.includes(body.address)) return sendError(res, 'not allowed');
   }
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
@@ -274,6 +273,7 @@ router.post('/message', async (req, res) => {
     }
   }
 
+  /** ignore hook
   fetch('https://snapshot.collab.land/api', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -294,6 +294,7 @@ router.post('/message', async (req, res) => {
     `Type "${msg.type}"\n`,
     `IPFS hash "${authorIpfsRes}"`
   );
+*/
 
   return res.json({ ipfsHash: authorIpfsRes });
 });
