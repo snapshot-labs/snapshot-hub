@@ -11,7 +11,7 @@ export async function storeProposal(
   relayerIpfsHash
 ) {
   const msg = JSON.parse(body.msg);
-  let query = 'INSERT IGNORE INTO messages SET ?;';
+  const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
       id: authorIpfsHash,
@@ -30,13 +30,13 @@ export async function storeProposal(
 }
 
 export async function archiveProposal(authorIpfsHash) {
-  let query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
+  const query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
   await db.queryAsync(query, ['archive-proposal', authorIpfsHash]);
 }
 
 export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
-  let query = 'INSERT IGNORE INTO messages SET ?;';
+  const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
       id: authorIpfsHash,
@@ -61,7 +61,7 @@ export async function storeSettings(space, body) {
   const result = await fleek.upload({
     apiKey: process.env.FLEEK_API_KEY || '',
     apiSecret: process.env.FLEEK_API_SECRET || '',
-    bucket: 'snapshot-team-bucket',
+    bucket: process.env.FLEEK_TEAM_NAME,
     key,
     data: JSON.stringify(msg.payload)
   });
@@ -69,10 +69,10 @@ export async function storeSettings(space, body) {
   console.log('Settings updated', space, ipfsHash);
 
   const ts = (Date.now() / 1e3).toFixed();
-  let query =
+  const query =
     'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
   await db.queryAsync(query, [
-    { id: space, created_at: ts, updated_at: ts },
+    { id: space, created_at: ts, updated_at: ts, address: body.address },
     ts
   ]);
 }
@@ -120,42 +120,41 @@ export async function getActiveProposals(spaces) {
   return await db.queryAsync(query, params);
 }
 
+export async function loadSpace(space: any) {
+  try {
+    const result = await getSpace(`${space[1]}/${space[0]}`);
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
+      space = result;
+  } catch (e) {
+    console.log('Load space failed', space.id);
+  }
+  return space;
+}
+
 export async function loadSpaces() {
-  console.time('loadSpaces');
-  const query = 'SELECT id FROM spaces';
+  const query = 'SELECT id, address FROM spaces';
   let result = [];
   try {
     result = await db.queryAsync(query);
   } catch (e) {
     console.log(e);
   }
-  const ids = result.map((space: any) => space.id);
+  const ids = result.map((space: any) => [space.id, space.address]);
   console.log('Spaces from db', ids.length);
   const spaces = {};
   const max = 200;
   const pages = Math.ceil(ids.length / max);
   for (let i = 0; i < pages; i++) {
     const pageIds = ids.slice(max * i, max * (i + 1));
-    const pageSpaces = await Promise.all(pageIds.map(id => loadSpace(id)));
+    const pageSpaces = await Promise.all(
+      pageIds.map(space => loadSpace(space))
+    );
     pageIds.forEach((id, index) => {
-      if (pageSpaces[index]) spaces[id] = pageSpaces[index];
+      if (pageSpaces[index]) spaces[id[0]] = pageSpaces[index];
     });
   }
   console.timeEnd('loadSpaces');
   return spaces;
-}
-
-export async function loadSpace(id) {
-  let space = false;
-  try {
-    const result = await getSpace(id);
-    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
-      space = result;
-    console.log('Load space', id);
-  } catch (e) {
-    console.log('Load space failed', id);
-  }
-  return space;
 }
 
 export async function resolveContent(provider, name) {

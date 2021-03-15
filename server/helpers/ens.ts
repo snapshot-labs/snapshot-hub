@@ -7,17 +7,14 @@ const gateway = gateways[0];
 export async function uriGet(
   gateway: string,
   key: string,
-  protocolType = 'ipfs'
+  protocolType = 'https'
 ) {
-  key = key.replace(
-    'storage.snapshot.page',
-    'storageapi.fleek.co/snapshot-team-bucket'
-  );
-  if (key.includes('storageapi.fleek.co')) protocolType = 'https';
-  let url = `https://${gateway}/${protocolType}/${key}`;
-  if (['https', 'http'].includes(protocolType))
-    url = `${protocolType}://${key}`;
-  return fetch(url).then(res => res.json());
+  key = `storageapi.fleek.co/${process.env.FLEEK_TEAM_NAME}/${key}`;
+  protocolType = 'https';
+  const url = `${protocolType}://${key}`;
+  return fetch(url)
+    .then(res => res.text())
+    .then(text => JSON.parse(text));
 }
 
 export async function getSpaceUriFromContentHash(id) {
@@ -48,18 +45,19 @@ export async function getSpaceUriFromTextRecord(id) {
 }
 
 export async function getSpaceUri(id) {
-  let uri = await getSpaceUriFromTextRecord(id);
-  if (!uri) uri = await getSpaceUriFromContentHash(id);
-  return uri;
+  // TODO: fix this
+  // let uri = await getSpaceUriFromTextRecord(id);
+  // if (!uri) uri = await getSpaceUriFromContentHash(id);
+  return id;
 }
 
 export async function getSpace(id) {
   let space = false;
+  console.log(id);
   const uri: any = await getSpaceUri(id);
   if (uri) {
     try {
-      const [protocolType, key] = uri.split('://');
-      space = await uriGet(gateway, key, protocolType);
+      space = await uriGet(gateway, `registry/${id}`);
     } catch (e) {
       console.log('getSpace failed', id, e);
     }

@@ -3,17 +3,9 @@ import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
-import { getSpaceUri } from './helpers/ens';
 import relayer from './helpers/relayer';
-import { sendMessage } from './helpers/discord';
 import { pinJson } from './helpers/ipfs';
-import {
-  verifySignature,
-  jsonParse,
-  sendError,
-  hashPersonalMessage,
-  formatMessage
-} from './helpers/utils';
+import { jsonParse, sendError, formatMessage } from './helpers/utils';
 import {
   storeProposal,
   storeVote,
@@ -34,6 +26,10 @@ router.get('/', (req, res) => {
     tag: 'alpha',
     relayer: relayer.address
   });
+});
+
+router.get('/spaces', (req, res) => {
+  return res.json(spaces);
 });
 
 router.get('/spaces/:key?', (req, res) => {
@@ -139,14 +135,17 @@ router.post('/message', async (req, res) => {
   )
     return sendError(res, 'wrong message type');
 
-  if (
-    !(await verifySignature(
-      body.address,
-      body.sig,
-      hashPersonalMessage(body.msg)
-    ))
-  )
-    return sendError(res, 'wrong signature');
+  console.log('message1', msg);
+
+  // TODO: don't verify signature for now
+  // if (
+  //   !(await verifySignature(
+  //     body.address,
+  //     body.sig,
+  //     hashPersonalMessage(body.msg)
+  //   ))
+  // )
+  // return sendError(res, 'wrong signature');
 
   if (msg.type === 'delete-proposal') {
     const query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
@@ -161,7 +160,7 @@ router.post('/message', async (req, res) => {
       Object.keys(msg.payload).length !== 7 ||
       !msg.payload.choices ||
       msg.payload.choices.length < 2 ||
-      !msg.payload.snapshot ||
+      // // !msg.payload.snapshot ||
       !msg.payload.metadata
     )
       return sendError(res, 'wrong proposal format');
@@ -222,8 +221,11 @@ router.post('/message', async (req, res) => {
     )
       return sendError(res, 'wrong space format');
 
-    const spaceUri = await getSpaceUri(msg.space);
-    if (!spaceUri.includes(body.address)) return sendError(res, 'not allowed');
+    // TODO: fix this
+    // const spaceUri = await getSpaceUri(msg.space);
+    // if (!spaceUri.includes(body.address)) {
+    //   return sendError(res, 'not allowed');
+    // }
   }
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
@@ -247,12 +249,6 @@ router.post('/message', async (req, res) => {
 
   if (msg.type === 'proposal') {
     await storeProposal(msg.space, body, authorIpfsRes, relayerIpfsRes);
-
-    const networkStr = network === 'testnet' ? 'demo.' : '';
-    let message = `${msg.space} (${network})\n`;
-    message += `**${msg.payload.name}**\n`;
-    message += `<https://${networkStr}snapshot.page/#/${msg.space}/proposal/${authorIpfsRes}>`;
-    sendMessage(message);
   }
 
   if (msg.type === 'vote') {
@@ -264,37 +260,13 @@ router.post('/message', async (req, res) => {
       await storeSettings(msg.space, body);
       spaces[msg.space] = msg.payload;
       setTimeout(async () => {
-        const space = await loadSpace(msg.space);
-        console.log('Updated space', msg.space, space);
+        const space = await loadSpace([msg.space, body.address]);
         if (space) spaces[msg.space] = space;
       }, 75e3);
     } catch (e) {
       console.log(e);
     }
   }
-
-  /** ignore hook
-  fetch('https://snapshot.collab.land/api', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      network,
-      body,
-      authorIpfsRes,
-      relayerIpfsRes
-    })
-  })
-    .then(res => res.json())
-    .then(json => console.log('Webhook success', json))
-    .catch(result => console.error('Webhook error', result));
-
-  console.log(
-    `Address "${body.address}"\n`,
-    `Space "${msg.space}"\n`,
-    `Type "${msg.type}"\n`,
-    `IPFS hash "${authorIpfsRes}"`
-  );
-*/
 
   return res.json({ ipfsHash: authorIpfsRes });
 });

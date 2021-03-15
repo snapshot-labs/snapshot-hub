@@ -1,10 +1,9 @@
-import legacySpaces from '@snapshot-labs/snapshot-spaces';
+// import legacySpaces from '@snapshot-labs/snapshot-spaces';
 import { getActiveProposals, loadSpaces } from './adapters/mysql';
 
-export let spaces = legacySpaces;
+export let spaces = {};
 
 loadSpaces().then(ensSpaces => {
-  console.log('GitHub spaces', Object.keys(spaces).length);
   console.log('ENS spaces', Object.keys(ensSpaces).length);
   spaces = { ...spaces, ...ensSpaces };
 });

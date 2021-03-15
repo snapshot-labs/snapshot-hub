@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import fleek from '@fleekhq/fleek-storage-js';
 import pinataSDK from '@pinata/sdk';
 
-const service = process.env.PINNING_SERVICE || 'pinata';
+const service = process.env.PINNING_SERVICE || 'fleek';
 
 const pinata = pinataSDK(
   process.env.PINATA_API_KEY,
