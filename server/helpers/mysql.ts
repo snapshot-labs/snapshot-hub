@@ -10,6 +10,7 @@ config.connectionLimit = 10;
 config.multipleStatements = true;
 config.database = config.path[0];
 config.host = config.hosts[0].name;
+config.charset = 'utf8mb4';
 bluebird.promisifyAll([Pool, Connection]);
 const db = mysql.createPool(config);
 
