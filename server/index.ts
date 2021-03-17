@@ -41,6 +41,13 @@ router.get('/spaces/:key?', (req, res) => {
   return res.json(key ? spaces[key] : spaces);
 });
 
+router.get('/spaces/:key/poke', async (req, res) => {
+  const { key } = req.params;
+  const space = await loadSpace(key);
+  spaces[key] = space;
+  return res.json(space);
+});
+
 router.get('/:space/proposals', async (req, res) => {
   const { space } = req.params;
   const query =
@@ -124,7 +131,7 @@ router.post('/message', async (req, res) => {
     return sendError(res, 'unknown space');
 
   if (
-    !msg.timestamp || 
+    !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
     msg.timestamp > upts
   )
