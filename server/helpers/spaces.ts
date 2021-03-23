@@ -1,5 +1,5 @@
 import legacySpaces from '@snapshot-labs/snapshot-spaces';
-import { getActiveProposals, loadSpaces } from './adapters/mysql';
+import { loadSpaces } from './adapters/mysql';
 
 export let spaces = legacySpaces;
 
@@ -9,6 +9,7 @@ loadSpaces().then(ensSpaces => {
   spaces = { ...spaces, ...ensSpaces };
 });
 
+/*
 setInterval(() => {
   getActiveProposals(spaces).then((result: any) =>
     result.forEach(count => {
@@ -17,3 +18,4 @@ setInterval(() => {
     })
   );
 }, 30e3);
+*/
