@@ -1,6 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
+import { getAddress } from '@ethersproject/address';
 import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
 import { getSpaceUri } from './helpers/ens';
@@ -77,10 +78,11 @@ router.get('/:space/proposal/:id', async (req, res) => {
       Object.fromEntries(
         messages.map(message => {
           const metadata = JSON.parse(message.metadata);
+          const address = getAddress(message.address);
           return [
-            message.address,
+            address,
             {
-              address: message.address,
+              address,
               msg: {
                 version: message.version,
                 timestamp: message.timestamp.toString(),
