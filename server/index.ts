@@ -185,7 +185,7 @@ router.post('/message', async (req, res) => {
 
     if (
       typeof msg.payload.metadata !== 'object' ||
-      JSON.stringify(msg.payload.metadata).length > 2e4
+      JSON.stringify(msg.payload.metadata).length > 8e4
     )
       return sendError(res, 'wrong proposal metadata');
 
