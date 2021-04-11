@@ -113,10 +113,9 @@ router.get('/voters', async (req, res) => {
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
-  const now = Date.now() / 1e3;
-  const ts = now.toFixed();
-  const upts = (now + 300).toFixed();
-  // const minBlock = (3600 * 24) / 15;
+  const ts = Date.now() / 1e3;
+  const overTs = (ts + 300).toFixed();
+  const underTs = (ts - 300).toFixed();
 
   if (!body || !body.address || !body.msg || !body.sig)
     return sendError(res, 'wrong message body');
@@ -135,7 +134,8 @@ router.post('/message', async (req, res) => {
   if (
     !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
-    msg.timestamp > upts
+    msg.timestamp > overTs
+    || msg.timestamp < underTs
   )
     return sendError(res, 'wrong timestamp');
 
@@ -220,7 +220,9 @@ router.post('/message', async (req, res) => {
     ]);
     if (!proposals[0]) return sendError(res, 'unknown proposal');
     const payload = jsonParse(proposals[0].payload);
-    if (ts > payload.end || payload.start > ts)
+
+    const msgTs = parseInt(msg.timestamp);
+    if (msgTs > payload.end || payload.start > msgTs)
       return sendError(res, 'not in voting window');
   }
 
