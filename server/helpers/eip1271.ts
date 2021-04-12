@@ -32,34 +32,33 @@ export const spec = {
 
 // support for older eip1271 implementations
 const spec_oldVersion = {
-  magicValue: "0x20c13b0b",
+  magicValue: '0x20c13b0b',
   abi: [
     {
       constant: true,
       inputs: [
         {
-          name: "_hash",
-          type: "bytes",
+          name: '_hash',
+          type: 'bytes'
         },
         {
-          name: "_sig",
-          type: "bytes",
-        },
+          name: '_sig',
+          type: 'bytes'
+        }
       ],
-      name: "isValidSignature",
+      name: 'isValidSignature',
       outputs: [
         {
-          name: "magicValue",
-          type: "bytes4",
-        },
+          name: 'magicValue',
+          type: 'bytes4'
+        }
       ],
       payable: false,
-      stateMutability: "view",
-      type: "function",
-    },
-  ],
+      stateMutability: 'view',
+      type: 'function'
+    }
+  ]
 };
-
 
 export async function isValidSignature(
   address: string,
@@ -84,7 +83,7 @@ export async function isValidSignature(
         data,
         provider,
         spec_oldVersion.abi, // old spec version abi
-        spec_oldVersion.magicValue, // old spec version magicValue
+        spec_oldVersion.magicValue // old spec version magicValue
       );
     }
 
