@@ -1,4 +1,4 @@
-import legacySpaces from '@snapshot-labs/snapshot-spaces';
+import legacySpaces from '@snapshot-labs/snapshot-spaces/mod.js';
 import { loadSpaces } from './adapters/mysql';
 
 export const spaces = legacySpaces;

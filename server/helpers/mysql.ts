@@ -4,8 +4,6 @@ import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 
-require('dotenv').config()
-
 // @ts-ignore
 const config = parse(process.env.JAWSDB_URL);
 config.connectionLimit = 25;

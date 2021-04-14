@@ -1,10 +1,11 @@
+require('dotenv').config()
+
 import bodyParser from 'body-parser';
 import frameguard from 'frameguard';
 import cors from 'cors';
 import api from './server';
 import express from 'express';
 
-require('dotenv').config()
 
 const app = express();
 app.use(bodyParser.json({ limit: '20mb' }));

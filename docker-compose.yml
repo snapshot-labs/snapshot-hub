@@ -6,7 +6,7 @@ services:
     build: .
     container_name: snapshot-hub
     env_file:
-      - .env
+      - .env.local
     depends_on:
       - snapshot-mysql
     ports:
