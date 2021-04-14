@@ -1,6 +1,5 @@
 import { jsonParse } from '../helpers/utils';
-import db from '../helpers/mysql';
-import { storeVote } from '../helpers/adapters/mysql';
+import { getProposal, storeVote } from '../helpers/adapters/mysql';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -19,13 +18,9 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('wrong vote metadata');
 
-  const query = `SELECT * FROM messages WHERE space = ? AND id = ? AND type = 'proposal'`;
-  const proposals = await db.queryAsync(query, [
-    msg.space,
-    msg.payload.proposal
-  ]);
-  if (!proposals[0]) return Promise.reject('unknown proposal');
-  const payload = jsonParse(proposals[0].payload);
+  const proposal = await getProposal(msg.space, msg.payload.proposal);
+  if (!proposal) return Promise.reject('unknown proposal');
+  const payload = jsonParse(proposal.payload);
 
   const msgTs = parseInt(msg.timestamp);
   if (msgTs > payload.end || payload.start > msgTs)
