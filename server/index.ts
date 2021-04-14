@@ -12,7 +12,7 @@ import {
   hashPersonalMessage,
   formatMessage
 } from './helpers/utils';
-import { loadSpace } from './helpers/adapters/mysql';
+import { addOrUpdateSpace, loadSpace } from './helpers/adapters/mysql';
 import writer from './writer';
 import pkg from '../package.json';
 
@@ -37,7 +37,10 @@ router.get('/spaces/:key?', (req, res) => {
 router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
   const space = await loadSpace(key);
-  spaces[key] = space;
+  if (space) {
+    await addOrUpdateSpace(key);
+    spaces[key] = space;
+  }
   return res.json(space);
 });
 
