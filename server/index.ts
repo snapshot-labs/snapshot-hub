@@ -47,7 +47,7 @@ router.get('/spaces/:key/poke', async (req, res) => {
 router.get('/:space/proposals', async (req, res) => {
   const { space } = req.params;
   const query =
-    "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC";
+    "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC LIMIT 100";
   db.queryAsync(query, [space]).then(messages => {
     res.json(
       Object.fromEntries(messages.map(message => formatMessage(message)))
