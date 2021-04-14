@@ -3,6 +3,7 @@ import fleek from '@fleekhq/fleek-storage-js';
 import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
 import { getSpace } from '../ens';
+import { spaces } from '../spaces';
 
 export async function storeProposal(
   space,
@@ -77,7 +78,7 @@ export async function storeSettings(space, body) {
   ]);
 }
 
-export async function getActiveProposals(spaces) {
+export async function getActiveProposals(_spaces) {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   let query = `
     SELECT space, COUNT(id) AS count FROM messages WHERE
@@ -88,7 +89,7 @@ export async function getActiveProposals(spaces) {
     AND (`;
   const params = [ts, ts];
 
-  Object.entries(spaces).forEach((space: any, i) => {
+  Object.entries(_spaces).forEach((space: any, i) => {
     if (i !== 0) query += ' OR ';
     query += '(space = ?';
     params.push(space[0]);
@@ -131,18 +132,21 @@ export async function loadSpaces() {
   }
   const ids = result.map((space: any) => space.id);
   console.log('Spaces from db', ids.length);
-  const spaces = {};
-  const max = 200;
+  const _spaces = {};
+  const max = 300;
   const pages = Math.ceil(ids.length / max);
   for (let i = 0; i < pages; i++) {
     const pageIds = ids.slice(max * i, max * (i + 1));
     const pageSpaces = await Promise.all(pageIds.map(id => loadSpace(id)));
     pageIds.forEach((id, index) => {
-      if (pageSpaces[index]) spaces[id] = pageSpaces[index];
+      if (pageSpaces[index]) {
+        _spaces[id] = pageSpaces[index];
+        spaces[id] = pageSpaces[index];
+      }
     });
   }
   console.timeEnd('loadSpaces');
-  return spaces;
+  return _spaces;
 }
 
 export async function loadSpace(id) {

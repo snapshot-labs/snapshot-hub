@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
 app.use(frameguard({ action: 'deny' }));
 app.use(cors());
 app.use('/api', api);
-app.get('/*', (req, res) => res.redirect('https://snapshot.page/#/balancer'));
+app.get('/*', (req, res) => res.redirect('/api'));
 
 
 const PORT = process.env.PORT || 8080;

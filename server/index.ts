@@ -1,6 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
+import { getAddress } from '@ethersproject/address';
 import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
 import { getSpaceUri } from './helpers/ens';
@@ -41,6 +42,13 @@ router.get('/spaces/:key?', (req, res) => {
   return res.json(key ? spaces[key] : spaces);
 });
 
+router.get('/spaces/:key/poke', async (req, res) => {
+  const { key } = req.params;
+  const space = await loadSpace(key);
+  spaces[key] = space;
+  return res.json(space);
+});
+
 router.get('/:space/proposals', async (req, res) => {
   const { space } = req.params;
   const query =
@@ -70,10 +78,11 @@ router.get('/:space/proposal/:id', async (req, res) => {
       Object.fromEntries(
         messages.map(message => {
           const metadata = JSON.parse(message.metadata);
+          const address = getAddress(message.address);
           return [
-            message.address,
+            address,
             {
-              address: message.address,
+              address,
               msg: {
                 version: message.version,
                 timestamp: message.timestamp.toString(),
@@ -104,10 +113,9 @@ router.get('/voters', async (req, res) => {
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
-  const now = Date.now() / 1e3;
-  const ts = now.toFixed();
-  const upts = (now + 300).toFixed();
-  // const minBlock = (3600 * 24) / 15;
+  const ts = Date.now() / 1e3;
+  const overTs = (ts + 300).toFixed();
+  const underTs = (ts - 300).toFixed();
 
   if (!body || !body.address || !body.msg || !body.sig)
     return sendError(res, 'wrong message body');
@@ -124,9 +132,10 @@ router.post('/message', async (req, res) => {
     return sendError(res, 'unknown space');
 
   if (
-    !msg.timestamp || 
+    !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
-    msg.timestamp > upts
+    msg.timestamp > overTs
+    || msg.timestamp < underTs
   )
     return sendError(res, 'wrong timestamp');
 
@@ -176,7 +185,7 @@ router.post('/message', async (req, res) => {
 
     if (
       typeof msg.payload.metadata !== 'object' ||
-      JSON.stringify(msg.payload.metadata).length > 2e4
+      JSON.stringify(msg.payload.metadata).length > 8e4
     )
       return sendError(res, 'wrong proposal metadata');
 
@@ -211,7 +220,9 @@ router.post('/message', async (req, res) => {
     ]);
     if (!proposals[0]) return sendError(res, 'unknown proposal');
     const payload = jsonParse(proposals[0].payload);
-    if (ts > payload.end || payload.start > ts)
+
+    const msgTs = parseInt(msg.timestamp);
+    if (msgTs > payload.end || payload.start > msgTs)
       return sendError(res, 'not in voting window');
   }
 

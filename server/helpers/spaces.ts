@@ -1,15 +1,14 @@
-// @ts-ignore
-import legacySpaces from '@snapshot-labs/snapshot-spaces/mod';
-import { getActiveProposals, loadSpaces } from './adapters/mysql';
+import legacySpaces from '@snapshot-labs/snapshot-spaces';
+import { loadSpaces } from './adapters/mysql';
 
-export let spaces = legacySpaces;
+export const spaces = legacySpaces;
+console.log('GitHub spaces', Object.keys(spaces).length);
 
 loadSpaces().then(ensSpaces => {
-  console.log('GitHub spaces', Object.keys(spaces).length);
   console.log('ENS spaces', Object.keys(ensSpaces).length);
-  spaces = { ...spaces, ...ensSpaces };
 });
 
+/*
 setInterval(() => {
   getActiveProposals(spaces).then((result: any) =>
     result.forEach(count => {
@@ -18,3 +17,4 @@ setInterval(() => {
     })
   );
 }, 30e3);
+*/

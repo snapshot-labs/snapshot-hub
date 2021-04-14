@@ -8,10 +8,11 @@ require('dotenv').config()
 
 // @ts-ignore
 const config = parse(process.env.JAWSDB_URL);
-config.connectionLimit = 10;
+config.connectionLimit = 25;
 config.multipleStatements = true;
 config.database = config.path[0];
 config.host = config.hosts[0].name;
+config.charset = 'utf8mb4';
 bluebird.promisifyAll([Pool, Connection]);
 const db = mysql.createPool(config);
 
