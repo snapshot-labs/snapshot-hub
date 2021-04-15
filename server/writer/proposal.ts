@@ -43,8 +43,8 @@ export async function verify(body): Promise<any> {
   const members = space.members
     ? space.members.map(address => address.toLowerCase())
     : [];
-  const exclusions = space.filter.exclusions
-    ? space.filter.exclusions.map(address => address.toLowerCase())
+  const exclusions = space.filters.exclusions
+    ? space.filters.exclusions.map(address => address.toLowerCase())
     : [];
   const isMember = members.includes(body.address.toLowerCase());
 
