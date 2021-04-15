@@ -1,6 +1,8 @@
+import snapshot from '@snapshot-labs/snapshot.js';
 import { storeProposal } from '../helpers/adapters/mysql';
 import { sendMessage } from '../helpers/discord';
 import { jsonParse } from '../helpers/utils';
+import { spaces } from '../helpers/spaces';
 
 const network = process.env.NETWORK || 'testnet';
 
@@ -36,6 +38,34 @@ export async function verify(body): Promise<any> {
     msg.payload.start >= msg.payload.end
   )
     return Promise.reject('wrong proposal period');
+
+  const space = spaces[msg.space];
+  const members = space.members
+    ? space.members.map(address => address.toLowerCase())
+    : [];
+  const isMember = members.includes(body.address.toLowerCase());
+
+  if (space.filters && space.filters.onlyMembers && !isMember) {
+    return Promise.reject('not a member');
+  } else if (!isMember && space.filters && space.filters.minScore) {
+    try {
+      const scores = await snapshot.utils.getScores(
+        msg.space,
+        space.strategies,
+        space.network,
+        snapshot.utils.getProvider(space.network),
+        [body.address]
+      );
+      const totalScore = scores
+        .map((score: any) =>
+          Object.values(score).reduce((a, b: any) => a + b, 0)
+        )
+        .reduce((a, b: any) => a + b, 0);
+      if (totalScore === 0) return Promise.reject('below min. score');
+    } catch (e) {
+      return Promise.reject('failed to check voting power');
+    }
+  }
 }
 
 export async function action(
