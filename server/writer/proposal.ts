@@ -43,10 +43,15 @@ export async function verify(body): Promise<any> {
   const members = space.members
     ? space.members.map(address => address.toLowerCase())
     : [];
+  const exclusions = space.filter.exclusions
+    ? space.filter.exclusions.map(address => address.toLowerCase())
+    : [];
   const isMember = members.includes(body.address.toLowerCase());
 
   if (space.filters && space.filters.onlyMembers && !isMember) {
     return Promise.reject('not a member');
+  } else if (exclusions.includes(body.address.toLowerCase())) {
+    return Promise.reject('excluded member');    
   } else if (!isMember && space.filters && space.filters.minScore) {
     try {
       const scores = await snapshot.utils.getScores(
