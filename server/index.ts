@@ -56,9 +56,12 @@ router.get('/:space/proposals', async (req, res) => {
 });
 
 router.get('/timeline', async (req, res) => {
-  const query =
-    "SELECT * FROM messages WHERE type = 'proposal' ORDER BY timestamp DESC LIMIT 30";
-  db.queryAsync(query).then(messages => {
+  const spacesArr = req.query.spaces
+    ? (req.query.spaces as string).split(',')
+    : [];
+  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
+  const query = `SELECT * FROM messages WHERE type = 'proposal' ${spacesStr} ORDER BY timestamp DESC LIMIT 30`;
+  db.queryAsync(query, [spacesArr]).then(messages => {
     res.json(
       Object.fromEntries(messages.map(message => formatMessage(message)))
     );
