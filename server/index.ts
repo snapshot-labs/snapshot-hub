@@ -1,12 +1,9 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
-import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
-import { getSpaceUri } from './helpers/ens';
 import relayer from './helpers/relayer';
-import { sendMessage } from './helpers/discord';
 import { pinJson } from './helpers/ipfs';
 import {
   verifySignature,
@@ -15,13 +12,8 @@ import {
   hashPersonalMessage,
   formatMessage
 } from './helpers/utils';
-import {
-  storeProposal,
-  storeVote,
-  storeSettings,
-  loadSpace,
-  archiveProposal
-} from './helpers/adapters/mysql';
+import { addOrUpdateSpace, loadSpace } from './helpers/adapters/mysql';
+import writer from './writer';
 import pkg from '../package.json';
 
 const router = express.Router();
@@ -45,14 +37,17 @@ router.get('/spaces/:key?', (req, res) => {
 router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
   const space = await loadSpace(key);
-  spaces[key] = space;
+  if (space) {
+    await addOrUpdateSpace(key);
+    spaces[key] = space;
+  }
   return res.json(space);
 });
 
 router.get('/:space/proposals', async (req, res) => {
   const { space } = req.params;
   const query =
-    "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC";
+    "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC LIMIT 100";
   db.queryAsync(query, [space]).then(messages => {
     res.json(
       Object.fromEntries(messages.map(message => formatMessage(message)))
@@ -61,9 +56,12 @@ router.get('/:space/proposals', async (req, res) => {
 });
 
 router.get('/timeline', async (req, res) => {
-  const query =
-    "SELECT * FROM messages WHERE type = 'proposal' ORDER BY timestamp DESC LIMIT 30";
-  db.queryAsync(query).then(messages => {
+  const spacesArr = req.query.spaces
+    ? (req.query.spaces as string).split(',')
+    : [];
+  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
+  const query = `SELECT * FROM messages WHERE type = 'proposal' ${spacesStr} ORDER BY timestamp DESC LIMIT 30`;
+  db.queryAsync(query, [spacesArr]).then(messages => {
     res.json(
       Object.fromEntries(messages.map(message => formatMessage(message)))
     );
@@ -144,10 +142,7 @@ router.post('/message', async (req, res) => {
   if (!msg.version || msg.version !== pkg.version)
     return sendError(res, 'wrong version');
 
-  if (
-    !msg.type ||
-    !['proposal', 'vote', 'settings', 'delete-proposal'].includes(msg.type)
-  )
+  if (!msg.type || !Object.keys(writer).includes(msg.type))
     return sendError(res, 'wrong message type');
 
   if (
@@ -159,84 +154,10 @@ router.post('/message', async (req, res) => {
   )
     return sendError(res, 'wrong signature');
 
-  if (msg.type === 'delete-proposal') {
-    const query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
-    const propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
-    if (propasalSigner[0].address !== body.address) {
-      return sendError(res, 'wrong signer');
-    }
-  }
-
-  if (msg.type === 'proposal') {
-    if (
-      Object.keys(msg.payload).length !== 7 ||
-      !msg.payload.choices ||
-      msg.payload.choices.length < 2 ||
-      !msg.payload.snapshot ||
-      !msg.payload.metadata
-    )
-      return sendError(res, 'wrong proposal format');
-
-    if (
-      !msg.payload.name ||
-      msg.payload.name.length > 256 ||
-      !msg.payload.body ||
-      msg.payload.body.length > 4e4
-    )
-      return sendError(res, 'wrong proposal size');
-
-    if (
-      typeof msg.payload.metadata !== 'object' ||
-      JSON.stringify(msg.payload.metadata).length > 8e4
-    )
-      return sendError(res, 'wrong proposal metadata');
-
-    if (
-      !msg.payload.start ||
-      // ts > msg.payload.start ||
-      !msg.payload.end ||
-      msg.payload.start >= msg.payload.end
-    )
-      return sendError(res, 'wrong proposal period');
-  }
-
-  if (msg.type === 'vote') {
-    if (
-      Object.keys(msg.payload).length !== 3 ||
-      !msg.payload.proposal ||
-      !msg.payload.choice ||
-      !msg.payload.metadata
-    )
-      return sendError(res, 'wrong vote format');
-
-    if (
-      typeof msg.payload.metadata !== 'object' ||
-      JSON.stringify(msg.payload.metadata).length > 1e4
-    )
-      return sendError(res, 'wrong vote metadata');
-
-    const query = `SELECT * FROM messages WHERE space = ? AND id = ? AND type = 'proposal'`;
-    const proposals = await db.queryAsync(query, [
-      msg.space,
-      msg.payload.proposal
-    ]);
-    if (!proposals[0]) return sendError(res, 'unknown proposal');
-    const payload = jsonParse(proposals[0].payload);
-
-    const msgTs = parseInt(msg.timestamp);
-    if (msgTs > payload.end || payload.start > msgTs)
-      return sendError(res, 'not in voting window');
-  }
-
-  if (msg.type === 'settings') {
-    if (
-      snapshot.utils.validateSchema(snapshot.schemas.space, msg.payload) !==
-      true
-    )
-      return sendError(res, 'wrong space format');
-
-    const spaceUri = await getSpaceUri(msg.space);
-    if (!spaceUri.includes(body.address)) return sendError(res, 'not allowed');
+  try {
+    await writer[msg.type].verify(body);
+  } catch (e) {
+    return sendError(res, e);
   }
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
@@ -245,7 +166,6 @@ router.post('/message', async (req, res) => {
     sig: body.sig,
     version: '2'
   });
-
   const relayerSig = await relayer.signMessage(authorIpfsRes);
   const relayerIpfsRes = await pinJson(`snapshot/${relayerSig}`, {
     address: relayer.address,
@@ -254,36 +174,10 @@ router.post('/message', async (req, res) => {
     version: '2'
   });
 
-  if (msg.type === 'delete-proposal') {
-    await archiveProposal(msg.payload.proposal);
-  }
-
-  if (msg.type === 'proposal') {
-    await storeProposal(msg.space, body, authorIpfsRes, relayerIpfsRes);
-
-    const networkStr = network === 'testnet' ? 'demo.' : '';
-    let message = `${msg.space} (${network})\n`;
-    message += `**${msg.payload.name}**\n`;
-    message += `<https://${networkStr}snapshot.page/#/${msg.space}/proposal/${authorIpfsRes}>`;
-    sendMessage(message);
-  }
-
-  if (msg.type === 'vote') {
-    await storeVote(msg.space, body, authorIpfsRes, relayerIpfsRes);
-  }
-
-  if (msg.type === 'settings') {
-    try {
-      await storeSettings(msg.space, body);
-      spaces[msg.space] = msg.payload;
-      setTimeout(async () => {
-        const space = await loadSpace(msg.space);
-        console.log('Updated space', msg.space, space);
-        if (space) spaces[msg.space] = space;
-      }, 75e3);
-    } catch (e) {
-      console.log(e);
-    }
+  try {
+    await writer[msg.type].action(body, authorIpfsRes, relayerIpfsRes);
+  } catch (e) {
+    return sendError(res, e);
   }
 
   fetch('https://snapshot.collab.land/api', {

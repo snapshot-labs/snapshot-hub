@@ -5,6 +5,29 @@ import db from '../mysql';
 import { getSpace } from '../ens';
 import { spaces } from '../spaces';
 
+export async function addOrUpdateSpace(space: string) {
+  const ts = (Date.now() / 1e3).toFixed();
+  const query =
+    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
+  await db.queryAsync(query, [
+    { id: space, created_at: ts, updated_at: ts },
+    ts
+  ]);
+}
+
+export async function loadSpace(id) {
+  let space = false;
+  try {
+    const result = await getSpace(id);
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
+      space = result;
+    console.log('Load space', id);
+  } catch (e) {
+    console.log('Load space failed', id);
+  }
+  return space;
+}
+
 export async function storeProposal(
   space,
   body,
@@ -69,13 +92,7 @@ export async function storeSettings(space, body) {
   const ipfsHash = result.hashV0;
   console.log('Settings updated', space, ipfsHash);
 
-  const ts = (Date.now() / 1e3).toFixed();
-  const query =
-    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
-  await db.queryAsync(query, [
-    { id: space, created_at: ts, updated_at: ts },
-    ts
-  ]);
+  await addOrUpdateSpace(space);
 }
 
 export async function loadSpace(id) {
@@ -168,4 +185,10 @@ export async function resolveContent(provider, name) {
     provider
   );
   return snapshot.utils.decodeContenthash(contentHash);
+}
+
+export async function getProposal(space, id) {
+  const query = `SELECT * FROM messages WHERE space = ? AND id = ? AND type = 'proposal'`;
+  const proposals = await db.queryAsync(query, [space, id]);
+  return proposals[0];
 }
