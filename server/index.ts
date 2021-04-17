@@ -108,6 +108,18 @@ router.get('/voters', async (req, res) => {
   res.json(messages);
 });
 
+router.get('/votes', async (req, res) => {
+  const { address } = req.query;
+  const query = `SELECT id, timestamp, space, payload FROM messages WHERE type = 'vote' AND address = ? ORDER BY timestamp DESC`;
+  const messages = await db.queryAsync(query, [address]);
+  res.json(messages.map(msg => {
+    msg.proposal = jsonParse(msg.payload).proposal;
+    msg.choice = jsonParse(msg.payload).choice;
+    delete msg.payload
+    return msg
+  }));
+});
+
 router.post('/message', async (req, res) => {
   const body = req.body;
   const msg = jsonParse(body.msg);
