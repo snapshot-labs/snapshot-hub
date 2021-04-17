@@ -1,5 +1,4 @@
 // https://github.com/WalletConnect/walletconnect-example-dapp/blob/961727c2fe4e33587bd1543393afa51033f95a4e/src/helpers/eip1271.ts
-// eslint-disable-next-line no-unused-vars
 import { Contract, providers, utils } from 'ethers';
 
 export const spec = {

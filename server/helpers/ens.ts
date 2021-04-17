@@ -1,7 +1,6 @@
 import ENS from '@ensdomains/ensjs';
 import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
-import fetch from 'node-fetch';
 
 const gateway = gateways[0];
 
