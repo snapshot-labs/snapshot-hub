@@ -1,0 +1,32 @@
+type Space {
+  id: String!
+  name: String!
+  network: String!
+  private: Boolean
+  members: [String]
+  about: String
+  twitter: String
+  github: String
+}
+
+type Proposal {
+  id: String!
+  author: String!
+  timestamp: Int!
+  space: Space!
+  name: String
+  body: String
+  state: String
+  start: Int
+  end: Int
+  snapshot: String
+}
+
+type Query {
+  timeline(
+    first: Int
+    skip: Int
+    spaces: [String]
+    state: String
+  ): [Proposal]
+}
