@@ -13,7 +13,7 @@ export const rootValue = {
     if (spaces.length === 0) spaces = Object.keys(registrySpaces) as any;
 
     const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ORDER BY timestamp DESC LIMIT ?, ?`;
-    const msgs = await db.queryAsync(query, [1518473607, spaces, first, skip]);
+    const msgs = await db.queryAsync(query, [1608473607, spaces, skip, first]);
 
     return msgs.map(msg => {
       const payload = jsonParse(msg.payload);
