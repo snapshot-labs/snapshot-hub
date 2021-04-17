@@ -95,19 +95,6 @@ export async function storeSettings(space, body) {
   await addOrUpdateSpace(space);
 }
 
-export async function loadSpace(id) {
-  let space = false;
-  try {
-    const result = await getSpace(id);
-    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
-      space = result;
-    console.log('Load space', id);
-  } catch (e) {
-    console.log('Load space failed', id);
-  }
-  return space;
-}
-
 export async function getActiveProposals(_spaces) {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   let query = `
