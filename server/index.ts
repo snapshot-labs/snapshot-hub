@@ -58,9 +58,8 @@ router.get('/:space/proposals', async (req, res) => {
 router.get('/timeline', async (req, res) => {
   const spacesArr = req.query.spaces
     ? (req.query.spaces as string).split(',')
-    : [];
-  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
-  const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? ${spacesStr} ORDER BY timestamp DESC LIMIT 30`;
+    : Object.keys(spaces);
+  const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ORDER BY timestamp DESC LIMIT 30`;
   db.queryAsync(query, [1618473607, spacesArr]).then(messages => {
     res.json(
       Object.fromEntries(messages.map(message => formatMessage(message)))
@@ -101,9 +100,10 @@ router.get('/:space/proposal/:id', async (req, res) => {
 
 router.get('/voters', async (req, res) => {
   const { from = 0, to = 1e24 } = req.query;
-  const spacesArr = req.query.spaces ? req.query.spaces.split(',') : [];
-  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
-  const query = `SELECT address, timestamp, space FROM messages WHERE type = 'vote' AND timestamp >= ? AND timestamp <= ? ${spacesStr} GROUP BY address ORDER BY timestamp DESC`;
+  const spacesArr = req.query.spaces
+    ? (req.query.spaces as string).split(',')
+    : Object.keys(spaces);
+  const query = `SELECT address, timestamp, space FROM messages WHERE type = 'vote' AND timestamp >= ? AND timestamp <= ? AND space IN (?) GROUP BY address ORDER BY timestamp DESC`;
   const messages = await db.queryAsync(query, [from, to, spacesArr]);
   res.json(messages);
 });
