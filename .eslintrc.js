@@ -4,19 +4,14 @@ module.exports = {
     node: true
   },
   extends: [
-    'eslint:recommended',
     'plugin:vue/essential',
     'eslint:recommended',
     '@vue/typescript/recommended',
     '@vue/prettier',
     '@vue/prettier/@typescript-eslint'
   ],
-  plugins: [
-    "@typescript-eslint"
-  ],
   parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: "module",
+    ecmaVersion: 2020
   },
   rules: {
     'no-console': 'off',
@@ -25,9 +20,5 @@ module.exports = {
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/no-undef': 'off',
-  },
-  globals: {
-    "fetch": false,
-    "Promise": false
   }
 };
