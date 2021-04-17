@@ -4,9 +4,16 @@ module.exports = {
     node: true
   },
   extends: [
-    'eslint:recommended'
+    'eslint:recommended',
+    'plugin:vue/essential',
+    'eslint:recommended',
+    '@vue/typescript/recommended',
+    '@vue/prettier',
+    '@vue/prettier/@typescript-eslint'
   ],
-  parser: "@typescript-eslint/parser",
+  plugins: [
+    "@typescript-eslint"
+  ],
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
@@ -19,7 +26,7 @@ module.exports = {
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/no-undef': 'off',
   },
-  "globals": {
+  globals: {
     "fetch": false,
     "Promise": false
   }

@@ -4,7 +4,7 @@
   "repository": "balancer-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint ./server/**/*.ts --fix",
+    "lint": "eslint . --ext .ts --fix",
     "express": "npm run watch",
     "watch": "nodemon -e ts -w ./server -x npm run watch:serve",
     "watch:serve": "ts-node index.ts",

@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 import bodyParser from 'body-parser';
 import frameguard from 'frameguard';
@@ -14,6 +14,7 @@ app.use(cors());
 app.use('/api', api);
 app.get('/*', (req, res) => res.redirect('/api'));
 
-
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`⚡⚡Server is running: https://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`⚡⚡Server is running: https://localhost:${PORT}`)
+);

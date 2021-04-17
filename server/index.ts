@@ -103,7 +103,9 @@ router.get('/:space/proposal/:id', async (req, res) => {
 
 router.get('/voters', async (req, res) => {
   const { from = 0, to = 1e24 } = req.query;
-  const spacesArr = req.query.spaces ? (req.query.spaces as string).split(',') : [];
+  const spacesArr = req.query.spaces
+    ? (req.query.spaces as string).split(',')
+    : [];
   const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
   const query = `SELECT address, timestamp, space FROM messages WHERE type = 'vote' AND timestamp >= ? AND timestamp <= ? ${spacesStr} GROUP BY address ORDER BY timestamp DESC`;
   const messages = await db.queryAsync(query, [from, to, spacesArr]);
@@ -134,8 +136,8 @@ router.post('/message', async (req, res) => {
   if (
     !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
-    msg.timestamp > overTs
-    || msg.timestamp < underTs
+    msg.timestamp > overTs ||
+    msg.timestamp < underTs
   )
     return sendError(res, 'wrong timestamp');
 
@@ -158,8 +160,8 @@ router.post('/message', async (req, res) => {
     return sendError(res, 'wrong signature');
 
   if (msg.type === 'delete-proposal') {
-    let query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
-    let propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
+    const query = `SELECT address FROM messages WHERE type = 'proposal' AND id = ?`;
+    const propasalSigner = await db.queryAsync(query, [msg.payload.proposal]);
     if (propasalSigner[0].address !== body.address) {
       return sendError(res, 'wrong signer');
     }
@@ -234,8 +236,7 @@ router.post('/message', async (req, res) => {
       return sendError(res, 'wrong space format');
 
     const spaceUri = await getSpaceUri(msg.space);
-    if (!spaceUri.includes(body.address))
-      return sendError(res, 'not allowed');
+    if (!spaceUri.includes(body.address)) return sendError(res, 'not allowed');
   }
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {

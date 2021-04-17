@@ -12,7 +12,7 @@ export async function storeProposal(
   relayerIpfsHash
 ) {
   const msg = JSON.parse(body.msg);
-  let query = 'INSERT IGNORE INTO messages SET ?;';
+  const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
       id: authorIpfsHash,
@@ -31,13 +31,13 @@ export async function storeProposal(
 }
 
 export async function archiveProposal(authorIpfsHash) {
-  let query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
+  const query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
   await db.queryAsync(query, ['archive-proposal', authorIpfsHash]);
 }
 
 export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
-  let query = 'INSERT IGNORE INTO messages SET ?;';
+  const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
       id: authorIpfsHash,
@@ -70,7 +70,7 @@ export async function storeSettings(space, body) {
   console.log('Settings updated', space, ipfsHash);
 
   const ts = (Date.now() / 1e3).toFixed();
-  let query =
+  const query =
     'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
   await db.queryAsync(query, [
     { id: space, created_at: ts, updated_at: ts },
@@ -78,15 +78,28 @@ export async function storeSettings(space, body) {
   ]);
 }
 
+export async function loadSpace(id) {
+  let space = false;
+  try {
+    const result = await getSpace(id);
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
+      space = result;
+    console.log('Load space', id);
+  } catch (e) {
+    console.log('Load space failed', id);
+  }
+  return space;
+}
+
 export async function getActiveProposals(_spaces) {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   let query = `
-    SELECT space, COUNT(id) AS count FROM messages WHERE
-    type = 'proposal'
-    AND space != ''
-    AND JSON_EXTRACT(payload, "$.start") <= ?
-    AND JSON_EXTRACT(payload, "$.end") >= ?
-    AND (`;
+  SELECT space, COUNT(id) AS count FROM messages WHERE
+  type = 'proposal'
+  AND space != ''
+  AND JSON_EXTRACT(payload, "$.start") <= ?
+  AND JSON_EXTRACT(payload, "$.end") >= ?
+  AND (`;
   const params = [ts, ts];
 
   Object.entries(_spaces).forEach((space: any, i) => {
@@ -147,19 +160,6 @@ export async function loadSpaces() {
   }
   console.timeEnd('loadSpaces');
   return _spaces;
-}
-
-export async function loadSpace(id) {
-  let space = false;
-  try {
-    const result = await getSpace(id);
-    if (snapshot.utils.validateSchema(snapshot.schemas.space, result))
-      space = result;
-    console.log('Load space', id);
-  } catch (e) {
-    console.log('Load space failed', id);
-  }
-  return space;
 }
 
 export async function resolveContent(provider, name) {
