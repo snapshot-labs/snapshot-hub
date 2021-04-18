@@ -1,11 +1,15 @@
 export default `query Timeline {
-  timeline(first: 5, spaces: ["balancer", "yam.eth"]) {
+  timeline(first: 10, spaces: ["balancer", "yam.eth"]) {
     id
-    author
-    timestamp
+    name
     start
     end
     state
+    author {
+      address
+      name
+      ens
+    }
     space {
       id
       name
