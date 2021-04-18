@@ -3,6 +3,7 @@ import { buildSchema } from 'graphql';
 import { spaces as registrySpaces } from '../helpers/spaces';
 import db from '../helpers/mysql';
 import { jsonParse } from '../helpers/utils';
+import { getProfiles } from '../helpers/profile';
 
 const schemaFile = importSchema('./**/*.graphql');
 export const schema = buildSchema(schemaFile);
@@ -13,7 +14,10 @@ export const rootValue = {
     if (spaces.length === 0) spaces = Object.keys(registrySpaces) as any;
 
     const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ORDER BY timestamp DESC LIMIT ?, ?`;
-    const msgs = await db.queryAsync(query, [1608473607, spaces, skip, first]);
+    const msgs = await db.queryAsync(query, [1614473607, spaces, skip, first]);
+
+    const authors = Array.from(new Set(msgs.map(msg => msg.address)));
+    const users = await getProfiles(authors);
 
     return msgs.map(msg => {
       const payload = jsonParse(msg.payload);
@@ -30,7 +34,7 @@ export const rootValue = {
 
       return {
         id: msg.id,
-        author: msg.address,
+        author: users[msg.address],
         timestamp: msg.timestamp,
         state: proposalState,
         start,

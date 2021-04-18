@@ -9,9 +9,16 @@ type Space {
   github: String
 }
 
+type User {
+  address: String!
+  ens: String
+  name: String
+  image: String
+}
+
 type Proposal {
   id: String!
-  author: String!
+  author: User!
   timestamp: Int!
   space: Space!
   name: String
