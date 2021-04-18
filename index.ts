@@ -4,6 +4,7 @@ import cors from 'cors';
 import { graphqlHTTP } from 'express-graphql';
 import api from './server';
 import { schema, rootValue } from './server/graphql';
+import timelineQuery from './server/graphql/example';
 
 export default (app, server) => {
   app.use(bodyParser.json({ limit: '20mb' }));
@@ -11,6 +12,6 @@ export default (app, server) => {
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
   app.use('/api', api);
-  app.use('/graphql', graphqlHTTP({ schema, rootValue, graphiql: true }));
+  app.use('/graphql', graphqlHTTP({ schema, rootValue, graphiql: { defaultQuery: timelineQuery }}));
   app.get('/*', (req, res) => res.redirect('/api'));
 };
