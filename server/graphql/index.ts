@@ -9,12 +9,31 @@ const schemaFile = importSchema('./**/*.graphql');
 export const schema = buildSchema(schemaFile);
 
 export const rootValue = {
-  timeline: async ({ spaces = [], first = 20, skip = 0 }) => {
-    const ts = (Date.now() / 1e3).toFixed();
+  timeline: async ({ spaces = [], first = 10, skip = 0, state }) => {
+    const ts = parseInt((Date.now() / 1e3).toFixed());
     if (spaces.length === 0) spaces = Object.keys(registrySpaces) as any;
 
-    const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ORDER BY timestamp DESC LIMIT ?, ?`;
-    const msgs = await db.queryAsync(query, [1614473607, spaces, skip, first]);
+    const params: any[] = [1614473607, spaces];
+
+    let stateStr = '';
+    if (state === 'pending') {
+      stateStr = 'AND JSON_EXTRACT(payload, "$.start") > ?';
+      params.push(ts);
+    }
+    if (state === 'active') {
+      stateStr =
+        'AND JSON_EXTRACT(payload, "$.start") < ? AND JSON_EXTRACT(payload, "$.end") > ?';
+      params.push(ts, ts);
+    }
+    if (state === 'closed') {
+      stateStr = 'AND ? > JSON_EXTRACT(payload, "$.end")';
+      params.push(ts);
+    }
+
+    params.push(skip, first);
+
+    const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ${stateStr} ORDER BY timestamp DESC LIMIT ?, ?`;
+    const msgs = await db.queryAsync(query, params);
 
     const authors = Array.from(new Set(msgs.map(msg => msg.address)));
     const users = await getProfiles(authors);
