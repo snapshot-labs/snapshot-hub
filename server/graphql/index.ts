@@ -2,7 +2,7 @@ import { importSchema } from 'graphql-import';
 import { buildSchema } from 'graphql';
 import { spaces as registrySpaces } from '../helpers/spaces';
 import db from '../helpers/mysql';
-import { jsonParse } from '../helpers/utils';
+import { clone, jsonParse } from '../helpers/utils';
 import { getProfiles } from '../helpers/profile';
 
 const schemaFile = importSchema('./**/*.graphql');
@@ -45,7 +45,7 @@ export const rootValue = {
       if (ts > start) proposalState = 'active';
       if (ts > end) proposalState = 'closed';
 
-      const space = registrySpaces[msg.space];
+      const space = clone(registrySpaces[msg.space]);
       space.id = msg.space;
       space.private = space.private || false;
       space.about = space.about || '';

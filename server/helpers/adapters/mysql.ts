@@ -150,7 +150,7 @@ export async function loadSpaces() {
   const ids = result.map((space: any) => space.id);
   console.log('Spaces from db', ids.length);
   const _spaces = {};
-  const max = 300;
+  const max = 1000;
   const pages = Math.ceil(ids.length / max);
   for (let i = 0; i < pages; i++) {
     const pageIds = ids.slice(max * i, max * (i + 1));
