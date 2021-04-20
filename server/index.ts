@@ -55,6 +55,15 @@ router.get('/:space/proposals', async (req, res) => {
   });
 });
 
+router.get('/:space/proposals/:id', async (req, res) => {
+  const { space, id } = req.params;
+  const query =
+    "SELECT * FROM messages WHERE type = 'proposal' AND space = ? AND id = ? ORDER BY timestamp DESC LIMIT 1";
+  db.queryAsync(query, [space, id]).then(([message]) => {
+    res.json(formatMessage(message));
+  });
+});
+
 router.get('/:space/proposal/:id', async (req, res) => {
   const { space, id } = req.params;
   const query = `SELECT * FROM messages WHERE type = 'vote' AND space = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
