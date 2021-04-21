@@ -11,10 +11,15 @@ type Space {
 
 type User {
   address: String!
+  profile: Profile
+}
+
+type Profile {
   ens: String
   name: String
   image: String
 }
+
 
 type Proposal {
   id: String!
