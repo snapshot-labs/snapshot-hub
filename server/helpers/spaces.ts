@@ -4,6 +4,8 @@ import { loadSpaces } from './adapters/mysql';
 export const spaces = legacySpaces;
 console.log('GitHub spaces', Object.keys(spaces).length);
 
+export const spaceIdsFailed: string[] = [];
+
 loadSpaces().then(ensSpaces => {
   console.log('ENS spaces', Object.keys(ensSpaces).length);
 });
