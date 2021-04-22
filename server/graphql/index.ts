@@ -1,22 +1,27 @@
-import path from "path";
-import fs from "fs";
-import { makeExecutableSchema } from "graphql-tools";
+import path from 'path';
+import fs from 'fs';
+import { makeExecutableSchema } from 'graphql-tools';
 import graphqlFields from 'graphql-fields';
 import { spaces as registrySpaces } from '../helpers/spaces';
 import db from '../helpers/mysql';
 import { clone, jsonParse } from '../helpers/utils';
 import { getProfiles } from '../helpers/profile';
 
-const schemaFile = path.join(__dirname, "./schema.graphql");
-const typeDefs = fs.readFileSync(schemaFile, "utf8");
+const schemaFile = path.join(__dirname, './schema.gql');
+const typeDefs = fs.readFileSync(schemaFile, 'utf8');
 
 export const rootValue = {
   Query: {
-    timeline: async ({ spaces = [], first = 10, skip = 0, state }, args, context, info) => {
+    timeline: async (
+      parent,
+      { skip = 0, state, id, spaces = [], first = 10 },
+      context,
+      info
+    ) => {
       const requestedFields = graphqlFields(info);
+
       const ts = parseInt((Date.now() / 1e3).toFixed());
       if (spaces.length === 0) spaces = Object.keys(registrySpaces) as any;
-  
       let queryStr = '';
       const params: any[] = [1614473607, spaces];
 
@@ -43,11 +48,11 @@ export const rootValue = {
 
       const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ${queryStr} ORDER BY timestamp DESC LIMIT ?, ?`;
       const msgs = await db.queryAsync(query, params);
-  
+
       const authors = Array.from(new Set(msgs.map(msg => msg.address)));
 
       let users = {};
-      if(requestedFields.author && requestedFields.author.profile) {
+      if (requestedFields.author && requestedFields.author.profile) {
         users = await getProfiles(authors);
       }
 
@@ -57,13 +62,13 @@ export const rootValue = {
         let proposalState = 'pending';
         if (ts > start) proposalState = 'active';
         if (ts > end) proposalState = 'closed';
-  
+
         const space = clone(registrySpaces[msg.space]);
         space.id = msg.space;
         space.private = space.private || false;
         space.about = space.about || '';
         space.members = space.members || [];
-  
+
         return {
           id: msg.id,
           author: {
