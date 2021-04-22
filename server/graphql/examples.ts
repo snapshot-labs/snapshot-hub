@@ -1,5 +1,5 @@
 export default `query Timeline {
-  timeline(first: 10, spaces: ["balancer", "yam.eth"]) {
+  timeline(first: 20, skip: 0, spaces: ["balancer", "yam.eth"], state: "closed") {
     id
     name
     start
@@ -7,8 +7,6 @@ export default `query Timeline {
     state
     author {
       address
-      name
-      ens
     }
     space {
       id

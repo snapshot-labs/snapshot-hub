@@ -14,7 +14,7 @@ export const rootValue = {
   Query: {
     timeline: async (
       parent,
-      { skip = 0, state, id, spaces = [], first = 10 },
+      { id, first = 20, skip = 0, spaces = [], state },
       context,
       info
     ) => {
