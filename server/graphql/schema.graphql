@@ -38,6 +38,7 @@ type Query {
   timeline(
     first: Int
     skip: Int
+    id: String
     spaces: [String]
     state: String
   ): [Proposal]
