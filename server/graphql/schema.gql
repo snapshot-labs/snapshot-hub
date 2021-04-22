@@ -20,7 +20,6 @@ type Profile {
   image: String
 }
 
-
 type Proposal {
   id: String!
   author: User!
