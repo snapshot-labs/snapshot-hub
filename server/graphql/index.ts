@@ -86,7 +86,12 @@ export const rootValue = {
         };
       });
     },
-    spaces: ({ all = false, first = 10, skip = 0, id, spaces = [] }) => {
+    spaces: (
+      parent,
+      { all = false, first = 10, skip = 0, id, spaces = [] },
+      context,
+      info
+    ) => {
       let allSpaces = Object.entries(clone(registrySpaces)).map((space: [any, any]) => {
         space[1].id = space[0];
         space[1].private = space[1].private || false;

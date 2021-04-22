@@ -4,12 +4,24 @@ type Space {
   id: String!
   name: String!
   network: String!
+  symbol: String
   private: Boolean
   members: [String]
   about: String
   twitter: String
   github: String
   strategies: [Strategy]
+  filters: Filter
+  plugins: JSONObject
+}
+
+type Filter {
+  defaultTab: String,
+  minScore: Int,
+  onlyMembers: Boolean,
+  invalids: [
+    String
+  ]
 }
 
 type Strategy {
@@ -49,6 +61,7 @@ type Query {
     spaces: [String]
     state: String
   ): [Proposal]
+
   spaces(
     all: Boolean
     first: Int
