@@ -1,3 +1,5 @@
+scalar JSONObject
+
 type Space {
   id: String!
   name: String!
@@ -7,6 +9,12 @@ type Space {
   about: String
   twitter: String
   github: String
+  strategies: [Strategy]
+}
+
+type Strategy {
+  name: String!
+  params: JSONObject
 }
 
 type User {
@@ -41,4 +49,11 @@ type Query {
     spaces: [String]
     state: String
   ): [Proposal]
+  spaces(
+    all: Boolean
+    first: Int
+    skip: Int
+    id: String
+    spaces: [String]
+  ): [Space]
 }

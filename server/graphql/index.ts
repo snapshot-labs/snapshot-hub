@@ -85,6 +85,26 @@ export const rootValue = {
           space
         };
       });
+    },
+    spaces: ({ all = false, first = 10, skip = 0, id, spaces = [] }) => {
+      let allSpaces = Object.entries(clone(registrySpaces)).map((space: [any, any]) => {
+        space[1].id = space[0];
+        space[1].private = space[1].private || false;
+        space[1].about = space[1].about || '';
+        space[1].members = space[1].members || [];
+        return space[1];
+      });
+      
+      if(!all) {
+        if(id){
+          spaces.push(id)
+        }
+        if(spaces.length){
+          allSpaces = allSpaces.filter(space => spaces.includes(space.id))
+        }
+        allSpaces = allSpaces.splice(skip, first)
+      }
+      return allSpaces
     }
   }
 };
