@@ -63,7 +63,6 @@ type Query {
   ): [Proposal]
 
   spaces(
-    all: Boolean
     first: Int
     skip: Int
     id: String
