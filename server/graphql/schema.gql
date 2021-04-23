@@ -39,7 +39,7 @@ type Vote {
   spaceId: String
   proposalId: String
   choice: Int
-  voteAddress: String
+  voter: User
 }
 
 type Query {

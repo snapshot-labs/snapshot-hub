@@ -99,6 +99,7 @@ export const rootValue = {
       context,
       info
     ) => {
+      const requestedFields = graphqlFields(info);
       let queryStr = "";
       const params: any[] = [];
       if (id) {
@@ -121,9 +122,18 @@ export const rootValue = {
       const query = `SELECT id, timestamp, space, payload, address FROM messages WHERE type = 'vote' ${queryStr} ORDER BY timestamp DESC LIMIT ?, ?`;
       const messages = await db.queryAsync(query, params);
 
+      const voters = Array.from(new Set(messages.map(msg => msg.address)));
+
+      let users = {};
+      if (requestedFields.voter && requestedFields.voter.profile) {
+        users = await getProfiles(voters);
+      }
       return messages.map(msg => {
         msg.spaceId = msg.space;
-        msg.voteAddress = msg.address
+        msg.voter = {
+          address: msg.address,
+          profile: users[msg.address]
+        }
         msg.proposalId = jsonParse(msg.payload).proposal;
         msg.choice = jsonParse(msg.payload).choice;
         delete msg.payload
