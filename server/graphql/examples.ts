@@ -28,4 +28,4 @@ query Spaces {
       params
     }
   }
-}`
+}`;
