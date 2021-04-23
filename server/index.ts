@@ -1,7 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import { getAddress } from '@ethersproject/address';
-import { spaces } from './helpers/spaces';
+import { spaceIdsFailed, spaces} from './helpers/spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
@@ -29,6 +29,20 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/spaces/poke', async (req, res) => {
+  res.json(spaceIdsFailed);
+  const spacesFailed = await Promise.all(
+    spaceIdsFailed.map(id => loadSpace(id))
+  );
+  spacesFailed.forEach((space, index) => {
+    if (space) {
+      spaces[spaceIdsFailed[index]] = space;
+      delete spaceIdsFailed[index];
+    }
+  });
+  return;
+});
+
 router.get('/spaces/:key?', (req, res) => {
   const { key } = req.params;
   return res.json(key ? spaces[key] : spaces);
@@ -49,19 +63,6 @@ router.get('/:space/proposals', async (req, res) => {
   const query =
     "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC LIMIT 100";
   db.queryAsync(query, [space]).then(messages => {
-    res.json(
-      Object.fromEntries(messages.map(message => formatMessage(message)))
-    );
-  });
-});
-
-router.get('/timeline', async (req, res) => {
-  const spacesArr = req.query.spaces
-    ? (req.query.spaces as string).split(',')
-    : [];
-  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
-  const query = `SELECT * FROM messages WHERE type = 'proposal' ${spacesStr} ORDER BY timestamp DESC LIMIT 30`;
-  db.queryAsync(query, [spacesArr]).then(messages => {
     res.json(
       Object.fromEntries(messages.map(message => formatMessage(message)))
     );
@@ -103,9 +104,8 @@ router.get('/voters', async (req, res) => {
   const { from = 0, to = 1e24 } = req.query;
   const spacesArr = req.query.spaces
     ? (req.query.spaces as string).split(',')
-    : [];
-  const spacesStr = req.query.spaces ? 'AND space IN (?)' : '';
-  const query = `SELECT address, timestamp, space FROM messages WHERE type = 'vote' AND timestamp >= ? AND timestamp <= ? ${spacesStr} GROUP BY address ORDER BY timestamp DESC`;
+    : Object.keys(spaces);
+  const query = `SELECT address, timestamp, space FROM messages WHERE type = 'vote' AND timestamp >= ? AND timestamp <= ? AND space IN (?) GROUP BY address ORDER BY timestamp DESC`;
   const messages = await db.queryAsync(query, [from, to, spacesArr]);
   res.json(messages);
 });

@@ -3,7 +3,7 @@ import fleek from '@fleekhq/fleek-storage-js';
 import { isAddress, getAddress } from '@ethersproject/address';
 import db from '../mysql';
 import { getSpace } from '../ens';
-import { spaces } from '../spaces';
+import { spaceIdsFailed, spaces} from '../spaces';
 
 export async function addOrUpdateSpace(space: string) {
   const ts = (Date.now() / 1e3).toFixed();
@@ -150,7 +150,7 @@ export async function loadSpaces() {
   const ids = result.map((space: any) => space.id);
   console.log('Spaces from db', ids.length);
   const _spaces = {};
-  const max = 300;
+  const max = 1000;
   const pages = Math.ceil(ids.length / max);
   for (let i = 0; i < pages; i++) {
     const pageIds = ids.slice(max * i, max * (i + 1));
@@ -159,6 +159,8 @@ export async function loadSpaces() {
       if (pageSpaces[index]) {
         _spaces[id] = pageSpaces[index];
         spaces[id] = pageSpaces[index];
+      } else {
+        spaceIdsFailed.push(id);
       }
     });
   }

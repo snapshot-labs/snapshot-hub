@@ -1,7 +1,7 @@
 {
   "name": "snapshot-hub",
   "version": "0.1.3",
-  "repository": "balancer-labs/snapshot-hub",
+  "repository": "snapshot-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
@@ -38,9 +38,14 @@
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
     "eslint": "^6.7.2",
+    "eth-ens-namehash": "^2.0.8",
     "ethereumjs-util": "^7.0.6",
     "ethers": "^5.0.17",
+    "express-graphql": "^0.12.0",
     "frameguard": "^3.1.0",
+    "graphql": "^15.5.0",
+    "graphql-fields": "^2.0.3",
+    "graphql-tools": "^7.0.4",
     "lodash": "^4.17.20",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",

@@ -35,6 +35,8 @@ export async function verify(body): Promise<any> {
   if (
     !msg.payload.start ||
     !msg.payload.end ||
+    typeof msg.payload.start !== 'number' ||
+    typeof msg.payload.end !== 'number' ||
     msg.payload.start >= msg.payload.end
   )
     return Promise.reject('wrong proposal period');
