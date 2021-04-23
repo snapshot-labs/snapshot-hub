@@ -1,4 +1,4 @@
-export const timelineQuery = `query Timeline {
+export default `query Timeline {
   timeline(first: 20, skip: 0, spaces: ["balancer", "yam.eth"], state: "closed") {
     id
     name
@@ -14,9 +14,9 @@ export const timelineQuery = `query Timeline {
       members
     }
   }
-}`;
+} 
 
-export const spacesQuery = `query Spaces {
+query Spaces {
   spaces(first: 10) {
     id
     name
