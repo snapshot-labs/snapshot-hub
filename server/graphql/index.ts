@@ -93,7 +93,8 @@ export const rootValue = {
         first = 10,
         skip = 0,
         address,
-        space
+        spaces=[],
+        proposal
       },
       context,
       info
@@ -108,9 +109,12 @@ export const rootValue = {
         queryStr += `AND address = ? `;
         params.push(address);
       }
-      if (space) {
-        queryStr += `AND space = ? `;
-        params.push(space);
+      if (spaces.length) {
+        queryStr += `AND space IN (?) `;
+        params.push(spaces);
+      }
+      if(proposal) {
+        queryStr += `AND payload like '%"proposal": "${proposal}"%' `;
       }
       params.push(skip, first);
 

@@ -55,6 +55,7 @@ type Query {
     first: Int,
     skip: Int,
     address: String,
-    space: String
+    spaces: [String],
+    proposal: String
   ): [Vote]
 }
