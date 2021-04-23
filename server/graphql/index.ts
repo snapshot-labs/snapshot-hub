@@ -85,6 +85,46 @@ export const rootValue = {
           space
         };
       });
+    },
+    votes: async (
+      parent,
+      { 
+        id,
+        first = 10,
+        skip = 0,
+        address,
+        space
+      },
+      context,
+      info
+    ) => {
+      let queryStr = "";
+      const params: any[] = [];
+      if (id) {
+        queryStr += `AND id = ? `;
+        params.push(id);
+      }
+      if (address) {
+        queryStr += `AND address = ? `;
+        params.push(address);
+      }
+      if (space) {
+        queryStr += `AND space = ? `;
+        params.push(space);
+      }
+      params.push(skip, first);
+
+      const query = `SELECT id, timestamp, space, payload, address FROM messages WHERE type = 'vote' ${queryStr} ORDER BY timestamp DESC LIMIT ?, ?`;
+      const messages = await db.queryAsync(query, params);
+
+      return messages.map(msg => {
+        msg.spaceId = msg.space;
+        msg.voteAddress = msg.address
+        msg.proposalId = jsonParse(msg.payload).proposal;
+        msg.choice = jsonParse(msg.payload).choice;
+        delete msg.payload
+        return msg
+      });
     }
   }
 };

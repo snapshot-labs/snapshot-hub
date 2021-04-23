@@ -33,6 +33,15 @@ type Proposal {
   snapshot: String
 }
 
+type Vote {
+  id: String
+  timestamp: Int
+  spaceId: String
+  proposalId: String
+  choice: Int
+  voteAddress: String
+}
+
 type Query {
   timeline(
     first: Int
@@ -41,4 +50,11 @@ type Query {
     spaces: [String]
     state: String
   ): [Proposal]
+  votes(
+    id: String,
+    first: Int,
+    skip: Int,
+    address: String,
+    space: String
+  ): [Vote]
 }
