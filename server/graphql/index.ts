@@ -88,19 +88,12 @@ export const rootValue = {
     },
     votes: async (
       parent,
-      { 
-        id,
-        first = 10,
-        skip = 0,
-        address,
-        spaces=[],
-        proposal
-      },
+      { id, first = 10, skip = 0, address, spaces = [], proposal },
       context,
       info
     ) => {
       const requestedFields = graphqlFields(info);
-      let queryStr = "";
+      let queryStr = '';
       const params: any[] = [];
       if (id) {
         queryStr += `AND id = ? `;
@@ -114,7 +107,7 @@ export const rootValue = {
         queryStr += `AND space IN (?) `;
         params.push(spaces);
       }
-      if(proposal) {
+      if (proposal) {
         queryStr += `AND payload like '%"proposal": "${proposal}"%' `;
       }
       params.push(skip, first);
@@ -139,11 +132,11 @@ export const rootValue = {
         msg.voter = {
           address: msg.address,
           profile: users[msg.address]
-        }
+        };
         msg.proposalId = jsonParse(msg.payload).proposal;
         msg.choice = jsonParse(msg.payload).choice;
-        delete msg.payload
-        return msg
+        delete msg.payload;
+        return msg;
       });
     }
   }
