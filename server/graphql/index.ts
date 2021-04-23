@@ -129,7 +129,13 @@ export const rootValue = {
         users = await getProfiles(voters);
       }
       return messages.map(msg => {
-        msg.spaceId = msg.space;
+        const space = clone(registrySpaces[msg.space]);
+        space.id = msg.space;
+        space.private = space.private || false;
+        space.about = space.about || '';
+        space.members = space.members || [];
+
+        msg.space = space;
         msg.voter = {
           address: msg.address,
           profile: users[msg.address]
