@@ -19,6 +19,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
-    '@typescript-eslint/no-undef': 'off',
+    '@typescript-eslint/no-undef': 'off'
   }
 };

@@ -21,3 +21,7 @@ app.use(
 );
 app.get('/*', (req, res) => res.redirect('/api'));
 
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () =>
+  console.log(`⚡⚡Server is running: https://localhost:${PORT}`)
+);

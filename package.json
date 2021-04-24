@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
     "express": "npm run watch",
-    "watch": "nodemon -e ts -w ./server -x npm run watch:serve",
+    "watch": "nodemon -e ts -x npm run watch:serve",
     "watch:serve": "ts-node index.ts",
     "express:run": "npm run watch:serve",
     "start": "npm run watch:serve"
