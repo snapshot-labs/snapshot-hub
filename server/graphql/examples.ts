@@ -14,4 +14,21 @@ export default `query Timeline {
       members
     }
   }
-}`;
+}
+
+query Votes{
+  votes(first:10) {
+    id
+    choice
+    space {
+			id
+      private
+      about
+    }
+    proposalId
+    voter{
+      address
+    }
+  }
+}
+`;
