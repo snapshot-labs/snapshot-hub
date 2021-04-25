@@ -21,9 +21,12 @@ export const rootValue = {
       const requestedFields = graphqlFields(info);
 
       const ts = parseInt((Date.now() / 1e3).toFixed());
-      if (spaces.length === 0) spaces = Object.keys(registrySpaces) as any;
+      const spaceKeys: string[] = Object.keys(registrySpaces);
+      spaces = spaces.filter(space => spaceKeys.includes(space));
+      if (spaces.length === 0) spaces = spaceKeys as any;
+
       let queryStr = '';
-      const params: any[] = [1614473607, spaces];
+      const params: any[] = [1618473607, spaces];
 
       if (id) {
         queryStr += `AND id = ? `;
@@ -31,59 +34,49 @@ export const rootValue = {
       }
 
       if (state === 'pending') {
-        queryStr += 'AND JSON_EXTRACT(payload, "$.start") > ? ';
+        queryStr += 'AND start > ? ';
         params.push(ts);
-      }
-      if (state === 'active') {
-        queryStr +=
-          'AND JSON_EXTRACT(payload, "$.start") < ? AND JSON_EXTRACT(payload, "$.end") > ? ';
+      } else if (state === 'active') {
+        queryStr += 'AND start < ? AND end > ? ';
         params.push(ts, ts);
-      }
-      if (state === 'closed') {
-        queryStr += 'AND ? > JSON_EXTRACT(payload, "$.end") ';
+      } else if (state === 'closed') {
+        queryStr += 'AND end < ? ';
         params.push(ts);
       }
 
       params.push(skip, first);
 
-      const query = `SELECT * FROM messages WHERE type = 'proposal' AND timestamp > ? AND space IN (?) ${queryStr} ORDER BY timestamp DESC LIMIT ?, ?`;
-      const msgs = await db.queryAsync(query, params);
+      const query = `SELECT * FROM proposals WHERE timestamp > ? AND space IN (?) ${queryStr} ORDER BY timestamp DESC LIMIT ?, ?`;
+      const proposals = await db.queryAsync(query, params);
 
-      const authors = Array.from(new Set(msgs.map(msg => msg.address)));
+      const authors = Array.from(new Set(proposals.map(msg => msg.address)));
 
       let users = {};
       if (requestedFields.author && requestedFields.author.profile) {
         users = await getProfiles(authors);
       }
 
-      return msgs.map(msg => {
-        const payload = jsonParse(msg.payload);
-        const { start, end } = payload;
-        let proposalState = 'pending';
-        if (ts > start) proposalState = 'active';
-        if (ts > end) proposalState = 'closed';
+      return proposals.map(proposal => {
+        proposal.choices = jsonParse(proposal.choices, []);
 
-        const space = clone(registrySpaces[msg.space]);
-        space.id = msg.space;
+        let proposalState = 'pending';
+        if (ts > proposal.start) proposalState = 'active';
+        if (ts > proposal.end) proposalState = 'closed';
+        proposal.state = proposalState;
+
+        proposal.author = {
+          address: proposal.author,
+          profile: users[proposal.author]
+        };
+
+        const space = clone(registrySpaces[proposal.space]);
+        space.id = proposal.space;
         space.private = space.private || false;
         space.about = space.about || '';
         space.members = space.members || [];
+        proposal.space = space;
 
-        return {
-          id: msg.id,
-          author: {
-            address: msg.address,
-            profile: users[msg.address]
-          },
-          timestamp: msg.timestamp,
-          state: proposalState,
-          start,
-          end,
-          snapshot: payload.snapshot,
-          name: payload.name,
-          body: payload.body,
-          space
-        };
+        return proposal;
       });
     },
     votes: async (
