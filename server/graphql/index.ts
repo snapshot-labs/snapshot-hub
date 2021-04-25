@@ -6,6 +6,7 @@ import { spaces as registrySpaces } from '../helpers/spaces';
 import db from '../helpers/mysql';
 import { clone, jsonParse } from '../helpers/utils';
 import { getProfiles } from '../helpers/profile';
+import pick from 'lodash/pick';
 
 const schemaFile = path.join(__dirname, './schema.gql');
 const typeDefs = fs.readFileSync(schemaFile, 'utf8');
@@ -87,25 +88,25 @@ export const rootValue = {
       });
     },
     spaces: (parent, { first = 10, skip = 0, id, spaces = [] }) => {
-      let allSpaces = Object.entries(clone(registrySpaces)).map(
-        (space: [any, any]) => {
-          space[1].id = space[0];
-          space[1].private = space[1].private || false;
-          space[1].about = space[1].about || '';
-          space[1].members = space[1].members || [];
-          return space[1];
-        }
-      );
+      let allSpaces = clone(registrySpaces);
 
       if (id) {
-        spaces.push(id);
+        allSpaces = pick(allSpaces, [id]);
+      } else if (spaces.length) {
+        allSpaces = pick(allSpaces, spaces);
+      } else {
+        allSpaces = Object.fromEntries(
+          Object.entries(allSpaces).splice(skip, first)
+        );
       }
-      if (spaces.length) {
-        allSpaces = allSpaces.filter(space => spaces.includes(space.id));
-      }
-      allSpaces = allSpaces.splice(skip, first);
 
-      return allSpaces;
+      return Object.entries(allSpaces).map((space: [any, any]) => {
+        space[1].id = space[0];
+        space[1].private = space[1].private || false;
+        space[1].about = space[1].about || '';
+        space[1].members = space[1].members || [];
+        return space[1];
+      });
     }
   }
 };
