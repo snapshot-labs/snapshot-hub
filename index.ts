@@ -1,5 +1,4 @@
-require('dotenv').config();
-
+import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import frameguard from 'frameguard';
 import cors from 'cors';
@@ -8,6 +7,8 @@ import api from './server';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
 import express from 'express';
+
+dotenv.config();
 const app = express();
 
 app.use(bodyParser.json({ limit: '20mb' }));
