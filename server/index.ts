@@ -134,6 +134,7 @@ router.post('/message', async (req, res) => {
   if (
     !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
+    msg.timestamp.length !== 10 ||
     msg.timestamp > overTs ||
     msg.timestamp < underTs
   )
