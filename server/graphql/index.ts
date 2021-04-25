@@ -101,7 +101,8 @@ export const rootValue = {
         params.push(spaces);
       }
       if (proposal) {
-        queryStr += `AND payload like '%"proposal": "${proposal}"%' `;
+        queryStr += `AND payload like ?`;
+        params.push(`%"proposal": "${proposal}"%`);
       }
       params.push(skip, first);
 
@@ -115,11 +116,14 @@ export const rootValue = {
         users = await getProfiles(voters);
       }
       return messages.map(msg => {
-        const space = clone(registrySpaces[msg.space]);
-        space.id = msg.space;
-        space.private = space.private || false;
-        space.about = space.about || '';
-        space.members = space.members || [];
+        let space = null;
+        if (registrySpaces[msg.space]) {
+          space = clone(registrySpaces[msg.space]);
+          space.id = msg.space;
+          space.private = space.private || false;
+          space.about = space.about || '';
+          space.members = space.members || [];
+        }
 
         msg.space = space;
         msg.voter = {
