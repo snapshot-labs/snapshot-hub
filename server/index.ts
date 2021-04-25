@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
 router.get('/spaces/poke', async (req, res) => {
   res.json(spaceIdsFailed);
   const spacesFailed = await Promise.all(
-    spaceIdsFailed.map(id => loadSpace(id))
+    spaceIdsFailed.filter(id => !!id).map(id => loadSpace(id))
   );
   spacesFailed.forEach((space, index) => {
     if (space) {
@@ -134,6 +134,7 @@ router.post('/message', async (req, res) => {
   if (
     !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
+    msg.timestamp.length !== 10 ||
     msg.timestamp > overTs ||
     msg.timestamp < underTs
   )
