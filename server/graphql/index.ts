@@ -14,7 +14,15 @@ export const rootValue = {
   Query: {
     timeline: async (
       parent,
-      { id, first = 20, skip = 0, spaces = [], state },
+      {
+        id,
+        first = 20,
+        skip = 0,
+        spaces = [],
+        state,
+        orderBy = 'timestamp',
+        orderDirection = 'desc'
+      },
       context,
       info
     ) => {
@@ -44,9 +52,18 @@ export const rootValue = {
         params.push(ts);
       }
 
+      if (!['timestamp', 'start', 'end'].includes(orderBy))
+        orderBy = 'timestamp';
+      orderDirection = orderDirection.toUpperCase();
+      if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
       params.push(skip, first);
 
-      const query = `SELECT * FROM proposals WHERE timestamp > ? AND space IN (?) ${queryStr} ORDER BY timestamp DESC LIMIT ?, ?`;
+      const query = `
+        SELECT * FROM proposals
+        WHERE timestamp > ? AND space IN (?) ${queryStr}
+        ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+      `;
       const proposals = await db.queryAsync(query, params);
 
       const authors = Array.from(new Set(proposals.map(msg => msg.address)));

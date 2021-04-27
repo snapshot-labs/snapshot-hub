@@ -34,6 +34,11 @@ type Proposal {
   snapshot: String!
 }
 
+enum OrderDirection {
+  asc
+  desc
+}
+
 type Query {
   timeline(
     first: Int
@@ -41,5 +46,7 @@ type Query {
     id: String
     spaces: [String]
     state: String
+    orderBy: String
+    orderDirection: OrderDirection
   ): [Proposal]
 }
