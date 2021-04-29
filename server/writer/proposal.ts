@@ -60,12 +60,12 @@ export async function verify(body): Promise<any> {
         snapshot.utils.getProvider(space.network),
         [body.address]
       );
-      const totalScore = scores
+      const totalScore: any = scores
         .map((score: any) =>
           Object.values(score).reduce((a, b: any) => a + b, 0)
         )
         .reduce((a, b: any) => a + b, 0);
-      if (totalScore === 0) return Promise.reject('below min. score');
+      if (totalScore < space.filters.minScore) return Promise.reject('below min. score');
     } catch (e) {
       return Promise.reject('failed to check voting power');
     }
