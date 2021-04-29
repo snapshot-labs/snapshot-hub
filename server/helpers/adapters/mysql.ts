@@ -4,13 +4,14 @@ import db from '../mysql';
 import { getSpace } from '../ens';
 import { spaceIdsFailed, spaces } from '../spaces';
 
-export async function addOrUpdateSpace(space: string) {
+export async function addOrUpdateSpace(space: string, settings: any) {
   const ts = (Date.now() / 1e3).toFixed();
   const query =
-    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?';
+    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?';
   await db.queryAsync(query, [
     { id: space, created_at: ts, updated_at: ts },
-    ts
+    ts,
+    settings
   ]);
 }
 
@@ -91,7 +92,7 @@ export async function storeSettings(space, body) {
   const ipfsHash = result.hashV0;
   console.log('Settings updated', space, ipfsHash);
 
-  await addOrUpdateSpace(space);
+  await addOrUpdateSpace(space, msg.payload);
 }
 
 export async function getActiveProposals() {
@@ -124,6 +125,7 @@ export async function loadSpaces() {
     pageIds.forEach((id, index) => {
       if (pageSpaces[index]) {
         _spaces[id] = pageSpaces[index];
+        addOrUpdateSpace(id, pageSpaces[index]);
         spaces[id] = pageSpaces[index];
       } else {
         spaceIdsFailed.push(id);

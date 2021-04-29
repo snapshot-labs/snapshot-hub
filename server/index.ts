@@ -52,7 +52,7 @@ router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
   const space = await loadSpace(key);
   if (space) {
-    await addOrUpdateSpace(key);
+    await addOrUpdateSpace(key, space);
     spaces[key] = space;
   }
   return res.json(space);
