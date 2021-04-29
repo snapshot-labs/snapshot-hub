@@ -125,7 +125,7 @@ export async function loadSpaces() {
     pageIds.forEach((id, index) => {
       if (pageSpaces[index]) {
         _spaces[id] = pageSpaces[index];
-        addOrUpdateSpace(id, pageSpaces[index]);
+        // addOrUpdateSpace(id, pageSpaces[index]);
         spaces[id] = pageSpaces[index];
       } else {
         spaceIdsFailed.push(id);
