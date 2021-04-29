@@ -11,7 +11,7 @@ export async function addOrUpdateSpace(space: string, settings: any) {
   await db.queryAsync(query, [
     { id: space, created_at: ts, updated_at: ts },
     ts,
-    settings
+    JSON.stringify(settings)
   ]);
 }
 
