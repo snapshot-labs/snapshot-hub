@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import frameguard from 'frameguard';
 import cors from 'cors';
 import { graphqlHTTP } from 'express-graphql';
-import rateLimit from "express-rate-limit";
+import rateLimit from 'express-rate-limit';
 import api from './server';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
@@ -17,6 +17,7 @@ export default app => {
     windowMs: 30 * 1000,
     max: 120,
     handler: (req, res) => {
+      console.log('Rate limited');
       sendError(res, 'rate limited')
     }
   }));
