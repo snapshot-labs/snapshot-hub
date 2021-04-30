@@ -15,11 +15,11 @@ export default app => {
   app.use(cors());
   app.set('trust proxy', 1);
   app.use(rateLimit({
-    windowMs: 30 * 1000,
-    max: 12,
+    windowMs: 10 * 1000,
+    max: 32,
     handler: (req, res) => {
       console.log('Rate limited');
-      sendError(res, 'rate limited')
+      sendError(res, 'too many requests')
     }
   }));
   app.use('/api', api);
