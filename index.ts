@@ -14,8 +14,8 @@ export default app => {
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
   app.use(rateLimit({
-    windowMs: 10 * 1000,
-    max: 2,
+    windowMs: 30 * 1000,
+    max: 120,
     handler: (req, res) => {
       sendError(res, 'rate limited')
     }
