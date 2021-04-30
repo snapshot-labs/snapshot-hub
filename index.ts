@@ -5,12 +5,14 @@ import { graphqlHTTP } from 'express-graphql';
 import api from './server';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
+import { rateLimit } from './server/helpers/ratelimit';
 
 export default app => {
   app.use(bodyParser.json({ limit: '20mb' }));
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
+  app.use(rateLimit);
   app.use('/api', api);
   app.use(
     '/graphql',

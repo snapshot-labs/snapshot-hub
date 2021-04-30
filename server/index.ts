@@ -1,11 +1,10 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import { getAddress } from '@ethersproject/address';
-import { spaceIdsFailed, spaces } from './helpers/spaces';
+import { spaceIdsFailed, spaces} from './helpers/spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
-import { rateLimit } from './helpers/ratelimit';
 import {
   verifySignature,
   jsonParse,
@@ -30,7 +29,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/spaces/poke', rateLimit, async (req, res) => {
+router.get('/spaces/poke', async (req, res) => {
   res.json(spaceIdsFailed);
   const spacesFailed = await Promise.all(
     spaceIdsFailed.filter(id => !!id).map(id => loadSpace(id))
@@ -44,12 +43,12 @@ router.get('/spaces/poke', rateLimit, async (req, res) => {
   return;
 });
 
-router.get('/spaces/:key?', rateLimit, (req, res) => {
+router.get('/spaces/:key?', (req, res) => {
   const { key } = req.params;
   return res.json(key ? spaces[key] : spaces);
 });
 
-router.get('/spaces/:key/poke', rateLimit, async (req, res) => {
+router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
   const space = await loadSpace(key);
   if (space) {
@@ -59,7 +58,7 @@ router.get('/spaces/:key/poke', rateLimit, async (req, res) => {
   return res.json(space);
 });
 
-router.get('/:space/proposals', rateLimit, async (req, res) => {
+router.get('/:space/proposals', async (req, res) => {
   const { space } = req.params;
   const query =
     "SELECT * FROM messages WHERE type = 'proposal' AND space = ? ORDER BY timestamp DESC LIMIT 100";
@@ -70,7 +69,7 @@ router.get('/:space/proposals', rateLimit, async (req, res) => {
   });
 });
 
-router.get('/:space/proposal/:id', rateLimit, async (req, res) => {
+router.get('/:space/proposal/:id', async (req, res) => {
   const { space, id } = req.params;
   const query = `SELECT * FROM messages WHERE type = 'vote' AND space = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
   db.queryAsync(query, [space, id]).then(messages => {
@@ -101,7 +100,7 @@ router.get('/:space/proposal/:id', rateLimit, async (req, res) => {
   });
 });
 
-router.get('/voters', rateLimit, async (req, res) => {
+router.get('/voters', async (req, res) => {
   const { from = 0, to = 1e24 } = req.query;
   const spacesArr = req.query.spaces
     ? (req.query.spaces as string).split(',')
@@ -111,7 +110,7 @@ router.get('/voters', rateLimit, async (req, res) => {
   res.json(messages);
 });
 
-router.post('/message', rateLimit, async (req, res) => {
+router.post('/message', async (req, res) => {
   if (process.env.MAINTENANCE)
     return sendError(res, 'update in progress, try later');
 
