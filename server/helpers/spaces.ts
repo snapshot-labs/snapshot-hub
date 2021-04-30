@@ -1,4 +1,4 @@
-import legacySpaces from '@snapshot-labs/snapshot-spaces';
+import legacySpaces from '@snapshot-labs/snapshot-spaces/spaces/legacy.json';
 import { getActiveProposals, loadSpaces } from './adapters/mysql';
 import db from './mysql';
 
