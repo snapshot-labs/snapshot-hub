@@ -5,7 +5,7 @@ import bluebird from 'bluebird';
 import parse from 'connection-string';
 
 // @ts-ignore
-const config = parse(process.env.JAWSDB_URL);
+const config = parse(process.env.DATABASE_URL);
 config.connectionLimit = 75;
 config.multipleStatements = true;
 config.database = config.path[0];
