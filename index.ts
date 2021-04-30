@@ -2,15 +2,24 @@ import bodyParser from 'body-parser';
 import frameguard from 'frameguard';
 import cors from 'cors';
 import { graphqlHTTP } from 'express-graphql';
+import rateLimit from "express-rate-limit";
 import api from './server';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
+import { sendError } from './server/helpers/utils';
 
 export default app => {
   app.use(bodyParser.json({ limit: '20mb' }));
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
+  app.use(rateLimit({
+    windowMs: 10 * 1000,
+    max: 2,
+    handler: (req, res) => {
+      sendError(res, 'rate limited')
+    }
+  }));
   app.use('/api', api);
   app.use(
     '/graphql',
