@@ -13,6 +13,7 @@ export default app => {
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
+  app.set('trust proxy', 1);
   app.use(rateLimit({
     windowMs: 30 * 1000,
     max: 120,
