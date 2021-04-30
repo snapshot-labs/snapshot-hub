@@ -1,4 +1,4 @@
-import legacySpaces from '@snapshot-labs/snapshot-spaces';
+import legacySpaces from '@snapshot-labs/snapshot-spaces/mod.js';
 import { getActiveProposals, loadSpaces } from './adapters/mysql';
 import db from './mysql';
 
@@ -7,9 +7,9 @@ console.log('GitHub spaces', Object.keys(spaces).length);
 
 export const spaceIdsFailed: string[] = [];
 
-loadSpaces().then(ensSpaces => {
-  console.log('ENS spaces', Object.keys(ensSpaces).length);
-});
+// loadSpaces().then(ensSpaces => {
+//   console.log('ENS spaces', Object.keys(ensSpaces).length);
+// });
 
 setInterval(() => {
   getActiveProposals().then((result: any) =>
