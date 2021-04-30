@@ -111,6 +111,9 @@ router.get('/voters', async (req, res) => {
 });
 
 router.post('/message', async (req, res) => {
+  if (process.env.MAINTENANCE)
+    return sendError(res, 'update in progress, try later');
+
   const body = req.body;
   const msg = jsonParse(body.msg);
   const ts = Date.now() / 1e3;
