@@ -26,6 +26,8 @@ export const rootValue = {
       context,
       info
     ) => {
+      console.log('GraphQL request', first, skip, state);
+
       const requestedFields = graphqlFields(info);
 
       const ts = parseInt((Date.now() / 1e3).toFixed());
