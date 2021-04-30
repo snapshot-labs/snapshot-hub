@@ -6,7 +6,7 @@ import parse from 'connection-string';
 
 // @ts-ignore
 const config = parse(process.env.DATABASE_URL);
-config.connectionLimit = 100;
+config.connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '75');
 config.multipleStatements = true;
 config.database = config.path[0];
 config.host = config.hosts[0].name;
