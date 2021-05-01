@@ -16,7 +16,7 @@ export default app => {
   app.set('trust proxy', 1);
   app.use(rateLimit({
     windowMs: 10 * 1000,
-    max: 32,
+    max: 24,
     handler: (req, res) => {
       console.log('Rate limited');
       sendError(res, 'too many requests')
