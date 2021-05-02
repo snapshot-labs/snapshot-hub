@@ -3,6 +3,7 @@ import frameguard from 'frameguard';
 import cors from 'cors';
 import { graphqlHTTP } from 'express-graphql';
 import rateLimit from 'express-rate-limit';
+import { createHash } from 'crypto';
 import api from './server';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
@@ -14,14 +15,19 @@ export default app => {
   app.use(frameguard({ action: 'deny' }));
   app.use(cors());
   app.set('trust proxy', 1);
-  app.use(rateLimit({
-    windowMs: 10 * 1000,
-    max: 24,
-    handler: (req, res) => {
-      console.log('Rate limited');
-      sendError(res, 'too many requests')
-    }
-  }));
+  app.use(
+    rateLimit({
+      windowMs: 10 * 1e3,
+      max: 24,
+      handler: (req, res) => {
+        const id = createHash('sha256')
+          .update(req.ip)
+          .digest('hex');
+        console.log('Too many requests', id.slice(0, 7));
+        sendError(res, 'too many requests', 429);
+      }
+    })
+  );
   app.use('/api', api);
   app.use(
     '/graphql',
