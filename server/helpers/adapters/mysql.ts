@@ -2,7 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import fleek from '@fleekhq/fleek-storage-js';
 import db from '../mysql';
 import { getSpace } from '../ens';
-import { spaceIdsFailed, spaces } from '../spaces';
+import { spaceIdsFailed } from '../spaces';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
   const ts = (Date.now() / 1e3).toFixed();
@@ -117,7 +117,7 @@ export async function loadSpaces() {
   const ids = result.map((space: any) => space.id);
   console.log('Spaces from db', ids.length);
   const _spaces = {};
-  const max = 50;
+  const max = 25;
   const pages = Math.ceil(ids.length / max);
   for (let i = 0; i < pages; i++) {
     const pageIds = ids.slice(max * i, max * (i + 1));

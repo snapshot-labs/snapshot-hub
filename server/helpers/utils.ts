@@ -21,8 +21,8 @@ export function clone(item) {
   return JSON.parse(JSON.stringify(item));
 }
 
-export function sendError(res, description) {
-  return res.status(500).json({
+export function sendError(res, description, status = 500) {
+  return res.status(status).json({
     error: 'unauthorized',
     error_description: description
   });
