@@ -1,7 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import { getAddress } from '@ethersproject/address';
-import { spaceIdsFailed, spaces} from './helpers/spaces';
+import { spaceIdsFailed, spaces } from './helpers/spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
@@ -179,20 +179,6 @@ router.post('/message', async (req, res) => {
   } catch (e) {
     return sendError(res, e);
   }
-
-  fetch('https://snapshot.collab.land/api', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      network,
-      body,
-      authorIpfsRes,
-      relayerIpfsRes
-    })
-  })
-    .then(res => res.json())
-    .then(json => console.log('Webhook success', json))
-    .catch(result => console.error('Webhook error', result));
 
   console.log(
     `Address "${body.address}"\n`,
