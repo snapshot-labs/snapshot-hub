@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
 router.get('/spaces/poke', async (req, res) => {
   res.json(spaceIdsFailed);
   const spacesFailed = await Promise.all(
-    spaceIdsFailed.map(id => loadSpace(id))
+    spaceIdsFailed.filter(id => !!id).map(id => loadSpace(id))
   );
   spacesFailed.forEach((space, index) => {
     if (space) {
@@ -52,7 +52,7 @@ router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
   const space = await loadSpace(key);
   if (space) {
-    await addOrUpdateSpace(key);
+    await addOrUpdateSpace(key, space);
     spaces[key] = space;
   }
   return res.json(space);
@@ -111,6 +111,9 @@ router.get('/voters', async (req, res) => {
 });
 
 router.post('/message', async (req, res) => {
+  if (process.env.MAINTENANCE)
+    return sendError(res, 'update in progress, try later');
+
   const body = req.body;
   const msg = jsonParse(body.msg);
   const ts = Date.now() / 1e3;
@@ -134,6 +137,7 @@ router.post('/message', async (req, res) => {
   if (
     !msg.timestamp ||
     typeof msg.timestamp !== 'string' ||
+    msg.timestamp.length !== 10 ||
     msg.timestamp > overTs ||
     msg.timestamp < underTs
   )

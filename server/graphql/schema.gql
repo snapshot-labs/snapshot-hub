@@ -25,12 +25,18 @@ type Proposal {
   author: User!
   timestamp: Int!
   space: Space!
-  name: String
-  body: String
-  state: String
-  start: Int
-  end: Int
-  snapshot: String
+  name: String!
+  body: String!
+  state: String!
+  start: Int!
+  end: Int!
+  choices: [String]!
+  snapshot: String!
+}
+
+enum OrderDirection {
+  asc
+  desc
 }
 
 type Query {
@@ -40,5 +46,7 @@ type Query {
     id: String
     spaces: [String]
     state: String
+    orderBy: String
+    orderDirection: OrderDirection
   ): [Proposal]
 }
