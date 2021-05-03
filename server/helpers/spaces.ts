@@ -1,15 +1,11 @@
 import legacySpaces from '@snapshot-labs/snapshot-spaces/spaces/legacy.json';
-import { getActiveProposals, loadSpaces } from './adapters/mysql';
+import { getActiveProposals } from './adapters/mysql';
 import db from './mysql';
 
 export let spaces = legacySpaces;
-console.log('GitHub spaces', Object.keys(spaces).length);
+console.log('Total GitHub spaces', Object.keys(spaces).length);
 
 export const spaceIdsFailed: string[] = [];
-
-loadSpaces().then(ensSpaces => {
-  console.log('ENS spaces', Object.keys(ensSpaces).length);
-});
 
 setInterval(() => {
   getActiveProposals().then((result: any) =>
@@ -20,13 +16,20 @@ setInterval(() => {
   );
 }, 30e3);
 
-console.log('Load spaces cache from db');
-const query =
-  'SELECT id, settings FROM spaces WHERE settings IS NOT NULL ORDER BY id ASC';
-db.queryAsync(query).then(result => {
-  const ensSpaces = Object.fromEntries(
-    result.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)])
-  );
-  spaces = { ...legacySpaces, ...ensSpaces };
-  console.log('Total spaces', Object.keys(spaces).length);
-});
+setTimeout(() => {
+  console.log('Load spaces from db');
+  const query =
+    'SELECT id, settings FROM spaces WHERE settings IS NOT NULL ORDER BY id ASC';
+  db.queryAsync(query).then(result => {
+    const ensSpaces = Object.fromEntries(
+      result.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)])
+    );
+    spaces = { ...legacySpaces, ...ensSpaces };
+    const totalSpaces = Object.keys(spaces).length;
+    const totalPublicSpaces = Object.values(spaces).filter(
+      (space: any) => !space.private
+    ).length;
+    console.log('Total spaces', totalSpaces);
+    console.log('Total public spaces', totalPublicSpaces);
+  });
+}, 2e3);

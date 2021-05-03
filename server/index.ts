@@ -31,14 +31,10 @@ router.get('/', (req, res) => {
 
 router.get('/spaces/poke', async (req, res) => {
   res.json(spaceIdsFailed);
-  const spacesFailed = await Promise.all(
-    spaceIdsFailed.filter(id => !!id).map(id => loadSpace(id))
-  );
-  spacesFailed.forEach((space, index) => {
-    if (space) {
-      spaces[spaceIdsFailed[index]] = space;
-      delete spaceIdsFailed[index];
-    }
+  spaceIdsFailed.forEach(spaceIdFailed => {
+    loadSpace(spaceIdFailed).then(space => {
+      if (space) spaces[spaceIdFailed] = space;
+    });
   });
   return;
 });
