@@ -7,9 +7,9 @@ console.log('GitHub spaces', Object.keys(spaces).length);
 
 export const spaceIdsFailed: string[] = [];
 
-// loadSpaces().then(ensSpaces => {
-//   console.log('ENS spaces', Object.keys(ensSpaces).length);
-// });
+loadSpaces().then(ensSpaces => {
+  console.log('ENS spaces', Object.keys(ensSpaces).length);
+});
 
 setInterval(() => {
   getActiveProposals().then((result: any) =>
