@@ -3,6 +3,8 @@ import { verifyMessage } from '@ethersproject/wallet';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import * as ethUtil from 'ethereumjs-util';
 import { isValidSignature } from './eip1271';
+import { spaces } from './spaces';
+import { getSpaceUri } from './ens';
 
 export function jsonParse(input, fallback?) {
   try {
@@ -104,4 +106,17 @@ export function formatMessage(message) {
       relayerIpfsHash: metadata.relayer_ipfs_hash
     }
   ];
+}
+
+export async function isSpaceAdmin(spaceName, address) {
+  if (
+    spaces[spaceName].admins &&
+    spaces[spaceName].admins
+      .map(admin => admin.toLowerCase())
+      .includes(address.toLowerCase())
+  ) {
+    return true;
+  }
+  const spaceUri = await getSpaceUri(spaceName);
+  return spaceUri.includes(address);
 }
