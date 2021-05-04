@@ -4,9 +4,12 @@ import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 
+const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
+console.log('Connection limit', connectionLimit);
+
 // @ts-ignore
 const config = parse(process.env.DATABASE_URL);
-config.connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '75');
+config.connectionLimit = connectionLimit;
 config.multipleStatements = true;
 config.database = config.path[0];
 config.host = config.hosts[0].name;
