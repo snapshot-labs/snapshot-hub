@@ -1,7 +1,7 @@
 global['fetch'] = require('node-fetch');
 import express from 'express';
 import { getAddress } from '@ethersproject/address';
-import { spaceIdsFailed, spaces } from './helpers/spaces';
+import { spaces } from './helpers/spaces';
 import db from './helpers/mysql';
 import relayer from './helpers/relayer';
 import { pinJson } from './helpers/ipfs';
@@ -27,16 +27,6 @@ router.get('/', (req, res) => {
     tag: 'alpha',
     relayer: relayer.address
   });
-});
-
-router.get('/spaces/poke', async (req, res) => {
-  res.json(spaceIdsFailed);
-  spaceIdsFailed.forEach(spaceIdFailed => {
-    loadSpace(spaceIdFailed).then(space => {
-      if (space) spaces[spaceIdFailed] = space;
-    });
-  });
-  return;
 });
 
 router.get('/spaces/:key?', (req, res) => {
