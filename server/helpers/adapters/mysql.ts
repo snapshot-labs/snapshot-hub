@@ -98,7 +98,7 @@ export async function storeSettings(space, body) {
 export async function getActiveProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
-    SELECT space, COUNT(id) AS count FROM proposals
+    SELECT space, COUNT(id) AS count FROM view_proposals
     WHERE timestamp > ? AND space != '' AND start < ? AND end > ?
     GROUP BY space
   `;

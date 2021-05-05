@@ -38,6 +38,31 @@ CREATE TABLE spaces (
   INDEX is_self (updated_at)
 );
 
+CREATE VIEW view_proposals AS
+SELECT
+	id,
+	address AS author,
+	timestamp,
+	space,
+	payload->>'$.name' AS name,
+	payload->>'$.body' AS body,
+	payload->>'$.choices' AS choices,
+	payload->>'$.start' AS start,
+	payload->>'$.end' AS end,
+	payload->>'$.snapshot' AS snapshot
+FROM messages
+WHERE type = "proposal" AND space IS NOT NULL
+
+CREATE VIEW view_votes AS
+SELECT
+	address AS voter,
+	timestamp,
+	space,
+	payload->>'$.choice' AS choice,
+	payload->>'$.proposal' AS proposal
+FROM messages
+WHERE type = "vote" AND space IS NOT NULL
+
 INSERT INTO spaces (id, created_at, updated_at) VALUES
   ('bonustrack.eth', 1605387647, 1605955059),
   ('samuv.eth', 1610006388, 1610377573);

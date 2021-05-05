@@ -62,7 +62,7 @@ export const rootValue = {
       params.push(skip, first);
 
       const query = `
-        SELECT * FROM proposals
+        SELECT * FROM view_proposals
         WHERE timestamp > ? AND space IN (?) ${queryStr}
         ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
       `;
