@@ -1,8 +1,9 @@
+import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import fleek from '@fleekhq/fleek-storage-js';
 import db from '../mysql';
 import { getSpace } from '../ens';
-import { spaceIdsFailed } from '../spaces';
+import { spaceIdsFailed, spaces } from '../spaces';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
   const ts = (Date.now() / 1e3).toFixed();
@@ -51,6 +52,36 @@ export async function storeProposal(
       })
     }
   ]);
+
+  const spaceSettings = spaces[space];
+  const author = getAddress(body.address);
+  const created = parseInt(msg.timestamp);
+  const metadata = msg.payload.metadata || {};
+  const strategies = JSON.stringify(
+    metadata.strategies || spaceSettings.strategies
+  );
+  const plugins = JSON.stringify(metadata.plugins || {});
+  const network = metadata.network || spaceSettings.network;
+  const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
+
+  const params = {
+    id: authorIpfsHash,
+    author,
+    created,
+    space,
+    network,
+    strategies,
+    plugins,
+    title: msg.payload.name,
+    body: msg.payload.body,
+    choices: JSON.stringify(msg.payload.choices),
+    start: parseInt(msg.payload.start || '0'),
+    end: parseInt(msg.payload.end || '0'),
+    snapshot: proposalSnapshot || 0
+  };
+
+  await db.queryAsync('INSERT IGNORE INTO proposals SET ?', params);
+  console.log('Store proposal complete', space, authorIpfsHash);
 }
 
 export async function archiveProposal(authorIpfsHash) {
