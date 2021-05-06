@@ -8,7 +8,7 @@
     "express": "vue-cli-service express:watch",
     "express:run": "vue-cli-service express:run",
     "start": "vue-cli-service express:run",
-    "invalid-proposals": "ts-node invalidPropsals.ts > debug.log"
+    "invalid-proposals": "ts-node invalidProposals.ts > debug.log"
   },
   "dependencies": {
     "@ensdomains/ensjs": "^2.0.0",
