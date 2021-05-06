@@ -1,9 +1,9 @@
+import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import fleek from '@fleekhq/fleek-storage-js';
 import db from '../mysql';
 import { getSpace } from '../ens';
 import { spaceIdsFailed, spaces } from '../spaces';
-import { getAddress } from "@ethersproject/address";
 
 export async function addOrUpdateSpace(space: string, settings: any) {
   const ts = (Date.now() / 1e3).toFixed();
