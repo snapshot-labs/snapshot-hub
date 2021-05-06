@@ -28,6 +28,29 @@ CREATE TABLE hubs (
   INDEX is_self (is_self)
 );
 
+CREATE TABLE proposals (
+  id VARCHAR(64) NOT NULL,
+  author VARCHAR(64) NOT NULL,
+  created INT(11) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  network VARCHAR(12) NOT NULL,
+  strategies JSON NOT NULL,
+  plugins JSON NOT NULL,
+  title TEXT NOT NULL,
+  body MEDIUMTEXT NOT NULL,
+  choices JSON NOT NULL,
+  start INT(11) NOT NULL,
+  end INT(11) NOT NULL,
+  snapshot INT(24) NOT NULL,
+  PRIMARY KEY (id),
+  INDEX author (author),
+  INDEX created (created),
+  INDEX network (network),
+  INDEX space (space),
+  INDEX start (start),
+  INDEX end (end)
+);
+
 CREATE TABLE spaces (
   id VARCHAR(64) NOT NULL,
   settings JSON,
