@@ -29,8 +29,20 @@ const init = async () => {
 
 const removeInvalidProposals = async spaceName => {
   try {
-    const proposalsInSpace = await getProposalsInSpace(spaceName);
-    console.log(`Total ${proposalsInSpace.length} Proposals found`);
+    const invalidProposalsInSpace: any =
+      spaces[spaceName].filters && spaces[spaceName].filters.invalids
+        ? spaces[spaceName].filters.invalids
+        : [];
+
+    const proposalsInSpace = (await getProposalsInSpace(spaceName)).filter(
+      proposal => !invalidProposalsInSpace.includes(proposal.id)
+    );
+    console.log(`Total ${proposalsInSpace.length} non-invalid proposals found`);
+    invalidProposalsInSpace.forEach(proposalID => {
+      console.log(
+        `${proposalID} - invalid from space settings - marked as invalid`
+      );
+    });
 
     const allScoresInSpace = await getScoresForSpace(
       spaceName,
@@ -38,7 +50,6 @@ const removeInvalidProposals = async spaceName => {
     );
 
     if (allScoresInSpace) {
-      const invalidProposalsInSpace: any = [];
       proposalsInSpace.forEach(async proposal => {
         proposal.payload = jsonParse(proposal.payload);
         proposal.score = allScoresInSpace[proposal.id];
@@ -65,8 +76,8 @@ const verifyProposal = proposal => {
   const members = space.members
     ? space.members.map(address => address.toLowerCase())
     : [];
-    
-    const isMember = members.includes(proposal.address.toLowerCase());
+
+  const isMember = members.includes(proposal.address.toLowerCase());
   if (space.filters && space.filters.onlyMembers && !isMember) {
     result.invalid = true;
     result.reason = 'not by member';
