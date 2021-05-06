@@ -36,7 +36,7 @@ export const rootValue = {
       if (spaces.length === 0) spaces = spaceKeys as any;
 
       let queryStr = '';
-      const params: any[] = [1618473607, spaces];
+      const params: any[] = [spaces];
 
       if (id) {
         queryStr += `AND id = ? `;
@@ -63,7 +63,7 @@ export const rootValue = {
 
       const query = `
         SELECT * FROM view_proposals
-        WHERE timestamp > ? AND space IN (?) ${queryStr}
+        WHERE space IN (?) ${queryStr}
         ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
       `;
       const proposals = await db.queryAsync(query, params);
