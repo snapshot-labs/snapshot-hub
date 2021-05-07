@@ -6,6 +6,7 @@ import { getSpace } from '../ens';
 import { spaceIdsFailed, spaces } from '../spaces';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
+  if (!settings || !settings.name) return false;
   const ts = (Date.now() / 1e3).toFixed();
   const query =
     'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?';
