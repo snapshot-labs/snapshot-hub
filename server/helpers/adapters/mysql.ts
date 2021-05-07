@@ -29,17 +29,12 @@ export async function loadSpace(id) {
   return space;
 }
 
-export async function storeProposal(
-  space,
-  body,
-  authorIpfsHash,
-  relayerIpfsHash
-) {
+export async function storeProposal(space, body, id, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
-      id: authorIpfsHash,
+      id,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -65,7 +60,7 @@ export async function storeProposal(
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
 
   const params = {
-    id: authorIpfsHash,
+    id,
     author,
     created,
     space,
@@ -81,12 +76,15 @@ export async function storeProposal(
   };
 
   await db.queryAsync('INSERT IGNORE INTO proposals SET ?', params);
-  console.log('Store proposal complete', space, authorIpfsHash);
+  console.log('Store proposal complete', space, id);
 }
 
-export async function archiveProposal(authorIpfsHash) {
+export async function archiveProposal(id) {
   const query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
-  await db.queryAsync(query, ['archive-proposal', authorIpfsHash]);
+  await db.queryAsync(query, ['archive-proposal', id]);
+
+  await db.queryAsync('DELETE FROM proposals WHERE id = ? LIMIT 1', [id]);
+  console.log('Delete proposal complete', id);
 }
 
 export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
