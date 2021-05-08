@@ -6,7 +6,7 @@ import { spaces as registrySpaces } from '../helpers/spaces';
 import db from '../helpers/mysql';
 import { clone, jsonParse } from '../helpers/utils';
 import { getProfiles } from '../helpers/profile';
-import { formatProposal } from './helpers';
+import { formatProposal, formatSpace } from './helpers';
 
 const schemaFile = path.join(__dirname, './schema.gql');
 const typeDefs = fs.readFileSync(schemaFile, 'utf8');
@@ -98,6 +98,50 @@ export const rootValue = {
       });
     },
 
+    space: async (parent, { id }) => {
+      const query = `
+        SELECT * FROM spaces
+        WHERE id = ? AND spaces.settings IS NOT NULL
+        LIMIT 1
+      `;
+      try {
+        const spaces = await db.queryAsync(query, [id]);
+        return (
+          spaces.map(space => formatSpace(space.id, space.settings))[0] || null
+        );
+      } catch (e) {
+        console.log(e);
+        return Promise.reject('request failed');
+      }
+    },
+
+    spaces: async (parent, args) => {
+      const params: any[] = [];
+
+      let orderBy = args.orderBy || 'created_at';
+      let orderDirection = args.orderDirection || 'desc';
+      if (!['created_at', 'updated_at', 'id'].includes(orderBy))
+        orderBy = 'created_at';
+      orderDirection = orderDirection.toUpperCase();
+      if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
+      const { first = 20, skip = 0 } = args;
+      params.push(skip, first);
+
+      const query = `
+        SELECT * FROM spaces
+        WHERE settings IS NOT NULL
+        ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+      `;
+      try {
+        const spaces = await db.queryAsync(query, params);
+        return spaces.map(space => formatSpace(space.id, space.settings));
+      } catch (e) {
+        console.log(e);
+        return Promise.reject('request failed');
+      }
+    },
+
     proposal: async (parent, { id }) => {
       const query = `
         SELECT p.*, spaces.settings FROM proposals p
@@ -107,7 +151,7 @@ export const rootValue = {
       `;
       try {
         const proposals = await db.queryAsync(query, [id]);
-        return proposals.map(proposal => formatProposal(proposal))[0] || [];
+        return proposals.map(proposal => formatProposal(proposal))[0] || null;
       } catch (e) {
         console.log(e);
         return Promise.reject('request failed');

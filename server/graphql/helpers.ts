@@ -7,6 +7,10 @@ export function formatSpace(id, settings) {
   space.about = space.about || '';
   space.admins = space.admins || [];
   space.members = space.members || [];
+  space.plugins = space.plugins || {};
+  space.filters = space.filters || {};
+  space.filters.minScore = space.filters.minScore || 0;
+  space.filters.onlyMembers = space.filters.onlyMembers || false;
   return space;
 }
 
