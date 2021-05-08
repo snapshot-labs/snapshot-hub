@@ -32,6 +32,7 @@ export const rootValue = {
 
       const spaceKeys: string[] = Object.keys(registrySpaces);
       spaces = spaces.filter(space => spaceKeys.includes(space));
+      if (spaces.length === 0) spaces = spaceKeys as any;
 
       let queryStr = '';
       const params: any[] = [spaces];
