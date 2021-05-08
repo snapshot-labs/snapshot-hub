@@ -1,3 +1,5 @@
+scalar Object
+
 type Space {
   id: String!
   name: String!
@@ -20,7 +22,7 @@ type Profile {
   image: String
 }
 
-type Proposal {
+type TimelineProposal {
   id: String!
   author: User!
   timestamp: Int!
@@ -34,11 +36,6 @@ type Proposal {
   snapshot: String!
 }
 
-enum OrderDirection {
-  asc
-  desc
-}
-
 type Query {
   timeline(
     first: Int
@@ -48,5 +45,52 @@ type Query {
     state: String
     orderBy: String
     orderDirection: OrderDirection
+  ): [TimelineProposal]
+
+  proposal(
+    id: String
+  ): Proposal
+
+  proposals(
+    first: Int
+    skip: Int
+    where: ProposalWhere,
+    orderBy: String
+    orderDirection: OrderDirection
   ): [Proposal]
+}
+
+type Proposal {
+  id: String!
+  author: String!
+  created: Int!
+  space: Space
+  network: String!
+  strategies: [Strategy]!
+  plugins: Object!
+  title: String!
+  body: String
+  choices: [String]!
+  start: Int!
+  end: Int!
+  snapshot: String
+  state: String
+}
+
+type Strategy {
+  name: String!
+  params: Object
+}
+
+input ProposalWhere {
+  id: String
+  id_in: [String]
+  space: String
+  space_in: [String]
+  state: String
+}
+
+enum OrderDirection {
+  asc
+  desc
 }

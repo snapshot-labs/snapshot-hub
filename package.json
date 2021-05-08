@@ -20,7 +20,6 @@
     "@ethersproject/wallet": "^5.0.1",
     "@fleekhq/fleek-storage-js": "^1.0.11",
     "@pinata/sdk": "^1.1.11",
-    "@snapshot-labs/snapshot-spaces": "github:snapshot-labs/snapshot-spaces#master",
     "@snapshot-labs/snapshot.js": "github:snapshot-labs/snapshot.js#master",
     "@vue/cli-plugin-babel": "^4.4.0",
     "@vue/cli-plugin-eslint": "^4.4.0",
