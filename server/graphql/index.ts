@@ -113,10 +113,8 @@ export const rootValue = {
       }
     },
 
-    proposals: async (parent, args, context, info) => {
-      const requestedFields = graphqlFields(info);
-      console.log(JSON.stringify(requestedFields));
-
+    proposals: async (parent, args) => {
+      // const requestedFields = graphqlFields(info);
       const { where = {} } = args;
       const ts = parseInt((Date.now() / 1e3).toFixed());
       let queryStr = '';

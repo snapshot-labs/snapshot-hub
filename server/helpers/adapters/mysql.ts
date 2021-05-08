@@ -11,7 +11,12 @@ export async function addOrUpdateSpace(space: string, settings: any) {
   const query =
     'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?';
   await db.queryAsync(query, [
-    { id: space, created_at: ts, updated_at: ts },
+    {
+      id: space,
+      created_at: ts,
+      updated_at: ts,
+      settings: JSON.stringify(settings)
+    },
     ts,
     JSON.stringify(settings)
   ]);
