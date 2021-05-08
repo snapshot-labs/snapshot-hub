@@ -1,4 +1,71 @@
 export default `
+query Space {
+  space(
+      id: "yam.eth"
+  ) {
+    id
+    name
+    private
+    about
+    terms
+    location
+    website
+    twitter
+    github
+    email
+    network
+    symbol
+    skin
+    domain
+    strategies {
+      name
+      params
+    }
+    admin
+    members
+    filters {
+      minScore
+      onlyMembers
+    }
+    plugins
+  }
+}
+
+query Spaces {
+  spaces(
+    first: 20,
+    skip: 0,
+    orderBy: "created",
+    orderDirection: desc
+  ) {
+    id
+    name
+    private
+    about
+    terms
+    location
+    website
+    twitter
+    github
+    email
+    network
+    symbol
+    skin
+    domain
+    strategies {
+      name
+      params
+    }
+    admin
+    members
+    filters {
+      minScore
+      onlyMembers
+    }
+    plugins
+  }
+}
+
 query Proposals {
   proposals(
     first: 20,

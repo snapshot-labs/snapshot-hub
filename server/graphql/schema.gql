@@ -1,40 +1,7 @@
 scalar Object
 
-type Space {
-  id: String!
-  name: String!
-  network: String!
-  private: Boolean
-  members: [String]
-  about: String
-  twitter: String
-  github: String
-}
 
-type User {
-  address: String!
-  profile: Profile
-}
-
-type Profile {
-  ens: String
-  name: String
-  image: String
-}
-
-type TimelineProposal {
-  id: String!
-  author: User!
-  timestamp: Int!
-  space: Space!
-  name: String!
-  body: String!
-  state: String!
-  start: Int!
-  end: Int!
-  choices: [String]!
-  snapshot: String!
-}
+# Queries
 
 type Query {
   timeline(
@@ -47,6 +14,17 @@ type Query {
     orderDirection: OrderDirection
   ): [TimelineProposal]
 
+  space(
+    id: String
+  ): Space
+
+  spaces(
+    first: Int
+    skip: Int
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Space]
+
   proposal(
     id: String
   ): Proposal
@@ -58,6 +36,49 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Proposal]
+}
+
+input ProposalWhere {
+  id: String
+  id_in: [String]
+  space: String
+  space_in: [String]
+  state: String
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+
+# Types
+
+type Space {
+  id: String!
+  name: String
+  private: Boolean
+  about: String
+  terms: String
+  location: String
+  website: String
+  twitter: String
+  github: String
+  email: String
+  network: String
+  symbol: String
+  skin: String
+  domain: String
+  strategies: [Strategy]
+  admin: [String]
+  members: [String]
+  filters: SpaceFilters
+  plugins: Object
+}
+
+type SpaceFilters {
+  minScore: Float
+  onlyMembers: Boolean
 }
 
 type Proposal {
@@ -82,15 +103,30 @@ type Strategy {
   params: Object
 }
 
-input ProposalWhere {
-  id: String
-  id_in: [String]
-  space: String
-  space_in: [String]
-  state: String
+
+# Legacy types
+
+type User {
+  address: String!
+  profile: Profile
 }
 
-enum OrderDirection {
-  asc
-  desc
+type Profile {
+  ens: String
+  name: String
+  image: String
+}
+
+type TimelineProposal {
+  id: String!
+  author: User!
+  timestamp: Int!
+  space: Space!
+  name: String!
+  body: String!
+  state: String!
+  start: Int!
+  end: Int!
+  choices: [String]!
+  snapshot: String!
 }
