@@ -133,11 +133,11 @@ export async function storeSettings(space, body) {
 export async function getActiveProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
-    SELECT space, COUNT(id) AS count FROM view_proposals
-    WHERE timestamp > ? AND space != '' AND start < ? AND end > ?
+    SELECT space, COUNT(id) AS count FROM proposals
+    WHERE start < ? AND end > ?
     GROUP BY space
   `;
-  return await db.queryAsync(query, [1618473607, ts, ts]);
+  return await db.queryAsync(query, [ts, ts]);
 }
 
 export async function loadSpaces() {

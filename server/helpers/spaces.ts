@@ -12,7 +12,7 @@ setInterval(() => {
         spaces[count.space]._activeProposals = count.count;
     })
   );
-}, 30e3);
+}, 20e3);
 
 setTimeout(() => {
   console.log('Load spaces from db');
