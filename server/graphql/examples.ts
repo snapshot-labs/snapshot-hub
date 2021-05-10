@@ -1,36 +1,4 @@
 export default `
-query Space {
-  space(
-      id: "yam.eth"
-  ) {
-    id
-    name
-    private
-    about
-    terms
-    location
-    website
-    twitter
-    github
-    email
-    network
-    symbol
-    skin
-    domain
-    strategies {
-      name
-      params
-    }
-    admin
-    members
-    filters {
-      minScore
-      onlyMembers
-    }
-    plugins
-  }
-}
-
 query Spaces {
   spaces(
     first: 20,
@@ -40,18 +8,9 @@ query Spaces {
   ) {
     id
     name
-    private
     about
-    terms
-    location
-    website
-    twitter
-    github
-    email
     network
     symbol
-    skin
-    domain
     strategies {
       name
       params
@@ -89,28 +48,6 @@ query Proposals {
     space {
       id
       name
-      members
-    }
-  }
-}
-
-query Proposal {
-  proposal(
-    id: "QmbVAj4AKrPfWxPrJY8KtN7RNE4gEkzmMW7zvu8iZcdZC9"
-  ) {
-    id
-    title
-    body
-    choices
-    start
-    end
-    snapshot
-    state
-    author
-    space {
-      id
-      name
-      members
     }
   }
 }
