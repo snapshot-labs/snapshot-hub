@@ -29,7 +29,7 @@ export async function pinJson(key: string, body) {
 
   fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`)
     .then(res => res.json())
-    .then(json => console.log('Arweave success', json))
+    // .then(json => console.log('Arweave success', json))
     .catch(e => console.error('Arweave error', e));
 
   return ipfsHash;
