@@ -4,10 +4,9 @@
   "repository": "snapshot-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
-    "lint": "vue-cli-service lint ./server/**/*.ts",
-    "express": "vue-cli-service express:watch",
-    "express:run": "vue-cli-service express:run",
-    "start": "vue-cli-service express:run"
+    "lint": "eslint . --ext .ts --fix",
+    "express": "nodemon index.ts",
+    "start": "ts-node index.ts"
   },
   "dependencies": {
     "@ensdomains/ensjs": "^2.0.1",
@@ -21,10 +20,6 @@
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pinata/sdk": "^1.1.14",
     "@snapshot-labs/snapshot.js": "github:snapshot-labs/snapshot.js#master",
-    "@vue/cli-plugin-babel": "^4.4.0",
-    "@vue/cli-plugin-eslint": "^4.4.0",
-    "@vue/cli-plugin-typescript": "^4.4.0",
-    "@vue/cli-service": "^4.5.13",
     "@walletconnect/utils": "^1.3.1",
     "ajv-formats": "^2.0.2",
     "bluebird": "^3.7.2",
@@ -37,6 +32,7 @@
     "eth-ens-namehash": "^2.0.8",
     "ethereumjs-util": "^7.0.6",
     "ethers": "^5.0.17",
+    "express": "^4.17.1",
     "express-graphql": "^0.12.0",
     "express-rate-limit": "^5.2.6",
     "graphql": "^15.5.0",
@@ -45,20 +41,21 @@
     "lodash": "^4.17.20",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
-    "typescript": "~3.9.3",
-    "vue-cli-plugin-express": "^1.0.2"
+    "typescript": "~3.9.3"
   },
   "devDependencies": {
     "@types/node": "^14.0.13",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
-    "@vue/cli-plugin-router": "^4.4.0",
-    "@vue/cli-plugin-vuex": "^4.4.0",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-vue": "^6.2.2",
+    "nodemon": "^2.0.7",
     "prettier": "^1.19.1",
-    "vue-template-compiler": "^2.6.11"
+    "ts-node": "^9.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
