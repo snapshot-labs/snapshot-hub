@@ -1,19 +1,8 @@
 scalar Object
 
-
 # Queries
 
 type Query {
-  timeline(
-    first: Int
-    skip: Int
-    id: String
-    spaces: [String]
-    state: String
-    orderBy: String
-    orderDirection: OrderDirection
-  ): [TimelineProposal]
-
   space(
     id: String
   ): Space
@@ -50,7 +39,6 @@ enum OrderDirection {
   asc
   desc
 }
-
 
 # Types
 
@@ -101,32 +89,4 @@ type Proposal {
 type Strategy {
   name: String!
   params: Object
-}
-
-
-# Legacy types
-
-type User {
-  address: String!
-  profile: Profile
-}
-
-type Profile {
-  ens: String
-  name: String
-  image: String
-}
-
-type TimelineProposal {
-  id: String!
-  author: User!
-  timestamp: Int!
-  space: Space!
-  name: String!
-  body: String!
-  state: String!
-  start: Int!
-  end: Int!
-  choices: [String]!
-  snapshot: String!
 }

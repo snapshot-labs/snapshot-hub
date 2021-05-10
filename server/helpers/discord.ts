@@ -1,7 +1,7 @@
 import Discord from 'discord.js';
 
-const token = process.env.DISCORD_TOKEN;
-const channel = '814466963047841792';
+const token = process.env.DISCORD_TOKEN || '';
+const channel = process.env.DISCORD_CHANNEL || '814466963047841792';
 let lastMessage;
 const client: any = new Discord.Client();
 let speaker;
@@ -18,9 +18,10 @@ client.on('message', msg => {
   }
 });
 
-client.login(token);
+if (token) client.login(token);
 
 export const sendMessage = message => {
+  if (!token) return;
   try {
     if (speaker) return speaker.send(message);
     console.log(`Missing bot message: ${message}`);
