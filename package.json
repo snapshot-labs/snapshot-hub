@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
-    "express": "nodemon index.ts",
+    "dev": "nodemon index.ts",
     "start": "ts-node index.ts"
   },
   "dependencies": {
