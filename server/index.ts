@@ -14,6 +14,7 @@ import {
 } from './helpers/utils';
 import { addOrUpdateSpace, loadSpace } from './helpers/adapters/mysql';
 import writer from './writer';
+import gossip from './helpers/gossip';
 import pkg from '../package.json';
 
 const router = express.Router();
@@ -149,6 +150,8 @@ router.post('/message', async (req, res) => {
   } catch (e) {
     return sendError(res, e);
   }
+
+  gossip(body, msg.space);
 
   const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
     address: body.address,

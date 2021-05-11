@@ -23,9 +23,11 @@ CREATE TABLE hubs (
   address VARCHAR(64),
   is_self INT DEFAULT 0,
   is_active INT DEFAULT 1,
+  scope TEXT NOT NULL,
   PRIMARY KEY (host),
   INDEX address (address),
-  INDEX is_self (is_self)
+  INDEX is_self (is_self),
+  INDEX is_active (is_active)
 );
 
 CREATE TABLE proposals (
