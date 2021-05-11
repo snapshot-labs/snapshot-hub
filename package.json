@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
-    "dev": "nodemon index.ts",
-    "start": "ts-node index.ts"
+    "start": "nodemon index.ts"
   },
   "dependencies": {
     "@ensdomains/ensjs": "^2.0.1",
