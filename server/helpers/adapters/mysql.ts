@@ -1,15 +1,22 @@
+import { getAddress } from '@ethersproject/address';
 import snapshot from '@snapshot-labs/snapshot.js';
 import fleek from '@fleekhq/fleek-storage-js';
 import db from '../mysql';
 import { getSpace } from '../ens';
-import { spaceIdsFailed } from '../spaces';
+import { spaceIdsFailed, spaces } from '../spaces';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
+  if (!settings || !settings.name) return false;
   const ts = (Date.now() / 1e3).toFixed();
   const query =
     'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?';
   await db.queryAsync(query, [
-    { id: space, created_at: ts, updated_at: ts },
+    {
+      id: space,
+      created_at: ts,
+      updated_at: ts,
+      settings: JSON.stringify(settings)
+    },
     ts,
     JSON.stringify(settings)
   ]);
@@ -28,17 +35,12 @@ export async function loadSpace(id) {
   return space;
 }
 
-export async function storeProposal(
-  space,
-  body,
-  authorIpfsHash,
-  relayerIpfsHash
-) {
+export async function storeProposal(space, body, id, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
-      id: authorIpfsHash,
+      id,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -51,11 +53,44 @@ export async function storeProposal(
       })
     }
   ]);
+
+  const spaceSettings = spaces[space];
+  const author = getAddress(body.address);
+  const created = parseInt(msg.timestamp);
+  const metadata = msg.payload.metadata || {};
+  const strategies = JSON.stringify(
+    metadata.strategies || spaceSettings.strategies
+  );
+  const plugins = JSON.stringify(metadata.plugins || {});
+  const network = metadata.network || spaceSettings.network;
+  const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
+
+  const params = {
+    id,
+    author,
+    created,
+    space,
+    network,
+    strategies,
+    plugins,
+    title: msg.payload.name,
+    body: msg.payload.body,
+    choices: JSON.stringify(msg.payload.choices),
+    start: parseInt(msg.payload.start || '0'),
+    end: parseInt(msg.payload.end || '0'),
+    snapshot: proposalSnapshot || 0
+  };
+
+  await db.queryAsync('INSERT IGNORE INTO proposals SET ?', params);
+  console.log('Store proposal complete', space, id);
 }
 
-export async function archiveProposal(authorIpfsHash) {
+export async function archiveProposal(id) {
   const query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
-  await db.queryAsync(query, ['archive-proposal', authorIpfsHash]);
+  await db.queryAsync(query, ['archive-proposal', id]);
+
+  await db.queryAsync('DELETE FROM proposals WHERE id = ? LIMIT 1', [id]);
+  console.log('Delete proposal complete', id);
 }
 
 export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
@@ -98,11 +133,11 @@ export async function storeSettings(space, body) {
 export async function getActiveProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
-    SELECT space, COUNT(id) AS count FROM view_proposals
-    WHERE timestamp > ? AND space != '' AND start < ? AND end > ?
+    SELECT space, COUNT(id) AS count FROM proposals
+    WHERE start < ? AND end > ?
     GROUP BY space
   `;
-  return await db.queryAsync(query, [1618473607, ts, ts]);
+  return await db.queryAsync(query, [ts, ts]);
 }
 
 export async function loadSpaces() {

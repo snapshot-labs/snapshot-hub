@@ -28,6 +28,29 @@ CREATE TABLE hubs (
   INDEX is_self (is_self)
 );
 
+CREATE TABLE proposals (
+  id VARCHAR(64) NOT NULL,
+  author VARCHAR(64) NOT NULL,
+  created INT(11) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  network VARCHAR(12) NOT NULL,
+  strategies JSON NOT NULL,
+  plugins JSON NOT NULL,
+  title TEXT NOT NULL,
+  body MEDIUMTEXT NOT NULL,
+  choices JSON NOT NULL,
+  start INT(11) NOT NULL,
+  end INT(11) NOT NULL,
+  snapshot INT(24) NOT NULL,
+  PRIMARY KEY (id),
+  INDEX author (author),
+  INDEX created (created),
+  INDEX network (network),
+  INDEX space (space),
+  INDEX start (start),
+  INDEX end (end)
+);
+
 CREATE TABLE spaces (
   id VARCHAR(64) NOT NULL,
   settings JSON,
@@ -37,32 +60,3 @@ CREATE TABLE spaces (
   INDEX address (created_at),
   INDEX is_self (updated_at)
 );
-
-CREATE VIEW view_proposals AS
-SELECT
-	id,
-	address AS author,
-	timestamp,
-	space,
-	payload->>'$.name' AS name,
-	payload->>'$.body' AS body,
-	payload->>'$.choices' AS choices,
-	payload->>'$.start' AS start,
-	payload->>'$.end' AS end,
-	payload->>'$.snapshot' AS snapshot
-FROM messages
-WHERE type = "proposal" AND space IS NOT NULL
-
-CREATE VIEW view_votes AS
-SELECT
-	address AS voter,
-	timestamp,
-	space,
-	payload->>'$.choice' AS choice,
-	payload->>'$.proposal' AS proposal
-FROM messages
-WHERE type = "vote" AND space IS NOT NULL
-
-INSERT INTO spaces (id, created_at, updated_at) VALUES
-  ('bonustrack.eth', 1605387647, 1605955059),
-  ('samuv.eth', 1610006388, 1610377573);

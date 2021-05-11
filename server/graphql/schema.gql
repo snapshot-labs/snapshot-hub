@@ -1,37 +1,38 @@
-type Space {
-  id: String!
-  name: String!
-  network: String!
-  private: Boolean
-  members: [String]
-  about: String
-  twitter: String
-  github: String
+scalar Object
+
+# Queries
+
+type Query {
+  space(
+    id: String
+  ): Space
+
+  spaces(
+    first: Int
+    skip: Int
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Space]
+
+  proposal(
+    id: String
+  ): Proposal
+
+  proposals(
+    first: Int
+    skip: Int
+    where: ProposalWhere,
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Proposal]
 }
 
-type User {
-  address: String!
-  profile: Profile
-}
-
-type Profile {
-  ens: String
-  name: String
-  image: String
-}
-
-type Proposal {
-  id: String!
-  author: User!
-  timestamp: Int!
-  space: Space!
-  name: String!
-  body: String!
-  state: String!
-  start: Int!
-  end: Int!
-  choices: [String]!
-  snapshot: String!
+input ProposalWhere {
+  id: String
+  id_in: [String]
+  space: String
+  space_in: [String]
+  state: String
 }
 
 enum OrderDirection {
@@ -39,14 +40,53 @@ enum OrderDirection {
   desc
 }
 
-type Query {
-  timeline(
-    first: Int
-    skip: Int
-    id: String
-    spaces: [String]
-    state: String
-    orderBy: String
-    orderDirection: OrderDirection
-  ): [Proposal]
+# Types
+
+type Space {
+  id: String!
+  name: String
+  private: Boolean
+  about: String
+  terms: String
+  location: String
+  website: String
+  twitter: String
+  github: String
+  email: String
+  network: String
+  symbol: String
+  skin: String
+  domain: String
+  strategies: [Strategy]
+  admin: [String]
+  members: [String]
+  filters: SpaceFilters
+  plugins: Object
+}
+
+type SpaceFilters {
+  minScore: Float
+  onlyMembers: Boolean
+}
+
+type Proposal {
+  id: String!
+  author: String!
+  created: Int!
+  space: Space
+  network: String!
+  strategies: [Strategy]!
+  plugins: Object!
+  title: String!
+  body: String
+  choices: [String]!
+  start: Int!
+  end: Int!
+  snapshot: String
+  state: String
+}
+
+type Strategy {
+  name: String!
+  params: Object
 }
