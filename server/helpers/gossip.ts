@@ -6,7 +6,7 @@ let hubs = [];
 export default async function gossip(body, space) {
   hubs
     .filter(
-      (hub: any) => hub.scope === '' || hub.scope.slice(',').include(space)
+      (hub: any) => hub.scope === '' || hub.scope.slice(',').includes(space)
     )
     .forEach((hub: any) => {
       fetch(`https://${hub.host}/api/message`, {
