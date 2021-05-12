@@ -1,17 +1,21 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
+    es6: true
   },
+  plugins: [
+    'prettier',
+    '@typescript-eslint'
+  ],
   extends: [
-    'plugin:vue/essential',
     'eslint:recommended',
-    '@vue/typescript/recommended',
-    '@vue/prettier',
-    '@vue/prettier/@typescript-eslint'
+    'plugin:@typescript-eslint/recommended'
   ],
   parserOptions: {
-    ecmaVersion: 2020
+    'parser': 'babel-eslint',
+    'ecmaVersion': 2020,
+    'sourceType': 'module'
   },
   rules: {
     'no-console': 'off',
@@ -19,6 +23,11 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
-    '@typescript-eslint/no-undef': 'off'
+    '@typescript-eslint/no-undef': 'off',
+    'prettier/prettier': 'error',
+    '@typescript-eslint/explicit-function-return-type': 'off'
+  },
+  globals: {
+    'fetch': false
   }
 };
