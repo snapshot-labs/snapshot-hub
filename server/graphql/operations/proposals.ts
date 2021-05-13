@@ -3,34 +3,23 @@ import { formatProposal } from '../helpers';
 
 export default async function(parent, args) {
   const { where = {} } = args;
-  const ts = parseInt((Date.now() / 1e3).toFixed());
   let queryStr = '';
   const params: any[] = [];
 
-  const space = where.space || null;
-  if (space) {
-    queryStr += `AND p.space = ? `;
-    params.push(space);
-  }
+  const fields = ['id', 'space', 'author', 'network'];
+  fields.forEach(field => {
+    if (where[field]) {
+      queryStr += `AND p.${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      queryStr += `AND p.${field} IN (?) `;
+      params.push(fieldIn);
+    }
+  });
 
-  const spaceIn = where.space_in || [];
-  if (spaceIn.length > 0) {
-    queryStr += `AND p.space IN (?) `;
-    params.push(spaceIn);
-  }
-
-  const id = where.id || null;
-  if (id) {
-    queryStr += `AND p.id = ? `;
-    params.push(id);
-  }
-
-  const idIn = where.id_in || [];
-  if (idIn.length > 0) {
-    queryStr += `AND p.id IN (?)`;
-    params.push(idIn);
-  }
-
+  const ts = parseInt((Date.now() / 1e3).toFixed());
   const state = where.state || null;
   if (state === 'pending') {
     queryStr += 'AND p.start > ? ';

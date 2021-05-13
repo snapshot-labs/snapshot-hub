@@ -6,41 +6,18 @@ export default async function(parent, args) {
   let queryStr = '';
   const params: any[] = [];
 
-  const space = where.space || null;
-  if (space) {
-    queryStr += `AND v.space = ? `;
-    params.push(space);
-  }
-
-  const spaceIn = where.space_in || [];
-  if (spaceIn.length > 0) {
-    queryStr += `AND v.space IN (?) `;
-    params.push(spaceIn);
-  }
-
-  const id = where.id || null;
-  if (id) {
-    queryStr += `AND v.id = ? `;
-    params.push(id);
-  }
-
-  const idIn = where.id_in || [];
-  if (idIn.length > 0) {
-    queryStr += `AND v.id IN (?)`;
-    params.push(idIn);
-  }
-
-  const proposal = where.proposal || null;
-  if (proposal) {
-    queryStr += `AND v.proposal = ? `;
-    params.push(proposal);
-  }
-
-  const proposalIn = where.proposal_in || [];
-  if (proposalIn.length > 0) {
-    queryStr += `AND v.proposal IN (?)`;
-    params.push(proposalIn);
-  }
+  const fields = ['id', 'space', 'voter', 'proposal'];
+  fields.forEach(field => {
+    if (where[field]) {
+      queryStr += `AND v.${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      queryStr += `AND v.${field} IN (?) `;
+      params.push(fieldIn);
+    }
+  });
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -55,7 +32,10 @@ export default async function(parent, args) {
   const query = `
     SELECT v.*, spaces.settings FROM votes v
     INNER JOIN spaces ON spaces.id = v.space
-    WHERE spaces.settings IS NOT NULL ${queryStr}
+    LEFT OUTER JOIN votes v2 ON
+      v.voter = v2.voter AND v.proposal = v2.proposal
+      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
+    WHERE v2.voter IS NULL AND spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
