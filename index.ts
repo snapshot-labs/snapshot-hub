@@ -39,5 +39,5 @@ app.get('/*', (req, res) => res.redirect('/api'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
-  console.log(`⚡⚡ Snapshot hub is running: http://localhost:${PORT}`)
+  console.log(`Snapshot hub started on: http://localhost:${PORT}`)
 );
