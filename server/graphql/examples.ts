@@ -51,4 +51,22 @@ query Proposals {
     }
   }
 }
+
+query Votes {
+  votes (
+    first: 1000
+    where: {
+      proposal: "QmPvbwguLfcVryzBRrbY4Pb9bCtxURagdv1XjhtFLf3wHj"
+    }
+  ) {
+    id
+    voter
+    created
+    proposal
+    choice
+    space {
+      id
+    }
+  }
+}
 `;
