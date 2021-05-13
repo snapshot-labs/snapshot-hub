@@ -1,4 +1,4 @@
-scalar Object
+scalar Any
 
 # Queries
 
@@ -25,6 +25,18 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Proposal]
+
+  vote(
+    id: String
+  ): Vote
+
+  votes(
+    first: Int
+    skip: Int
+    where: VoteWhere,
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Vote]
 }
 
 input ProposalWhere {
@@ -33,6 +45,15 @@ input ProposalWhere {
   space: String
   space_in: [String]
   state: String
+}
+
+input VoteWhere {
+  id: String
+  id_in: [String]
+  space: String
+  space_in: [String]
+  proposal: String
+  proposal_in: [String]
 }
 
 enum OrderDirection {
@@ -61,7 +82,7 @@ type Space {
   admin: [String]
   members: [String]
   filters: SpaceFilters
-  plugins: Object
+  plugins: Any
 }
 
 type SpaceFilters {
@@ -76,7 +97,7 @@ type Proposal {
   space: Space
   network: String!
   strategies: [Strategy]!
-  plugins: Object!
+  plugins: Any!
   title: String!
   body: String
   choices: [String]!
@@ -88,5 +109,15 @@ type Proposal {
 
 type Strategy {
   name: String!
-  params: Object
+  params: Any
+}
+
+type Vote {
+  id: String!
+  voter: String!
+  created: Int!
+  space: Space!
+  proposal: String
+  choice: Any!
+  metadata: Any
 }
