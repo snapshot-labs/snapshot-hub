@@ -1,3 +1,15 @@
+CREATE TABLE hubs (
+  host VARCHAR(64) NOT NULL,
+  address VARCHAR(64),
+  is_self INT DEFAULT 0,
+  is_active INT DEFAULT 1,
+  scope TEXT NOT NULL,
+  PRIMARY KEY (host),
+  INDEX address (address),
+  INDEX is_self (is_self),
+  INDEX is_active (is_active)
+);
+
 CREATE TABLE messages (
   id VARCHAR(64) NOT NULL,
   address VARCHAR(64) NOT NULL,
@@ -18,16 +30,14 @@ CREATE TABLE messages (
   INDEX type (type)
 );
 
-CREATE TABLE hubs (
-  host VARCHAR(64) NOT NULL,
-  address VARCHAR(64),
-  is_self INT DEFAULT 0,
-  is_active INT DEFAULT 1,
-  scope TEXT NOT NULL,
-  PRIMARY KEY (host),
-  INDEX address (address),
-  INDEX is_self (is_self),
-  INDEX is_active (is_active)
+CREATE TABLE spaces (
+  id VARCHAR(64) NOT NULL,
+  settings JSON,
+  created_at BIGINT NOT NULL,
+  updated_at BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  INDEX address (created_at),
+  INDEX is_self (updated_at)
 );
 
 CREATE TABLE proposals (
@@ -53,12 +63,17 @@ CREATE TABLE proposals (
   INDEX end (end)
 );
 
-CREATE TABLE spaces (
+CREATE TABLE votes (
   id VARCHAR(64) NOT NULL,
-  settings JSON,
-  created_at BIGINT NOT NULL,
-  updated_at BIGINT NOT NULL,
+  voter VARCHAR(64) NOT NULL,
+  created INT(11) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  proposal VARCHAR(64) NOT NULL,
+  choice JSON NOT NULL,
+  metadata JSON NOT NULL,
   PRIMARY KEY (id),
-  INDEX address (created_at),
-  INDEX is_self (updated_at)
+  INDEX voter (voter),
+  INDEX created (created),
+  INDEX space (space),
+  INDEX proposal (proposal)
 );
