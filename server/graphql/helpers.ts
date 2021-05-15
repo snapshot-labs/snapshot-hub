@@ -26,3 +26,10 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace(proposal.space, proposal.settings);
   return proposal;
 }
+
+export function formatVote(vote) {
+  vote.choice = jsonParse(vote.choice);
+  vote.metadata = jsonParse(vote.metadata, {});
+  vote.space = formatSpace(vote.space, vote.settings);
+  return vote;
+}

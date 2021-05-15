@@ -54,6 +54,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
     }
   ]);
 
+  /* Store the proposal in dedicated table 'proposals' */
   const spaceSettings = spaces[space];
   const author = getAddress(body.address);
   const created = parseInt(msg.timestamp);
@@ -93,12 +94,12 @@ export async function archiveProposal(id) {
   console.log('Delete proposal complete', id);
 }
 
-export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
+export async function storeVote(space, body, id, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   const query = 'INSERT IGNORE INTO messages SET ?;';
   await db.queryAsync(query, [
     {
-      id: authorIpfsHash,
+      id,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -111,6 +112,20 @@ export async function storeVote(space, body, authorIpfsHash, relayerIpfsHash) {
       })
     }
   ]);
+
+  /* Store the vote in dedicated table 'votes' */
+  const params = {
+    id,
+    voter: getAddress(body.address),
+    created: parseInt(msg.timestamp),
+    space,
+    proposal: msg.payload.proposal,
+    choice: JSON.stringify(msg.payload.choice),
+    metadata: JSON.stringify(msg.payload.metadata || {})
+  };
+
+  await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
+  console.log('Store vote complete', space, id);
 }
 
 export async function storeSettings(space, body) {
