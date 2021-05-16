@@ -42,6 +42,7 @@ export async function verify(body): Promise<any> {
       .reduce((a, b: any) => a + b, 0);
     if (totalScore === 0) return Promise.reject('no voting power');
   } catch (e) {
+    console.log('Failed to check voting power (vote)', msg.space, e);
     return Promise.reject('failed to check voting power');
   }
 }
