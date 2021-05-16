@@ -68,7 +68,12 @@ export async function verify(body): Promise<any> {
       if (totalScore < space.filters.minScore)
         return Promise.reject('below min. score');
     } catch (e) {
-      console.log('Failed to check voting power (proposal)', msg.space, e);
+      console.log(
+        'Failed to check voting power (proposal)',
+        msg.space,
+        body.address,
+        e
+      );
       return Promise.reject('failed to check voting power');
     }
   }

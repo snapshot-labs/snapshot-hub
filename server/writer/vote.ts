@@ -35,14 +35,21 @@ export async function verify(body): Promise<any> {
       space.strategies,
       space.network,
       snapshot.utils.getProvider(space.network),
-      [body.address]
+      [body.address],
+      payload.snapshot
     );
     const totalScore = scores
       .map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0))
       .reduce((a, b: any) => a + b, 0);
     if (totalScore === 0) return Promise.reject('no voting power');
   } catch (e) {
-    console.log('Failed to check voting power (vote)', msg.space, e);
+    console.log(
+      'Failed to check voting power (vote)',
+      msg.space,
+      body.address,
+      payload.snapshot,
+      e
+    );
     return Promise.reject('failed to check voting power');
   }
 }
