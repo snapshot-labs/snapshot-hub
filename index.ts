@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
-app.use(cors());
+app.use(cors({ maxAge: 3600 }));
 app.set('trust proxy', 1);
 app.use(
   rateLimit({
