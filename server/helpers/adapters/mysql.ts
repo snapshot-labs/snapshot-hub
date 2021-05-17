@@ -193,8 +193,8 @@ export async function resolveContent(provider, name) {
   return snapshot.utils.decodeContenthash(contentHash);
 }
 
-export async function getProposal(space, id) {
-  const query = `SELECT * FROM messages WHERE space = ? AND id = ? AND type = 'proposal'`;
-  const proposals = await db.queryAsync(query, [space, id]);
+export async function getProposal(id) {
+  const query = `SELECT * FROM proposals WHERE id = ?`;
+  const proposals = await db.queryAsync(query, [id]);
   return proposals[0];
 }

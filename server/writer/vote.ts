@@ -1,5 +1,4 @@
 import snapshot from '@snapshot-labs/snapshot.js';
-import { spaces } from '../helpers/spaces';
 import { jsonParse } from '../helpers/utils';
 import { getProposal, storeVote } from '../helpers/adapters/mysql';
 
@@ -20,21 +19,19 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('wrong vote metadata');
 
-  const proposal = await getProposal(msg.space, msg.payload.proposal);
+  const proposal = await getProposal(msg.payload.proposal);
   if (!proposal) return Promise.reject('unknown proposal');
 
-  const payload = jsonParse(proposal.payload);
   const msgTs = parseInt(msg.timestamp);
-  if (msgTs > payload.end || payload.start > msgTs)
+  if (msgTs > proposal.end || proposal.start > msgTs)
     return Promise.reject('not in voting window');
 
-  const space = spaces[msg.space];
   try {
     const scores = await snapshot.utils.getScores(
       msg.space,
-      space.strategies,
-      space.network,
-      snapshot.utils.getProvider(space.network),
+      jsonParse(proposal.strategies),
+      proposal.network,
+      snapshot.utils.getProvider(proposal.network),
       [body.address]
     );
     const totalScore = scores

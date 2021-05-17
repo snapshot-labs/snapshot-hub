@@ -4,14 +4,14 @@ import { jsonParse } from '../helpers/utils';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
-  const proposal = await getProposal(msg.space, msg.payload.proposal);
+  const proposal = await getProposal(msg.payload.proposal);
 
   const admins = (spaces[msg.space].admins || []).map(admin =>
     admin.toLowerCase()
   );
   if (
     !admins.includes(body.address.toLowerCase()) &&
-    proposal.address !== body.address
+    proposal.author !== body.address
   )
     return Promise.reject('wrong signer');
 }
