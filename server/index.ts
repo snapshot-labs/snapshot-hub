@@ -58,8 +58,15 @@ router.get('/:space/proposals', async (req, res) => {
 
 router.get('/:space/proposal/:id', async (req, res) => {
   const { space, id } = req.params;
-  const query = `SELECT * FROM messages WHERE type = 'vote' AND space = ? AND JSON_EXTRACT(payload, "$.proposal") = ? ORDER BY timestamp ASC`;
+  console.time('loadVotes');
+  const query = `
+    SELECT id, address, version, timestamp, payload, metadata FROM messages
+    WHERE type = 'vote' AND space = ? AND JSON_EXTRACT(payload, "$.proposal") = ?
+    ORDER BY timestamp ASC
+  `;
   db.queryAsync(query, [space, id]).then(messages => {
+    console.timeEnd('loadVotes');
+    console.log('Total votes', messages.length);
     res.json(
       Object.fromEntries(
         messages.map(message => {
@@ -72,11 +79,8 @@ router.get('/:space/proposal/:id', async (req, res) => {
               msg: {
                 version: message.version,
                 timestamp: message.timestamp.toString(),
-                space: message.space,
-                type: message.type,
                 payload: JSON.parse(message.payload)
               },
-              sig: message.sig,
               authorIpfsHash: message.id,
               relayerIpfsHash: metadata.relayer_ipfs_hash
             }

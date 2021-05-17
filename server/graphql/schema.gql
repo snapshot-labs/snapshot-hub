@@ -85,7 +85,7 @@ type Space {
   skin: String
   domain: String
   strategies: [Strategy]
-  admin: [String]
+  admins: [String]
   members: [String]
   filters: SpaceFilters
   plugins: Any
