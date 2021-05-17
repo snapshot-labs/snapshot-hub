@@ -79,7 +79,6 @@ router.get('/:space/proposal/:id', async (req, res) => {
             {
               address,
               msg: {
-                version: message.version || '0.1.3',
                 timestamp: message.created.toString(),
                 payload: {
                   choice: JSON.parse(message.choice),
