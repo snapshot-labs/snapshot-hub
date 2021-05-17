@@ -58,7 +58,6 @@ router.get('/:space/proposals', async (req, res) => {
 
 router.get('/:space/proposal/:id', async (req, res) => {
   const { space, id } = req.params;
-  console.time('loadVotes');
   const query = `
     SELECT v.* FROM votes v
     LEFT OUTER JOIN votes v2 ON
@@ -68,8 +67,6 @@ router.get('/:space/proposal/:id', async (req, res) => {
     ORDER BY created ASC
   `;
   db.queryAsync(query, [space, id]).then(messages => {
-    console.timeEnd('loadVotes');
-    console.log('Total votes', messages.length);
     res.json(
       Object.fromEntries(
         messages.map(message => {
