@@ -58,31 +58,32 @@ router.get('/:space/proposals', async (req, res) => {
 
 router.get('/:space/proposal/:id', async (req, res) => {
   const { space, id } = req.params;
-  console.time('loadVotes');
   const query = `
-    SELECT id, address, version, timestamp, payload, metadata FROM messages
-    WHERE type = 'vote' AND space = ? AND JSON_EXTRACT(payload, "$.proposal") = ?
-    ORDER BY timestamp ASC
+    SELECT v.* FROM votes v
+    LEFT OUTER JOIN votes v2 ON
+      v.voter = v2.voter AND v.proposal = v2.proposal
+      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
+    WHERE v2.voter IS NULL AND v.space = ? AND v.proposal = ?
+    ORDER BY created ASC
   `;
   db.queryAsync(query, [space, id]).then(messages => {
-    console.timeEnd('loadVotes');
-    console.log('Total votes', messages.length);
     res.json(
       Object.fromEntries(
         messages.map(message => {
-          const metadata = JSON.parse(message.metadata);
-          const address = getAddress(message.address);
+          const address = getAddress(message.voter);
           return [
             address,
             {
               address,
               msg: {
-                version: message.version,
-                timestamp: message.timestamp.toString(),
-                payload: JSON.parse(message.payload)
+                timestamp: message.created.toString(),
+                payload: {
+                  choice: JSON.parse(message.choice),
+                  metadata: JSON.parse(message.metadata),
+                  proposal: message.proposal
+                }
               },
-              authorIpfsHash: message.id,
-              relayerIpfsHash: metadata.relayer_ipfs_hash
+              authorIpfsHash: message.id
             }
           ];
         })

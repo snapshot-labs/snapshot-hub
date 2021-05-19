@@ -15,12 +15,12 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
-app.use(cors({ maxAge: 3600 }));
+app.use(cors({ maxAge: 86400 }));
 app.set('trust proxy', 1);
 app.use(
   rateLimit({
     windowMs: 10 * 1e3,
-    max: 24,
+    max: 32,
     handler: (req, res) => {
       const id = createHash('sha256')
         .update(req.ip)
