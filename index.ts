@@ -20,7 +20,7 @@ app.set('trust proxy', 1);
 app.use(
   rateLimit({
     windowMs: 10 * 1e3,
-    max: 24,
+    max: 32,
     handler: (req, res) => {
       const id = createHash('sha256')
         .update(req.ip)
