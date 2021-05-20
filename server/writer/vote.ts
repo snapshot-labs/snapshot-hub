@@ -19,7 +19,7 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('wrong vote metadata');
 
-  const proposal = await getProposal(msg.payload.proposal);
+  const proposal = await getProposal(msg.space, msg.payload.proposal);
   if (!proposal) return Promise.reject('unknown proposal');
 
   const msgTs = parseInt(msg.timestamp);
