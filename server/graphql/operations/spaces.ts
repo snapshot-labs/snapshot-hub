@@ -2,7 +2,22 @@ import db from '../../helpers/mysql';
 import { formatSpace } from '../helpers';
 
 export default async function(parent, args) {
+  const { where = {} } = args;
+  let queryStr = '';
   const params: any[] = [];
+
+  const fields = ['id'];
+  fields.forEach(field => {
+    if (where[field]) {
+      queryStr += `AND ${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      queryStr += `AND ${field} IN (?) `;
+      params.push(fieldIn);
+    }
+  });
 
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
@@ -16,7 +31,7 @@ export default async function(parent, args) {
 
   const query = `
     SELECT * FROM spaces
-    WHERE settings IS NOT NULL
+    WHERE settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
