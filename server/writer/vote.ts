@@ -6,18 +6,16 @@ import { getProposal, storeVote } from '../helpers/adapters/mysql';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
-  if (
-    Object.keys(msg.payload).length !== 3 ||
-    !msg.payload.proposal ||
-    !msg.payload.choice ||
-    !msg.payload.metadata
-  )
+  const schemaIsValid = snapshot.utils.validateSchema(
+    snapshot.schemas.vote,
+    msg.payload
+  );
+  if (schemaIsValid !== true) {
+    console.log('Wrong vote format', schemaIsValid);
     return Promise.reject('wrong vote format');
+  }
 
-  if (
-    typeof msg.payload.metadata !== 'object' ||
-    JSON.stringify(msg.payload.metadata).length > 1e4
-  )
+  if (JSON.stringify(msg.payload.metadata || {}).length > 1e4)
     return Promise.reject('wrong vote metadata');
 
   const proposal = await getProposal(msg.space, msg.payload.proposal);
