@@ -7,10 +7,14 @@ import { getSpaceUri } from '../helpers/ens';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
-  if (
-    snapshot.utils.validateSchema(snapshot.schemas.space, msg.payload) !== true
-  )
+  const schemaIsValid = snapshot.utils.validateSchema(
+    snapshot.schemas.space,
+    msg.payload
+  );
+  if (schemaIsValid !== true) {
+    console.log('Wrong space format', schemaIsValid);
     return Promise.reject('wrong space format');
+  }
 
   const spaceUri = await getSpaceUri(msg.space);
   if (!spaceUri.includes(body.address)) return Promise.reject('not allowed');
