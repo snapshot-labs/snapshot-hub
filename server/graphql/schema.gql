@@ -108,6 +108,7 @@ type Proposal {
   created: Int!
   space: Space
   network: String!
+  type: String
   strategies: [Strategy]!
   plugins: Any!
   title: String!
