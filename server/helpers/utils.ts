@@ -1,3 +1,4 @@
+import { GraphQLError, Kind } from 'graphql';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { verifyMessage } from '@ethersproject/wallet';
 import { convertUtf8ToHex } from '@walletconnect/utils';
@@ -105,3 +106,34 @@ export function formatMessage(message) {
     }
   ];
 }
+
+export const queryCountLimit = (
+  maxQueryCount: number,
+  maxSelectionCount: number | null = null
+) => validationContext => {
+  const { definitions } = validationContext.getDocument();
+  const queries = definitions.reduce((map, definition) => {
+    if (definition.kind === Kind.OPERATION_DEFINITION) {
+      map[definition.name ? definition.name.value : ''] = definition;
+    }
+    return map;
+  }, {});
+
+  if (Object.keys(queries).length > maxQueryCount) {
+    throw new GraphQLError(
+      `The request exceeds the maximum number of query: ${maxQueryCount}`
+    );
+  }
+
+  for (const name in queries) {
+    if (
+      queries[name].selectionSet.selections.length >
+      (maxSelectionCount || maxQueryCount)
+    ) {
+      throw new GraphQLError(
+        `${name} query exceeds the maximum number of root selections: ${maxQueryCount}`
+      );
+    }
+  }
+  return validationContext;
+};

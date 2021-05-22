@@ -72,6 +72,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
     created,
     space,
     network,
+    type: msg.payload.type || 'single-choice',
     strategies,
     plugins,
     title: msg.payload.name,

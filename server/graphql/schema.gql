@@ -10,6 +10,7 @@ type Query {
   spaces(
     first: Int
     skip: Int
+    where: SpaceWhere,
     orderBy: String
     orderDirection: OrderDirection
   ): [Space]
@@ -37,6 +38,11 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Vote]
+}
+
+input SpaceWhere {
+  id: String
+  id_in: [String]
 }
 
 input ProposalWhere {
@@ -102,6 +108,7 @@ type Proposal {
   created: Int!
   space: Space
   network: String!
+  type: String
   strategies: [Strategy]!
   plugins: Any!
   title: String!

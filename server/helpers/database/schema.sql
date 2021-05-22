@@ -46,6 +46,7 @@ CREATE TABLE proposals (
   created INT(11) NOT NULL,
   space VARCHAR(64) NOT NULL,
   network VARCHAR(12) NOT NULL,
+  type VARCHAR(24) NOT NULL,
   strategies JSON NOT NULL,
   plugins JSON NOT NULL,
   title TEXT NOT NULL,
