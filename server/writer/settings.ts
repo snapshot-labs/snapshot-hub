@@ -17,20 +17,20 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong space format');
   }
 
+  const spaceUri = await getSpaceUri(msg.space);
+  const isOwner = spaceUri.includes(body.address);
   const admins = (spaces[msg.space].admins || []).map(admin =>
     admin.toLowerCase()
   );
   const isAdmin = admins.includes(body.address.toLowerCase());
-  const spaceUri = await getSpaceUri(msg.space);
-  const isOwner = spaceUri.includes(body.address);
-
-  if (!isAdmin && !isOwner) return Promise.reject('not allowed');
-
   const newAdmins = (msg.payload.admins || []).map(admin =>
     admin.toLowerCase()
   );
-  if (!isOwner && isAdmin && !isEqual(admins, newAdmins))
-    return Promise.reject('not allowed to change admins');
+
+  if (!isAdmin && !isOwner) return Promise.reject('not allowed');
+
+  if (!isOwner && !isEqual(admins, newAdmins))
+    return Promise.reject('not allowed change admins');
 }
 
 export async function action(body): Promise<void> {
