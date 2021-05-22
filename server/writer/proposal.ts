@@ -9,38 +9,19 @@ const network = process.env.NETWORK || 'testnet';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
-  if (
-    Object.keys(msg.payload).length !== 7 ||
-    !msg.payload.choices ||
-    msg.payload.choices.length < 2 ||
-    !msg.payload.snapshot ||
-    !msg.payload.metadata
-  )
+  const schemaIsValid = snapshot.utils.validateSchema(
+    snapshot.schemas.proposal,
+    msg.payload
+  );
+  if (schemaIsValid !== true) {
+    console.log('Wrong schema', schemaIsValid);
     return Promise.reject('wrong proposal format');
+  }
 
-  if (
-    !msg.payload.name ||
-    msg.payload.name.length > 256 ||
-    !msg.payload.body ||
-    msg.payload.body.length > 4e4
-  )
-    return Promise.reject('wrong proposal size');
-
-  if (
-    typeof msg.payload.metadata !== 'object' ||
-    JSON.stringify(msg.payload.metadata).length > 8e4
-  )
+  if (JSON.stringify(msg.payload.metadata || {}).length > 8e4)
     return Promise.reject('wrong proposal metadata');
 
-  if (
-    !msg.payload.start ||
-    !msg.payload.end ||
-    typeof msg.payload.start !== 'number' ||
-    typeof msg.payload.end !== 'number' ||
-    msg.payload.start.toString().length !== 10 ||
-    msg.payload.end.toString().length !== 10 ||
-    msg.payload.start >= msg.payload.end
-  )
+  if (msg.payload.start >= msg.payload.end)
     return Promise.reject('wrong proposal period');
 
   const space = spaces[msg.space];
