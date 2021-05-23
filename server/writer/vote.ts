@@ -15,9 +15,6 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong vote format');
   }
 
-  if (JSON.stringify(msg.payload.metadata || {}).length > 1e4)
-    return Promise.reject('wrong vote metadata');
-
   const proposal = await getProposal(msg.space, msg.payload.proposal);
   if (!proposal) return Promise.reject('unknown proposal');
 

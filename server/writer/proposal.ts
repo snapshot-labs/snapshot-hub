@@ -18,12 +18,6 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong proposal format');
   }
 
-  if (JSON.stringify(msg.payload.metadata || {}).length > 8e4)
-    return Promise.reject('wrong proposal metadata');
-
-  if (msg.payload.start >= msg.payload.end)
-    return Promise.reject('wrong proposal period');
-
   const space = spaces[msg.space];
   const members = space.members
     ? space.members.map(address => address.toLowerCase())
