@@ -19,7 +19,7 @@ export async function verify(body): Promise<any> {
 
   const spaceUri = await getSpaceUri(msg.space);
   const isOwner = spaceUri.includes(body.address);
-  const admins = (spaces[msg.space].admins || []).map(admin =>
+  const admins = (spaces[msg.space]?.admins || []).map(admin =>
     admin.toLowerCase()
   );
   const isAdmin = admins.includes(body.address.toLowerCase());
