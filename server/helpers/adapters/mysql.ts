@@ -87,14 +87,6 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
   console.log('Store proposal complete', space, id);
 }
 
-export async function archiveProposal(id) {
-  const query = 'UPDATE messages SET type = ? WHERE id = ? LIMIT 1';
-  await db.queryAsync(query, ['archive-proposal', id]);
-
-  await db.queryAsync('DELETE FROM proposals WHERE id = ? LIMIT 1', [id]);
-  console.log('Delete proposal complete', id);
-}
-
 export async function storeVote(space, body, id, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
   const query = 'INSERT IGNORE INTO messages SET ?;';
