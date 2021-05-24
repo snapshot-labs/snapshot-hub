@@ -35,16 +35,10 @@ export async function verify(body): Promise<any> {
 
 export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
-
   try {
     await storeSettings(msg.space, body);
     spaces[msg.space] = msg.payload;
-    setTimeout(async () => {
-      const space = await loadSpace(msg.space);
-      console.log('Updated space', msg.space, space);
-      if (space) spaces[msg.space] = space;
-    }, 75e3);
   } catch (e) {
-    console.log(e);
+    console.log('Failed to store settings', msg.space, e);
   }
 }
