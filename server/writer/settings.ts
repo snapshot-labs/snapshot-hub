@@ -1,6 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import isEqual from 'lodash/isEqual';
-import { loadSpace, storeSettings } from '../helpers/adapters/mysql';
+import { storeSettings } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
 import { spaces } from '../helpers/spaces';
 import { getSpaceUri } from '../helpers/ens';

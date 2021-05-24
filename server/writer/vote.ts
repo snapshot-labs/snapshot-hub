@@ -23,6 +23,13 @@ export async function verify(body): Promise<any> {
   if (msgTs > payload.end || payload.start > msgTs)
     return Promise.reject('not in voting window');
 
+  if (
+    payload.type &&
+    payload.type === 'approval' &&
+    !Array.isArray(msg.payload.choice)
+  )
+    return Promise.reject('invalid choice');
+
   const space = spaces[msg.space];
   try {
     const scores = await snapshot.utils.getScores(
