@@ -80,6 +80,7 @@ type Space {
   name: String
   private: Boolean
   about: String
+  avatar: String
   terms: String
   location: String
   website: String
