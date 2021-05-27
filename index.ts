@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
 import express from 'express';
 import api from './server';
+import upload from './server/upload';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
 import { queryCountLimit, sendError } from './server/helpers/utils';
@@ -31,6 +32,7 @@ app.use(
   })
 );
 app.use('/api', api);
+app.use('/api', upload);
 app.use(
   '/graphql',
   graphqlHTTP({
