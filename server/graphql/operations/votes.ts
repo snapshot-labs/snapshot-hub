@@ -3,8 +3,7 @@ import db from '../../helpers/mysql';
 import { formatProposal, formatVote } from '../helpers';
 
 export default async function(parent, args, context, info) {
-  const requestedFields = Object.keys(graphqlFields(info));
-
+  const requestedFields = graphqlFields(info);
   const { where = {} } = args;
   let queryStr = '';
   const params: any[] = [];
@@ -51,7 +50,7 @@ export default async function(parent, args, context, info) {
     return Promise.reject('request failed');
   }
 
-  if (requestedFields.includes('proposal')) {
+  if (requestedFields.proposal) {
     const proposalIds = votes.map(vote => vote.proposal);
     const query = `
       SELECT p.*, spaces.settings FROM proposals p
