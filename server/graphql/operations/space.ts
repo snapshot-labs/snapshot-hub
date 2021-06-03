@@ -1,10 +1,7 @@
-import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
 import { formatSpace } from '../helpers';
 
-export default async function(parent, { id }, context, info) {
-  const requestedFields = graphqlFields(info);
-  console.log(requestedFields);
+export default async function(parent, { id }) {
   const query = `
     SELECT * FROM spaces
     WHERE id = ? AND spaces.settings IS NOT NULL
