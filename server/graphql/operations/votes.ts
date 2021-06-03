@@ -50,7 +50,7 @@ export default async function(parent, args, context, info) {
     return Promise.reject('request failed');
   }
 
-  if (requestedFields.proposal) {
+  if (requestedFields.proposal && votes.length > 0) {
     const proposalIds = votes.map(vote => vote.proposal);
     const query = `
       SELECT p.*, spaces.settings FROM proposals p
