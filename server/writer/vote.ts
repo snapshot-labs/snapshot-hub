@@ -23,12 +23,13 @@ export async function verify(body): Promise<any> {
   if (msgTs > payload.end || payload.start > msgTs)
     return Promise.reject('not in voting window');
 
-  if (
-    payload.type &&
-    payload.type === 'approval' &&
-    !Array.isArray(msg.payload.choice)
-  )
-    return Promise.reject('invalid choice');
+  if (payload.type) {
+    if (payload.type === 'approval' && !Array.isArray(msg.payload.choice))
+      return Promise.reject('invalid choice');
+
+    if (payload.type === 'quadratic' && typeof msg.payload.choice !== 'object')
+      return Promise.reject('invalid choice');
+  }
 
   const space = spaces[msg.space];
   try {
