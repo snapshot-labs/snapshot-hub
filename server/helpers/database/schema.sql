@@ -78,3 +78,13 @@ CREATE TABLE votes (
   INDEX space (space),
   INDEX proposal (proposal)
 );
+
+CREATE TABLE events (
+  id VARCHAR(64) NOT NULL,
+  event VARCHAR(64) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  expire INT(11) NOT NULL,
+  PRIMARY KEY (id, event),
+  INDEX space (space),
+  INDEX expire (expire)
+);
