@@ -37,8 +37,7 @@ export async function loadSpace(id) {
 
 export async function storeProposal(space, body, id, relayerIpfsHash) {
   const msg = JSON.parse(body.msg);
-  const query = 'INSERT IGNORE INTO messages SET ?;';
-  await db.queryAsync(query, [
+  await db.queryAsync('INSERT IGNORE INTO messages SET ?', [
     {
       id,
       address: body.address,
@@ -66,7 +65,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
   const network = metadata.network || spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
 
-  const params = {
+  const proposal = {
     id,
     author,
     created,
@@ -82,8 +81,42 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
     end: parseInt(msg.payload.end || '0'),
     snapshot: proposalSnapshot || 0
   };
+  let query = 'INSERT IGNORE INTO proposals SET ?; ';
+  const params: any[] = [proposal];
 
-  await db.queryAsync('INSERT IGNORE INTO proposals SET ?', params);
+  /* Store events in database */
+  const event = {
+    id: `proposal/${id}`,
+    space
+  };
+  const ts = Date.now() / 1e3;
+
+  query += 'INSERT IGNORE INTO events SET ?; ';
+  params.push({
+    event: 'proposal/created',
+    expire: proposal.created,
+    ...event
+  });
+
+  if (proposal.start > ts) {
+    query += 'INSERT IGNORE INTO events SET ?; ';
+    params.push({
+      event: 'proposal/start',
+      expire: proposal.start,
+      ...event
+    });
+  }
+
+  if (proposal.end > ts) {
+    query += 'INSERT IGNORE INTO events SET ?; ';
+    params.push({
+      event: 'proposal/end',
+      expire: proposal.end,
+      ...event
+    });
+  }
+
+  await db.queryAsync(query, params);
   console.log('Store proposal complete', space, id);
 }
 

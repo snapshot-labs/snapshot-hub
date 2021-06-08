@@ -20,10 +20,28 @@ export async function verify(body): Promise<any> {
 export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
   const id = msg.payload.proposal;
+
+  const ts = parseInt((Date.now() / 1e3).toFixed());
+  const event = {
+    id: `proposal/${id}`,
+    space: msg.space,
+    event: 'proposal/deleted',
+    expire: ts
+  };
+
   const query = `
     UPDATE messages SET type = ? WHERE id = ? AND type = 'proposal' LIMIT 1;
     DELETE FROM proposals WHERE id = ? LIMIT 1;
     DELETE FROM votes WHERE proposal = ?;
+    DELETE FROM events WHERE id = ?;
+    INSERT IGNORE INTO events SET ?;
   `;
-  await db.queryAsync(query, ['archive-proposal', id, id, id]);
+  await db.queryAsync(query, [
+    'archive-proposal',
+    id,
+    id,
+    id,
+    `proposal/${id}`,
+    event
+  ]);
 }
