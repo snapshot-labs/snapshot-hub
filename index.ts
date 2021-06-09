@@ -8,6 +8,7 @@ import api from './server';
 import upload from './server/upload';
 import graphqlServer from './server/graphql';
 import { sendError } from './server/helpers/utils';
+import './server/events';
 
 dotenv.config();
 
