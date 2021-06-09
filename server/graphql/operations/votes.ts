@@ -1,25 +1,21 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { formatProposal, formatVote } from '../helpers';
+import { buildWhereQuery, formatProposal, formatVote } from '../helpers';
 
 export default async function(parent, args, context, info) {
   const requestedFields = graphqlFields(info);
   const { where = {} } = args;
-  let queryStr = '';
-  const params: any[] = [];
 
-  const fields = ['id', 'space', 'voter', 'proposal'];
-  fields.forEach(field => {
-    if (where[field]) {
-      queryStr += `AND v.${field} = ? `;
-      params.push(where[field]);
-    }
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      queryStr += `AND v.${field} IN (?) `;
-      params.push(fieldIn);
-    }
-  });
+  const fields = {
+    id: 'string',
+    space: 'string',
+    voter: 'string',
+    proposal: 'string',
+    created: 'number'
+  };
+  const whereQuery = buildWhereQuery(fields, 'v', where);
+  const queryStr = whereQuery.query;
+  const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
