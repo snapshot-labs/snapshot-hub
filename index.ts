@@ -33,20 +33,23 @@ app.use(
 app.use('/api', api);
 app.use('/api', upload);
 
-const PORT = process.env.PORT || 3000;
 const server = new ApolloServer({
   schema,
   rootValue,
-  playground: true,
+  playground: {
+    // @ts-ignore
+    shareEnabled: true
+  },
+  tracing: true,
   validationRules: [queryCountLimit(5, 5)]
 });
-server.start().then(() => {
-  server.applyMiddleware({ app });
-  app.get('/*', (req, res) => res.redirect('/api'));
-  app.listen(PORT, () => {
-    console.log(`Snapshot hub started on: http://localhost:${PORT}`);
-    console.log(
-      `Snapshot graphql api ready at http://localhost:${PORT}${server.graphqlPath}`
-    );
-  });
+server.applyMiddleware({ app });
+
+app.get('/*', (req, res) => res.redirect('/api'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Snapshot hub started on: http://localhost:${PORT}`);
+  console.log(
+    `GraphQL API ready at: http://localhost:${PORT}${server.graphqlPath}`
+  );
 });
