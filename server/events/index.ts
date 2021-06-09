@@ -22,5 +22,3 @@ async function processEvents() {
 setInterval(async () => {
   await processEvents();
 }, delay * 1e3);
-
-processEvents().then(() => console.log('Process events done'));
