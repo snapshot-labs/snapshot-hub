@@ -62,6 +62,24 @@ input ProposalWhere {
   author_in: [String]
   network: String
   network_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+  start: Int
+  start_in: [Int]
+  start_gt: Int
+  start_gte: Int
+  start_lt: Int
+  start_lte: Int
+  end: Int
+  end_in: [Int]
+  end_gt: Int
+  end_gte: Int
+  end_lt: Int
+  end_lte: Int
   state: String
 }
 
@@ -74,6 +92,12 @@ input VoteWhere {
   voter_in: [String]
   proposal: String
   proposal_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
 }
 
 enum OrderDirection {
