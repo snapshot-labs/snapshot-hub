@@ -5,6 +5,7 @@ import pinataSDK from '@pinata/sdk';
 const service = process.env.PINNING_SERVICE || 'pinata';
 
 const pinata = pinataSDK(
+  // @ts-ignore
   process.env.PINATA_API_KEY,
   process.env.PINATA_SECRET_API_KEY
 );

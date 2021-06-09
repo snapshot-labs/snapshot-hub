@@ -1,14 +1,13 @@
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { graphqlHTTP } from 'express-graphql';
+import { ApolloServer } from 'apollo-server-express';
 import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
 import express from 'express';
 import api from './server';
 import upload from './server/upload';
 import { schema, rootValue } from './server/graphql';
-import defaultQuery from './server/graphql/examples';
 import { queryCountLimit, sendError } from './server/helpers/utils';
 
 dotenv.config();
@@ -33,18 +32,21 @@ app.use(
 );
 app.use('/api', api);
 app.use('/api', upload);
-app.use(
-  '/graphql',
-  graphqlHTTP({
-    schema,
-    rootValue,
-    graphiql: { defaultQuery },
-    validationRules: [queryCountLimit(5, 5)]
-  })
-);
-app.get('/*', (req, res) => res.redirect('/api'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`Snapshot hub started on: http://localhost:${PORT}`)
-);
+const server = new ApolloServer({
+  schema,
+  rootValue,
+  playground: true,
+  validationRules: [queryCountLimit(5, 5)]
+});
+server.start().then(() => {
+  server.applyMiddleware({ app });
+  app.get('/*', (req, res) => res.redirect('/api'));
+  app.listen(PORT, () => {
+    console.log(`Snapshot hub started on: http://localhost:${PORT}`);
+    console.log(
+      `Snapshot graphql api ready at http://localhost:${PORT}${server.graphqlPath}`
+    );
+  });
+});
