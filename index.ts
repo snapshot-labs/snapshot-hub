@@ -10,6 +10,7 @@ import upload from './server/upload';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
 import { queryCountLimit, sendError } from './server/helpers/utils';
+import './server/events';
 
 dotenv.config();
 
