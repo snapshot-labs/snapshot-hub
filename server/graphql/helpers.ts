@@ -1,3 +1,4 @@
+import { GraphQLError, Kind } from 'graphql';
 import { jsonParse } from '../helpers/utils';
 
 export function formatSpace(id, settings) {
@@ -75,3 +76,34 @@ export function buildWhereQuery(fields, alias, where) {
   });
   return { query, params };
 }
+
+export const queryCountLimit = (
+  maxQueryCount: number,
+  maxSelectionCount: number | null = null
+) => validationContext => {
+  const { definitions } = validationContext.getDocument();
+  const queries = definitions.reduce((map, definition) => {
+    if (definition.kind === Kind.OPERATION_DEFINITION) {
+      map[definition.name ? definition.name.value : ''] = definition;
+    }
+    return map;
+  }, {});
+
+  if (Object.keys(queries).length > maxQueryCount) {
+    throw new GraphQLError(
+      `The request exceeds the maximum number of query: ${maxQueryCount}`
+    );
+  }
+
+  for (const name in queries) {
+    if (
+      queries[name].selectionSet.selections.length >
+      (maxSelectionCount || maxQueryCount)
+    ) {
+      throw new GraphQLError(
+        `${name} query exceeds the maximum number of root selections: ${maxQueryCount}`
+      );
+    }
+  }
+  return validationContext;
+};

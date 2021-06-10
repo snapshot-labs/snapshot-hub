@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server-express';
 import path from 'path';
 import fs from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
-import { queryCountLimit } from './../helpers/utils';
+import { queryCountLimit } from './../graphql/helpers';
 import Query from './operations';
 
 const schemaFile = path.join(__dirname, './schema.gql');
