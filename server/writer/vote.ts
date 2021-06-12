@@ -25,8 +25,8 @@ export async function verify(body): Promise<any> {
 
   if (payload.type) {
     if (
-      payload.type === 'approval' ||
-      (payload.type === 'ranked-choice' && !Array.isArray(msg.payload.choice))
+      ['approval', 'ranked-choice'].includes(payload.type) &&
+      !Array.isArray(msg.payload.choice)
     )
       return Promise.reject('invalid choice');
 
