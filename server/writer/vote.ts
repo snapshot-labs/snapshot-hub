@@ -21,18 +21,15 @@ export async function verify(body): Promise<any> {
   if (msgTs > proposal.end || proposal.start > msgTs)
     return Promise.reject('not in voting window');
 
-  if (payload.type) {
-    if (
-      ['approval', 'ranked-choice'].includes(payload.type) &&
-      !Array.isArray(msg.payload.choice)
-    )
-      return Promise.reject('invalid choice');
+  if (
+    ['approval', 'ranked-choice'].includes(proposal.type) &&
+    !Array.isArray(msg.payload.choice)
+  )
+    return Promise.reject('invalid choice');
 
-    if (payload.type === 'quadratic' && typeof msg.payload.choice !== 'object')
-      return Promise.reject('invalid choice');
-  }
+  if (proposal.type === 'quadratic' && typeof msg.payload.choice !== 'object')
+    return Promise.reject('invalid choice');
 
-  const space = spaces[msg.space];
   try {
     const scores = await snapshot.utils.getScores(
       msg.space,
