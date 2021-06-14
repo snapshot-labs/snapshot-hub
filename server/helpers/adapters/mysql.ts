@@ -220,7 +220,7 @@ export async function resolveContent(provider, name) {
 }
 
 export async function getProposal(space, id) {
-  const query = `SELECT * FROM messages WHERE space = ? AND id = ? AND type = 'proposal'`;
+  const query = `SELECT * FROM proposals WHERE space = ? AND id = ?`;
   const proposals = await db.queryAsync(query, [space, id]);
   return proposals[0];
 }
