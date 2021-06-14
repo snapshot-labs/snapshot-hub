@@ -12,7 +12,7 @@ export async function verify(body): Promise<any> {
   );
   if (
     !admins.includes(body.address.toLowerCase()) &&
-    proposal.address !== body.address
+    proposal.author !== body.address
   )
     return Promise.reject('wrong signer');
 }

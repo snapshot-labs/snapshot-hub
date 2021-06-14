@@ -1,5 +1,4 @@
 import snapshot from '@snapshot-labs/snapshot.js';
-import { spaces } from '../helpers/spaces';
 import { jsonParse } from '../helpers/utils';
 import { getProposal, storeVote } from '../helpers/adapters/mysql';
 
@@ -18,29 +17,25 @@ export async function verify(body): Promise<any> {
   const proposal = await getProposal(msg.space, msg.payload.proposal);
   if (!proposal) return Promise.reject('unknown proposal');
 
-  const payload = jsonParse(proposal.payload);
   const msgTs = parseInt(msg.timestamp);
-  if (msgTs > payload.end || payload.start > msgTs)
+  if (msgTs > proposal.end || proposal.start > msgTs)
     return Promise.reject('not in voting window');
 
-  if (payload.type) {
-    if (
-      ['approval', 'ranked-choice'].includes(payload.type) &&
-      !Array.isArray(msg.payload.choice)
-    )
-      return Promise.reject('invalid choice');
+  if (
+    ['approval', 'ranked-choice'].includes(proposal.type) &&
+    !Array.isArray(msg.payload.choice)
+  )
+    return Promise.reject('invalid choice');
 
-    if (payload.type === 'quadratic' && typeof msg.payload.choice !== 'object')
-      return Promise.reject('invalid choice');
-  }
+  if (proposal.type === 'quadratic' && typeof msg.payload.choice !== 'object')
+    return Promise.reject('invalid choice');
 
-  const space = spaces[msg.space];
   try {
     const scores = await snapshot.utils.getScores(
       msg.space,
-      space.strategies,
-      space.network,
-      snapshot.utils.getProvider(space.network),
+      jsonParse(proposal.strategies),
+      proposal.network,
+      snapshot.utils.getProvider(proposal.network),
       [body.address]
     );
     const totalScore = scores
