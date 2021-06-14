@@ -5,19 +5,14 @@ import { getProposal, storeVote } from '../helpers/adapters/mysql';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
-  if (
-    Object.keys(msg.payload).length !== 3 ||
-    !msg.payload.proposal ||
-    !msg.payload.choice ||
-    !msg.payload.metadata
-  )
+  const schemaIsValid = snapshot.utils.validateSchema(
+    snapshot.schemas.vote,
+    msg.payload
+  );
+  if (schemaIsValid !== true) {
+    console.log('Wrong vote format', schemaIsValid);
     return Promise.reject('wrong vote format');
-
-  if (
-    typeof msg.payload.metadata !== 'object' ||
-    JSON.stringify(msg.payload.metadata).length > 1e4
-  )
-    return Promise.reject('wrong vote metadata');
+  }
 
   const proposal = await getProposal(msg.space, msg.payload.proposal);
   if (!proposal) return Promise.reject('unknown proposal');
@@ -26,6 +21,18 @@ export async function verify(body): Promise<any> {
   if (msgTs > proposal.end || proposal.start > msgTs)
     return Promise.reject('not in voting window');
 
+  if (payload.type) {
+    if (
+      ['approval', 'ranked-choice'].includes(payload.type) &&
+      !Array.isArray(msg.payload.choice)
+    )
+      return Promise.reject('invalid choice');
+
+    if (payload.type === 'quadratic' && typeof msg.payload.choice !== 'object')
+      return Promise.reject('invalid choice');
+  }
+
+  const space = spaces[msg.space];
   try {
     const scores = await snapshot.utils.getScores(
       msg.space,

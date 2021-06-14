@@ -4,6 +4,9 @@ export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
+  space.avatar =
+    space.avatar ||
+    `https://raw.githubusercontent.com/snapshot-labs/snapshot-spaces/master/spaces/${id}/space.png`;
   space.about = space.about || '';
   space.admins = space.admins || [];
   space.members = space.members || [];
@@ -32,4 +35,43 @@ export function formatVote(vote) {
   vote.metadata = jsonParse(vote.metadata, {});
   vote.space = formatSpace(vote.space, vote.settings);
   return vote;
+}
+
+export function buildWhereQuery(fields, alias, where) {
+  let query: any = '';
+  const params: any[] = [];
+  Object.entries(fields).forEach(([field, type]) => {
+    if (where[field]) {
+      query += `AND ${alias}.${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      query += `AND ${alias}.${field} IN (?) `;
+      params.push(fieldIn);
+    }
+    if (type === 'number') {
+      const fieldGt = where[`${field}_gt`];
+      const fieldGte = where[`${field}_gte`];
+      const fieldLt = where[`${field}_lt`];
+      const fieldLte = where[`${field}_lte`];
+      if (fieldGt) {
+        query += `AND ${alias}.${field} > ? `;
+        params.push(fieldGt);
+      }
+      if (fieldGte) {
+        query += `AND ${alias}.${field} >= ? `;
+        params.push(fieldGte);
+      }
+      if (fieldLt) {
+        query += `AND ${alias}.${field} < ? `;
+        params.push(fieldLt);
+      }
+      if (fieldLte) {
+        query += `AND ${alias}.${field} <= ? `;
+        params.push(fieldLte);
+      }
+    }
+  });
+  return { query, params };
 }

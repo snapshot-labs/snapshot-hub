@@ -6,9 +6,11 @@ import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
 import express from 'express';
 import api from './server';
+import upload from './server/upload';
 import { schema, rootValue } from './server/graphql';
 import defaultQuery from './server/graphql/examples';
-import { sendError } from './server/helpers/utils';
+import { queryCountLimit, sendError } from './server/helpers/utils';
+import './server/events';
 
 dotenv.config();
 
@@ -31,9 +33,15 @@ app.use(
   })
 );
 app.use('/api', api);
+app.use('/api', upload);
 app.use(
   '/graphql',
-  graphqlHTTP({ schema, rootValue, graphiql: { defaultQuery } })
+  graphqlHTTP({
+    schema,
+    rootValue,
+    graphiql: { defaultQuery },
+    validationRules: [queryCountLimit(5, 5)]
+  })
 );
 app.get('/*', (req, res) => res.redirect('/api'));
 

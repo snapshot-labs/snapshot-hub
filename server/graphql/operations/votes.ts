@@ -1,23 +1,21 @@
+import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { formatVote } from '../helpers';
+import { buildWhereQuery, formatProposal, formatVote } from '../helpers';
 
-export default async function(parent, args) {
+export default async function(parent, args, context, info) {
+  const requestedFields = graphqlFields(info);
   const { where = {} } = args;
-  let queryStr = '';
-  const params: any[] = [];
 
-  const fields = ['id', 'space', 'voter', 'proposal'];
-  fields.forEach(field => {
-    if (where[field]) {
-      queryStr += `AND v.${field} = ? `;
-      params.push(where[field]);
-    }
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      queryStr += `AND v.${field} IN (?) `;
-      params.push(fieldIn);
-    }
-  });
+  const fields = {
+    id: 'string',
+    space: 'string',
+    voter: 'string',
+    proposal: 'string',
+    created: 'number'
+  };
+  const whereQuery = buildWhereQuery(fields, 'v', where);
+  const queryStr = whereQuery.query;
+  const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -29,6 +27,8 @@ export default async function(parent, args) {
   const { first = 20, skip = 0 } = args;
   params.push(skip, first);
 
+  let votes: any[] = [];
+
   const query = `
     SELECT v.*, spaces.settings FROM votes v
     INNER JOIN spaces ON spaces.id = v.space
@@ -39,10 +39,34 @@ export default async function(parent, args) {
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
-    const votes = await db.queryAsync(query, params);
-    return votes.map(vote => formatVote(vote));
+    votes = await db.queryAsync(query, params);
+    votes = votes.map(vote => formatVote(vote));
   } catch (e) {
     console.log(e);
     return Promise.reject('request failed');
   }
+
+  if (requestedFields.proposal && votes.length > 0) {
+    const proposalIds = votes.map(vote => vote.proposal);
+    const query = `
+      SELECT p.*, spaces.settings FROM proposals p
+      INNER JOIN spaces ON spaces.id = p.space
+      WHERE spaces.settings IS NOT NULL AND p.id IN (?)
+    `;
+    try {
+      let proposals = await db.queryAsync(query, [proposalIds]);
+      proposals = Object.fromEntries(
+        proposals.map(proposal => [proposal.id, formatProposal(proposal)])
+      );
+      votes = votes.map(vote => {
+        vote.proposal = proposals[vote.proposal];
+        return vote;
+      });
+    } catch (e) {
+      console.log(e);
+      return Promise.reject('request failed');
+    }
+  }
+
+  return votes;
 }

@@ -46,6 +46,7 @@ CREATE TABLE proposals (
   created INT(11) NOT NULL,
   space VARCHAR(64) NOT NULL,
   network VARCHAR(12) NOT NULL,
+  type VARCHAR(24) NOT NULL,
   strategies JSON NOT NULL,
   plugins JSON NOT NULL,
   title TEXT NOT NULL,
@@ -76,4 +77,14 @@ CREATE TABLE votes (
   INDEX created (created),
   INDEX space (space),
   INDEX proposal (proposal)
+);
+
+CREATE TABLE events (
+  id VARCHAR(64) NOT NULL,
+  event VARCHAR(64) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  expire INT(11) NOT NULL,
+  PRIMARY KEY (id, event),
+  INDEX space (space),
+  INDEX expire (expire)
 );

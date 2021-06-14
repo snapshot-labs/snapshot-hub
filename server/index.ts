@@ -123,6 +123,9 @@ router.post('/message', async (req, res) => {
   )
     return sendError(res, 'wrong signed message');
 
+  if (JSON.stringify(body).length > 1e5)
+    return sendError(res, 'too large message');
+
   if (!spaces[msg.space] && msg.type !== 'settings')
     return sendError(res, 'unknown space');
 
@@ -185,7 +188,13 @@ router.post('/message', async (req, res) => {
     `IPFS hash "${authorIpfsRes}"`
   );
 
-  return res.json({ ipfsHash: authorIpfsRes });
+  return res.json({
+    ipfsHash: authorIpfsRes,
+    relayer: {
+      address: relayer.address,
+      receipt: relayerIpfsRes
+    }
+  });
 });
 
 export default router;

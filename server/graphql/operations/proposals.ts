@@ -1,23 +1,21 @@
 import db from '../../helpers/mysql';
-import { formatProposal } from '../helpers';
+import { buildWhereQuery, formatProposal } from '../helpers';
 
 export default async function(parent, args) {
   const { where = {} } = args;
-  let queryStr = '';
-  const params: any[] = [];
 
-  const fields = ['id', 'space', 'author', 'network'];
-  fields.forEach(field => {
-    if (where[field]) {
-      queryStr += `AND p.${field} = ? `;
-      params.push(where[field]);
-    }
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      queryStr += `AND p.${field} IN (?) `;
-      params.push(fieldIn);
-    }
-  });
+  const fields = {
+    id: 'string',
+    space: 'string',
+    author: 'string',
+    network: 'string',
+    created: 'number',
+    start: 'number',
+    end: 'number'
+  };
+  const whereQuery = buildWhereQuery(fields, 'p', where);
+  let queryStr = whereQuery.query;
+  const params: any[] = whereQuery.params;
 
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const state = where.state || null;
