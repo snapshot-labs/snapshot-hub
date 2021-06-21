@@ -36,7 +36,8 @@ export async function verify(body): Promise<any> {
       jsonParse(proposal.strategies),
       proposal.network,
       snapshot.utils.getProvider(proposal.network),
-      [body.address]
+      [body.address],
+      proposal.snapshot
     );
     const totalScore = scores
       .map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0))
@@ -47,6 +48,7 @@ export async function verify(body): Promise<any> {
       'Failed to check voting power (vote)',
       msg.space,
       body.address,
+      proposal.snapshot,
       e
     );
     return Promise.reject('failed to check voting power');
