@@ -12,6 +12,7 @@ const rootValue = { Query };
 const server = new ApolloServer({
   typeDefs,
   resolvers: rootValue,
+  introspection: true,
   playground: {
     // @ts-ignore
     shareEnabled: true,
