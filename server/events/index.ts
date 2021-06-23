@@ -1,6 +1,17 @@
+import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
 
 const delay = 300;
+const to = 'https://snapshot.events/api/event';
+
+async function sendEvent(event) {
+  const res = await fetch(to, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(event)
+  });
+  return res.json();
+}
 
 async function processEvents() {
   const ts = parseInt((Date.now() / 1e3).toFixed()) - delay;
@@ -9,13 +20,16 @@ async function processEvents() {
   ]);
   console.log('Process events', ts, events.length);
   for (const event of events) {
-    // @TODO Send notification
-
-    await db.queryAsync(
-      'DELETE FROM events WHERE id = ? AND event = ? LIMIT 1',
-      [event.id, event.event]
-    );
-    console.log(`Event sent ${event.id} ${event.event}`);
+    try {
+      await sendEvent(event);
+      await db.queryAsync(
+        'DELETE FROM events WHERE id = ? AND event = ? LIMIT 1',
+        [event.id, event.event]
+      );
+      console.log(`Event sent ${event.id} ${event.event}`);
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 
