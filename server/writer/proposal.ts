@@ -22,38 +22,18 @@ export async function verify(body): Promise<any> {
     return Promise.reject('something is wrong here');
 
   const space = spaces[msg.space];
-  const members = space.members
-    ? space.members.map(address => address.toLowerCase())
-    : [];
-  const isMember = members.includes(body.address.toLowerCase());
-
-  if (space.filters && space.filters.onlyMembers && !isMember) {
-    return Promise.reject('not a member');
-  } else if (!isMember && space.filters && space.filters.minScore) {
-    try {
-      const scores = await snapshot.utils.getScores(
-        msg.space,
-        space.strategies,
-        space.network,
-        snapshot.utils.getProvider(space.network),
-        [body.address]
-      );
-      const totalScore: any = scores
-        .map((score: any) =>
-          Object.values(score).reduce((a, b: any) => a + b, 0)
-        )
-        .reduce((a, b: any) => a + b, 0);
-      if (totalScore < space.filters.minScore)
-        return Promise.reject('below min. score');
-    } catch (e) {
-      console.log(
-        'Failed to check voting power (proposal)',
-        msg.space,
-        body.address,
-        e
-      );
-      return Promise.reject('failed to check voting power');
-    }
+  try {
+    const validationName = space.validation?.name || 'basic';
+    const validationParams = space.validation?.params || {};
+    const isValid = await snapshot.utils.validations[validationName](
+      body.address,
+      space,
+      msg.payload,
+      validationParams
+    );
+    if (!isValid) return Promise.reject('validation failed');
+  } catch (e) {
+    return Promise.reject('failed to check validation');
   }
 }
 
