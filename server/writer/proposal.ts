@@ -18,6 +18,9 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong proposal format');
   }
 
+  if (msg.space === 'levidao.eth')
+    return Promise.reject('something is wrong here');
+
   const space = spaces[msg.space];
   const members = space.members
     ? space.members.map(address => address.toLowerCase())
