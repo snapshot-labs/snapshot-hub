@@ -27,7 +27,10 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('invalid choice');
 
-  if (proposal.type === 'quadratic' && typeof msg.payload.choice !== 'object')
+  if (
+    ['weighted', 'quadratic-choice'].includes(proposal.type) &&
+    typeof msg.payload.choice !== 'object'
+  )
     return Promise.reject('invalid choice');
 
   try {
@@ -36,7 +39,8 @@ export async function verify(body): Promise<any> {
       jsonParse(proposal.strategies),
       proposal.network,
       snapshot.utils.getProvider(proposal.network),
-      [body.address]
+      [body.address],
+      proposal.snapshot
     );
     const totalScore = scores
       .map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0))
@@ -47,6 +51,7 @@ export async function verify(body): Promise<any> {
       'Failed to check voting power (vote)',
       msg.space,
       body.address,
+      proposal.snapshot,
       e
     );
     return Promise.reject('failed to check voting power');
