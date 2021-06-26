@@ -3,14 +3,12 @@ global['fetch'] = fetch;
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import { createHash } from 'crypto';
 import express from 'express';
 import api from './routes/api';
 import upload from './routes/upload';
 import legacy from './routes/legacy';
 import graphql from './graphql';
-import { sendError } from './helpers/utils';
+import rateLimit from './helpers/rateLimit';
 import './events';
 
 dotenv.config();
@@ -20,19 +18,7 @@ app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
 app.use(cors({ maxAge: 86400 }));
 app.set('trust proxy', 1);
-app.use(
-  rateLimit({
-    windowMs: 10 * 1e3,
-    max: 64,
-    handler: (req, res) => {
-      const id = createHash('sha256')
-        .update(req.ip)
-        .digest('hex');
-      console.log('Too many requests', id.slice(0, 7));
-      sendError(res, 'too many requests', 429);
-    }
-  })
-);
+app.use(rateLimit);
 app.use('/api', api);
 app.use('/api', upload);
 app.use('/api', legacy);
