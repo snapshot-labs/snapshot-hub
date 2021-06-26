@@ -3,16 +3,14 @@ global['fetch'] = fetch;
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { graphqlHTTP } from 'express-graphql';
 import rateLimit from 'express-rate-limit';
 import { createHash } from 'crypto';
 import express from 'express';
 import api from './routes/api';
 import upload from './routes/upload';
 import legacy from './routes/legacy';
-import { schema, rootValue } from './graphql';
-import defaultQuery from './graphql/examples';
-import { queryCountLimit, sendError } from './helpers/utils';
+import graphql from './graphql';
+import { sendError } from './helpers/utils';
 import './events';
 
 dotenv.config();
@@ -38,18 +36,8 @@ app.use(
 app.use('/api', api);
 app.use('/api', upload);
 app.use('/api', legacy);
-app.use(
-  '/graphql',
-  graphqlHTTP({
-    schema,
-    rootValue,
-    graphiql: { defaultQuery },
-    validationRules: [queryCountLimit(5, 5)]
-  })
-);
+app.use('/graphql', graphql);
 app.get('/*', (req, res) => res.redirect('/api'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`Snapshot hub started on: http://localhost:${PORT}`)
-);
+app.listen(PORT, () => console.log(`Started on: http://localhost:${PORT}`));
