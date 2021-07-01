@@ -38,14 +38,6 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Vote]
-
-  scores(
-    space: String
-    strategies: [Any]!
-    network: String!
-    addresses: [String]!
-    snapshot: Any
-  ): Scores
 }
 
 input SpaceWhere {
@@ -156,10 +148,6 @@ type Proposal {
 type Strategy {
   name: String!
   params: Any
-}
-
-type Scores {
-  scores: [Any]
 }
 
 type Vote {
