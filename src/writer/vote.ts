@@ -22,6 +22,12 @@ export async function verify(body): Promise<any> {
     return Promise.reject('not in voting window');
 
   if (
+    (!proposal.type || proposal.type === 'single-choice') &&
+    typeof msg.payload.choice !== 'number'
+  )
+    return Promise.reject('invalid choice');
+
+  if (
     ['approval', 'ranked-choice'].includes(proposal.type) &&
     !Array.isArray(msg.payload.choice)
   )
