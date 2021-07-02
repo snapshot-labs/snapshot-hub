@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-global['fetch'] = fetch;
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
