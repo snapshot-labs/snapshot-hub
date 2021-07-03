@@ -10,8 +10,6 @@ const NAME = 'snapshot';
 const VERSION = '0.1.4';
 
 export default async function(body) {
-  console.log('Typed data', body);
-
   const schemaIsValid = snapshot.utils.validateSchema(envelop, body);
   if (schemaIsValid !== true) {
     console.log('Wrong envelop format', schemaIsValid);
@@ -26,7 +24,7 @@ export default async function(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
-  // @TODO accept settings message without existing space
+  // @TODO accept "settings" message without existing space
   if (!spaces[message.space]) return Promise.reject('unknown space');
 
   if (message.timestamp > overTs || message.timestamp < underTs)
@@ -36,8 +34,9 @@ export default async function(body) {
     return Promise.reject('wrong domain');
 
   // @TODO check if EIP-712 types is allowed
-  if (!types.Vote) return Promise.reject('wrong types');
-  const type = 'vote';
+  const type = Object.keys(types)[0].toLowerCase();
+  if (!['vote', 'proposal'].includes(type))
+    return Promise.reject('wrong types');
 
   // Check if signature is valid
   const isValid = await snapshot.utils.verify(
@@ -48,7 +47,33 @@ export default async function(body) {
   if (!isValid) return Promise.reject('wrong signature');
   console.log('Signature is valid');
 
-  // @TODO support 'proposal', 'delete-proposal' and 'settings'
+  // @TODO support 'delete-proposal' and 'settings'
+  let payload = {};
+
+  if (type === 'vote')
+    payload = {
+      proposal: message.proposal,
+      choice: message.choice,
+      metadata: JSON.parse(message.metadata)
+    };
+
+  if (type === 'proposal')
+    payload = {
+      name: message.title,
+      body: message.body,
+      choices: message.choices,
+      start: message.start,
+      end: message.end,
+      snapshot: message.snapshot,
+      metadata: {
+        plugins: JSON.parse(message.plugins),
+        network: message.network,
+        strategies: JSON.parse(message.strategies),
+        ...JSON.parse(message.metadata)
+      },
+      type: message.type
+    };
+
   const legacyBody = {
     address: body.address,
     msg: JSON.stringify({
@@ -56,11 +81,7 @@ export default async function(body) {
       timestamp: message.timestamp,
       space: message.space,
       type,
-      payload: {
-        proposal: message.proposal,
-        choice: message.choice,
-        metadata: JSON.parse(message.metadata)
-      }
+      payload
     }),
     sig: body.sig
   };
@@ -74,17 +95,19 @@ export default async function(body) {
   // @TODO gossip to typed data endpoint
   // gossip(body, message.space);
 
-  const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, body);
-  const relayerSig = await relayer.signMessage(authorIpfsRes);
+  const id = await pinJson(`snapshot/${body.sig}`, body);
+
+  // @TODO use EIP712 for relayer message
+  const relayerSig = await relayer.signMessage(id);
   const relayerIpfsRes = await pinJson(`snapshot/${relayerSig}`, {
     address: relayer.address,
-    msg: authorIpfsRes,
+    msg: id,
     sig: relayerSig,
     version: '2'
   });
 
   try {
-    await writer[type].action(legacyBody, authorIpfsRes, relayerIpfsRes);
+    await writer[type].action(legacyBody, id, relayerIpfsRes);
   } catch (e) {
     return Promise.reject(e);
   }
@@ -93,13 +116,11 @@ export default async function(body) {
     `Address "${body.address}"\n`,
     `Space "${message.space}"\n`,
     `Type "${type}"\n`,
-    `IPFS hash "${authorIpfsRes}"`
+    `Id "${id}"`
   );
 
-  console.log('All good!', legacyBody);
-
   return {
-    ipfsHash: authorIpfsRes,
+    id,
     relayer: {
       address: relayer.address,
       receipt: relayerIpfsRes
