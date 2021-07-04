@@ -4,7 +4,7 @@ import { spaces } from '../../helpers/spaces';
 import writer from '../../writer';
 import gossip from '../../helpers/gossip';
 import { pinJson } from '../../helpers/ipfs';
-import relayer from '../../helpers/relayer';
+import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
 
 export default async function(body) {
@@ -63,22 +63,18 @@ export default async function(body) {
 
   gossip(body, msg.space);
 
-  const authorIpfsRes = await pinJson(`snapshot/${body.sig}`, {
-    address: body.address,
-    msg: body.msg,
-    sig: body.sig,
-    version: '2'
-  });
-  const relayerSig = await relayer.signMessage(authorIpfsRes);
-  const relayerIpfsRes = await pinJson(`snapshot/${relayerSig}`, {
-    address: relayer.address,
-    msg: authorIpfsRes,
-    sig: relayerSig,
-    version: '2'
-  });
+  const [id, receipt] = await Promise.all([
+    pinJson(`snapshot/${body.sig}`, {
+      address: body.address,
+      msg: body.msg,
+      sig: body.sig,
+      version: '2'
+    }),
+    issueReceipt(body.sig)
+  ]);
 
   try {
-    await writer[msg.type].action(body, authorIpfsRes, relayerIpfsRes);
+    await writer[msg.type].action(body, id, receipt);
   } catch (e) {
     return Promise.reject(e);
   }
@@ -87,14 +83,14 @@ export default async function(body) {
     `Address "${body.address}"\n`,
     `Space "${msg.space}"\n`,
     `Type "${msg.type}"\n`,
-    `IPFS hash "${authorIpfsRes}"`
+    `IPFS hash "${id}"`
   );
 
   return {
-    ipfsHash: authorIpfsRes,
+    ipfsHash: id,
     relayer: {
       address: relayer.address,
-      receipt: relayerIpfsRes
+      receipt
     }
   };
 }
