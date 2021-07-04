@@ -24,9 +24,6 @@ export default async function(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
-  // @TODO accept "settings" message without existing space
-  if (!spaces[message.space]) return Promise.reject('unknown space');
-
   if (message.timestamp > overTs || message.timestamp < underTs)
     return Promise.reject('wrong timestamp');
 
@@ -34,9 +31,15 @@ export default async function(body) {
     return Promise.reject('wrong domain');
 
   // @TODO check if EIP-712 types is allowed
-  const type = Object.keys(types)[0].toLowerCase();
-  if (!['vote', 'proposal'].includes(type))
+  let type = Object.keys(types)[0].toLowerCase();
+  type = type
+    .replace('cancelproposal', 'delete-proposal')
+    .replace('space', 'settings');
+  if (!['settings', 'proposal', 'delete-proposal', 'vote'].includes(type))
     return Promise.reject('wrong types');
+
+  if (type !== 'settings' && !spaces[message.space])
+    return Promise.reject('unknown space');
 
   // Check if signature is valid
   const isValid = await snapshot.utils.verify(
@@ -47,15 +50,9 @@ export default async function(body) {
   if (!isValid) return Promise.reject('wrong signature');
   console.log('Signature is valid');
 
-  // @TODO support 'delete-proposal' and 'settings'
   let payload = {};
 
-  if (type === 'vote')
-    payload = {
-      proposal: message.proposal,
-      choice: message.choice,
-      metadata: JSON.parse(message.metadata)
-    };
+  if (type === 'settings') payload = JSON.parse(message.settings);
 
   if (type === 'proposal')
     payload = {
@@ -72,6 +69,15 @@ export default async function(body) {
         ...JSON.parse(message.metadata)
       },
       type: message.type
+    };
+
+  if (type === 'delete-proposal') payload = { proposal: message.proposal };
+
+  if (type === 'vote')
+    payload = {
+      proposal: message.proposal,
+      choice: message.choice,
+      metadata: JSON.parse(message.metadata)
     };
 
   const legacyBody = {
