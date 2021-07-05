@@ -6,19 +6,10 @@ import writer from '../../writer';
 // import gossip from '../../helpers/gossip';
 import { pinJson } from '../../helpers/ipfs';
 import { sha256 } from '../../helpers/utils';
+import hashTypes from './types.json';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
-
-const hashTypes = {
-  '42fba4630d7f592485f965a5f6a6e8af42c087348ae36cc642eb00fd1d952cb5':
-    'settings',
-  '4e5611bfc9b6ed686ed0b8f3cfd7950d0c9a783fe8b1e579999787c8036189db':
-    'proposal',
-  '1ccb249afd29797d0fb88854cfc5762e52edb82b539ed108b799cebea7d90103':
-    'delete-proposal',
-  '3c1e6f02885a75e88bc2e5f4e12ee331b094b4685c567774da41e8da1029b596': 'vote'
-};
 
 export default async function(body) {
   const schemaIsValid = snapshot.utils.validateSchema(envelop, body);
@@ -44,7 +35,7 @@ export default async function(body) {
   const hash = sha256(JSON.stringify(types));
   if (!Object.keys(hashTypes).includes(hash))
     return Promise.reject('wrong types');
-  const type = hashTypes[hash];
+  let type = hashTypes[hash];
 
   if (type !== 'settings' && !spaces[message.space])
     return Promise.reject('unknown space');
@@ -81,12 +72,16 @@ export default async function(body) {
 
   if (type === 'delete-proposal') payload = { proposal: message.proposal };
 
-  if (type === 'vote')
+  if (['vote', 'vote-array', 'vote-string'].includes(type)) {
+    let choice = message.choice;
+    if (type === 'vote-string') choice = JSON.parse(message.choice);
     payload = {
       proposal: message.proposal,
-      choice: message.choice,
+      choice,
       metadata: JSON.parse(message.metadata)
     };
+    type = 'vote';
+  }
 
   const legacyBody = {
     address: body.address,
@@ -103,6 +98,7 @@ export default async function(body) {
   try {
     await writer[type].verify(legacyBody);
   } catch (e) {
+    console.log(e);
     return Promise.reject(e);
   }
 
