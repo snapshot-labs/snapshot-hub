@@ -1,21 +1,21 @@
 import snapshot from '@snapshot-labs/snapshot.js';
+import hashTypes from '@snapshot-labs/snapshot.js/src/sign/types.json';
 import relayer, { issueReceipt } from '../../helpers/relayer';
-import envelop from './envelop.json';
+import envelope from './envelope.json';
 import { spaces } from '../../helpers/spaces';
 import writer from '../../writer';
 // import gossip from '../../helpers/gossip';
 import { pinJson } from '../../helpers/ipfs';
 import { sha256 } from '../../helpers/utils';
-import hashTypes from './types.json';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
 
 export default async function(body) {
-  const schemaIsValid = snapshot.utils.validateSchema(envelop, body);
+  const schemaIsValid = snapshot.utils.validateSchema(envelope, body);
   if (schemaIsValid !== true) {
-    console.log('Wrong envelop format', schemaIsValid);
-    return Promise.reject('wrong envelop format');
+    console.log('Wrong envelope format', schemaIsValid);
+    return Promise.reject('wrong envelope format');
   }
 
   const ts = Date.now() / 1e3;
