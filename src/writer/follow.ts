@@ -9,7 +9,8 @@ export async function action(message, id): Promise<void> {
   const params = {
     id,
     follower: getAddress(message.from),
-    space: message.space
+    space: message.space,
+    created: message.timestamp
   };
   await db.queryAsync('INSERT IGNORE INTO follows SET ?', params);
   console.log(`Stored: ${message.from} follow ${message.space}`);
