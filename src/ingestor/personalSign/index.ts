@@ -7,7 +7,7 @@ import { pinJson } from '../../helpers/ipfs';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
 
-export default async function(body) {
+export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
   const overTs = (ts + 300).toFixed();
   const underTs = (ts - 300).toFixed();

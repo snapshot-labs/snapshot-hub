@@ -32,6 +32,9 @@
             "message": {
               "type": "object",
               "properties": {
+                "from": {
+                  "type": "string"
+                },
                 "timestamp": {
                   "type": "number"
                 },
@@ -40,6 +43,7 @@
                 }
               },
               "required": [
+                "from",
                 "timestamp",
                 "space"
               ]

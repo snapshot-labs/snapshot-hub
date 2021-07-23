@@ -11,7 +11,7 @@ import { sha256 } from '../../helpers/utils';
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
 
-export default async function(body) {
+export default async function ingestor(body) {
   const schemaIsValid = snapshot.utils.validateSchema(envelope, body);
   if (schemaIsValid !== true) {
     console.log('Wrong envelope format', schemaIsValid);
@@ -39,6 +39,8 @@ export default async function(body) {
 
   if (type !== 'settings' && !spaces[message.space])
     return Promise.reject('unknown space');
+
+  if (body.address !== message.from) return Promise.reject('wrong from');
 
   // Check if signature is valid
   const isValid = await snapshot.utils.verify(
@@ -83,7 +85,7 @@ export default async function(body) {
     type = 'vote';
   }
 
-  const legacyBody = {
+  let legacyBody = {
     address: body.address,
     msg: JSON.stringify({
       version: domain.version,
@@ -94,6 +96,10 @@ export default async function(body) {
     }),
     sig: body.sig
   };
+
+  if (['follow', 'unfollow'].includes(type)) {
+    legacyBody = message;
+  }
 
   try {
     await writer[type].verify(legacyBody);

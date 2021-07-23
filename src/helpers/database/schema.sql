@@ -88,3 +88,10 @@ CREATE TABLE events (
   INDEX space (space),
   INDEX expire (expire)
 );
+
+CREATE TABLE follows (
+  id VARCHAR(64) NOT NULL,
+  follower VARCHAR(64) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  PRIMARY KEY (follower, space)
+);
