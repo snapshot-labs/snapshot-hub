@@ -2,9 +2,15 @@ import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
 
 const delay = 300;
-const to = 'https://snapshot.events/api/event';
+const interval = 120;
+const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 
-async function sendEvent(event) {
+const subscribers = [
+  'https://snapshot.events/api/event',
+  'https://sgbbedlmia.execute-api.eu-central-1.amazonaws.com/PROD/v1/new'
+];
+
+async function sendEvent(event, to) {
   const res = await fetch(to, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -21,7 +27,13 @@ async function processEvents() {
   console.log('Process events', ts, events.length);
   for (const event of events) {
     try {
-      await sendEvent(event);
+      await Promise.all(
+        subscribers.map(subscriber => sendEvent(event, subscriber))
+      );
+    } catch (e) {
+      console.log('Event failed', e);
+    }
+    try {
       await db.queryAsync(
         'DELETE FROM events WHERE id = ? AND event = ? LIMIT 1',
         [event.id, event.event]
@@ -33,6 +45,8 @@ async function processEvents() {
   }
 }
 
-setInterval(async () => {
-  await processEvents();
-}, delay * 1e3);
+if (serviceEvents) {
+  setInterval(async () => {
+    await processEvents();
+  }, interval * 1e3);
+}
