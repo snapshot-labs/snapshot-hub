@@ -40,6 +40,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
   await db.queryAsync('INSERT IGNORE INTO messages SET ?', [
     {
       id,
+      ipfs: id,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -67,6 +68,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
 
   const proposal = {
     id,
+    ipfs: id,
     author,
     created,
     space,
@@ -126,6 +128,7 @@ export async function storeVote(space, body, id, relayerIpfsHash) {
   await db.queryAsync(query, [
     {
       id,
+      ipfs: id,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -142,6 +145,7 @@ export async function storeVote(space, body, id, relayerIpfsHash) {
   /* Store the vote in dedicated table 'votes' */
   const params = {
     id,
+    ipfs: id,
     voter: getAddress(body.address),
     created: parseInt(msg.timestamp),
     space,

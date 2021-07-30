@@ -8,6 +8,7 @@ export async function verify(): Promise<any> {
 export async function action(message, id): Promise<void> {
   const params = {
     id,
+    ipfs: id,
     follower: getAddress(message.from),
     space: message.space,
     created: message.timestamp
