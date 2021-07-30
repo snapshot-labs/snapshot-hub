@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch';
-import ENS from '@ensdomains/ensjs';
+import { namehash } from '@ethersproject/hash';
 import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 
@@ -21,36 +21,23 @@ export async function uriGet(
   return fetch(url).then(res => res.json());
 }
 
-export async function getSpaceUriFromContentHash(id) {
-  let uri: any = false;
-  const provider = snapshot.utils.getProvider('1');
-  try {
-    const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e';
-    const ens = new ENS({ provider, ensAddress });
-    uri = await ens.name(id).getContent();
-    uri = uri.value;
-  } catch (e) {
-    console.log('getSpaceUriFromContentHash failed', id, e);
-  }
-  return uri;
-}
+export async function getSpaceUri(id) {
+  const abi =
+    'function text(bytes32 node, string calldata key) external view returns (string memory)';
+  const address = '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41';
 
-export async function getSpaceUriFromTextRecord(id) {
   let uri: any = false;
-  const provider = snapshot.utils.getProvider('1');
   try {
-    const ensAddress = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e';
-    const ens = new ENS({ provider, ensAddress });
-    uri = await ens.name(id).getText('snapshot');
+    const hash = namehash(id);
+    const provider = snapshot.utils.getProvider('1');
+    uri = await snapshot.utils.call(
+      provider,
+      [abi],
+      [address, 'text', [hash, 'snapshot']]
+    );
   } catch (e) {
     console.log('getSpaceUriFromTextRecord failed', id, e);
   }
-  return uri;
-}
-
-export async function getSpaceUri(id) {
-  let uri = await getSpaceUriFromTextRecord(id);
-  if (!uri) uri = await getSpaceUriFromContentHash(id);
   return uri;
 }
 
