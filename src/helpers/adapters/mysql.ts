@@ -211,14 +211,6 @@ export async function loadSpaces() {
   return _spaces;
 }
 
-export async function resolveContent(provider, name) {
-  const contentHash = await snapshot.utils.resolveENSContentHash(
-    name,
-    provider
-  );
-  return snapshot.utils.decodeContenthash(contentHash);
-}
-
 export async function getProposal(space, id) {
   const query = `SELECT * FROM proposals WHERE space = ? AND id = ?`;
   const proposals = await db.queryAsync(query, [space, id]);
