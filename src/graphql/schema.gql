@@ -129,6 +129,7 @@ type SpaceFilters {
 
 type Proposal {
   id: String!
+  ipfs: String
   author: String!
   created: Int!
   space: Space
@@ -152,6 +153,7 @@ type Strategy {
 
 type Vote {
   id: String!
+  ipfs: String
   voter: String!
   created: Int!
   space: Space!
