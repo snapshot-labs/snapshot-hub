@@ -19,10 +19,8 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong proposal format');
   }
 
-  if (msg.space === 'levidao.eth')
-    return Promise.reject('something is wrong here');
-
   const space = spaces[msg.space];
+  space.id = msg.space;
   try {
     const validationName = space.validation?.name || 'basic';
     const validationParams = space.validation?.params || {};
