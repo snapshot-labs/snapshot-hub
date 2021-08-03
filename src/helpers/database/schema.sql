@@ -22,6 +22,7 @@ CREATE TABLE messages (
   sig VARCHAR(256) NOT NULL,
   metadata JSON,
   PRIMARY KEY (id),
+  INDEX ipfs (ipfs),
   INDEX address (address),
   INDEX version (version),
   INDEX timestamp (timestamp),
@@ -57,6 +58,7 @@ CREATE TABLE proposals (
   end INT(11) NOT NULL,
   snapshot INT(24) NOT NULL,
   PRIMARY KEY (id),
+  INDEX ipfs (ipfs),
   INDEX author (author),
   INDEX created (created),
   INDEX network (network),
@@ -75,6 +77,7 @@ CREATE TABLE votes (
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
   PRIMARY KEY (id),
+  INDEX ipfs (ipfs),
   INDEX voter (voter),
   INDEX created (created),
   INDEX space (space),
@@ -98,5 +101,6 @@ CREATE TABLE follows (
   space VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
   PRIMARY KEY (follower, space),
+  INDEX ipfs (ipfs),
   INDEX space (created)
 );
