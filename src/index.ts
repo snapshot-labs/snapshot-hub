@@ -4,7 +4,6 @@ import cors from 'cors';
 import express from 'express';
 import api from './routes/api';
 import upload from './routes/upload';
-import legacy from './routes/legacy';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import './events';
@@ -19,7 +18,6 @@ app.set('trust proxy', 1);
 app.use(rateLimit);
 app.use('/api', api);
 app.use('/api', upload);
-app.use('/api', legacy);
 app.use('/graphql', graphql);
 app.get('/*', (req, res) => res.redirect('/api'));
 
