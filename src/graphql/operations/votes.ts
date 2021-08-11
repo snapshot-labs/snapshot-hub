@@ -8,6 +8,7 @@ export default async function(parent, args, context, info) {
 
   const fields = {
     id: 'string',
+    ipfs: 'string',
     space: 'string',
     voter: 'string',
     proposal: 'string',

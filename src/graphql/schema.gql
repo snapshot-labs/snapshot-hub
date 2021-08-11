@@ -38,6 +38,14 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Vote]
+
+  follows(
+    first: Int
+    skip: Int
+    where: FollowWhere,
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Follow]
 }
 
 input SpaceWhere {
@@ -48,6 +56,8 @@ input SpaceWhere {
 input ProposalWhere {
   id: String
   id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
   space: String
   space_in: [String]
   author: String
@@ -78,12 +88,31 @@ input ProposalWhere {
 input VoteWhere {
   id: String
   id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
   space: String
   space_in: [String]
   voter: String
   voter_in: [String]
   proposal: String
   proposal_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
+input FollowWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  follower: String
+  follower_in: [String]
+  space: String
+  space_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -160,4 +189,12 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+}
+
+type Follow {
+  id: String!
+  ipfs: String
+  follower: String!
+  space: Space!
+  created: Int!
 }
