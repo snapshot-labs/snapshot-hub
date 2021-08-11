@@ -104,3 +104,13 @@ CREATE TABLE follows (
   INDEX ipfs (ipfs),
   INDEX space (created)
 );
+
+CREATE TABLE aliases (
+  id VARCHAR(64) NOT NULL,
+  ipfs VARCHAR(64) NOT NULL,
+  address VARCHAR(64) NOT NULL,
+  alias VARCHAR(64) NOT NULL,
+  created INT(11) NOT NULL,
+  PRIMARY KEY (address, alias),
+  INDEX ipfs (ipfs)
+);

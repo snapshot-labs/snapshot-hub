@@ -37,7 +37,10 @@ export default async function ingestor(body) {
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
-  if (type !== 'settings' && !spaces[message.space])
+  if (
+    !['settings', 'alias'].includes(type) &&
+    (!message.space || !spaces[message.space])
+  )
     return Promise.reject('unknown space');
 
   if (body.address !== message.from) return Promise.reject('wrong from');
