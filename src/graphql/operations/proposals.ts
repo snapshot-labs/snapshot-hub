@@ -6,6 +6,7 @@ export default async function(parent, args) {
 
   const fields = {
     id: 'string',
+    ipfs: 'string',
     space: 'string',
     author: 'string',
     network: 'string',

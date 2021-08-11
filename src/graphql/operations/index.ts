@@ -4,6 +4,7 @@ import proposal from './proposal';
 import proposals from './proposals';
 import vote from './vote';
 import votes from './votes';
+import follows from './follows';
 
 export default {
   space,
@@ -11,5 +12,6 @@ export default {
   proposal,
   proposals,
   vote,
-  votes
+  votes,
+  follows
 };

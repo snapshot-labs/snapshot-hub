@@ -37,6 +37,11 @@ export function formatVote(vote) {
   return vote;
 }
 
+export function formatFollow(follow) {
+  follow.space = formatSpace(follow.space, follow.settings);
+  return follow;
+}
+
 export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];

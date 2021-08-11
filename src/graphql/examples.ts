@@ -62,11 +62,21 @@ query Votes {
     id
     voter
     created
-    proposal
     choice
     space {
       id
     }
+  }
+}
+
+query Follows {
+  follows (where: { follower: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7" }) {
+    id
+    follower
+    space {
+      id
+    }
+    created
   }
 }
 `;
