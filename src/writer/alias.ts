@@ -1,8 +1,8 @@
 import { getAddress } from '@ethersproject/address';
 import db from '../helpers/mysql';
 
-export async function verify(): Promise<any> {
-  return true;
+export async function verify(message): Promise<any> {
+  return message.from !== message.alias;
 }
 
 export async function action(message, id): Promise<void> {

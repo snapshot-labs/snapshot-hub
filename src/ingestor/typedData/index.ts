@@ -100,7 +100,7 @@ export default async function ingestor(body) {
     sig: body.sig
   };
 
-  if (['follow', 'unfollow'].includes(type)) {
+  if (['follow', 'unfollow', 'alias'].includes(type)) {
     legacyBody = message;
   }
 
