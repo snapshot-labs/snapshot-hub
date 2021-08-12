@@ -38,7 +38,7 @@ export async function verify(body): Promise<any> {
 
 export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
-  await storeProposal(msg.space, body, id, receipt);
+  await storeProposal(msg.space, body, ipfs, receipt, id);
 
   if (serviceDiscord) {
     const networkStr = network === 'testnet' ? 'demo.' : '';

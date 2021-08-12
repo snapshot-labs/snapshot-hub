@@ -35,12 +35,12 @@ export async function loadSpace(id) {
   return space;
 }
 
-export async function storeProposal(space, body, id, relayerIpfsHash) {
+export async function storeProposal(space, body, ipfs, receipt, id) {
   const msg = JSON.parse(body.msg);
   await db.queryAsync('INSERT IGNORE INTO messages SET ?', [
     {
       id,
-      ipfs: id,
+      ipfs,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -49,7 +49,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
       payload: JSON.stringify(msg.payload),
       sig: body.sig,
       metadata: JSON.stringify({
-        relayer_ipfs_hash: relayerIpfsHash
+        relayer_ipfs_hash: receipt
       })
     }
   ]);
@@ -68,7 +68,7 @@ export async function storeProposal(space, body, id, relayerIpfsHash) {
 
   const proposal = {
     id,
-    ipfs: id,
+    ipfs,
     author,
     created,
     space,
