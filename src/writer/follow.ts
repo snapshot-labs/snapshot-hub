@@ -5,10 +5,10 @@ export async function verify(): Promise<any> {
   return true;
 }
 
-export async function action(message, id): Promise<void> {
+export async function action(message, ipfs, receipt, id): Promise<void> {
   const params = {
     id,
-    ipfs: id,
+    ipfs,
     follower: getAddress(message.from),
     space: message.space,
     created: message.timestamp

@@ -36,19 +36,15 @@ export async function verify(body): Promise<any> {
   }
 }
 
-export async function action(
-  body,
-  authorIpfsHash,
-  relayerIpfsHash
-): Promise<void> {
+export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
-  await storeProposal(msg.space, body, authorIpfsHash, relayerIpfsHash);
+  await storeProposal(msg.space, body, id, receipt);
 
   if (serviceDiscord) {
     const networkStr = network === 'testnet' ? 'demo.' : '';
     let message = `${msg.space} (${network})\n`;
     message += `**${msg.payload.name}**\n`;
-    message += `<https://${networkStr}snapshot.org/#/${msg.space}/proposal/${authorIpfsHash}>`;
+    message += `<https://${networkStr}snapshot.org/#/${msg.space}/proposal/${id}>`;
     sendMessage(message);
   }
 }
