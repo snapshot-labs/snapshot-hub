@@ -19,6 +19,7 @@ app.use(rateLimit);
 app.use('/api', api);
 app.use('/api', upload);
 app.use('/graphql', graphql);
+app.all('/api/*', (req, res) => res.redirect('/api'));
 app.get('/*', (req, res) => res.redirect('/api'));
 
 const PORT = process.env.PORT || 3000;
