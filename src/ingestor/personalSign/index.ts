@@ -63,7 +63,7 @@ export default async function ingestor(body) {
 
   gossip(body, msg.space);
 
-  const [id, receipt] = await Promise.all([
+  const [ipfs, receipt] = await Promise.all([
     pinJson(`snapshot/${body.sig}`, {
       address: body.address,
       msg: body.msg,
@@ -72,9 +72,10 @@ export default async function ingestor(body) {
     }),
     issueReceipt(body.sig)
   ]);
+  const id = ipfs;
 
   try {
-    await writer[msg.type].action(body, id, receipt);
+    await writer[msg.type].action(body, ipfs, receipt, id);
   } catch (e) {
     return Promise.reject(e);
   }
@@ -83,11 +84,13 @@ export default async function ingestor(body) {
     `Address "${body.address}"\n`,
     `Space "${msg.space}"\n`,
     `Type "${msg.type}"\n`,
-    `IPFS hash "${id}"`
+    `Id "${id}"\n`,
+    `IPFS "${ipfs}"`
   );
 
   return {
-    ipfsHash: id,
+    id,
+    ipfsHash: ipfs,
     relayer: {
       address: relayer.address,
       receipt

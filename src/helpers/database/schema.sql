@@ -11,7 +11,7 @@ CREATE TABLE hubs (
 );
 
 CREATE TABLE messages (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   address VARCHAR(64) NOT NULL,
   version VARCHAR(6) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE spaces (
 );
 
 CREATE TABLE proposals (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   author VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
@@ -68,12 +68,12 @@ CREATE TABLE proposals (
 );
 
 CREATE TABLE votes (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   voter VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
   space VARCHAR(64) NOT NULL,
-  proposal VARCHAR(64) NOT NULL,
+  proposal VARCHAR(66) NOT NULL,
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
   PRIMARY KEY (id),
@@ -85,7 +85,7 @@ CREATE TABLE votes (
 );
 
 CREATE TABLE events (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(128) NOT NULL,
   event VARCHAR(64) NOT NULL,
   space VARCHAR(64) NOT NULL,
   expire INT(11) NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE events (
 );
 
 CREATE TABLE follows (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   follower VARCHAR(64) NOT NULL,
   space VARCHAR(64) NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE follows (
 );
 
 CREATE TABLE aliases (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   address VARCHAR(64) NOT NULL,
   alias VARCHAR(64) NOT NULL,

@@ -64,11 +64,7 @@ export async function verify(body): Promise<any> {
   }
 }
 
-export async function action(
-  body,
-  authorIpfsHash,
-  relayerIpfsHash
-): Promise<void> {
+export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
-  await storeVote(msg.space, body, authorIpfsHash, relayerIpfsHash);
+  await storeVote(msg.space, body, ipfs, receipt, id);
 }

@@ -51,6 +51,7 @@ export default async function ingestor(body) {
     body.sig,
     body.data
   );
+  const id = snapshot.utils.getHash(body.data);
   if (!isValid) return Promise.reject('wrong signature');
   console.log('Signature is valid');
 
@@ -114,13 +115,13 @@ export default async function ingestor(body) {
   // @TODO gossip to typed data endpoint
   // gossip(body, message.space);
 
-  const [id, receipt] = await Promise.all([
+  const [ipfs, receipt] = await Promise.all([
     pinJson(`snapshot/${body.sig}`, body),
     issueReceipt(body.sig)
   ]);
 
   try {
-    await writer[type].action(legacyBody, id, receipt);
+    await writer[type].action(legacyBody, ipfs, receipt, id);
   } catch (e) {
     return Promise.reject(e);
   }
@@ -129,11 +130,13 @@ export default async function ingestor(body) {
     `Address "${body.address}"\n`,
     `Space "${message.space}"\n`,
     `Type "${type}"\n`,
-    `Id "${id}"`
+    `Id "${id}"\n`,
+    `IPFS "${ipfs}"`
   );
 
   return {
     id,
+    ipfs,
     relayer: {
       address: relayer.address,
       receipt
