@@ -18,7 +18,6 @@ CREATE TABLE messages (
   timestamp BIGINT NOT NULL,
   space VARCHAR(64),
   type VARCHAR(12) NOT NULL,
-  payload JSON,
   sig VARCHAR(256) NOT NULL,
   metadata JSON,
   PRIMARY KEY (id),

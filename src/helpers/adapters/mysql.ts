@@ -46,7 +46,6 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
       timestamp: msg.timestamp,
       space,
       type: 'proposal',
-      payload: JSON.stringify(msg.payload),
       sig: body.sig,
       metadata: JSON.stringify({
         relayer_ipfs_hash: receipt
@@ -134,7 +133,6 @@ export async function storeVote(space, body, ipfs, receipt, id) {
       timestamp: msg.timestamp,
       space,
       type: 'vote',
-      payload: JSON.stringify(msg.payload),
       sig: body.sig,
       metadata: JSON.stringify({
         relayer_ipfs_hash: receipt
