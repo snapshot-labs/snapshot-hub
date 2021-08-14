@@ -47,9 +47,6 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
       space,
       type: 'proposal',
       sig: body.sig,
-      metadata: JSON.stringify({
-        relayer_ipfs_hash: receipt
-      }),
       receipt
     }
   ]);
@@ -135,9 +132,6 @@ export async function storeVote(space, body, ipfs, receipt, id) {
       space,
       type: 'vote',
       sig: body.sig,
-      metadata: JSON.stringify({
-        relayer_ipfs_hash: receipt
-      }),
       receipt
     }
   ]);

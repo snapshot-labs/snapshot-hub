@@ -19,7 +19,6 @@ CREATE TABLE messages (
   space VARCHAR(64),
   type VARCHAR(12) NOT NULL,
   sig VARCHAR(256) NOT NULL,
-  metadata JSON,
   receipt VARCHAR(128) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
