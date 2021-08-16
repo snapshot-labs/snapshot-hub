@@ -7,8 +7,7 @@ const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 
 const subscribers = [
   'https://snapshot.events/api/event',
-  'https://sgbbedlmia.execute-api.eu-central-1.amazonaws.com/PROD/v1/new',
-  'https://hooks.slack.com/services/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'
+  'https://sgbbedlmia.execute-api.eu-central-1.amazonaws.com/PROD/v1/new'
 ];
 
 async function sendEvent(event, to) {
