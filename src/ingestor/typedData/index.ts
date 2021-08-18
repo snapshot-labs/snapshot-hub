@@ -7,6 +7,7 @@ import writer from '../../writer';
 // import gossip from '../../helpers/gossip';
 import { pinJson } from '../../helpers/ipfs';
 import { sha256 } from '../../helpers/utils';
+import { isValidAlias } from '../../helpers/alias';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -43,7 +44,14 @@ export default async function ingestor(body) {
   )
     return Promise.reject('unknown space');
 
-  if (body.address !== message.from) return Promise.reject('wrong from');
+  // Check if signing address is an alias
+  if (body.address !== message.from) {
+    if (!['follow', 'unfollow'].includes(type))
+      return Promise.reject('wrong from');
+
+    if (!(await isValidAlias(message.from, body.address)))
+      return Promise.reject('wrong alias');
+  }
 
   // Check if signature is valid
   const isValid = await snapshot.utils.verify(
