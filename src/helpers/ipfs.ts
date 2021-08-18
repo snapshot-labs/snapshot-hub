@@ -3,6 +3,7 @@ import fleek from '@fleekhq/fleek-storage-js';
 import pinataSDK from '@pinata/sdk';
 
 const service = process.env.PINNING_SERVICE || 'pinata';
+const serviceArweave = parseInt(process.env.SERVICE_ARWEAVE || '0');
 
 const pinata = pinataSDK(
   process.env.PINATA_API_KEY,
@@ -27,10 +28,12 @@ export async function pinJson(key: string, body) {
     ipfsHash = result.IpfsHash;
   }
 
-  fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`)
-    .then(res => res.json())
-    // .then(json => console.log('Arweave success', json))
-    .catch(e => console.error('Arweave error', e));
+  if (serviceArweave) {
+    fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`)
+      .then(res => res.json())
+      // .then(json => console.log('Arweave success', json))
+      .catch(e => console.error('Arweave error', e));
+  }
 
   return ipfsHash;
 }
