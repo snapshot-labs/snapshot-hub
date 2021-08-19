@@ -39,6 +39,14 @@ type Query {
     orderDirection: OrderDirection
   ): [Vote]
 
+  aliases(
+    first: Int
+    skip: Int
+    where: AliasWhere,
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Alias]
+
   follows(
     first: Int
     skip: Int
@@ -96,6 +104,23 @@ input VoteWhere {
   voter_in: [String]
   proposal: String
   proposal_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
+input AliasWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  address: String
+  address_in: [String]
+  alias: String
+  alias_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -189,6 +214,14 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+}
+
+type Alias {
+  id: String!
+  ipfs: String
+  address: String!
+  alias: String!
+  created: Int!
 }
 
 type Follow {
