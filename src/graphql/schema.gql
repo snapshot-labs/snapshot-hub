@@ -198,6 +198,7 @@ type Proposal {
   end: Int!
   snapshot: String
   state: String
+  link: String
 }
 
 type Strategy {
