@@ -1,5 +1,7 @@
 import { jsonParse } from '../helpers/utils';
 
+const network = process.env.NETWORK || 'testnet';
+
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
@@ -27,6 +29,8 @@ export function formatProposal(proposal) {
   if (ts > proposal.end) proposalState = 'closed';
   proposal.state = proposalState;
   proposal.space = formatSpace(proposal.space, proposal.settings);
+  const networkStr = network === 'testnet' ? 'demo.' : '';
+  proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   return proposal;
 }
 
