@@ -1,5 +1,5 @@
 import express from 'express';
-import { spaces } from '../helpers/spaces';
+import { spaces, spacesActiveProposals } from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
@@ -16,6 +16,51 @@ router.get('/', (req, res) => {
     version: pkg.version,
     tag: 'alpha',
     relayer: relayer.address
+  });
+});
+
+router.get('/explore', (req, res) => {
+  const spacesMetadata = {};
+  const networks = {};
+  const strategies = {};
+  const plugins = {};
+  const skins = {};
+
+  Object.entries(spaces).forEach(([id, space]: any) => {
+    if (space.skin)
+      skins[space.skin] = skins[space.skin] ? skins[space.skin] + 1 : 1;
+
+    networks[space.network] = networks[space.network]
+      ? networks[space.network] + 1
+      : 1;
+
+    space.strategies.forEach(strategy => {
+      strategies[strategy.name] = strategies[strategy.name]
+        ? strategies[strategy.name] + 1
+        : 1;
+    });
+
+    Object.keys(space.plugins || {}).forEach(plugin => {
+      plugins[plugin] = plugins[plugin] ? plugins[plugin] + 1 : 1;
+    });
+
+    if (!space.private) {
+      spacesMetadata[id] = {
+        name: space.name,
+        avatar: space.avatar || undefined,
+        symbol: space.symbol,
+        skin: space.skin || undefined,
+        activeProposals: spacesActiveProposals[id] || undefined
+      };
+    }
+  });
+
+  return res.json({
+    spaces: spacesMetadata,
+    networks,
+    strategies,
+    skins,
+    plugins
   });
 });
 
