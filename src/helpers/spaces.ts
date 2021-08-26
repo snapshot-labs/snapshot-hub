@@ -2,14 +2,17 @@ import { getActiveProposals } from './adapters/mysql';
 import db from './mysql';
 
 export let spaces = {};
+export const spacesActiveProposals = {};
 
 export const spaceIdsFailed: string[] = [];
 
 setInterval(() => {
   getActiveProposals().then((result: any) =>
     result.forEach(count => {
-      if (spaces[count.space])
+      if (spaces[count.space]) {
         spaces[count.space]._activeProposals = count.count;
+        spacesActiveProposals[count.space] = count.count;
+      }
     })
   );
 }, 20e3);
