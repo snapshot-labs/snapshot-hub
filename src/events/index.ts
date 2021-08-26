@@ -1,14 +1,10 @@
 import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
+import subscribers from './subscribers.json';
 
 const delay = 300;
 const interval = 120;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
-
-const subscribers = [
-  'https://snapshot.events/api/event',
-  'https://sgbbedlmia.execute-api.eu-central-1.amazonaws.com/PROD/v1/new'
-];
 
 async function sendEvent(event, to) {
   const res = await fetch(to, {
@@ -28,7 +24,12 @@ async function processEvents() {
   for (const event of events) {
     try {
       await Promise.all(
-        subscribers.map(subscriber => sendEvent(event, subscriber))
+        subscribers
+          .filter(
+            subscriber =>
+              !subscriber.spaces || subscriber.spaces.includes(event.space)
+          )
+          .map(subscriber => sendEvent(event, subscriber.url))
       );
     } catch (e) {
       console.log('Event failed', e);
