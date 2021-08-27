@@ -48,7 +48,6 @@ router.get('/explore', (req, res) => {
       spacesMetadata[id] = {
         name: space.name,
         avatar: space.avatar || undefined,
-        symbol: space.symbol,
         skin: space.skin || undefined,
         activeProposals: spacesActiveProposals[id] || undefined
       };
