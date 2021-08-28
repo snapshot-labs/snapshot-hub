@@ -33,11 +33,16 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('invalid choice');
 
-  if (
-    ['weighted', 'quadratic-choice'].includes(proposal.type) &&
-    typeof msg.payload.choice !== 'object'
-  )
-    return Promise.reject('invalid choice');
+  if (['weighted', 'quadratic-choice'].includes(proposal.type)) {
+    if (typeof msg.payload.choice !== 'object')
+      return Promise.reject('invalid choice');
+
+    let choiceIsValid = true;
+    Object.values(msg.payload.choice).forEach(value => {
+      if (typeof value !== 'number' || value < 0) choiceIsValid = false;
+    });
+    if (!choiceIsValid) return Promise.reject('invalid choice');
+  }
 
   try {
     const scores = await snapshot.utils.getScores(
