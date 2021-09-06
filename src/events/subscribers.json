@@ -8,5 +8,8 @@
   {
     "url": "https://uniswap-govbot.herokuapp.com/snapshot-webhook",
     "spaces": ["uniswap"]
+  },
+  {
+    "url": "https://snapshot-subscribe.herokuapp.com/snapshot/webhooks"
   }
 ]
