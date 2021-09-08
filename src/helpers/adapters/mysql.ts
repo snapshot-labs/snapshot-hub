@@ -179,6 +179,14 @@ export async function getActiveProposals() {
   return await db.queryAsync(query, [ts, ts]);
 }
 
+export async function getFollowers() {
+  const query = `
+    SELECT space, COUNT(id) AS count FROM follows
+    GROUP BY space
+  `;
+  return await db.queryAsync(query);
+}
+
 export async function loadSpaces() {
   console.time('loadSpaces');
   const query = 'SELECT id FROM spaces';
