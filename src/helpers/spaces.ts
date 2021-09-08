@@ -1,8 +1,9 @@
-import { getActiveProposals } from './adapters/mysql';
+import { getActiveProposals, getFollowers } from './adapters/mysql';
 import db from './mysql';
 
 export let spaces = {};
 export const spacesActiveProposals = {};
+export const spaceFollowers = {};
 
 export const spaceIdsFailed: string[] = [];
 
@@ -12,6 +13,16 @@ setInterval(() => {
       if (spaces[count.space]) {
         spaces[count.space]._activeProposals = count.count;
         spacesActiveProposals[count.space] = count.count;
+      }
+    })
+  );
+}, 20e3);
+
+setInterval(() => {
+  getFollowers().then((result: any) =>
+    result.forEach(followers => {
+      if (spaces[followers.space]) {
+        spaceFollowers[followers.space] = followers.count;
       }
     })
   );

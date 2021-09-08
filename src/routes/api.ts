@@ -1,5 +1,9 @@
 import express from 'express';
-import { spaces, spacesActiveProposals } from '../helpers/spaces';
+import {
+  spaces,
+  spacesActiveProposals,
+  spaceFollowers
+} from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
@@ -25,7 +29,6 @@ router.get('/explore', (req, res) => {
   const strategies = {};
   const plugins = {};
   const skins = {};
-
   Object.entries(spaces).forEach(([id, space]: any) => {
     if (space.skin)
       skins[space.skin] = skins[space.skin] ? skins[space.skin] + 1 : 1;
@@ -49,7 +52,8 @@ router.get('/explore', (req, res) => {
         name: space.name,
         avatar: space.avatar || undefined,
         skin: space.skin || undefined,
-        activeProposals: spacesActiveProposals[id] || undefined
+        activeProposals: spacesActiveProposals[id] || undefined,
+        followers: spaceFollowers[id] || undefined
       };
     }
   });
