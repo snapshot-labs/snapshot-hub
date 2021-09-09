@@ -29,9 +29,16 @@ router.get('/explore', (req, res) => {
   const strategies = {};
   const plugins = {};
   const skins = {};
+  const validations = {};
+
   Object.entries(spaces).forEach(([id, space]: any) => {
     if (space.skin)
       skins[space.skin] = skins[space.skin] ? skins[space.skin] + 1 : 1;
+
+    if (space.validation)
+      validations[space.validation.name] = validations[space.validation.name]
+        ? validations[space.validation.name] + 1
+        : 1;
 
     networks[space.network] = networks[space.network]
       ? networks[space.network] + 1
@@ -53,8 +60,7 @@ router.get('/explore', (req, res) => {
         avatar: space.avatar || undefined,
         skin: space.skin || undefined,
         activeProposals: spacesActiveProposals[id] || undefined,
-        followers: spaceFollowers[id] || undefined,
-        validation: space.validation
+        followers: spaceFollowers[id] || undefined
       };
     }
   });
@@ -64,7 +70,8 @@ router.get('/explore', (req, res) => {
     networks,
     strategies,
     skins,
-    plugins
+    plugins,
+    validations
   });
 });
 
