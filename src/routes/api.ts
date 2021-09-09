@@ -53,7 +53,8 @@ router.get('/explore', (req, res) => {
         avatar: space.avatar || undefined,
         skin: space.skin || undefined,
         activeProposals: spacesActiveProposals[id] || undefined,
-        followers: spaceFollowers[id] || undefined
+        followers: spaceFollowers[id] || undefined,
+        validation: space.validation
       };
     }
   });
