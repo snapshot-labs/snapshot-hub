@@ -54,15 +54,14 @@ router.get('/explore', (req, res) => {
       plugins[plugin] = plugins[plugin] ? plugins[plugin] + 1 : 1;
     });
 
-    if (!space.private) {
-      spacesMetadata[id] = {
-        name: space.name,
-        avatar: space.avatar || undefined,
-        skin: space.skin || undefined,
-        activeProposals: spacesActiveProposals[id] || undefined,
-        followers: spaceFollowers[id] || undefined
-      };
-    }
+    spacesMetadata[id] = {
+      name: space.name,
+      avatar: space.avatar || undefined,
+      private: space.private || undefined,
+      skin: space.skin || undefined,
+      activeProposals: spacesActiveProposals[id] || undefined,
+      followers: spaceFollowers[id] || undefined,
+    };
   });
 
   return res.json({
