@@ -22,7 +22,7 @@ setInterval(() => {
   getFollowers().then((result: any) =>
     result.forEach(followers => {
       if (spaces[followers.space]) {
-        spaceFollowers[followers.space] = followers.count;
+        spaceFollowers[followers.space] = followers;
       }
     })
   );
