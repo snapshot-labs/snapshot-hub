@@ -60,7 +60,9 @@ router.get('/explore', (req, res) => {
       private: space.private || undefined,
       skin: space.skin || undefined,
       activeProposals: spacesActiveProposals[id] || undefined,
-      followers: spaceFollowers[id] || undefined,
+      followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
+      followers_1d:
+        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined
     };
   });
 

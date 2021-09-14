@@ -181,8 +181,7 @@ export async function getActiveProposals() {
 
 export async function getFollowers() {
   const query = `
-    SELECT space, COUNT(id) AS count FROM follows
-    GROUP BY space
+    SELECT space, COUNT(id) as count, count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d FROM follows GROUP BY space
   `;
   return await db.queryAsync(query);
 }
