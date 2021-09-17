@@ -2,7 +2,8 @@ import express from 'express';
 import {
   spaces,
   spacesActiveProposals,
-  spaceFollowers
+  spaceFollowers,
+  spaceOneDayVotes
 } from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
@@ -63,7 +64,8 @@ router.get('/explore', (req, res) => {
       activeProposals: spacesActiveProposals[id] || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
       followers_1d:
-        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined
+        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined,
+      votes_1d: spaceOneDayVotes[id] || undefined
     };
   });
 
