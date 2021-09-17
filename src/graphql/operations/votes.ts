@@ -31,12 +31,11 @@ export default async function(parent, args, context, info) {
   let votes: any[] = [];
 
   const query = `
-    SELECT v.*, spaces.settings FROM votes v
-    INNER JOIN spaces ON spaces.id = v.space
+    SELECT v.* FROM votes v
     LEFT OUTER JOIN votes v2 ON
       v.voter = v2.voter AND v.proposal = v2.proposal
       AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-    WHERE v2.voter IS NULL AND spaces.settings IS NOT NULL ${queryStr}
+    WHERE v2.voter IS NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
