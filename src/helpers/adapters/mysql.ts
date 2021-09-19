@@ -189,7 +189,7 @@ export async function getFollowers() {
 export async function getOneDayVotes() {
   const query = `
     SELECT space, COUNT(DISTINCT voter, proposal) AS count FROM votes
-    where created > (UNIX_TIMESTAMP() - 86400) group by space
+    WHERE created > (UNIX_TIMESTAMP() - 86400) GROUP BY space
   `;
   return await db.queryAsync(query);
 }
