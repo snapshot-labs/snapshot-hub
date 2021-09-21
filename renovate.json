@@ -2,10 +2,10 @@
   "extends": [
     "config:base"
   ],
+  "enabledManagers": ["npm"],
+  "pinVersions": false,
   "packageRules": [
     {
-      "enabledManagers": ["npm"],
-      "pinVersions": false,
       "matchPackageNames": ["@snapshot-labs/snapshot.js"],
       "matchPackagePatterns": ["^@snapshot-labs/"],
       "groupName": "snapshot-labs packages"
