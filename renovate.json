@@ -4,7 +4,7 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": ["@snapshot-labs/snapshot.js"]
+      "matchPackageNames": ["@snapshot-labs/snapshot.js"]
     }
   ]
 }
