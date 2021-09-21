@@ -4,6 +4,7 @@
   ],
   "packageRules": [
     {
+      "excludePackagePatterns": ["*"],
       "matchPackageNames": ["@snapshot-labs/snapshot.js"],
       "matchPackagePatterns": ["^@snapshot-labs/"],
       "groupName": "snapshot-labs packages"
