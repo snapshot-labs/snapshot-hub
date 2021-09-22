@@ -169,12 +169,13 @@ export async function storeSettings(space, body) {
   await addOrUpdateSpace(space, msg.payload);
 }
 
-export async function getActiveProposals() {
+export async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
-    SELECT space, COUNT(id) AS count FROM proposals
-    WHERE start < ? AND end > ?
-    GROUP BY space
+    SELECT space, COUNT(id) AS count, 
+    COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active, 
+    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d 
+    FROM proposals GROUP BY space
   `;
   return await db.queryAsync(query, [ts, ts]);
 }

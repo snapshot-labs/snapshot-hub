@@ -1,9 +1,5 @@
 import express from 'express';
-import {
-  spaces,
-  spacesActiveProposals,
-  spaceFollowers
-} from '../helpers/spaces';
+import { spaces, spaceProposals, spaceFollowers } from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
@@ -60,7 +56,11 @@ router.get('/explore', (req, res) => {
       private: space.private || undefined,
       skin: space.skin || undefined,
       terms: space.terms || undefined,
-      activeProposals: spacesActiveProposals[id] || undefined,
+      activeProposals:
+        (spaceProposals[id] && spaceProposals[id].active) || undefined,
+      proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
+      proposals_1d:
+        (spaceProposals[id] && spaceProposals[id].count_1d) || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
       followers_1d:
         (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined
