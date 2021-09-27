@@ -10,6 +10,10 @@
     "spaces": ["uniswap"]
   },
   {
+    "url": "https://defi-govbot.herokuapp.com/snapshot-webhook",
+    "spaces": ["balancer.eth"]
+  },
+  {
     "url": "https://snapshot-subscribe.herokuapp.com/snapshot/webhooks"
   }
 ]
