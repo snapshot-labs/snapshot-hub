@@ -1,4 +1,6 @@
 import express from 'express';
+import snapshot from '@snapshot-labs/snapshot.js';
+import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 import {
   spaces,
   spacesActiveProposals,
@@ -9,6 +11,10 @@ import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
 import ingestor from '../ingestor';
 import pkg from '../../package.json';
+import db from '../helpers/mysql';
+import { hashPersonalMessage } from '../ingestor/personalSign/utils';
+
+const gateway = gateways[0];
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
@@ -75,6 +81,57 @@ router.get('/explore', (req, res) => {
     skins,
     plugins,
     validations
+  });
+});
+
+router.get('/report/:id/:source?', async (req, res) => {
+  const { id, source } = req.params;
+  let votes: any = [];
+  let sources: any = false;
+
+  const query = `
+    SELECT v.id, v.ipfs FROM votes v
+    LEFT OUTER JOIN votes v2 ON
+      v.voter = v2.voter AND v.proposal = v2.proposal
+      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
+    WHERE v2.voter IS NULL AND v.proposal = ?
+    ORDER BY v.created DESC
+  `;
+  try {
+    votes = await db.queryAsync(query, [id]);
+  } catch (e) {
+    console.log(e);
+    return Promise.reject('request failed');
+  }
+
+  if (source) {
+    const p: any = [];
+    votes.forEach(vote => {
+      p.push(snapshot.utils.ipfsGet(gateway, vote.ipfs));
+    });
+    try {
+      sources = await Promise.all(p);
+    } catch (e) {
+      console.log(e);
+      return sendError(res, e);
+    }
+  }
+
+  votes = source ? sources : votes.map(vote => vote.id);
+  const message = {
+    proposal: id,
+    status: 'pending',
+    votes: votes
+  };
+
+  const hash = hashPersonalMessage(JSON.stringify(message));
+  const sig = await relayer.signMessage(hash);
+
+  return res.json({
+    relayer: relayer.address,
+    sig,
+    hash,
+    message
   });
 });
 
