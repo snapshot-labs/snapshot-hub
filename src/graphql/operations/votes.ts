@@ -1,6 +1,11 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, formatVote } from '../helpers';
+import {
+  buildWhereQuery,
+  formatProposal,
+  formatSpace,
+  formatVote
+} from '../helpers';
 
 export default async function(parent, args, context, info) {
   const requestedFields = graphqlFields(info);
@@ -44,6 +49,28 @@ export default async function(parent, args, context, info) {
   } catch (e) {
     console.log(e);
     return Promise.reject('request failed');
+  }
+
+  if (requestedFields.space && votes.length > 0) {
+    const spaceIds = votes.map(vote => vote.space.id);
+    const query = `
+      SELECT id, settings FROM spaces
+      WHERE id IN (?) AND settings IS NOT NULL  
+    `;
+    try {
+      let spaces = await db.queryAsync(query, [spaceIds]);
+
+      spaces = Object.fromEntries(
+        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+      );
+      votes = votes.map(vote => {
+        if (spaces[vote.space.id]) vote.space = spaces[vote.space.id];
+        return vote;
+      });
+    } catch (e) {
+      console.log(e);
+      return Promise.reject('request failed');
+    }
   }
 
   if (requestedFields.proposal && votes.length > 0) {
