@@ -11,7 +11,6 @@ setInterval(() => {
   getProposals().then((result: any) =>
     result.forEach(proposals => {
       if (spaces[proposals.space]) {
-        spaces[proposals.space]._activeProposals = proposals.active;
         spaceProposals[proposals.space] = proposals;
       }
     })
