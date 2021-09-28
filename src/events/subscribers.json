@@ -15,5 +15,8 @@
   },
   {
     "url": "https://snapshot-subscribe.herokuapp.com/snapshot/webhooks"
+  },
+  {
+    "url": "http://54.183.131.158/api/v1/snapshot/webhook"
   }
 ]
