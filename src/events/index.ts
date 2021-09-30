@@ -1,10 +1,9 @@
 import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
-import { sleep } from '../helpers/utils';
 
-const delay = 10;
-const interval = 10;
+const delay = 1;
+const interval = 30;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 
 async function sendEvent(event, to) {
@@ -24,7 +23,7 @@ async function processEvents() {
   console.log('Process events', ts, events.length);
   for (const event of events) {
     try {
-      await Promise.allSettled(
+      await Promise.all(
         subscribers
           .filter(
             subscriber =>
@@ -47,10 +46,6 @@ async function processEvents() {
   }
 }
 
-async function streamEvents() {
-  await sleep(interval * 1e3);
-  await processEvents();
-  await streamEvents();
+if (serviceEvents) {
+  setInterval(async () => await processEvents(), interval * 1e3);
 }
-
-if (serviceEvents) streamEvents();
