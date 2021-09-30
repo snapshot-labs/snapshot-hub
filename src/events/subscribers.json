@@ -24,5 +24,8 @@
   },
   {
     "url": "https://kyve-operator.herokuapp.com/proposal"
+  },
+  {
+    "url": "https://snapshot-discord.herokuapp.com/api/webhook"
   }
 ]
