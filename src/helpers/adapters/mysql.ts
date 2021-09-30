@@ -4,7 +4,7 @@ import fleek from '@fleekhq/fleek-storage-js';
 import db from '../mysql';
 import { getSpace } from '../ens';
 import { spaceIdsFailed, spaces } from '../spaces';
- 
+
 export async function addOrUpdateSpace(space: string, settings: any) {
   if (!settings || !settings.name) return false;
   const ts = (Date.now() / 1e3).toFixed();
@@ -97,14 +97,12 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
     ...event
   });
 
-  if (proposal.start > ts) {
-    query += 'INSERT IGNORE INTO events SET ?; ';
-    params.push({
-      event: 'proposal/start',
-      expire: proposal.start,
-      ...event
-    });
-  }
+  query += 'INSERT IGNORE INTO events SET ?; ';
+  params.push({
+    event: 'proposal/start',
+    expire: proposal.start,
+    ...event
+  });
 
   if (proposal.end > ts) {
     query += 'INSERT IGNORE INTO events SET ?; ';
@@ -172,9 +170,9 @@ export async function storeSettings(space, body) {
 export async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
-    SELECT space, COUNT(id) AS count, 
-    COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active, 
-    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d 
+    SELECT space, COUNT(id) AS count,
+    COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active,
+    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d
     FROM proposals GROUP BY space
   `;
   return await db.queryAsync(query, [ts, ts]);
