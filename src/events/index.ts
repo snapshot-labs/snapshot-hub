@@ -2,8 +2,8 @@ import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
 
-const delay = 300;
-const interval = 120;
+const delay = 60;
+const interval = 60;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 
 async function sendEvent(event, to) {
