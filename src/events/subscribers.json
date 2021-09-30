@@ -18,5 +18,8 @@
   },
   {
     "url": "http://54.183.131.158/api/v1/snapshot/webhook"
+  },
+  {
+    "url": "https://acnwecff23.execute-api.eu-central-1.amazonaws.com/STAGING/v1/new"
   }
 ]
