@@ -21,5 +21,11 @@
   },
   {
     "url": "https://acnwecff23.execute-api.eu-central-1.amazonaws.com/STAGING/v1/new"
+  },
+  {
+    "url": "https://kyve-operator.herokuapp.com/proposal"
+  },
+  {
+    "url": "https://snapshot-discord.herokuapp.com/api/webhook"
   }
 ]
