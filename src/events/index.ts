@@ -24,7 +24,7 @@ async function processEvents() {
   console.log('Process events', ts, events.length);
   for (const event of events) {
     try {
-      await Promise.all(
+      await Promise.allSettled(
         subscribers
           .filter(
             subscriber =>
@@ -48,8 +48,8 @@ async function processEvents() {
 }
 
 async function streamEvents() {
-  await processEvents();
   await sleep(interval * 1e3);
+  await processEvents();
   await streamEvents();
 }
 
