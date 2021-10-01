@@ -26,7 +26,6 @@ CREATE TABLE messages (
   INDEX version (version),
   INDEX timestamp (timestamp),
   INDEX space (space),
-  INDEX token (token),
   INDEX type (type),
   INDEX receipt (receipt)
 );
