@@ -2,7 +2,7 @@ import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
 
-const delay = 60;
+const delay = 30;
 const interval = 60;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 
@@ -47,7 +47,5 @@ async function processEvents() {
 }
 
 if (serviceEvents) {
-  setInterval(async () => {
-    await processEvents();
-  }, interval * 1e3);
+  setInterval(async () => await processEvents(), interval * 1e3);
 }
