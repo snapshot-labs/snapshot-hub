@@ -1,7 +1,12 @@
 import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
-import { spaces, spaceProposals, spaceFollowers } from '../helpers/spaces';
+import {
+  spaces,
+  spaceProposals,
+  spaceFollowers,
+  spaceOneDayVoters
+} from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
@@ -70,7 +75,8 @@ router.get('/explore', (req, res) => {
         (spaceProposals[id] && spaceProposals[id].count_1d) || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
       followers_1d:
-        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined
+        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined,
+      voters_1d: spaceOneDayVoters[id] || undefined
     };
   });
 
