@@ -14,9 +14,15 @@
     "spaces": ["balancer.eth"]
   },
   {
-    "url": "https://snapshot-subscribe.herokuapp.com/snapshot/webhooks"
+    "url": "http://54.183.131.158/api/v1/snapshot/webhook"
   },
   {
-    "url": "http://54.183.131.158/api/v1/snapshot/webhook"
+    "url": "https://acnwecff23.execute-api.eu-central-1.amazonaws.com/STAGING/v1/new"
+  },
+  {
+    "url": "https://kyve-operator.herokuapp.com/proposal"
+  },
+  {
+    "url": "https://snapshot-discord.herokuapp.com/api/webhook"
   }
 ]

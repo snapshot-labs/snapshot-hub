@@ -1,9 +1,10 @@
-import { getProposals, getFollowers } from './adapters/mysql';
+import { getProposals, getFollowers, getOneDayVoters } from './adapters/mysql';
 import db from './mysql';
 
 export let spaces = {};
 export const spaceProposals = {};
 export const spaceFollowers = {};
+export const spaceOneDayVoters = {};
 
 export const spaceIdsFailed: string[] = [];
 
@@ -20,6 +21,14 @@ setInterval(() => {
     result.forEach(followers => {
       if (spaces[followers.space]) {
         spaceFollowers[followers.space] = followers;
+      }
+    })
+  );
+
+  getOneDayVoters().then((result: any) =>
+    result.forEach(votes => {
+      if (spaces[votes.space]) {
+        spaceOneDayVoters[votes.space] = votes.count;
       }
     })
   );

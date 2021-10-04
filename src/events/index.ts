@@ -2,8 +2,8 @@ import fetch from 'cross-fetch';
 import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
 
-const delay = 300;
-const interval = 120;
+const delay = 5;
+const interval = 30;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 
 async function sendEvent(event, to) {
@@ -20,20 +20,19 @@ async function processEvents() {
   const events = await db.queryAsync('SELECT * FROM events WHERE expire <= ?', [
     ts
   ]);
-  console.log('Process events', ts, events.length);
+  console.log('Process event start', ts, events.length);
   for (const event of events) {
-    try {
-      await Promise.all(
-        subscribers
-          .filter(
-            subscriber =>
-              !subscriber.spaces || subscriber.spaces.includes(event.space)
-          )
-          .map(subscriber => sendEvent(event, subscriber.url))
-      );
-    } catch (e) {
-      console.log('Event failed', e);
-    }
+    Promise.all(
+      subscribers
+        .filter(
+          subscriber =>
+            !subscriber.spaces || subscriber.spaces.includes(event.space)
+        )
+        .map(subscriber => sendEvent(event, subscriber.url))
+    )
+      .then(() => console.log('Process event done'))
+      .catch(e => console.log('Process event failed', e));
+
     try {
       await db.queryAsync(
         'DELETE FROM events WHERE id = ? AND event = ? LIMIT 1',
@@ -47,7 +46,5 @@ async function processEvents() {
 }
 
 if (serviceEvents) {
-  setInterval(async () => {
-    await processEvents();
-  }, interval * 1e3);
+  setInterval(async () => await processEvents(), interval * 1e3);
 }
