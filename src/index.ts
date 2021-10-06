@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+dotenv.config();
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
@@ -7,8 +8,6 @@ import upload from './routes/upload';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import './events';
-
-dotenv.config();
 
 const app = express();
 app.use(bodyParser.json({ limit: '20mb' }));
