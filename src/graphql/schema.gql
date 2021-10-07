@@ -174,11 +174,17 @@ type Space {
   members: [String]
   filters: SpaceFilters
   plugins: Any
+  voting: SpaceVoting
 }
 
 type SpaceFilters {
   minScore: Float
   onlyMembers: Boolean
+}
+
+type SpaceVoting {
+  delay: Int
+  period: Int
 }
 
 type Proposal {
