@@ -7,6 +7,7 @@ import * as unfollow from './unfollow';
 import * as alias from './alias';
 import * as subscribe from './subscribe';
 import * as unsubscribe from './unsubscribe';
+
 export default {
   proposal,
   vote,

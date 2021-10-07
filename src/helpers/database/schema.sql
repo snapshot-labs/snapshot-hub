@@ -121,5 +121,6 @@ CREATE TABLE subscriptions (
   space VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
   PRIMARY KEY (address, space),
-  INDEX ipfs (ipfs)
+  INDEX ipfs (ipfs),
+  INDEX created (created)
 );
