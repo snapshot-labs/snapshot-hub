@@ -16,6 +16,9 @@ export function formatSpace(id, settings) {
   space.filters = space.filters || {};
   space.filters.minScore = space.filters.minScore || 0;
   space.filters.onlyMembers = space.filters.onlyMembers || false;
+  space.voting = space.voting || {};
+  space.voting.delay = space.voting.delay || null;
+  space.voting.period = space.voting.period || null;
   return space;
 }
 
