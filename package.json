@@ -20,7 +20,7 @@
     "@ethersproject/wallet": "^5.0.1",
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pinata/sdk": "^1.1.14",
-    "@snapshot-labs/snapshot.js": "^0.2.10",
+    "@snapshot-labs/snapshot.js": "^0.2.13",
     "@walletconnect/utils": "^1.3.1",
     "ajv-formats": "^2.0.2",
     "bluebird": "^3.7.2",

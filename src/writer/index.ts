@@ -5,7 +5,8 @@ import * as deleteProposal from './delete-proposal';
 import * as follow from './follow';
 import * as unfollow from './unfollow';
 import * as alias from './alias';
-
+import * as subscribe from './subscribe';
+import * as unsubscribe from './unsubscribe';
 export default {
   proposal,
   vote,
@@ -13,5 +14,7 @@ export default {
   'delete-proposal': deleteProposal,
   follow,
   unfollow,
+  subscribe,
+  unsubscribe,
   alias
 };

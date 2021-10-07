@@ -6,6 +6,7 @@ import vote from './vote';
 import votes from './votes';
 import aliases from './aliases';
 import follows from './follows';
+import subscriptions from './subscriptions';
 
 export default {
   space,
@@ -15,5 +16,6 @@ export default {
   vote,
   votes,
   aliases,
-  follows
+  follows,
+  subscriptions
 };

@@ -79,4 +79,15 @@ query Follows {
     created
   }
 }
+
+query Subscriptions {
+  subscriptions (where: { address: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7" }) {
+    id
+    address
+    space {
+      id
+    }
+    created
+  }
+}
 `;

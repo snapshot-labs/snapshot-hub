@@ -113,3 +113,13 @@ CREATE TABLE aliases (
   PRIMARY KEY (address, alias),
   INDEX ipfs (ipfs)
 );
+
+CREATE TABLE subscriptions (
+  id VARCHAR(66) NOT NULL,
+  ipfs VARCHAR(64) NOT NULL,
+  address VARCHAR(64) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  created INT(11) NOT NULL,
+  PRIMARY KEY (address, space),
+  INDEX ipfs (ipfs)
+);
