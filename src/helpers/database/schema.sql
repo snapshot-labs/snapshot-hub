@@ -101,7 +101,7 @@ CREATE TABLE follows (
   created INT(11) NOT NULL,
   PRIMARY KEY (follower, space),
   INDEX ipfs (ipfs),
-  INDEX space (created)
+  INDEX created (created)
 );
 
 CREATE TABLE aliases (
