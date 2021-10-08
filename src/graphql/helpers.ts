@@ -19,6 +19,8 @@ export function formatSpace(id, settings) {
   space.voting = space.voting || {};
   space.voting.delay = space.voting.delay || null;
   space.voting.period = space.voting.period || null;
+  space.voting.type = space.voting.type || null;
+  space.voting.quorum = space.voting.quorum || null;
   return space;
 }
 

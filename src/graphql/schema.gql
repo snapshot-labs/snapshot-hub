@@ -185,6 +185,8 @@ type SpaceFilters {
 type SpaceVoting {
   delay: Int
   period: Int
+  type: String
+  quorum: Int
 }
 
 type Proposal {
