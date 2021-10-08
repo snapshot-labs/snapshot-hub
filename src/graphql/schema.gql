@@ -186,7 +186,7 @@ type SpaceVoting {
   delay: Int
   period: Int
   type: String
-  quorum: Int
+  quorum: Float
 }
 
 type Proposal {
