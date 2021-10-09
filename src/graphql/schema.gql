@@ -3,38 +3,32 @@ scalar Any
 # Queries
 
 type Query {
-  space(
-    id: String
-  ): Space
+  space(id: String): Space
 
   spaces(
     first: Int
     skip: Int
-    where: SpaceWhere,
+    where: SpaceWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Space]
 
-  proposal(
-    id: String
-  ): Proposal
+  proposal(id: String): Proposal
 
   proposals(
     first: Int
     skip: Int
-    where: ProposalWhere,
+    where: ProposalWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Proposal]
 
-  vote(
-    id: String
-  ): Vote
+  vote(id: String): Vote
 
   votes(
     first: Int
     skip: Int
-    where: VoteWhere,
+    where: VoteWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Vote]
@@ -42,7 +36,7 @@ type Query {
   aliases(
     first: Int
     skip: Int
-    where: AliasWhere,
+    where: AliasWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Alias]
@@ -50,10 +44,18 @@ type Query {
   follows(
     first: Int
     skip: Int
-    where: FollowWhere,
+    where: FollowWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Follow]
+
+  subscriptions(
+    first: Int
+    skip: Int
+    where: SubscriptionWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Subscription]
 }
 
 input SpaceWhere {
@@ -136,6 +138,23 @@ input FollowWhere {
   ipfs_in: [String]
   follower: String
   follower_in: [String]
+  space: String
+  space_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
+input SubscriptionWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  address: String
+  address_in: [String]
   space: String
   space_in: [String]
   created: Int
@@ -229,6 +248,14 @@ type Follow {
   id: String!
   ipfs: String
   follower: String!
+  space: Space!
+  created: Int!
+}
+
+type Subscription {
+  id: String!
+  ipfs: String
+  address: String!
   space: Space!
   created: Int!
 }
