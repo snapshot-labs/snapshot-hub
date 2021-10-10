@@ -51,6 +51,11 @@ export function formatFollow(follow) {
   return follow;
 }
 
+export function formatSubscription(subscription) {
+  subscription.space = formatSpace(subscription.space, subscription.settings);
+  return subscription;
+}
+
 export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];
