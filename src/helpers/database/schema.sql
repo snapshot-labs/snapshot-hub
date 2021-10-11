@@ -115,12 +115,20 @@ CREATE TABLE aliases (
 );
 
 CREATE TABLE subscriptions (
-  id VARCHAR(66) NOT NULL,
-  ipfs VARCHAR(64) NOT NULL,
-  address VARCHAR(64) NOT NULL,
-  space VARCHAR(64) NOT NULL,
-  created INT(11) NOT NULL,
-  PRIMARY KEY (address, space),
-  INDEX ipfs (ipfs),
-  INDEX created (created)
-);
+  id varchar(66) CHARACTER
+  SET
+    utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    ipfs varchar(64) CHARACTER
+  SET
+    utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    address varchar(64) CHARACTER
+  SET
+    utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    space varchar(64) CHARACTER
+  SET
+    utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    created int NOT NULL,
+    PRIMARY KEY (address, space),
+    KEY created (created),
+    KEY ipfs (ipfs)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
