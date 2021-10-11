@@ -17,7 +17,7 @@ CREATE TABLE messages (
   version VARCHAR(6) NOT NULL,
   timestamp BIGINT NOT NULL,
   space VARCHAR(64),
-  type VARCHAR(16) NOT NULL,
+  type VARCHAR(24) NOT NULL,
   sig VARCHAR(256) NOT NULL,
   receipt VARCHAR(128) NOT NULL,
   PRIMARY KEY (id),
