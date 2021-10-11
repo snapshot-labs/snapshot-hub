@@ -17,7 +17,7 @@ CREATE TABLE messages (
   version VARCHAR(6) NOT NULL,
   timestamp BIGINT NOT NULL,
   space VARCHAR(64),
-  type VARCHAR(12) NOT NULL,
+  type VARCHAR(24) NOT NULL,
   sig VARCHAR(256) NOT NULL,
   receipt VARCHAR(128) NOT NULL,
   PRIMARY KEY (id),
@@ -101,7 +101,7 @@ CREATE TABLE follows (
   created INT(11) NOT NULL,
   PRIMARY KEY (follower, space),
   INDEX ipfs (ipfs),
-  INDEX space (created)
+  INDEX created (created)
 );
 
 CREATE TABLE aliases (
@@ -112,4 +112,15 @@ CREATE TABLE aliases (
   created INT(11) NOT NULL,
   PRIMARY KEY (address, alias),
   INDEX ipfs (ipfs)
+);
+
+CREATE TABLE subscriptions (
+  id VARCHAR(66) NOT NULL,
+  ipfs VARCHAR(64) NOT NULL,
+  address VARCHAR(64) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  created INT(11) NOT NULL,
+  PRIMARY KEY (address, space),
+  INDEX ipfs (ipfs),
+  INDEX created (created)
 );

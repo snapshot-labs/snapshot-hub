@@ -21,5 +21,8 @@
   },
   {
     "url": "https://snapshot-discord.herokuapp.com/api/webhook"
+  },
+  {
+    "url": "https://us-central1-static-174201.cloudfunctions.net/gov-bot-hook"
   }
 ]
