@@ -64,7 +64,8 @@ export default async function(parent, args, context, info) {
         spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
       );
       votes = votes.map(vote => {
-        if (spaces[vote.space.id]) vote.space = spaces[vote.space.id];
+        if (spaces[vote.space.id])
+          return { ...vote, space: spaces[vote.space.id] };
         return vote;
       });
     } catch (e) {
