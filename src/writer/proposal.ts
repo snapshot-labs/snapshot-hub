@@ -17,7 +17,6 @@ export async function verify(body): Promise<any> {
 
   const space = spaces[msg.space];
   space.id = msg.space;
-
   try {
     const validationName = space.validation?.name || 'basic';
     const validationParams = space.validation?.params || {};
