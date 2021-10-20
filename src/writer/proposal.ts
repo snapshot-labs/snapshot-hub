@@ -18,15 +18,6 @@ export async function verify(body): Promise<any> {
   const space = spaces[msg.space];
   space.id = msg.space;
 
-  if (space.voting?.delay) {
-    msg.payload.start =
-      (new Date().getTime() / 1e3).toFixed() + space.voting.delay;
-  }
-
-  if (space.voting?.period) {
-    msg.payload.end = msg.payload.start + space.voting.period;
-  }
-
   try {
     const validationName = space.validation?.name || 'basic';
     const validationParams = space.validation?.params || {};
