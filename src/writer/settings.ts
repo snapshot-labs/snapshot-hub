@@ -3,7 +3,7 @@ import isEqual from 'lodash/isEqual';
 import { storeSettings } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
 import { spaces } from '../helpers/spaces';
-import { getSpaceUri } from '../helpers/ens';
+import { getSpaceUri } from '@snapshot-labs/snapshot.js/src/utils';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
