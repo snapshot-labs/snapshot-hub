@@ -63,17 +63,6 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
   const network = metadata.network || spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
 
-  let start = parseInt(msg.payload.start || '0');
-  let end = parseInt(msg.payload.end || '0');
-
-  if (spaceSettings.voting?.delay) {
-    start = created + spaceSettings.voting.delay;
-  }
-
-  if (spaceSettings.voting?.period) {
-    end = start + spaceSettings.voting.period;
-  }
-
   const proposal = {
     id,
     ipfs,
@@ -87,8 +76,8 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
     title: msg.payload.name,
     body: msg.payload.body,
     choices: JSON.stringify(msg.payload.choices),
-    start,
-    end,
+    start: parseInt(msg.payload.start || '0'),
+    end: parseInt(msg.payload.end || '0'),
     snapshot: proposalSnapshot || 0
   };
   let query = 'INSERT IGNORE INTO proposals SET ?; ';
