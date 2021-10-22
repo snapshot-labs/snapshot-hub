@@ -40,7 +40,8 @@ const sendPushNotification = async event => {
       web: {
         notification: {
           title: event.space,
-          body: proposal.title
+          body: proposal.title,
+          deep_link: `${process.env.SNAPSHOT_URI}/#/${event.space}/${event.id}`
         }
       }
     });
