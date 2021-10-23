@@ -8,7 +8,7 @@ This is a hub for Snapshot network that stores the database and forwards new mes
 ```sh
 npm install
 ```
-
+ 
 2. Copy [`.env.example`](https://github.com/snapshot-labs/snapshot-hub/blob/master/.env.example), rename it to `.env` and set a value for these config vars:
 
 - `DATABASE_URL`: The database connection string. You will need to run your own MySQL database or use a Cloud service like [JawsDB](https://jawsdb.com).
