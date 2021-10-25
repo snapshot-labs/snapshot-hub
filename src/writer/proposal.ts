@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { storeProposal } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
@@ -13,6 +14,13 @@ export async function verify(body): Promise<any> {
   if (schemaIsValid !== true) {
     console.log('Wrong proposal format', schemaIsValid);
     return Promise.reject('wrong proposal format');
+  }
+
+  if (
+    msg.payload.type === 'basic' &&
+    !isEqual(['For', 'Against', 'Abstain'], msg.payload.choices)
+  ) {
+    return Promise.reject('wrong choices for basic type voting');
   }
 
   const space = spaces[msg.space];
