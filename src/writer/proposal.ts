@@ -25,6 +25,20 @@ export async function verify(body): Promise<any> {
 
   const space = spaces[msg.space];
   space.id = msg.space;
+
+  if (space.voting?.delay) {
+    const isValidDelay =
+      msg.payload.start === parseInt(msg.timestamp) + space.voting.delay;
+
+    if (!isValidDelay) return Promise.reject('invalid voting delay');
+  }
+
+  if (space.voting?.period) {
+    const isValidPeriod =
+      msg.payload.end - msg.payload.start === space.voting.period;
+    if (!isValidPeriod) return Promise.reject('invalid voting period');
+  }
+
   try {
     const validationName = space.validation?.name || 'basic';
     const validationParams = space.validation?.params || {};
