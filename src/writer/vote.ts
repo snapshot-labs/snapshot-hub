@@ -35,7 +35,7 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('invalid choice');
 
-  if (['weighted', 'quadratic-choice'].includes(proposal.type)) {
+  if (['weighted', 'quadratic'].includes(proposal.type)) {
     if (typeof msg.payload.choice !== 'object')
       return Promise.reject('invalid choice');
 
