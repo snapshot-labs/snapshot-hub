@@ -60,7 +60,9 @@ type Query {
 
 input SpaceWhere {
   id: String
-  id_in: [String]
+  id_in: [String],
+  is_admin: String,
+  is_member: String
 }
 
 input ProposalWhere {

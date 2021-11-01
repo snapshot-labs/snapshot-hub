@@ -6,6 +6,15 @@ export default async function(parent, args) {
   let queryStr = '';
   const params: any[] = [];
 
+  if (where['is_admin']) {
+    queryStr += `AND JSON_CONTAINS(settings->"$.admins", ?)`;
+    params.push(`"${where['is_admin']}"`);
+  }
+  if (where['is_member']) {
+    queryStr += `AND JSON_CONTAINS(settings->"$.members", ?)`;
+    params.push(`"${where['is_member']}"`);
+  }
+
   const fields = ['id'];
   fields.forEach(field => {
     if (where[field]) {
