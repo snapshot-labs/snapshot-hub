@@ -7,6 +7,9 @@ import chunk from 'lodash/chunk';
 const delay = 5;
 const interval = 30;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
+const servicePushNotifications = parseInt(
+  process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
+);
 
 const getProposal = async proposalId => {
   try {
@@ -66,7 +69,8 @@ async function processEvents() {
   console.log('Process event start', ts, events.length);
 
   for (const event of events) {
-    if (event.event === 'proposal/start') sendPushNotification(event);
+    if (servicePushNotifications && event.event === 'proposal/start')
+      sendPushNotification(event);
 
     Promise.all(
       subscribers
