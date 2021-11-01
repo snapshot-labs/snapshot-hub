@@ -33,6 +33,7 @@ const getSubscribedWallets = async space => {
   const wallets = subscriptions.map(subscription => subscription.address);
   return wallets;
 };
+
 const sendPushNotification = async event => {
   const subscribedWallets = await getSubscribedWallets(event.space);
   const walletsChunks = chunk(subscribedWallets, 100);
