@@ -24,5 +24,9 @@
   },
   {
     "url": "https://us-central1-static-174201.cloudfunctions.net/gov-bot-hook"
+  },
+  {
+    "url": "https://10a07ef41d70d93d02f53f0bad9b3cb8.m.pipedream.net",
+    "spaces": ["dcip.eth"]
   }
 ]
