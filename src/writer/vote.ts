@@ -51,7 +51,6 @@ export async function verify(body): Promise<any> {
       msg.space,
       jsonParse(proposal.strategies),
       proposal.network,
-      snapshot.utils.getProvider(proposal.network),
       [body.address],
       proposal.snapshot
     );
