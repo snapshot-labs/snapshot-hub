@@ -6,13 +6,13 @@ export default async function(parent, args) {
   let queryStr = '';
   const params: any[] = [];
 
-  if (where['is_admin']) {
-    queryStr += `AND JSON_CONTAINS(settings->"$.admins", ?)`;
-    params.push(`"${where['is_admin']}"`);
+  if (where['admin_contains']) {
+    queryStr += `AND JSON_OVERLAPS(settings->"$.admins", ?)`;
+    params.push(`${JSON.stringify(where['admin_contains'])}`);
   }
-  if (where['is_member']) {
-    queryStr += `AND JSON_CONTAINS(settings->"$.members", ?)`;
-    params.push(`"${where['is_member']}"`);
+  if (where['member_contains']) {
+    queryStr += `AND JSON_OVERLAPS(settings->"$.members", ?)`;
+    params.push(`${JSON.stringify(where['member_contains'])}`);
   }
 
   const fields = ['id'];
