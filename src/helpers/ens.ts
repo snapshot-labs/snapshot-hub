@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
+import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
-import { getSpaceUri } from '@snapshot-labs/snapshot.js/src/utils';
 
 const gateway = gateways[0];
 
@@ -22,7 +22,7 @@ export async function uriGet(
 
 export async function getSpace(id) {
   let space = false;
-  const uri: any = await getSpaceUri(id);
+  const uri: any = await snapshot.utils.getSpaceUri(id);
   if (uri) {
     try {
       const [protocolType, key] = uri.split('://');
