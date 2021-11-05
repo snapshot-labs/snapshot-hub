@@ -7,6 +7,8 @@ import { spaces } from '../helpers/spaces';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
+  if (msg.space === 'huwacoin.eth') return Promise.reject('over the limit');
+
   const schemaIsValid = snapshot.utils.validateSchema(
     snapshot.schemas.proposal,
     msg.payload
