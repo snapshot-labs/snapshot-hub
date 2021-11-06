@@ -6,8 +6,8 @@ export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
-  space.avatar =
-    space.avatar || `https://metadata.ens.domains/mainnet/avatar/${id}`;
+  space.avatar = space.avatar ||
+    `https://raw.githubusercontent.com/snapshot-labs/snapshot-spaces/master/spaces/${id}/space.png`;
   space.about = space.about || '';
   space.admins = space.admins || [];
   space.members = space.members || [];
