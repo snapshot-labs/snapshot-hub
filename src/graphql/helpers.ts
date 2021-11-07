@@ -20,6 +20,7 @@ export function formatSpace(id, settings) {
   space.voting.period = space.voting.period || null;
   space.voting.type = space.voting.type || null;
   space.voting.quorum = space.voting.quorum || null;
+  space.voting.blind = space.voting.blind || null;
   return space;
 }
 
