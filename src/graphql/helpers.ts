@@ -6,8 +6,7 @@ export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
-  space.avatar =
-    space.avatar ||
+  space.avatar = space.avatar ||
     `https://raw.githubusercontent.com/snapshot-labs/snapshot-spaces/master/spaces/${id}/space.png`;
   space.about = space.about || '';
   space.admins = space.admins || [];
@@ -21,6 +20,7 @@ export function formatSpace(id, settings) {
   space.voting.period = space.voting.period || null;
   space.voting.type = space.voting.type || null;
   space.voting.quorum = space.voting.quorum || null;
+  space.voting.blind = space.voting.blind || null;
   return space;
 }
 
