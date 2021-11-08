@@ -208,6 +208,7 @@ type SpaceVoting {
   period: Int
   type: String
   quorum: Float
+  blind: Boolean
 }
 
 type Proposal {
