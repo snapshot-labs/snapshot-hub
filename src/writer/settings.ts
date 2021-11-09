@@ -3,7 +3,6 @@ import isEqual from 'lodash/isEqual';
 import { storeSettings } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
 import { spaces } from '../helpers/spaces';
-import { getSpaceUri } from '../helpers/ens';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -17,7 +16,7 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong space format');
   }
 
-  const spaceUri = await getSpaceUri(msg.space);
+  const spaceUri = await snapshot.utils.getSpaceUri(msg.space);
   const isOwner = spaceUri.includes(body.address);
   const admins = (spaces[msg.space]?.admins || []).map(admin =>
     admin.toLowerCase()

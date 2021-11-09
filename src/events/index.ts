@@ -1,10 +1,56 @@
 import fetch from 'cross-fetch';
+import beams from '../helpers/beams';
 import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
+import chunk from 'lodash/chunk';
 
 const delay = 5;
 const interval = 30;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
+const servicePushNotifications = parseInt(
+  process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
+);
+
+const getProposal = async proposalId => {
+  try {
+    const proposals = await db.queryAsync(
+      'SELECT * FROM proposals WHERE id = ?',
+      [proposalId]
+    );
+    const proposal = proposals[0];
+    return proposal;
+  } catch (error) {
+    throw new Error(`Proposal not found with id ${proposalId}`);
+  }
+};
+
+const getSubscribedWallets = async space => {
+  const subscriptions = await db.queryAsync(
+    'SELECT * FROM subscriptions WHERE space = ?',
+    [space]
+  );
+
+  const wallets = subscriptions.map(subscription => subscription.address);
+  return wallets;
+};
+
+const sendPushNotification = async event => {
+  const subscribedWallets = await getSubscribedWallets(event.space);
+  const walletsChunks = chunk(subscribedWallets, 100);
+  const proposal = await getProposal(event.id.replace('proposal/', ''));
+
+  for await (const walletsChunk of walletsChunks) {
+    await beams.publishToInterests(walletsChunk, {
+      web: {
+        notification: {
+          title: event.space,
+          body: proposal.title,
+          deep_link: `${process.env.SNAPSHOT_URI}/#/${event.space}/${event.id}`
+        }
+      }
+    });
+  }
+};
 
 async function sendEvent(event, to) {
   const res = await fetch(to, {
@@ -20,8 +66,13 @@ async function processEvents() {
   const events = await db.queryAsync('SELECT * FROM events WHERE expire <= ?', [
     ts
   ]);
+
   console.log('Process event start', ts, events.length);
+
   for (const event of events) {
+    if (servicePushNotifications && event.event === 'proposal/start')
+      sendPushNotification(event);
+
     Promise.all(
       subscribers
         .filter(

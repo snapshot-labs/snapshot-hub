@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { storeProposal } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
@@ -5,6 +6,8 @@ import { spaces } from '../helpers/spaces';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
+
+  if (msg.space === 'huwacoin.eth') return Promise.reject('over the limit');
 
   const schemaIsValid = snapshot.utils.validateSchema(
     snapshot.schemas.proposal,
@@ -15,8 +18,29 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong proposal format');
   }
 
+  if (
+    msg.payload.type === 'basic' &&
+    !isEqual(['For', 'Against', 'Abstain'], msg.payload.choices)
+  ) {
+    return Promise.reject('wrong choices for basic type voting');
+  }
+
   const space = spaces[msg.space];
   space.id = msg.space;
+
+  if (space.voting?.delay) {
+    const isValidDelay =
+      msg.payload.start === parseInt(msg.timestamp) + space.voting.delay;
+
+    if (!isValidDelay) return Promise.reject('invalid voting delay');
+  }
+
+  if (space.voting?.period) {
+    const isValidPeriod =
+      msg.payload.end - msg.payload.start === space.voting.period;
+    if (!isValidPeriod) return Promise.reject('invalid voting period');
+  }
+
   try {
     const validationName = space.validation?.name || 'basic';
     const validationParams = space.validation?.params || {};
