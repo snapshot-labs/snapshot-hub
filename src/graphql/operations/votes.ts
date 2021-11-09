@@ -6,13 +6,14 @@ export default async function(parent, args, context, info) {
   const requestedFields = graphqlFields(info);
   const { where = {} } = args;
 
-  // Test for ENS proposal
+  /** Test for ENS proposal
   if (
     where?.proposal ===
     '0xd810c4cf2f09737a6f833f1ec51eaa5504cbc0afeeb883a21a7e1c91c8a597e4'
   ) {
     return [];
   }
+  */
 
   const fields = {
     id: 'string',
