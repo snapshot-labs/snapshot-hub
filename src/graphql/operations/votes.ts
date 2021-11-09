@@ -30,7 +30,7 @@ export default async function(parent, args, context, info) {
 
   let votes: any[] = [];
 
-  const query = `SELECT * FROM votes WHERE 1-1 ${queryStr}
+  const query = `SELECT * FROM votes WHERE 1=1 ${queryStr}
    GROUP BY voter, proposal ORDER BY created DESC, ${orderBy} ${orderDirection} LIMIT ?, ?`;
 
   try {
