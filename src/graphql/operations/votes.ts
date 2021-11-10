@@ -20,7 +20,9 @@ export default async function(parent, args, context, info) {
     space: 'string',
     voter: 'string',
     proposal: 'string',
-    created: 'number'
+    created: 'number',
+    vp: 'number',
+    vp_state: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;
@@ -33,7 +35,9 @@ export default async function(parent, args, context, info) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  const { first = 20, skip = 0 } = args;
+  let { first = 20 } = args;
+  const { skip = 0 } = args;
+  if (first > 10000) first = 10000;
   params.push(skip, first);
 
   let votes: any[] = [];
