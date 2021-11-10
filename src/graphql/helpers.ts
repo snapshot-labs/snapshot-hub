@@ -29,6 +29,8 @@ export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
   proposal.plugins = jsonParse(proposal.plugins, {});
+  proposal.scores = jsonParse(proposal.scores, []);
+  proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
   let proposalState = 'pending';
   const ts = parseInt((Date.now() / 1e3).toFixed());
   if (ts > proposal.start) proposalState = 'active';

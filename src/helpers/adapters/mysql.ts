@@ -78,7 +78,10 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
     choices: JSON.stringify(msg.payload.choices),
     start: parseInt(msg.payload.start || '0'),
     end: parseInt(msg.payload.end || '0'),
-    snapshot: proposalSnapshot || 0
+    snapshot: proposalSnapshot || 0,
+    scores: JSON.stringify([]),
+    scores_by_strategy: JSON.stringify([]),
+    scores_state: ''
   };
   let query = 'INSERT IGNORE INTO proposals SET ?; ';
   const params: any[] = [proposal];

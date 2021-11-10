@@ -56,6 +56,9 @@ CREATE TABLE proposals (
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
   snapshot INT(24) NOT NULL,
+  scores JSON NOT NULL,
+  scores_by_strategy JSON NOT NULL,
+  scores_state VARCHAR(24) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX author (author),
@@ -63,7 +66,8 @@ CREATE TABLE proposals (
   INDEX network (network),
   INDEX space (space),
   INDEX start (start),
-  INDEX end (end)
+  INDEX end (end),
+  INDEX scores_state (scores_state)
 );
 
 CREATE TABLE votes (
