@@ -6,9 +6,6 @@ export default async function(parent, args, context, info) {
   const requestedFields = graphqlFields(info);
   const { where = {} } = args;
 
-  // Temporary fix
-  return [];
-
   // Temporary fix for ENS proposal
   if (
     where?.proposal ===
