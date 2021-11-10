@@ -1,6 +1,11 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, formatVote } from '../helpers';
+import {
+  buildWhereQuery,
+  formatProposal,
+  formatSpace,
+  formatVote
+} from '../helpers';
 
 export default async function(parent, args, context, info) {
   const requestedFields = graphqlFields(info);
@@ -43,12 +48,11 @@ export default async function(parent, args, context, info) {
   let votes: any[] = [];
 
   const query = `
-    SELECT v.*, spaces.settings FROM votes v
-    INNER JOIN spaces ON spaces.id = v.space
+    SELECT v.* FROM votes v
     LEFT OUTER JOIN votes v2 ON
       v.voter = v2.voter AND v.proposal = v2.proposal
       AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-    WHERE v2.voter IS NULL AND spaces.settings IS NOT NULL ${queryStr}
+    WHERE v2.voter IS NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
@@ -57,6 +61,29 @@ export default async function(parent, args, context, info) {
   } catch (e) {
     console.log(e);
     return Promise.reject('request failed');
+  }
+
+  if (requestedFields.space && votes.length > 0) {
+    const spaceIds = votes.map(vote => vote.space.id).filter((v, i, a) => a.indexOf(v) === i);
+    const query = `
+      SELECT id, settings FROM spaces
+      WHERE id IN (?) AND settings IS NOT NULL  
+    `;
+    try {
+      let spaces = await db.queryAsync(query, [spaceIds]);
+
+      spaces = Object.fromEntries(
+        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+      );
+      votes = votes.map(vote => {
+        if (spaces[vote.space.id])
+          return { ...vote, space: spaces[vote.space.id] };
+        return vote;
+      });
+    } catch (e) {
+      console.log(e);
+      return Promise.reject('request failed');
+    }
   }
 
   if (requestedFields.proposal && votes.length > 0) {
