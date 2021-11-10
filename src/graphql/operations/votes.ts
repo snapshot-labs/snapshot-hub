@@ -21,7 +21,9 @@ export default async function(parent, args, context, info) {
     space: 'string',
     voter: 'string',
     proposal: 'string',
-    created: 'number'
+    created: 'number',
+    vp: 'number',
+    vp_state: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;

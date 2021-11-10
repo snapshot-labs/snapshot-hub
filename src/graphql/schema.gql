@@ -112,6 +112,14 @@ input VoteWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  vp: Int
+  vp_in: [Int]
+  vp_gt: Int
+  vp_gte: Int
+  vp_lt: Int
+  vp_lte: Int
+  vp_state: String
+  vp_state_in: [String]
 }
 
 input AliasWhere {
@@ -243,6 +251,9 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+  vp: Int
+  vp_by_strategy: [Int]
+  vp_state: String
 }
 
 type Alias {
