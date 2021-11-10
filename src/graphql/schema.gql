@@ -92,6 +92,8 @@ input ProposalWhere {
   end_gte: Int
   end_lt: Int
   end_lte: Int
+  scores_state: String
+  scores_state_in: [String]
   state: String
 }
 
@@ -235,6 +237,9 @@ type Proposal {
   snapshot: String
   state: String
   link: String
+  scores: [Int]
+  scores_by_strategy: [[Int]]
+  scores_state: String
 }
 
 type Strategy {
