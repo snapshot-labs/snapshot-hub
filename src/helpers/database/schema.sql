@@ -75,12 +75,17 @@ CREATE TABLE votes (
   proposal VARCHAR(66) NOT NULL,
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
+  vp BIGINT NOT NULL,
+  vp_by_strategy JSON NOT NULL,
+  vp_state VARCHAR(24) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX voter (voter),
   INDEX created (created),
   INDEX space (space),
-  INDEX proposal (proposal)
+  INDEX proposal (proposal),
+  INDEX vp (vp),
+  INDEX vp_state (vp_state)
 );
 
 CREATE TABLE events (
