@@ -49,4 +49,4 @@ setTimeout(() => {
     console.log('Total spaces', totalSpaces);
     console.log('Total public spaces', totalPublicSpaces);
   });
-}, 2e3);
+}, 3e3);

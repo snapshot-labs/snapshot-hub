@@ -114,12 +114,12 @@ input VoteWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
-  vp: Int
-  vp_in: [Int]
-  vp_gt: Int
-  vp_gte: Int
-  vp_lt: Int
-  vp_lte: Int
+  vp: Float
+  vp_in: [Float]
+  vp_gt: Float
+  vp_gte: Float
+  vp_lt: Float
+  vp_lte: Float
   vp_state: String
   vp_state_in: [String]
 }
@@ -237,8 +237,8 @@ type Proposal {
   snapshot: String
   state: String
   link: String
-  scores: [Int]
-  scores_by_strategy: [[Int]]
+  scores: [Float]
+  scores_by_strategy: [[Float]]
   scores_state: String
 }
 
@@ -256,8 +256,8 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
-  vp: Int
-  vp_by_strategy: [Int]
+  vp: Float
+  vp_by_strategy: [Float]
   vp_state: String
 }
 

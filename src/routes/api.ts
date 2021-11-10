@@ -14,6 +14,7 @@ import ingestor from '../ingestor';
 import pkg from '../../package.json';
 import db from '../helpers/mysql';
 import { hashPersonalMessage } from '../ingestor/personalSign/utils';
+import { getProposalScores } from '../scores';
 
 const gateway = gateways[0];
 
@@ -28,6 +29,11 @@ router.get('/', (req, res) => {
     tag: 'alpha',
     relayer: relayer.address
   });
+});
+
+router.get('/scores/:proposalId', async (req, res) => {
+  const { proposalId } = req.params;
+  return res.json(await getProposalScores(proposalId));
 });
 
 router.get('/explore', (req, res) => {
