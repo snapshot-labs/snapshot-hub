@@ -143,7 +143,10 @@ export async function storeVote(space, body, ipfs, receipt, id) {
     space,
     proposal: msg.payload.proposal,
     choice: JSON.stringify(msg.payload.choice),
-    metadata: JSON.stringify(msg.payload.metadata || {})
+    metadata: JSON.stringify(msg.payload.metadata || {}),
+    vp: 0,
+    vp_by_strategy: JSON.stringify([]),
+    vp_state: ''
   };
 
   await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
@@ -187,7 +190,7 @@ export async function getFollowers() {
 
 export async function getOneDayVoters() {
   const query = `
-    SELECT space, COUNT(DISTINCT(voter)) AS count FROM votes 
+    SELECT space, COUNT(DISTINCT(voter)) AS count FROM votes
     WHERE created > (UNIX_TIMESTAMP() - 86400) GROUP BY space
   `;
   return await db.queryAsync(query);
