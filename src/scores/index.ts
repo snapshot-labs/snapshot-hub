@@ -73,20 +73,31 @@ export async function getProposalScores(proposalId) {
       votes,
       proposal.strategies
     );
-    const resultsByVoteBalance = votingClass.resultsByVoteBalance();
-    const resultsByStrategyScore = votingClass.resultsByStrategyScore();
-
     const results = {
       scores_state: proposal.state === 'closed' ? state : 'pending',
-      scores: resultsByVoteBalance,
-      scores_by_strategy: resultsByStrategyScore
+      scores: votingClass.resultsByVoteBalance(),
+      scores_by_strategy: votingClass.resultsByStrategyScore(),
+      scores_total: votingClass.sumOfResultsBalance()
     };
 
-    const query = `UPDATE proposals SET scores_state = ?, scores = ?, scores_by_strategy = ? WHERE id = ? LIMIT 1;`;
+    const ts = (Date.now() / 1e3).toFixed();
+    const query = `
+      UPDATE proposals
+      SET scores_state = ?,
+      scores = ?,
+      scores_by_strategy = ?,
+      scores_total = ?,
+      scores_updated = ?,
+      votes = ?
+      WHERE id = ? LIMIT 1;
+    `;
     await db.queryAsync(query, [
       results.scores_state,
       JSON.stringify(results.scores),
       JSON.stringify(results.scores_by_strategy),
+      results.scores_total,
+      ts,
+      votes.length,
       proposalId
     ]);
 
