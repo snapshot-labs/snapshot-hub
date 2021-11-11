@@ -240,6 +240,8 @@ type Proposal {
   scores: [Float]
   scores_by_strategy: [[Float]]
   scores_state: String
+  scores_total: Float
+  scores_updated: Int
 }
 
 type Strategy {
