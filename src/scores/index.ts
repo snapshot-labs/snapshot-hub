@@ -37,6 +37,15 @@ export async function getProposalScores(proposalId) {
     // Get proposal
     const proposal = await getProposal({}, { id: proposalId });
 
+    if (proposal.scores_state === 'final') {
+      return {
+        scores_state: proposal.scores_state,
+        scores: proposal.scores,
+        scores_by_strategy: proposal.scores_by_strategy,
+        scores_total: proposal.scores_total
+      };
+    }
+
     // Get votes
     let votes = await getVotes(
       {},
