@@ -166,9 +166,11 @@ async function run() {
     'SELECT id FROM proposals WHERE scores_state = ? ORDER BY created ASC LIMIT 1',
     ['']
   );
-  console.log('Get proposal', proposal.id);
-  await getProposalScores(proposal.id);
-  await run();
+  if (proposal && proposal.id) {
+    console.log('Get proposal', proposal.id);
+    await getProposalScores(proposal.id);
+    await run();
+  }
 }
 
 snapshot.utils.sleep(5000).then(() => run());
