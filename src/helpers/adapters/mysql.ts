@@ -155,7 +155,7 @@ export async function storeVote(space, body, ipfs, receipt, id) {
     vp_state: ''
   };
 
-  await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
+  await db.queryAsync('INSERT IGNORE INTO votes SET ? ON DUPLICATE KEY UPDATE ?', [params, params]);
   console.log('Store vote complete', space, id, ipfs);
 }
 

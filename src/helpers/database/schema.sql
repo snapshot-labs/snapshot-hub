@@ -88,6 +88,7 @@ CREATE TABLE votes (
   vp_by_strategy JSON NOT NULL,
   vp_state VARCHAR(24) NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE KEY unique_vote (voter, proposal),
   INDEX ipfs (ipfs),
   INDEX voter (voter),
   INDEX created (created),
