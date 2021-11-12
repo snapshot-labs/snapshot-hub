@@ -95,6 +95,7 @@ export async function getProposalScores(proposalId) {
         votesInPages.push(votes.slice(max * i, max * (i + 1)));
       });
 
+      let i = 0;
       for (const votesInPage of votesInPages) {
         const params: any = [];
         let query2 = '';
@@ -109,7 +110,8 @@ export async function getProposalScores(proposalId) {
           params.push(proposalId);
         });
         await db.queryAsync(query2, params);
-        await snapshot.utils.sleep(100);
+        if (i) await snapshot.utils.sleep(200);
+        i++;
         console.log('Updated votes');
       }
 
@@ -137,11 +139,11 @@ export async function getProposalScores(proposalId) {
       votes.length,
       proposalId
     ]);
-    console.log('Proposal updated');
+    console.log('Proposal', results.scores_state);
 
     return results;
   } catch (e) {
-    console.log('Scores failed', proposalId, e);
+    console.log('> Failed!', proposalId);
 
     const ts = (Date.now() / 1e3).toFixed();
     const query = `
@@ -151,7 +153,7 @@ export async function getProposalScores(proposalId) {
       WHERE id = ? LIMIT 1;
     `;
     await db.queryAsync(query, ['invalid', ts, proposalId]);
-    console.log('Proposal updated');
+    console.log('Proposal invalid');
 
     return { scores_state: 'invalid' };
   }
@@ -169,4 +171,4 @@ async function run() {
   await run();
 }
 
-// snapshot.utils.sleep(3000).then(() => run());
+snapshot.utils.sleep(5000).then(() => run());
