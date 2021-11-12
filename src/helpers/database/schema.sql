@@ -56,6 +56,12 @@ CREATE TABLE proposals (
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
   snapshot INT(24) NOT NULL,
+  scores JSON NOT NULL,
+  scores_by_strategy JSON NOT NULL,
+  scores_state VARCHAR(24) NOT NULL,
+  scores_total DECIMAL(64,30) NOT NULL,
+  scores_updated INT(11) NOT NULL,
+  votes INT(12) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX author (author),
@@ -63,7 +69,10 @@ CREATE TABLE proposals (
   INDEX network (network),
   INDEX space (space),
   INDEX start (start),
-  INDEX end (end)
+  INDEX end (end),
+  INDEX scores_state (scores_state),
+  INDEX scores_updated (scores_updated),
+  INDEX votes (votes)
 );
 
 CREATE TABLE votes (
@@ -75,12 +84,17 @@ CREATE TABLE votes (
   proposal VARCHAR(66) NOT NULL,
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
+  vp DECIMAL(64,30) NOT NULL,
+  vp_by_strategy JSON NOT NULL,
+  vp_state VARCHAR(24) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX voter (voter),
   INDEX created (created),
   INDEX space (space),
-  INDEX proposal (proposal)
+  INDEX proposal (proposal),
+  INDEX vp (vp),
+  INDEX vp_state (vp_state)
 );
 
 CREATE TABLE events (

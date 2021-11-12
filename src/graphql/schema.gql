@@ -94,6 +94,8 @@ input ProposalWhere {
   end_gte: Int
   end_lt: Int
   end_lte: Int
+  scores_state: String
+  scores_state_in: [String]
   state: String
 }
 
@@ -114,6 +116,14 @@ input VoteWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  vp: Float
+  vp_in: [Float]
+  vp_gt: Float
+  vp_gte: Float
+  vp_lt: Float
+  vp_lte: Float
+  vp_state: String
+  vp_state_in: [String]
 }
 
 input AliasWhere {
@@ -229,6 +239,11 @@ type Proposal {
   snapshot: String
   state: String
   link: String
+  scores: [Float]
+  scores_by_strategy: [[Float]]
+  scores_state: String
+  scores_total: Float
+  scores_updated: Int
 }
 
 type Strategy {
@@ -245,6 +260,9 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+  vp: Float
+  vp_by_strategy: [Float]
+  vp_state: String
 }
 
 type Alias {

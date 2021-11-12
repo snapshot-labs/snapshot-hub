@@ -78,7 +78,13 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
     choices: JSON.stringify(msg.payload.choices),
     start: parseInt(msg.payload.start || '0'),
     end: parseInt(msg.payload.end || '0'),
-    snapshot: proposalSnapshot || 0
+    snapshot: proposalSnapshot || 0,
+    scores: JSON.stringify([]),
+    scores_by_strategy: JSON.stringify([]),
+    scores_state: '',
+    scores_total: 0,
+    scores_updated: 0,
+    votes: 0
   };
   let query = 'INSERT IGNORE INTO proposals SET ?; ';
   const params: any[] = [proposal];
@@ -143,7 +149,10 @@ export async function storeVote(space, body, ipfs, receipt, id) {
     space,
     proposal: msg.payload.proposal,
     choice: JSON.stringify(msg.payload.choice),
-    metadata: JSON.stringify(msg.payload.metadata || {})
+    metadata: JSON.stringify(msg.payload.metadata || {}),
+    vp: 0,
+    vp_by_strategy: JSON.stringify([]),
+    vp_state: ''
   };
 
   await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
@@ -187,7 +196,7 @@ export async function getFollowers() {
 
 export async function getOneDayVoters() {
   const query = `
-    SELECT space, COUNT(DISTINCT(voter)) AS count FROM votes 
+    SELECT space, COUNT(DISTINCT(voter)) AS count FROM votes
     WHERE created > (UNIX_TIMESTAMP() - 86400) GROUP BY space
   `;
   return await db.queryAsync(query);

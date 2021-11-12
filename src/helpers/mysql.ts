@@ -13,6 +13,8 @@ config.connectionLimit = connectionLimit;
 config.multipleStatements = true;
 config.database = config.path[0];
 config.host = config.hosts[0].name;
+config.port = config.hosts[0].port;
+config.connectTimeout = 30000;
 config.charset = 'utf8mb4';
 bluebird.promisifyAll([Pool, Connection]);
 const db = mysql.createPool(config);

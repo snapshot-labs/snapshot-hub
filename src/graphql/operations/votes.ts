@@ -1,10 +1,23 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, formatVote } from '../helpers';
+import {
+  buildWhereQuery,
+  formatProposal,
+  formatSpace,
+  formatVote
+} from '../helpers';
 
-export default async function(parent, args, context, info) {
-  const requestedFields = graphqlFields(info);
+export default async function(parent, args, context?, info?) {
+  const requestedFields = info ? graphqlFields(info) : {};
   const { where = {} } = args;
+
+  // Temporary fix for ENS proposal
+  if (
+    where?.proposal ===
+    '0xd810c4cf2f09737a6f833f1ec51eaa5504cbc0afeeb883a21a7e1c91c8a597e4'
+  ) {
+    return [];
+  }
 
   const fields = {
     id: 'string',
@@ -12,7 +25,9 @@ export default async function(parent, args, context, info) {
     space: 'string',
     voter: 'string',
     proposal: 'string',
-    created: 'number'
+    created: 'number',
+    vp: 'number',
+    vp_state: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;
@@ -25,18 +40,19 @@ export default async function(parent, args, context, info) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  const { first = 20, skip = 0 } = args;
+  let { first = 20 } = args;
+  const { skip = 0 } = args;
+  if (first > 100000) first = 100000;
   params.push(skip, first);
 
   let votes: any[] = [];
 
   const query = `
-    SELECT v.*, spaces.settings FROM votes v
-    INNER JOIN spaces ON spaces.id = v.space
+    SELECT v.* FROM votes v
     LEFT OUTER JOIN votes v2 ON
       v.voter = v2.voter AND v.proposal = v2.proposal
       AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-    WHERE v2.voter IS NULL AND spaces.settings IS NOT NULL ${queryStr}
+    WHERE v2.voter IS NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
@@ -45,6 +61,31 @@ export default async function(parent, args, context, info) {
   } catch (e) {
     console.log(e);
     return Promise.reject('request failed');
+  }
+
+  if (requestedFields.space && votes.length > 0) {
+    const spaceIds = votes
+      .map(vote => vote.space.id)
+      .filter((v, i, a) => a.indexOf(v) === i);
+    const query = `
+      SELECT id, settings FROM spaces
+      WHERE id IN (?) AND settings IS NOT NULL
+    `;
+    try {
+      let spaces = await db.queryAsync(query, [spaceIds]);
+
+      spaces = Object.fromEntries(
+        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+      );
+      votes = votes.map(vote => {
+        if (spaces[vote.space.id])
+          return { ...vote, space: spaces[vote.space.id] };
+        return vote;
+      });
+    } catch (e) {
+      console.log(e);
+      return Promise.reject('request failed');
+    }
   }
 
   if (requestedFields.proposal && votes.length > 0) {

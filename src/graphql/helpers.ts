@@ -6,7 +6,8 @@ export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
-  space.avatar = space.avatar ||
+  space.avatar =
+    space.avatar ||
     `https://raw.githubusercontent.com/snapshot-labs/snapshot-spaces/master/spaces/${id}/space.png`;
   space.about = space.about || '';
   space.admins = space.admins || [];
@@ -28,6 +29,8 @@ export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
   proposal.plugins = jsonParse(proposal.plugins, {});
+  proposal.scores = jsonParse(proposal.scores, []);
+  proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
   let proposalState = 'pending';
   const ts = parseInt((Date.now() / 1e3).toFixed());
   if (ts > proposal.start) proposalState = 'active';
@@ -42,6 +45,7 @@ export function formatProposal(proposal) {
 export function formatVote(vote) {
   vote.choice = jsonParse(vote.choice);
   vote.metadata = jsonParse(vote.metadata, {});
+  vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
   vote.space = formatSpace(vote.space, vote.settings);
   return vote;
 }

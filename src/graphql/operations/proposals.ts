@@ -12,7 +12,8 @@ export default async function(parent, args) {
     network: 'string',
     created: 'number',
     start: 'number',
-    end: 'number'
+    end: 'number',
+    scores_state: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'p', where);
   let queryStr = whereQuery.query;
