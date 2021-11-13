@@ -155,7 +155,20 @@ export async function storeVote(space, body, ipfs, receipt, id) {
     vp_state: ''
   };
 
-  await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
+  const connection = await db.getConnectionAsync();
+
+  await connection.beginTransactionAsync();
+
+  const deleteVotesQuery =
+    'DELETE FROM votes WHERE voter = ? AND proposal = ?;';
+  const deleteVotesParams = [params.voter, params.proposal];
+  await connection.queryAsync(deleteVotesQuery, deleteVotesParams);
+
+  const insertVoteQuery = 'INSERT INTO votes SET ?;';
+  const insertVoteParams = [params];
+  await connection.queryAsync(insertVoteQuery, insertVoteParams);
+
+  await connection.commitAsync();
   console.log('Store vote complete', space, id, ipfs);
 }
 
