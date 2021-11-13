@@ -238,7 +238,7 @@ type Proposal {
   state: String
   link: String
   scores: [Float]
-  scores_by_strategy: [[Float]]
+  scores_by_strategy: Any
   scores_state: String
   scores_total: Float
   scores_updated: Int
