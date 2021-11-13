@@ -155,20 +155,29 @@ export async function storeVote(space, body, ipfs, receipt, id) {
     vp_state: ''
   };
 
-  const connection = await db.getConnectionAsync();
-
-  await connection.beginTransactionAsync();
-
+  // Delete old votes with lower created timestamp
   const deleteVotesQuery =
-    'DELETE FROM votes WHERE voter = ? AND proposal = ?;';
-  const deleteVotesParams = [params.voter, params.proposal];
-  await connection.queryAsync(deleteVotesQuery, deleteVotesParams);
+    'DELETE FROM votes WHERE voter = ? AND proposal = ? AND created <= ?;';
+  const deleteVotesParams = [params.voter, params.proposal, params.created];
+  await db.queryAsync(deleteVotesQuery, deleteVotesParams);
 
+  // Find previous votes that did not get deleted by the previous delete query
+  const previousVotesQuery =
+    'SELECT * FROM votes WHERE voter = ? AND proposal = ?';
+  const previousVotes = await db.queryAsync(previousVotesQuery, [
+    params.voter,
+    params.proposal
+  ]);
+
+  if (previousVotes.length > 0) {
+    throw new Error('A more recent vote is already present.');
+  }
+
+  // Store the vote in the database
   const insertVoteQuery = 'INSERT INTO votes SET ?;';
   const insertVoteParams = [params];
-  await connection.queryAsync(insertVoteQuery, insertVoteParams);
+  await db.queryAsync(insertVoteQuery, insertVoteParams);
 
-  await connection.commitAsync();
   console.log('Store vote complete', space, id, ipfs);
 }
 
