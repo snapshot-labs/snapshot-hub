@@ -242,6 +242,7 @@ type Proposal {
   scores_state: String
   scores_total: Float
   scores_updated: Int
+  votes: Int
 }
 
 type Strategy {
