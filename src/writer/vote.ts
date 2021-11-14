@@ -90,7 +90,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     }
   ]);
 
-  /* Store the vote in dedicated table 'votes' */
+  // Store vote in dedicated table
   const params = {
     id,
     ipfs,
@@ -105,7 +105,6 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     vp_state: '',
     cb: 0
   };
-
   await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   console.log('Store vote complete', msg.space, id, ipfs);
 }
