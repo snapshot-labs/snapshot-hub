@@ -10,6 +10,7 @@ export function formatSpace(id, settings) {
     space.avatar ||
     `https://raw.githubusercontent.com/snapshot-labs/snapshot-spaces/master/spaces/${id}/space.png`;
   space.about = space.about || '';
+  space.categories = space.categories || [];
   space.admins = space.admins || [];
   space.members = space.members || [];
   space.plugins = space.plugins || {};
