@@ -13,6 +13,7 @@ export default async function(parent, args) {
     created: 'number',
     start: 'number',
     end: 'number',
+    type: 'string',
     scores_state: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'p', where);
