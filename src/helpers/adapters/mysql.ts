@@ -152,7 +152,8 @@ export async function storeVote(space, body, ipfs, receipt, id) {
     metadata: JSON.stringify(msg.payload.metadata || {}),
     vp: 0,
     vp_by_strategy: JSON.stringify([]),
-    vp_state: ''
+    vp_state: '',
+    cb: 0
   };
 
   await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
