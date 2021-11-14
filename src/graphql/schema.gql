@@ -74,6 +74,8 @@ input ProposalWhere {
   author_in: [String]
   network: String
   network_in: [String]
+  type: String
+  type_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -204,6 +206,7 @@ type Space {
   filters: SpaceFilters
   plugins: Any
   voting: SpaceVoting
+  categories: [String]
 }
 
 type SpaceFilters {
@@ -242,6 +245,7 @@ type Proposal {
   scores_state: String
   scores_total: Float
   scores_updated: Int
+  votes: Int
 }
 
 type Strategy {
