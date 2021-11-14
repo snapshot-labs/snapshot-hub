@@ -74,6 +74,7 @@ router.get('/explore', (req, res) => {
       skin: space.skin || undefined,
       terms: space.terms || undefined,
       network: space.network || undefined,
+      categories: space.categories || undefined,
       activeProposals:
         (spaceProposals[id] && spaceProposals[id].active) || undefined,
       proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
