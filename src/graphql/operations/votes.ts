@@ -35,7 +35,7 @@ export default async function(parent, args, context?, info?) {
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created'].includes(orderBy)) orderBy = 'created';
+  if (!['created', 'vp'].includes(orderBy)) orderBy = 'created';
   orderBy = `v.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
@@ -52,7 +52,7 @@ export default async function(parent, args, context?, info?) {
     LEFT OUTER JOIN votes v2 ON
       v.voter = v2.voter AND v.proposal = v2.proposal
       AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-    WHERE v2.voter IS NULL ${queryStr}
+    WHERE v2.voter IS NULL AND v.cb = 0 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
