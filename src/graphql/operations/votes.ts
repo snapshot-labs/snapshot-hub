@@ -11,14 +11,6 @@ export default async function(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {} } = args;
 
-  // Temporary fix for ENS proposal
-  if (
-    where?.proposal ===
-    '0xd810c4cf2f09737a6f833f1ec51eaa5504cbc0afeeb883a21a7e1c91c8a597e4'
-  ) {
-    return [];
-  }
-
   const fields = {
     id: 'string',
     ipfs: 'string',
@@ -42,7 +34,7 @@ export default async function(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 100000) first = 100000;
+  if (first > 20000) first = 20000;
   params.push(skip, first);
 
   let votes: any[] = [];
