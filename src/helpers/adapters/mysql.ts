@@ -156,7 +156,7 @@ export async function getRecentProposalsCount(space) {
     SELECT
     COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d,
     COUNT(IF(created > (UNIX_TIMESTAMP() - 2592000), 1, NULL)) AS count_30d
-    FROM proposals WHERE space = ?
+    FROM proposals WHERE space = ? AND created > (UNIX_TIMESTAMP() - 2592000
   `;
   return await db.queryAsync(query, [space]);
 }
