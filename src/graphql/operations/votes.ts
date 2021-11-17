@@ -11,14 +11,6 @@ export default async function(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {} } = args;
 
-  // Temporary fix for ENS proposal
-  if (
-    where?.proposal ===
-    '0xd810c4cf2f09737a6f833f1ec51eaa5504cbc0afeeb883a21a7e1c91c8a597e4'
-  ) {
-    return [];
-  }
-
   const fields = {
     id: 'string',
     ipfs: 'string',
@@ -35,20 +27,20 @@ export default async function(parent, args, context?, info?) {
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created'].includes(orderBy)) orderBy = 'created';
+  if (!['created', 'vp'].includes(orderBy)) orderBy = 'created';
   orderBy = `v.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 100000) first = 100000;
+  if (first > 20000) first = 20000;
   params.push(skip, first);
 
   let votes: any[] = [];
 
   const query = `
-    SELECT * FROM votes v WHERE 1=1 ${queryStr}
+    SELECT * FROM votes v WHERE v.cb = 0 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {

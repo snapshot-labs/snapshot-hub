@@ -1,6 +1,8 @@
 import snapshot from '@snapshot-labs/snapshot.js';
+import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../helpers/utils';
-import { getProposal, storeVote } from '../helpers/adapters/mysql';
+import { getProposal } from '../helpers/adapters/mysql';
+import db from '../helpers/mysql';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -72,5 +74,37 @@ export async function verify(body): Promise<any> {
 
 export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
-  await storeVote(msg.space, body, ipfs, receipt, id);
+
+  const query = 'INSERT IGNORE INTO messages SET ?';
+  await db.queryAsync(query, [
+    {
+      id,
+      ipfs,
+      address: body.address,
+      version: msg.version,
+      timestamp: msg.timestamp,
+      space: msg.space,
+      type: 'vote',
+      sig: body.sig,
+      receipt
+    }
+  ]);
+
+  // Store vote in dedicated table
+  const params = {
+    id,
+    ipfs,
+    voter: getAddress(body.address),
+    created: parseInt(msg.timestamp),
+    space: msg.space,
+    proposal: msg.payload.proposal,
+    choice: JSON.stringify(msg.payload.choice),
+    metadata: JSON.stringify(msg.payload.metadata || {}),
+    vp: 0,
+    vp_by_strategy: JSON.stringify([]),
+    vp_state: '',
+    cb: 0
+  };
+  await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
+  console.log('Store vote complete', msg.space, id, ipfs);
 }

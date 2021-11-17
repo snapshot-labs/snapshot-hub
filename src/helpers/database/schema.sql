@@ -87,6 +87,7 @@ CREATE TABLE votes (
   vp DECIMAL(64,30) NOT NULL,
   vp_by_strategy JSON NOT NULL,
   vp_state VARCHAR(24) NOT NULL,
+  cb INT(11) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY unique_vote (voter, proposal),
   INDEX ipfs (ipfs),
@@ -95,7 +96,8 @@ CREATE TABLE votes (
   INDEX space (space),
   INDEX proposal (proposal),
   INDEX vp (vp),
-  INDEX vp_state (vp_state)
+  INDEX vp_state (vp_state),
+  INDEX cb (cb)
 );
 
 CREATE TABLE events (

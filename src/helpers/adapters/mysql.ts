@@ -123,42 +123,6 @@ export async function storeProposal(space, body, ipfs, receipt, id) {
   console.log('Store proposal complete', space, id);
 }
 
-export async function storeVote(space, body, ipfs, receipt, id) {
-  const msg = JSON.parse(body.msg);
-  const query = 'INSERT IGNORE INTO messages SET ?;';
-  await db.queryAsync(query, [
-    {
-      id,
-      ipfs,
-      address: body.address,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      space,
-      type: 'vote',
-      sig: body.sig,
-      receipt
-    }
-  ]);
-
-  /* Store the vote in dedicated table 'votes' */
-  const params = {
-    id,
-    ipfs,
-    voter: getAddress(body.address),
-    created: parseInt(msg.timestamp),
-    space,
-    proposal: msg.payload.proposal,
-    choice: JSON.stringify(msg.payload.choice),
-    metadata: JSON.stringify(msg.payload.metadata || {}),
-    vp: 0,
-    vp_by_strategy: JSON.stringify([]),
-    vp_state: ''
-  };
-
-  await db.queryAsync('INSERT IGNORE INTO votes SET ? ON DUPLICATE KEY UPDATE ?', [params, params]);
-  console.log('Store vote complete', space, id, ipfs);
-}
-
 export async function storeSettings(space, body) {
   const msg = JSON.parse(body.msg);
 
