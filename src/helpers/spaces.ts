@@ -36,8 +36,7 @@ setInterval(() => {
 
 setTimeout(() => {
   console.log('Load spaces from db');
-  const query =
-    'SELECT id, settings FROM spaces WHERE settings IS NOT NULL ORDER BY id ASC';
+  const query = 'SELECT id, settings FROM spaces ORDER BY id ASC';
   db.queryAsync(query).then(result => {
     spaces = Object.fromEntries(
       result.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)])
