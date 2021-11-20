@@ -112,10 +112,10 @@ export async function getProposalScores(proposalId) {
         await db.queryAsync(query2, params);
         if (i) await snapshot.utils.sleep(200);
         i++;
-        console.log('Updated votes');
+        console.log('[scores] Updated votes');
       }
 
-      console.log('Votes updated', votes.length);
+      console.log('[scores] Votes updated', votes.length);
     }
 
     // Store scores
@@ -139,11 +139,11 @@ export async function getProposalScores(proposalId) {
       votes.length,
       proposalId
     ]);
-    console.log('Proposal', results.scores_state);
+    console.log('[scores] Proposal', results.scores_state);
 
     return results;
   } catch (e) {
-    console.log('> Failed!', proposalId);
+    console.log('[scores] Failed!', proposalId);
 
     const ts = (Date.now() / 1e3).toFixed();
     const query = `
@@ -153,7 +153,7 @@ export async function getProposalScores(proposalId) {
       WHERE id = ? LIMIT 1;
     `;
     await db.queryAsync(query, ['invalid', ts, proposalId]);
-    console.log('Proposal invalid');
+    console.log('[scores] Proposal invalid');
 
     return { scores_state: 'invalid' };
   }
@@ -167,7 +167,7 @@ async function run() {
     ['']
   );
   if (proposal && proposal.id) {
-    console.log('Get proposal', proposal.id);
+    console.log('[scores] Get proposal', proposal.id);
     await getProposalScores(proposal.id);
     await run();
   }

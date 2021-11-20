@@ -23,4 +23,6 @@ app.use(BASE_PATH + '/api', upload);
 app.use(BASE_PATH + '/graphql', graphql);
 app.get(BASE_PATH + '/*', (req, res) => res.redirect('/api'));
 
-app.listen(PORT, () => console.log(`Started on: http://localhost:${PORT}${BASE_PATH}`));
+app.listen(PORT, () =>
+  console.log(`Started on: http://localhost:${PORT}${BASE_PATH}`)
+);
