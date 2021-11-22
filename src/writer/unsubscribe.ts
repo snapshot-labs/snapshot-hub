@@ -8,5 +8,7 @@ export async function action(message): Promise<void> {
   const query =
     'DELETE FROM subscriptions WHERE address = ? AND space = ? LIMIT 1';
   await db.queryAsync(query, [message.from, message.space]);
-  console.log(`Removed: ${message.from} unsubscribed ${message.space}`);
+  console.log(
+    `[writer] Removed: ${message.from} unsubscribed ${message.space}`
+  );
 }
