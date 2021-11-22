@@ -12,7 +12,7 @@ export default async function(parent, { id }) {
     const votes = await db.queryAsync(query, [id]);
     return votes.map(vote => formatVote(vote))[0] || null;
   } catch (e) {
-    console.log(e);
+    console.log('[graphql]', e);
     return Promise.reject('request failed');
   }
 }

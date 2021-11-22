@@ -13,7 +13,7 @@ export default async function(parent, { id }) {
       spaces.map(space => formatSpace(space.id, space.settings))[0] || null
     );
   } catch (e) {
-    console.log(e);
+    console.log('[graphql]', e);
     return Promise.reject('request failed');
   }
 }

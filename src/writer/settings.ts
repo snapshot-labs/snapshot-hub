@@ -12,7 +12,7 @@ export async function verify(body): Promise<any> {
     msg.payload
   );
   if (schemaIsValid !== true) {
-    console.log('Wrong space format', schemaIsValid);
+    console.log('[writer] Wrong space format', schemaIsValid);
     return Promise.reject('wrong space format');
   }
 
@@ -38,6 +38,6 @@ export async function action(body): Promise<void> {
     await storeSettings(msg.space, body);
     spaces[msg.space] = msg.payload;
   } catch (e) {
-    console.log('Failed to store settings', msg.space, e);
+    console.log('[writer] Failed to store settings', msg.space, e);
   }
 }
