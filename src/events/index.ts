@@ -7,7 +7,7 @@ import { getProposalScores } from '../scores';
 
 const delay = 5;
 const interval = 30;
-const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
+const serviceEvents = 0;
 const servicePushNotifications = parseInt(
   process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
 );
