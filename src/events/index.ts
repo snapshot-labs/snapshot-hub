@@ -57,6 +57,7 @@ const sendPushNotification = async event => {
 
 async function sendEvent(event, to) {
   event.token = sha256(`${to}${serviceEventsSalt}`);
+  event.secret = sha256(`${to}${serviceEventsSalt}`);
   const res = await fetch(to, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
