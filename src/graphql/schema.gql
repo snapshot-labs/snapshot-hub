@@ -209,6 +209,7 @@ type Space {
   plugins: Any
   voting: SpaceVoting
   categories: [String]
+  validation: Strategy
 }
 
 type SpaceFilters {
