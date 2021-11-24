@@ -4,10 +4,12 @@ import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
 import chunk from 'lodash/chunk';
 import { getProposalScores } from '../scores';
+import { sha256 } from '../helpers/utils';
 
 const delay = 5;
 const interval = 30;
-const serviceEvents = 0;
+const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
+const serviceEventsSalt = parseInt(process.env.SERVICE_EVENTS_SALT || '12345');
 const servicePushNotifications = parseInt(
   process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
 );
@@ -54,6 +56,8 @@ const sendPushNotification = async event => {
 };
 
 async function sendEvent(event, to) {
+  event.token = sha256(`${to}${serviceEventsSalt}`);
+  event.secret = sha256(`${to}${serviceEventsSalt}`);
   const res = await fetch(to, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
