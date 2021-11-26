@@ -22,8 +22,8 @@ export function formatSpace(id, settings) {
   space.voting.period = space.voting.period || null;
   space.voting.type = space.voting.type || null;
   space.voting.quorum = space.voting.quorum || null;
-  space.voting.blind = space.voting.blind || null;
-  space.voting.hideAbstain = space.voting.hideAbstain || null;
+  space.voting.blind = space.voting.blind || false;
+  space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
   return space;
 }
