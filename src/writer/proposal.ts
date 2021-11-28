@@ -18,7 +18,7 @@ export async function verify(body): Promise<any> {
     msg.payload
   );
   if (schemaIsValid !== true) {
-    console.log('Wrong proposal format', schemaIsValid);
+    console.log('[writer] Wrong proposal format', schemaIsValid);
     return Promise.reject('wrong proposal format');
   }
 

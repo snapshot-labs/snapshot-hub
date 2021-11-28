@@ -207,6 +207,7 @@ type Space {
   plugins: Any
   voting: SpaceVoting
   categories: [String]
+  validation: Strategy
 }
 
 type SpaceFilters {
@@ -220,6 +221,7 @@ type SpaceVoting {
   type: String
   quorum: Float
   blind: Boolean
+  hideAbstain: Boolean
 }
 
 type Proposal {
