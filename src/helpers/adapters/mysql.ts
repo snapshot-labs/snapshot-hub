@@ -151,6 +151,16 @@ export async function getProposals() {
   return await db.queryAsync(query, [ts, ts]);
 }
 
+export async function getRecentProposalsCount(space) {
+  const query = `
+    SELECT
+    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d,
+    COUNT(*) AS count_30d
+    FROM proposals WHERE space = ? AND created > (UNIX_TIMESTAMP() - 2592000
+  `;
+  return await db.queryAsync(query, [space]);
+}
+
 export async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count, count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d FROM follows GROUP BY space

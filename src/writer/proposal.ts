@@ -1,8 +1,14 @@
 import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
-import { storeProposal } from '../helpers/adapters/mysql';
+import {
+  getRecentProposalsCount,
+  storeProposal
+} from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
 import { spaces } from '../helpers/spaces';
+
+const proposalDayLimit = 32;
+const proposalMonthLimit = 320;
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -51,6 +57,21 @@ export async function verify(body): Promise<any> {
     if (!isValid) return Promise.reject('validation failed');
   } catch (e) {
     return Promise.reject('failed to check validation');
+  }
+
+  try {
+    const [
+      { count_1d: proposalsDayCount, count_30d: proposalsMonthCount }
+    ] = await getRecentProposalsCount(space.id);
+
+    if (proposalsDayCount >= proposalDayLimit) {
+      return Promise.reject('daily proposal limit reached');
+    }
+    if (proposalsMonthCount >= proposalMonthLimit) {
+      return Promise.reject('monthly proposal limit reached');
+    }
+  } catch (e) {
+    return Promise.reject('failed to check proposals limit');
   }
 }
 
