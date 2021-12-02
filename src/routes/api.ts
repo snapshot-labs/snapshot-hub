@@ -57,9 +57,10 @@ router.get('/explore', (req, res) => {
       ? networks[space.network] + 1
       : 1;
 
-    space.strategies.forEach(strategy => {
-      strategies[strategy.name] = strategies[strategy.name]
-        ? strategies[strategy.name] + 1
+    const uniqueStrategies = new Set<string>(space.strategies.map((strategy) =>strategy.name));
+    uniqueStrategies.forEach(strategyName => {
+      strategies[strategyName] = strategies[strategyName]
+        ? strategies[strategyName] + 1
         : 1;
     });
 
