@@ -37,7 +37,7 @@ export default async function(parent, args) {
     subscriptions = await db.queryAsync(query, params);
     return subscriptions.map(subscription => formatSubscription(subscription));
   } catch (e) {
-    console.log(e);
+    console.log('[graphql]', e);
     return Promise.reject('request failed');
   }
 }

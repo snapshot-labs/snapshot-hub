@@ -15,7 +15,7 @@ const VERSION = '0.1.4';
 export default async function ingestor(body) {
   const schemaIsValid = snapshot.utils.validateSchema(envelope, body);
   if (schemaIsValid !== true) {
-    console.log('Wrong envelope format', schemaIsValid);
+    console.log('[ingestor] Wrong envelope format', schemaIsValid);
     return Promise.reject('wrong envelope format');
   }
 
@@ -62,7 +62,7 @@ export default async function ingestor(body) {
   );
   const id = snapshot.utils.getHash(body.data);
   if (!isValid) return Promise.reject('wrong signature');
-  console.log('Signature is valid');
+  console.log('[ingestor] Signature is valid');
 
   let payload = {};
 
@@ -119,7 +119,7 @@ export default async function ingestor(body) {
   try {
     await writer[type].verify(legacyBody);
   } catch (e) {
-    console.log(e);
+    console.log('[ingestor]', e);
     return Promise.reject(e);
   }
 
@@ -138,6 +138,7 @@ export default async function ingestor(body) {
   }
 
   console.log(
+    '[ingestor]',
     `Address "${body.address}"\n`,
     `Space "${message.space}"\n`,
     `Type "${type}"\n`,

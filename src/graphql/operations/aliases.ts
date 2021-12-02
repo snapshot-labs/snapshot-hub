@@ -33,7 +33,7 @@ export default async function(parent, args) {
   try {
     return await db.queryAsync(query, params);
   } catch (e) {
-    console.log(e);
+    console.log('[graphql]', e);
     return Promise.reject('request failed');
   }
 }

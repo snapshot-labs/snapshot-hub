@@ -3,10 +3,13 @@ import beams from '../helpers/beams';
 import db from '../helpers/mysql';
 import subscribers from './subscribers.json';
 import chunk from 'lodash/chunk';
+import { getProposalScores } from '../scores';
+import { sha256 } from '../helpers/utils';
 
 const delay = 5;
 const interval = 30;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
+const serviceEventsSalt = parseInt(process.env.SERVICE_EVENTS_SALT || '12345');
 const servicePushNotifications = parseInt(
   process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
 );
@@ -53,6 +56,8 @@ const sendPushNotification = async event => {
 };
 
 async function sendEvent(event, to) {
+  event.token = sha256(`${to}${serviceEventsSalt}`);
+  event.secret = sha256(`${to}${serviceEventsSalt}`);
   const res = await fetch(to, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -67,9 +72,23 @@ async function processEvents() {
     ts
   ]);
 
-  console.log('Process event start', ts, events.length);
+  console.log('[events] Process event start', ts, events.length);
 
   for (const event of events) {
+    if (event.event === 'proposal/end') {
+      try {
+        const proposalId = event.id.replace('proposal/', '');
+        const scores = await getProposalScores(proposalId);
+        console.log(
+          '[events] Stored scores on proposal/end',
+          scores.scores_state,
+          proposalId
+        );
+      } catch (e) {
+        console.log('[events]', e);
+      }
+    }
+
     if (servicePushNotifications && event.event === 'proposal/start')
       sendPushNotification(event);
 
@@ -81,17 +100,17 @@ async function processEvents() {
         )
         .map(subscriber => sendEvent(event, subscriber.url))
     )
-      .then(() => console.log('Process event done'))
-      .catch(e => console.log('Process event failed', e));
+      .then(() => console.log('[events] Process event done'))
+      .catch(e => console.log('[events] Process event failed', e));
 
     try {
       await db.queryAsync(
         'DELETE FROM events WHERE id = ? AND event = ? LIMIT 1',
         [event.id, event.event]
       );
-      console.log(`Event sent ${event.id} ${event.event}`);
+      console.log(`[events] Event sent ${event.id} ${event.event}`);
     } catch (e) {
-      console.log(e);
+      console.log('[events]', e);
     }
   }
 }

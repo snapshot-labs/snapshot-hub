@@ -114,7 +114,7 @@ router.get('/report/:id/:source?', async (req, res) => {
   try {
     votes = await db.queryAsync(query, [id]);
   } catch (e) {
-    console.log(e);
+    console.log('[api]', e);
     return Promise.reject('request failed');
   }
 
@@ -126,7 +126,7 @@ router.get('/report/:id/:source?', async (req, res) => {
     try {
       sources = await Promise.all(p);
     } catch (e) {
-      console.log(e);
+      console.log('[api]', e);
       return sendError(res, e);
     }
   }

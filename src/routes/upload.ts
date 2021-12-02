@@ -25,7 +25,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     };
     res.json({ file });
   } catch (error) {
-    console.log(error);
+    console.log('[upload]', error);
     return sendError(res, 'upload failed');
   }
   await fs.unlinkSync(path);

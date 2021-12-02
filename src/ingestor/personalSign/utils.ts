@@ -31,7 +31,7 @@ export async function verifySignature(
     const signer = recoverPublicKey(sig, hash);
     return signer.toLowerCase() === address.toLowerCase();
   } else {
-    console.log('Smart contract signature');
+    console.log('[ingestor] Smart contract signature');
     return isValidSignature(address, sig, hash, provider);
   }
 }

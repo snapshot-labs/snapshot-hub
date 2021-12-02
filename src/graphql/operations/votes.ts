@@ -51,7 +51,7 @@ export default async function(parent, args, context?, info?) {
     votes = await db.queryAsync(query, params);
     votes = votes.map(vote => formatVote(vote));
   } catch (e) {
-    console.log(e);
+    console.log('[graphql]', e);
     return Promise.reject('request failed');
   }
 
@@ -75,7 +75,7 @@ export default async function(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      console.log(e);
+      console.log('[graphql]', e);
       return Promise.reject('request failed');
     }
   }
@@ -97,7 +97,7 @@ export default async function(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      console.log(e);
+      console.log('[graphql]', e);
       return Promise.reject('request failed');
     }
   }

@@ -33,11 +33,13 @@ CREATE TABLE messages (
 CREATE TABLE spaces (
   id VARCHAR(64) NOT NULL,
   settings JSON,
+  verified INT NOT NULL DEFAULT '0',
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
   PRIMARY KEY (id),
-  INDEX address (created_at),
-  INDEX is_self (updated_at)
+  INDEX verified (verified),
+  INDEX created_at (created_at),
+  INDEX updated_at (updated_at)
 );
 
 CREATE TABLE proposals (

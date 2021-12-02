@@ -12,7 +12,7 @@ export async function verify(body): Promise<any> {
     msg.payload
   );
   if (schemaIsValid !== true) {
-    console.log('Wrong vote format', schemaIsValid);
+    console.log('[writer] Wrong vote format', schemaIsValid);
     return Promise.reject('wrong vote format');
   }
 
@@ -62,7 +62,7 @@ export async function verify(body): Promise<any> {
     if (totalScore === 0) return Promise.reject('no voting power');
   } catch (e) {
     console.log(
-      'Failed to check voting power (vote)',
+      '[writer] Failed to check voting power (vote)',
       msg.space,
       body.address,
       proposal.snapshot,
@@ -106,5 +106,5 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     cb: 0
   };
   await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
-  console.log('Store vote complete', msg.space, id, ipfs);
+  console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }
