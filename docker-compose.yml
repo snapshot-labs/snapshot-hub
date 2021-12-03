@@ -10,11 +10,11 @@ services:
     depends_on:
       - snapshot-mysql
     ports:
-      - "8080:8080"
+      - "3001:3001"
 
   # Snapshot MySQL instance
-  snapshot-mysql:
-    image: mysql:8.0.21
+  snapshot-mysql:  
+    image: mariadb:10.6
     container_name: snapshot-mysql
     environment:
       MYSQL_USER: "admin"
@@ -23,7 +23,10 @@ services:
       MYSQL_DATABASE: "snapshot"
     volumes:
         - ./server/helpers/database/:/docker-entrypoint-initdb.d
-
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+ 
 networks:
   default:
     name: snapshot-network
