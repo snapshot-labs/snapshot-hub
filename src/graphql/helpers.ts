@@ -1,8 +1,14 @@
 import { jsonParse } from '../helpers/utils';
+import space from './operations/space';
 
 const network = process.env.NETWORK || 'testnet';
 
-export function formatSpace(id, settings) {
+export function formatSpace(
+  id,
+  settings,
+  created_at = false,
+  updated_at = false
+) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
@@ -25,6 +31,9 @@ export function formatSpace(id, settings) {
   space.voting.blind = space.voting.blind || false;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
+  space.created_at = created_at || null;
+  space.updated_at = updated_at || null;
+
   return space;
 }
 
@@ -39,7 +48,13 @@ export function formatProposal(proposal) {
   if (ts > proposal.start) proposalState = 'active';
   if (ts > proposal.end) proposalState = 'closed';
   proposal.state = proposalState;
-  proposal.space = formatSpace(proposal.space, proposal.settings);
+
+  proposal.space = formatSpace(
+    proposal.space,
+    proposal.settings,
+    proposal.created_at, // space.created_at
+    proposal.updated_at // space.updated_at
+  );
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   return proposal;
@@ -49,17 +64,32 @@ export function formatVote(vote) {
   vote.choice = jsonParse(vote.choice);
   vote.metadata = jsonParse(vote.metadata, {});
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
-  vote.space = formatSpace(vote.space, vote.settings);
+  vote.space = formatSpace(
+    vote.space,
+    vote.settings,
+    vote.created_at,
+    vote.updated_at
+  );
   return vote;
 }
 
 export function formatFollow(follow) {
-  follow.space = formatSpace(follow.space, follow.settings);
+  follow.space = formatSpace(
+    follow.space,
+    follow.settings,
+    follow.created_at, // space.created_at
+    follow.updated_at // space.updated_at
+  );
   return follow;
 }
 
 export function formatSubscription(subscription) {
-  subscription.space = formatSpace(subscription.space, subscription.settings);
+  subscription.space = formatSpace(
+    subscription.space,
+    subscription.settings,
+    subscription.created_at, // space.created_at
+    subscription.updated_at // space.updated_at
+  );
   return subscription;
 }
 

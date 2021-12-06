@@ -130,7 +130,7 @@ export async function storeSettings(space, body) {
   const result = await fleek.upload({
     apiKey: process.env.FLEEK_API_KEY || '',
     apiSecret: process.env.FLEEK_API_SECRET || '',
-    bucket: 'snapshot-team-bucket',
+    bucket: process.env.FLEEK_BUCKET_NAME || 'snapshot-team-bucket',
     key,
     data: JSON.stringify(msg.payload)
   });

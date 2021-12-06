@@ -3,7 +3,7 @@ import { formatProposal } from '../helpers';
 
 export default async function(parent, { id }) {
   const query = `
-    SELECT p.*, spaces.settings FROM proposals p
+    SELECT p.*, spaces.settings, spaces.created_at, spaces.updated_at FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE p.id = ? AND spaces.settings IS NOT NULL
     LIMIT 1

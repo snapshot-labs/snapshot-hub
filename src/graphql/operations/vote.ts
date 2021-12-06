@@ -3,7 +3,7 @@ import { formatVote } from '../helpers';
 
 export default async function(parent, { id }) {
   const query = `
-    SELECT v.*, spaces.settings FROM votes v
+    SELECT v.*, spaces.settings, spaces.created_at, spaces.updated_at FROM votes v
     INNER JOIN spaces ON spaces.id = v.space
     WHERE v.id = ? AND v.cb = 0 AND spaces.settings IS NOT NULL
     LIMIT 1

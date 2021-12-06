@@ -208,6 +208,8 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  created_at: Int!
+  updated_at: Int!
 }
 
 type SpaceFilters {

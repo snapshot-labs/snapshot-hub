@@ -22,6 +22,8 @@ query Spaces {
       onlyMembers
     }
     plugins
+    created_at
+    updated_at
   }
 }
 
@@ -48,6 +50,8 @@ query Proposals {
     space {
       id
       name
+      created_at
+      updated_at
     }
   }
 }

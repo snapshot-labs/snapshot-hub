@@ -28,7 +28,7 @@ export default async function(parent, args) {
   let follows: any[] = [];
 
   const query = `
-    SELECT f.*, spaces.settings FROM follows f
+    SELECT f.*, spaces.settings, spaces.created_at, spaces.updated_at FROM follows f
     INNER JOIN spaces ON spaces.id = f.space
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?

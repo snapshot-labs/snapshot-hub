@@ -10,7 +10,7 @@ export default async function(parent, { id }) {
   try {
     const spaces = await db.queryAsync(query, [id]);
     return (
-      spaces.map(space => formatSpace(space.id, space.settings))[0] || null
+      spaces.map(space => formatSpace(space.id, space.settings, space.created_at, space.updated_at))[0] || null
     );
   } catch (e) {
     console.log('[graphql]', e);

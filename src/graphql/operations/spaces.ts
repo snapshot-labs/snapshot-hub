@@ -38,7 +38,9 @@ export default async function(parent, args) {
   `;
   try {
     const spaces = await db.queryAsync(query, params);
-    return spaces.map(space => formatSpace(space.id, space.settings));
+    return spaces.map(space =>
+      formatSpace(space.id, space.settings, space.created_at, space.updated_at)
+    );
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');
