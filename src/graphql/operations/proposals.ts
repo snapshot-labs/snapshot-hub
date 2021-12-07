@@ -44,7 +44,7 @@ export default async function(parent, args) {
   params.push(skip, first);
 
   const query = `
-    SELECT p.*, spaces.settings, spaces.created_at, spaces.updated_at FROM proposals p
+    SELECT p.*, spaces.settings, spaces.created_at as space_created_at, spaces.updated_at as space_updated_at FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?

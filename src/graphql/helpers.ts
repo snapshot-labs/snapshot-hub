@@ -3,12 +3,7 @@ import space from './operations/space';
 
 const network = process.env.NETWORK || 'testnet';
 
-export function formatSpace(
-  id,
-  settings,
-  created_at = false,
-  updated_at = false
-) {
+export function formatSpace(id, settings, created_at, updated_at) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
@@ -52,8 +47,8 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace(
     proposal.space,
     proposal.settings,
-    proposal.created_at, // space.created_at
-    proposal.updated_at // space.updated_at
+    proposal.space_created_at,
+    proposal.space_updated_at
   );
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
@@ -67,8 +62,8 @@ export function formatVote(vote) {
   vote.space = formatSpace(
     vote.space,
     vote.settings,
-    vote.created_at,
-    vote.updated_at
+    vote.space_created_at,
+    vote.space_updated_at
   );
   return vote;
 }
@@ -77,8 +72,8 @@ export function formatFollow(follow) {
   follow.space = formatSpace(
     follow.space,
     follow.settings,
-    follow.created_at, // space.created_at
-    follow.updated_at // space.updated_at
+    follow.space_created_at,
+    follow.space_updated_at
   );
   return follow;
 }
@@ -87,8 +82,8 @@ export function formatSubscription(subscription) {
   subscription.space = formatSpace(
     subscription.space,
     subscription.settings,
-    subscription.created_at, // space.created_at
-    subscription.updated_at // space.updated_at
+    subscription.space_created_at,
+    subscription.space_updated_at
   );
   return subscription;
 }

@@ -43,7 +43,7 @@ export default async function(parent, args, context?, info?) {
     SELECT v.* FROM votes v
     LEFT OUTER JOIN votes v2 ON
       v.voter = v2.voter AND v.proposal = v2.proposal
-      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
+      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))    
     WHERE v2.voter IS NULL AND v.cb = 0 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
@@ -91,7 +91,7 @@ export default async function(parent, args, context?, info?) {
   if (requestedFields.proposal && votes.length > 0) {
     const proposalIds = votes.map(vote => vote.proposal);
     const query = `
-      SELECT p.*, spaces.settings, spaces.created_at, spaces.updated_at FROM proposals p
+      SELECT p.*, spaces.settings, spaces.created_at as space_created_at, spaces.updated_at as space_updated_at FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
       WHERE spaces.settings IS NOT NULL AND p.id IN (?)
     `;
