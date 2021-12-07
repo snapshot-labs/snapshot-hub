@@ -20,8 +20,10 @@ export default async function ingestor(body) {
   }
 
   const ts = Date.now() / 1e3;
-  const overTs = (ts + 300).toFixed();
-  const underTs = (ts - 300).toFixed();
+  const over = 300;
+  const under = 60 * 60;
+  const overTs = (ts + over).toFixed();
+  const underTs = (ts - under).toFixed();
   const { domain, message, types } = body.data;
 
   if (JSON.stringify(body).length > 1e5)
