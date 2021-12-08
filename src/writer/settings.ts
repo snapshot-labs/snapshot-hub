@@ -4,6 +4,8 @@ import { storeSettings } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
 import { spaces } from '../helpers/spaces';
 
+const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
+
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
@@ -16,7 +18,7 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong space format');
   }
 
-  const spaceUri = await snapshot.utils.getSpaceUri(msg.space);
+  const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
   const isOwner = spaceUri.includes(body.address);
   const admins = (spaces[msg.space]?.admins || []).map(admin =>
     admin.toLowerCase()

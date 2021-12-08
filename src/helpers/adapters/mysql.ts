@@ -130,7 +130,7 @@ export async function storeSettings(space, body) {
   const result = await fleek.upload({
     apiKey: process.env.FLEEK_API_KEY || '',
     apiSecret: process.env.FLEEK_API_SECRET || '',
-    bucket: 'snapshot-team-bucket',
+    bucket: process.env.FLEEK_BUCKET || 'snapshot-team-bucket',
     key,
     data: JSON.stringify(msg.payload)
   });
@@ -149,6 +149,16 @@ export async function getProposals() {
     FROM proposals GROUP BY space
   `;
   return await db.queryAsync(query, [ts, ts]);
+}
+
+export async function getRecentProposalsCount(space) {
+  const query = `
+    SELECT
+    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d,
+    COUNT(*) AS count_30d
+    FROM proposals WHERE space = ? AND created > (UNIX_TIMESTAMP() - 2592000)
+  `;
+  return await db.queryAsync(query, [space]);
 }
 
 export async function getFollowers() {

@@ -19,8 +19,14 @@ export async function verify(body): Promise<any> {
   const proposal = await getProposal(msg.space, msg.payload.proposal);
   if (!proposal) return Promise.reject('unknown proposal');
 
+  const tsInt = (Date.now() / 1e3).toFixed();
   const msgTs = parseInt(msg.timestamp);
-  if (msgTs > proposal.end || proposal.start > msgTs)
+  if (
+    msgTs > proposal.end ||
+    proposal.start > msgTs ||
+    tsInt > proposal.end ||
+    proposal.start > tsInt
+  )
     return Promise.reject('not in voting window');
 
   if (
@@ -74,27 +80,11 @@ export async function verify(body): Promise<any> {
 
 export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
-
-  const query = 'INSERT IGNORE INTO messages SET ?';
-  await db.queryAsync(query, [
-    {
-      id,
-      ipfs,
-      address: body.address,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      space: msg.space,
-      type: 'vote',
-      sig: body.sig,
-      receipt
-    }
-  ]);
-
-  // Store vote in dedicated table
+  const voter = getAddress(body.address);
   const params = {
     id,
     ipfs,
-    voter: getAddress(body.address),
+    voter,
     created: parseInt(msg.timestamp),
     space: msg.space,
     proposal: msg.payload.proposal,
@@ -105,6 +95,43 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     vp_state: '',
     cb: 0
   };
+
+  // Check if voter already voted
+  const votes = await db.queryAsync(
+    'SELECT id, created FROM votes WHERE voter = ? AND proposal = ? ORDER BY created DESC LIMIT 1',
+    [voter, msg.payload.proposal]
+  );
+
+  // Reject vote with later timestamp
+  if (votes[0]) {
+    if (votes[0].created > parseInt(msg.timestamp)) {
+      return Promise.reject('already voted at later time');
+    } else if (votes[0].created === parseInt(msg.timestamp)) {
+      const localCompare = id.localeCompare(votes[0].id);
+      if (localCompare <= 0)
+        return Promise.reject('already voted same time with lower index');
+    }
+  }
+
+  //
+
+  // Store message
+  const query = 'INSERT IGNORE INTO messages SET ?';
+  await db.queryAsync(query, [
+    {
+      id,
+      ipfs,
+      address: voter,
+      version: msg.version,
+      timestamp: msg.timestamp,
+      space: msg.space,
+      type: 'vote',
+      sig: body.sig,
+      receipt
+    }
+  ]);
+
+  // Store vote in dedicated table
   await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }

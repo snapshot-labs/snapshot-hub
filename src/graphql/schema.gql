@@ -223,6 +223,7 @@ type SpaceVoting {
   type: String
   quorum: Float
   blind: Boolean
+  hideAbstain: Boolean
 }
 
 type Proposal {
