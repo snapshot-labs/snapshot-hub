@@ -208,9 +208,10 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
-  created_at: Int!
-  updated_at: Int!
+  created: Int!
+  updated: Int!
 }
+
 
 type SpaceFilters {
   minScore: Float

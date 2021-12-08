@@ -26,8 +26,8 @@ export function formatSpace(id, settings, created_at, updated_at) {
   space.voting.blind = space.voting.blind || false;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
-  space.created_at = created_at || null;
-  space.updated_at = updated_at || null;
+  space.created = created_at || null;
+  space.updated = updated_at || null;
 
   return space;
 }

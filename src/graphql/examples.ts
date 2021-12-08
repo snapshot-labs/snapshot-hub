@@ -22,8 +22,8 @@ query Spaces {
       onlyMembers
     }
     plugins
-    created:created_at
-    updated:updated_at
+    created
+    updated
   }
 }
 
@@ -50,8 +50,8 @@ query Proposals {
     space {
       id
       name
-      created:created_at
-      updated:updated_at
+      created
+      updated
     }
   }
 }
@@ -69,8 +69,8 @@ query Votes {
     choice
     space {
       id
-      created:created_at
-      updated:updated_at
+      created
+      updated
     }
   }
 }
@@ -81,8 +81,8 @@ query Follows {
     follower
     space {
       id
-      created:created_at
-      updated:updated_at
+      created
+      updated
     }
     created
   }
