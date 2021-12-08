@@ -1,5 +1,4 @@
 import { jsonParse } from '../helpers/utils';
-import space from './operations/space';
 
 const network = process.env.NETWORK || 'testnet';
 
