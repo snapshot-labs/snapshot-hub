@@ -212,7 +212,6 @@ type Space {
   updated: Int!
 }
 
-
 type SpaceFilters {
   minScore: Float
   onlyMembers: Boolean
