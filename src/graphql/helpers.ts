@@ -46,8 +46,8 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace(
     proposal.space,
     proposal.settings,
-    proposal.space_created_at,
-    proposal.space_updated_at
+    proposal.space_created,
+    proposal.space_updated
   );
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
@@ -61,8 +61,8 @@ export function formatVote(vote) {
   vote.space = formatSpace(
     vote.space,
     vote.settings,
-    vote.space_created_at,
-    vote.space_updated_at
+    vote.space_created,
+    vote.space_updated
   );
   return vote;
 }
@@ -71,8 +71,8 @@ export function formatFollow(follow) {
   follow.space = formatSpace(
     follow.space,
     follow.settings,
-    follow.space_created_at,
-    follow.space_updated_at
+    follow.space_created,
+    follow.space_updated
   );
   return follow;
 }
@@ -81,8 +81,8 @@ export function formatSubscription(subscription) {
   subscription.space = formatSpace(
     subscription.space,
     subscription.settings,
-    subscription.space_created_at,
-    subscription.space_updated_at
+    subscription.space_created,
+    subscription.space_updated
   );
   return subscription;
 }
