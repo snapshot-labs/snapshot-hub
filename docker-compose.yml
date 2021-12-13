@@ -6,23 +6,28 @@ services:
     build: .
     container_name: snapshot-hub
     env_file:
-      - .env.local
+      - .env
+    environment:
+      DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
+    
     depends_on:
       - snapshot-mysql
     ports:
-      - "8080:8080"
+      - "3000:3000"
 
   # Snapshot MySQL instance
   snapshot-mysql:
-    image: mysql:8.0.21
+    image: mysql:5.7
     container_name: snapshot-mysql
+    ports:
+      - 3306:3306
     environment:
       MYSQL_USER: "admin"
-      MYSQL_PASSWORD: "admin"
+      MYSQL_PASSWORD: "pwd"
       MYSQL_ROOT_PASSWORD: "admin"
       MYSQL_DATABASE: "snapshot"
     volumes:
-        - ./server/helpers/database/:/docker-entrypoint-initdb.d
+        - "./src/helpers/database/:/docker-entrypoint-initdb.d/"
 
 networks:
   default:
