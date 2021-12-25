@@ -1,4 +1,5 @@
-import { hashPersonalMessage, verifySignature } from './utils';
+import { hashMessage } from '@ethersproject/hash';
+import { verifySignature } from './utils';
 import { jsonParse } from '../../helpers/utils';
 import { spaces } from '../../helpers/spaces';
 import writer from '../../writer';
@@ -48,13 +49,7 @@ export default async function ingestor(body) {
   if (!msg.type || !Object.keys(writer).includes(msg.type))
     return Promise.reject('wrong message type');
 
-  if (
-    !(await verifySignature(
-      body.address,
-      body.sig,
-      hashPersonalMessage(body.msg)
-    ))
-  )
+  if (!(await verifySignature(body.address, body.sig, hashMessage(body.msg))))
     return Promise.reject('wrong signature');
 
   try {
