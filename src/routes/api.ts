@@ -13,7 +13,7 @@ import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
 import ingestor from '../ingestor';
 import pkg from '../../package.json';
 import db from '../helpers/mysql';
-import { hashPersonalMessage } from '../ingestor/personalSign/utils';
+import { hashMessage } from '@ethersproject/hash';
 import { getProposalScores } from '../scores';
 
 const gateway = gateways[0];
@@ -57,7 +57,9 @@ router.get('/explore', (req, res) => {
       ? networks[space.network] + 1
       : 1;
 
-    const uniqueStrategies = new Set<string>(space.strategies.map((strategy) =>strategy.name));
+    const uniqueStrategies = new Set<string>(
+      space.strategies.map(strategy => strategy.name)
+    );
     uniqueStrategies.forEach(strategyName => {
       strategies[strategyName] = strategies[strategyName]
         ? strategies[strategyName] + 1
@@ -138,7 +140,7 @@ router.get('/report/:id/:source?', async (req, res) => {
     votes: votes
   };
 
-  const hash = hashPersonalMessage(JSON.stringify(message));
+  const hash = hashMessage(JSON.stringify(message));
   const sig = await relayer.signMessage(hash);
 
   return res.json({
