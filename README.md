@@ -24,7 +24,7 @@ https://github.com/snapshot-labs/snapshot-hub/blob/master/src/helpers/database/s
 
 - Use this command to run the hub: 
 ```sh
-node run start
+npm run start
 ```
 
 - Go on this page: http://localhost:3000/api if everything is fine it should return details of the hub example: 
