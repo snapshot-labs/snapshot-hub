@@ -151,9 +151,9 @@ router.get('/report/:id/:source?', async (req, res) => {
   });
 });
 
-router.get('/spaces/:key?', (req, res) => {
+router.get('/spaces/:key', (req, res) => {
   const { key } = req.params;
-  return res.json(key ? spaces[key] : spaces);
+  return res.json(spaces[key]);
 });
 
 router.get('/spaces/:key/poke', async (req, res) => {
