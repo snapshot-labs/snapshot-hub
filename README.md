@@ -6,7 +6,7 @@ This is a hub for Snapshot network that stores the database and forwards new mes
 
 1. Install Node.js, clone the repository, then say:
 ```sh
-npm install
+yarn
 ```
  
 2. Copy [`.env.example`](https://github.com/snapshot-labs/snapshot-hub/blob/master/.env.example), rename it to `.env` and set a value for these config vars:
@@ -24,7 +24,7 @@ https://github.com/snapshot-labs/snapshot-hub/blob/master/src/helpers/database/s
 
 - Use this command to run the hub: 
 ```sh
-node run start
+yarn start
 ```
 
 - Go on this page: http://localhost:3000/api if everything is fine it should return details of the hub example: 
