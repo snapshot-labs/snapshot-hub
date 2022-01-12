@@ -20,7 +20,7 @@ COPY package*.json ./
 COPY renovate*.json ./
 
 # Install app dependencies
-RUN npm ci
+RUN yarn
 
 # Bundle app source
 COPY --chown=node:node . .
@@ -29,4 +29,4 @@ COPY --chown=node:node . .
 EXPOSE 8080
 
 # Start the aplication
-CMD ["npm", "run", "start" ]
+CMD ["yarn", "run", "start" ]
