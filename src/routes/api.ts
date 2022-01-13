@@ -74,7 +74,6 @@ router.get('/explore', (req, res) => {
       name: space.name,
       avatar: space.avatar || undefined,
       private: space.private || undefined,
-      skin: space.skin || undefined,
       terms: space.terms || undefined,
       network: space.network || undefined,
       categories: space.categories || undefined,
