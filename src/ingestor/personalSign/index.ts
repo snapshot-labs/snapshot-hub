@@ -11,7 +11,7 @@ import pkg from '../../../package.json';
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
   const over = 300;
-  const under = 60 * 60 * 24 * 7;
+  const under = 60 * 60 * 24 * 2;
   const overTs = (ts + over).toFixed();
   const underTs = (ts - under).toFixed();
 
