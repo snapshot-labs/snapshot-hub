@@ -1,16 +1,18 @@
 import db from '../../helpers/mysql';
 import { formatSpace } from '../helpers';
 
-export default async function(parent, { id }) {
+export default async function(_parent, { id }) {
   const query = `
-    SELECT * FROM spaces
-    WHERE id = ? AND spaces.settings IS NOT NULL
+    SELECT s.*, COUNT(f.id) as followerCount FROM spaces s
+    JOIN follows f ON f.space = s.id
+    WHERE s.id = ? AND s.settings IS NOT NULL
+    GROUP BY s.id
     LIMIT 1
   `;
   try {
     const spaces = await db.queryAsync(query, [id]);
     return (
-      spaces.map(space => formatSpace(space.id, space.settings))[0] || null
+      spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)))[0] || null
     );
   } catch (e) {
     console.log('[graphql]', e);
