@@ -3,7 +3,7 @@ import { formatSpace } from '../helpers';
 
 export default async function(_parent, { id }) {
   const query = `
-    SELECT s.*, COUNT(f.id) as followerCount FROM spaces s
+    SELECT s.*, COUNT(f.id) as followersCount FROM spaces s
     JOIN follows f ON f.space = s.id
     WHERE s.id = ? AND s.settings IS NOT NULL
     GROUP BY s.id
