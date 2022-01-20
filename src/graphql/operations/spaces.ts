@@ -1,7 +1,7 @@
 import db from '../../helpers/mysql';
 import { formatSpace } from '../helpers';
 
-export default async function(parent, args) {
+export default async function(_parent, args) {
   const { where = {} } = args;
   let queryStr = '';
   const params: any[] = [];
@@ -9,12 +9,12 @@ export default async function(parent, args) {
   const fields = ['id'];
   fields.forEach(field => {
     if (where[field]) {
-      queryStr += `AND ${field} = ? `;
+      queryStr += `AND s.${field} = ? `;
       params.push(where[field]);
     }
     const fieldIn = where[`${field}_in`] || [];
     if (fieldIn.length > 0) {
-      queryStr += `AND ${field} IN (?) `;
+      queryStr += `AND s.${field} IN (?) `;
       params.push(fieldIn);
     }
   });
@@ -32,13 +32,15 @@ export default async function(parent, args) {
   params.push(skip, first);
 
   const query = `
-    SELECT * FROM spaces
+    SELECT s.*, COUNT(f.id) as followersCount FROM spaces s
+    JOIN follows f ON f.space = s.id
     WHERE 1 = 1 ${queryStr}
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    GROUP BY s.id
+    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
     const spaces = await db.queryAsync(query, params);
-    return spaces.map(space => formatSpace(space.id, space.settings));
+    return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');

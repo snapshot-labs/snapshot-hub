@@ -208,6 +208,7 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  followersCount: Int
 }
 
 type SpaceFilters {
