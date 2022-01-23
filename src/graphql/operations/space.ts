@@ -12,7 +12,9 @@ export default async function(_parent, { id }) {
   try {
     const spaces = await db.queryAsync(query, [id]);
     return (
-      spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)))[0] || null
+      spaces.map(space =>
+        Object.assign(space, formatSpace(space.id, space.settings))
+      )[0] || null
     );
   } catch (e) {
     console.log('[graphql]', e);
