@@ -32,7 +32,7 @@ setInterval(() => {
       }
     })
   );
-}, 20e3);
+}, 60e3);
 
 setTimeout(() => {
   console.log('Load spaces from db');

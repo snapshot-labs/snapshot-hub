@@ -3,8 +3,7 @@ import { formatSpace } from '../helpers';
 
 export default async function(_parent, { id }) {
   const query = `
-    SELECT s.*, COUNT(f.id) as followersCount FROM spaces s
-    LEFT JOIN follows f ON f.space = s.id
+    SELECT s.* FROM spaces s
     WHERE s.id = ? AND s.settings IS NOT NULL
     GROUP BY s.id
     LIMIT 1

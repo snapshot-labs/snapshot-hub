@@ -32,8 +32,7 @@ export default async function(_parent, args) {
   params.push(skip, first);
 
   const query = `
-    SELECT s.*, COUNT(f.id) as followersCount FROM spaces s
-    LEFT JOIN follows f ON f.space = s.id
+    SELECT s.* FROM spaces s
     WHERE 1 = 1 ${queryStr}
     GROUP BY s.id
     ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
