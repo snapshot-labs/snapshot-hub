@@ -173,4 +173,4 @@ async function run() {
   }
 }
 
-snapshot.utils.sleep(5000).then(() => run());
+// snapshot.utils.sleep(5000).then(() => run());
