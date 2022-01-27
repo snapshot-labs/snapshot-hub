@@ -1,13 +1,13 @@
 import fetch from 'cross-fetch';
 import beams from '../helpers/beams';
 import db from '../helpers/mysql';
-import subscribers from './subscribers.json';
 import chunk from 'lodash/chunk';
 import { getProposalScores } from '../scores';
-import { sha256 } from '../helpers/utils';
+import { getJSON, sha256 } from '../helpers/utils';
 
 const delay = 5;
 const interval = 30;
+const serviceEventsSubscribers = process.env.SERVICE_EVENTS_SUBSCRIBERS || 0;
 const serviceEvents = parseInt(process.env.SERVICE_EVENTS || '0');
 const serviceEventsSalt = parseInt(process.env.SERVICE_EVENTS_SALT || '12345');
 const servicePushNotifications = parseInt(
@@ -16,11 +16,8 @@ const servicePushNotifications = parseInt(
 
 const getProposal = async proposalId => {
   try {
-    const proposals = await db.queryAsync(
-      'SELECT * FROM proposals WHERE id = ?',
-      [proposalId]
-    );
-    const proposal = proposals[0];
+    const query = 'SELECT * FROM proposals WHERE id = ?';
+    const [proposal] = await db.queryAsync(query, [proposalId]);
     return proposal;
   } catch (error) {
     throw new Error(`Proposal not found with id ${proposalId}`);
@@ -32,9 +29,7 @@ const getSubscribedWallets = async space => {
     'SELECT * FROM subscriptions WHERE space = ?',
     [space]
   );
-
-  const wallets = subscriptions.map(subscription => subscription.address);
-  return wallets;
+  return subscriptions.map(subscription => subscription.address);
 };
 
 const sendPushNotification = async event => {
@@ -66,7 +61,7 @@ async function sendEvent(event, to) {
   return res.json();
 }
 
-async function processEvents() {
+async function processEvents(subscribers) {
   const ts = parseInt((Date.now() / 1e3).toFixed()) - delay;
   const events = await db.queryAsync('SELECT * FROM events WHERE expire <= ?', [
     ts
@@ -115,6 +110,10 @@ async function processEvents() {
   }
 }
 
-if (serviceEvents) {
-  setInterval(async () => await processEvents(), interval * 1e3);
+if (serviceEvents && serviceEventsSubscribers) {
+  setInterval(async () => {
+    const subscribers = await getJSON(serviceEventsSubscribers);
+    console.log('[events] Subscribers', subscribers.length);
+    await processEvents(subscribers);
+  }, interval * 1e3);
 }

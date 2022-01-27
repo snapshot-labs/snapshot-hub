@@ -56,6 +56,16 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Subscription]
+
+  skins: [Item]
+
+  networks: [Item]
+
+  validations: [Item]
+
+  plugins: [Item]
+
+  strategies: [Item]
 }
 
 input SpaceWhere {
@@ -208,6 +218,7 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  followersCount: Int!
   created: Int!
   updated: Int!
 }
@@ -293,4 +304,9 @@ type Subscription {
   address: String!
   space: Space!
   created: Int!
+}
+
+type Item {
+  id: String!
+  spacesCount: Int
 }

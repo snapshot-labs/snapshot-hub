@@ -7,6 +7,11 @@ import votes from './votes';
 import aliases from './aliases';
 import follows from './follows';
 import subscriptions from './subscriptions';
+import skins from './skins';
+import networks from './networks';
+import validations from './validations';
+import plugins from './plugins';
+import strategies from './strategies';
 
 export default {
   space,
@@ -17,5 +22,10 @@ export default {
   votes,
   aliases,
   follows,
-  subscriptions
+  subscriptions,
+  skins,
+  networks,
+  validations,
+  plugins,
+  strategies
 };

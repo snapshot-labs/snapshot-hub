@@ -13,7 +13,7 @@ import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
 import ingestor from '../ingestor';
 import pkg from '../../package.json';
 import db from '../helpers/mysql';
-import { hashPersonalMessage } from '../ingestor/personalSign/utils';
+import { hashMessage } from '@ethersproject/hash';
 import { getProposalScores } from '../scores';
 
 const gateway = gateways[0];
@@ -57,7 +57,9 @@ router.get('/explore', (req, res) => {
       ? networks[space.network] + 1
       : 1;
 
-    const uniqueStrategies = new Set<string>(space.strategies.map((strategy) =>strategy.name));
+    const uniqueStrategies = new Set<string>(
+      space.strategies.map(strategy => strategy.name)
+    );
     uniqueStrategies.forEach(strategyName => {
       strategies[strategyName] = strategies[strategyName]
         ? strategies[strategyName] + 1
@@ -72,7 +74,6 @@ router.get('/explore', (req, res) => {
       name: space.name,
       avatar: space.avatar || undefined,
       private: space.private || undefined,
-      skin: space.skin || undefined,
       terms: space.terms || undefined,
       network: space.network || undefined,
       categories: space.categories || undefined,
@@ -138,7 +139,7 @@ router.get('/report/:id/:source?', async (req, res) => {
     votes: votes
   };
 
-  const hash = hashPersonalMessage(JSON.stringify(message));
+  const hash = hashMessage(JSON.stringify(message));
   const sig = await relayer.signMessage(hash);
 
   return res.json({
@@ -149,9 +150,9 @@ router.get('/report/:id/:source?', async (req, res) => {
   });
 });
 
-router.get('/spaces/:key?', (req, res) => {
+router.get('/spaces/:key', (req, res) => {
   const { key } = req.params;
-  return res.json(key ? spaces[key] : spaces);
+  return res.json(spaces[key]);
 });
 
 router.get('/spaces/:key/poke', async (req, res) => {

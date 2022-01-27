@@ -1,7 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import * as ethUtil from 'ethereumjs-util';
 import { isValidSignature } from '../../helpers/eip1271';
-import { convertUtf8ToHex } from '@walletconnect/utils';
 
 export function recoverPublicKey(sig: string, hash: string): string {
   const params = ethUtil.fromRpcSig(sig);
@@ -34,23 +33,4 @@ export async function verifySignature(
     console.log('[ingestor] Smart contract signature');
     return isValidSignature(address, sig, hash, provider);
   }
-}
-
-export function encodePersonalMessage(msg: string): string {
-  const data = ethUtil.toBuffer(convertUtf8ToHex(msg));
-  const buf = Buffer.concat([
-    Buffer.from(
-      '\u0019Ethereum Signed Message:\n' + data.length.toString(),
-      'utf8'
-    ),
-    data
-  ]);
-  return ethUtil.bufferToHex(buf);
-}
-
-export function hashPersonalMessage(msg: string): string {
-  const data = encodePersonalMessage(msg);
-  const buf = ethUtil.toBuffer(data);
-  const hash = ethUtil.keccak256(buf);
-  return ethUtil.bufferToHex(hash);
 }
