@@ -44,13 +44,13 @@ export default async function(parent, args) {
   params.push(skip, first);
 
   const query = `
-    SELECT p.*, spaces.settings FROM proposals p
+    SELECT p.*, spaces.settings, spaces.created_at AS space_created, spaces.updated_at AS space_updated FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
-    const proposals = await db.queryAsync(query, params);
+    const proposals = await db.queryAsync(query, params);  
     return proposals.map(proposal => formatProposal(proposal));
   } catch (e) {
     console.log('[graphql]', e);

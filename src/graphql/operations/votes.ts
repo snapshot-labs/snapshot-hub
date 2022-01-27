@@ -60,14 +60,22 @@ export default async function(parent, args, context?, info?) {
       .map(vote => vote.space.id)
       .filter((v, i, a) => a.indexOf(v) === i);
     const query = `
-      SELECT id, settings FROM spaces
+      SELECT * FROM spaces
       WHERE id IN (?) AND settings IS NOT NULL
     `;
     try {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
       spaces = Object.fromEntries(
-        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+        spaces.map(space => [
+          space.id,
+          formatSpace(
+            space.id,
+            space.settings,
+            space.created_at,
+            space.updated_at
+          )
+        ])
       );
       votes = votes.map(vote => {
         if (spaces[vote.space.id])
@@ -83,7 +91,7 @@ export default async function(parent, args, context?, info?) {
   if (requestedFields.proposal && votes.length > 0) {
     const proposalIds = votes.map(vote => vote.proposal);
     const query = `
-      SELECT p.*, spaces.settings FROM proposals p
+      SELECT p.*, spaces.settings, spaces.created_at AS space_created, spaces.updated_at AS space_updated FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
       WHERE spaces.settings IS NOT NULL AND p.id IN (?)
     `;

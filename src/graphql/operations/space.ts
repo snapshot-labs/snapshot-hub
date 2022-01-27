@@ -13,7 +13,7 @@ export default async function(_parent, { id }) {
     const spaces = await db.queryAsync(query, [id]);
     return (
       spaces.map(space =>
-        Object.assign(space, formatSpace(space.id, space.settings))
+        Object.assign(space, formatSpace(space.id, space.settings, space.created_at, space.updated_at))
       )[0] || null
     );
   } catch (e) {

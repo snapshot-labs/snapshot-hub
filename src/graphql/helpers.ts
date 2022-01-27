@@ -2,7 +2,7 @@ import { jsonParse } from '../helpers/utils';
 
 const network = process.env.NETWORK || 'testnet';
 
-export function formatSpace(id, settings) {
+export function formatSpace(id, settings, created_at, updated_at) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
@@ -23,6 +23,9 @@ export function formatSpace(id, settings) {
   space.voting.blind = space.voting.blind || false;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
+  space.created = created_at || null;
+  space.updated = updated_at || null;
+
   return space;
 }
 
@@ -37,7 +40,13 @@ export function formatProposal(proposal) {
   if (ts > proposal.start) proposalState = 'active';
   if (ts > proposal.end) proposalState = 'closed';
   proposal.state = proposalState;
-  proposal.space = formatSpace(proposal.space, proposal.settings);
+
+  proposal.space = formatSpace(
+    proposal.space,
+    proposal.settings,
+    proposal.space_created,
+    proposal.space_updated
+  );
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   return proposal;
@@ -47,17 +56,32 @@ export function formatVote(vote) {
   vote.choice = jsonParse(vote.choice);
   vote.metadata = jsonParse(vote.metadata, {});
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
-  vote.space = formatSpace(vote.space, vote.settings);
+  vote.space = formatSpace(
+    vote.space,
+    vote.settings,
+    vote.space_created,
+    vote.space_updated
+  );
   return vote;
 }
 
 export function formatFollow(follow) {
-  follow.space = formatSpace(follow.space, follow.settings);
+  follow.space = formatSpace(
+    follow.space,
+    follow.settings,
+    follow.space_created,
+    follow.space_updated
+  );
   return follow;
 }
 
 export function formatSubscription(subscription) {
-  subscription.space = formatSpace(subscription.space, subscription.settings);
+  subscription.space = formatSpace(
+    subscription.space,
+    subscription.settings,
+    subscription.space_created,
+    subscription.space_updated
+  );
   return subscription;
 }
 

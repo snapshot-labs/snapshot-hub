@@ -218,7 +218,9 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
-  followersCount: Int
+  followersCount: Int!
+  created: Int!
+  updated: Int!
 }
 
 type SpaceFilters {
