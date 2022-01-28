@@ -65,7 +65,7 @@ type Query {
 
   plugins: [Item]
 
-  strategies: [Item]
+  strategies: [StrategyItem]
 }
 
 input SpaceWhere {
@@ -307,5 +307,15 @@ type Subscription {
 
 type Item {
   id: String!
+  spacesCount: Int
+}
+
+type StrategyItem {
+  id: String!
+  author: String
+  version: String
+  schema: Any
+  examples: [Any]
+  about: String
   spacesCount: Int
 }

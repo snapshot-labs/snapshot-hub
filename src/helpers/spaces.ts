@@ -34,10 +34,10 @@ setInterval(() => {
       }
     })
   );
-}, 30e3);
+}, 32e3);
 
 setTimeout(() => {
-  console.log('Load spaces from db');
+  console.log('[spaces] Load spaces from db');
   const query = 'SELECT id, settings FROM spaces ORDER BY id ASC';
   db.queryAsync(query).then(result => {
     spaces = Object.fromEntries(
@@ -47,7 +47,7 @@ setTimeout(() => {
     const totalPublicSpaces = Object.values(spaces).filter(
       (space: any) => !space.private
     ).length;
-    console.log('Total spaces', totalSpaces);
-    console.log('Total public spaces', totalPublicSpaces);
+    console.log('[spaces] Total spaces', totalSpaces);
+    console.log('[spaces] Total public spaces', totalPublicSpaces);
   });
 }, 3e3);
