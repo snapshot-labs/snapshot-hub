@@ -9,6 +9,8 @@ export const spaceOneDayVoters = {};
 export const spaceIdsFailed: string[] = [];
 
 setInterval(() => {
+  console.log('[spaces] Load metrics');
+
   getProposals().then((result: any) =>
     result.forEach(proposals => {
       if (spaces[proposals.space]) {
@@ -32,7 +34,7 @@ setInterval(() => {
       }
     })
   );
-}, 60e3);
+}, 30e3);
 
 setTimeout(() => {
   console.log('Load spaces from db');
