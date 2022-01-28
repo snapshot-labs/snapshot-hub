@@ -12,7 +12,7 @@ export default async function(parent, { id }, context, info) {
   `;
   try {
     const votes = await db.queryAsync(query, [id]);
-    let result = votes.map(vote => formatVote(vote))[0] || null;
+    const result = votes.map(vote => formatVote(vote))[0] || null;
     if (requestedFields.proposal && result?.proposal) {
       const proposalId = result.proposal;
       const query = `
@@ -28,8 +28,7 @@ export default async function(parent, { id }, context, info) {
         return Promise.reject('request failed');
       }
     }
-    return result
-    
+    return result;
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');
