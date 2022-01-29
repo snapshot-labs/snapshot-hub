@@ -106,7 +106,9 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const author = getAddress(body.address);
   const created = parseInt(msg.timestamp);
   const metadata = msg.payload.metadata || {};
-  const strategies = JSON.stringify(spaceSettings.strategies);
+  const strategies = JSON.stringify(
+    metadata.strategies || spaceSettings.strategies
+  );
   const plugins = JSON.stringify(metadata.plugins || {});
   const network = metadata.network || spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
