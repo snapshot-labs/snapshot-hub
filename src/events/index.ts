@@ -112,8 +112,12 @@ async function processEvents(subscribers) {
 
 if (serviceEvents && serviceEventsSubscribers) {
   setInterval(async () => {
-    const subscribers = await getJSON(serviceEventsSubscribers);
-    console.log('[events] Subscribers', subscribers.length);
-    await processEvents(subscribers);
+    try {
+      const subscribers = await getJSON(serviceEventsSubscribers);
+      console.log('[events] Subscribers', subscribers.length);
+      await processEvents(subscribers);
+    } catch (e) {
+      console.log('[events] Failed to process');
+    }
   }, interval * 1e3);
 }
