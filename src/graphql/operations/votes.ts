@@ -6,8 +6,9 @@ import {
   formatSpace,
   formatVote
 } from '../helpers';
+import serve from '../../helpers/ee';
 
-export default async function(parent, args, context?, info?) {
+async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {} } = args;
 
@@ -103,4 +104,14 @@ export default async function(parent, args, context?, info?) {
   }
 
   return votes;
+}
+
+export default async function(parent, args, context?, info?) {
+  const requestedFields = info ? graphqlFields(info) : {};
+  return await serve(JSON.stringify({ args, requestedFields }), query, [
+    parent,
+    args,
+    context,
+    info
+  ]);
 }
