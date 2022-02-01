@@ -2,6 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
 
 export let strategies: any[] = [];
+export let strategiesObj: any = {};
 
 const uri = 'https://score.snapshot.org/api/strategies';
 
@@ -28,6 +29,10 @@ async function loadStrategies() {
       return strategy;
     })
     .sort((a, b): any => b.spacesCount - a.spacesCount);
+
+  strategiesObj = Object.fromEntries(
+    strategies.map(strategy => [strategy.id, strategy])
+  );
 }
 
 setInterval(async () => await loadStrategies(), 16e3);
