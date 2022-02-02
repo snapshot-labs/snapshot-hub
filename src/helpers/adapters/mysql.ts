@@ -2,7 +2,6 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import fleek from '@fleekhq/fleek-storage-js';
 import db from '../mysql';
 import { getSpace } from '../ens';
-import { spaceIdsFailed } from '../spaces';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
   if (!settings || !settings.name) return false;
@@ -75,36 +74,6 @@ export async function getOneDayVoters() {
     WHERE created > (UNIX_TIMESTAMP() - 86400) GROUP BY space
   `;
   return await db.queryAsync(query);
-}
-
-export async function loadSpaces() {
-  console.time('loadSpaces');
-  const query = 'SELECT id FROM spaces';
-  let result = [];
-  try {
-    result = await db.queryAsync(query);
-  } catch (e) {
-    console.log(e);
-  }
-  const ids = result.map((space: any) => space.id);
-  console.log('Spaces from db', ids.length);
-  const _spaces = {};
-  const max = 25;
-  const pages = Math.ceil(ids.length / max);
-  for (let i = 0; i < pages; i++) {
-    const pageIds = ids.slice(max * i, max * (i + 1));
-    const pageSpaces = await Promise.all(pageIds.map(id => loadSpace(id)));
-    pageIds.forEach((id, index) => {
-      if (pageSpaces[index]) {
-        _spaces[id] = pageSpaces[index];
-        addOrUpdateSpace(id, pageSpaces[index]);
-      } else {
-        spaceIdsFailed.push(id);
-      }
-    });
-  }
-  console.timeEnd('loadSpaces');
-  return _spaces;
 }
 
 export async function getProposal(space, id) {
