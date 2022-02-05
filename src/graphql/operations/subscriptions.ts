@@ -23,6 +23,7 @@ export default async function(parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const { first = 20, skip = 0 } = args;
+  if (first > 100) first = 100;
   params.push(skip, first);
 
   let subscriptions: any[] = [];
