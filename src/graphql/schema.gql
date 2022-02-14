@@ -66,6 +66,8 @@ type Query {
   plugins: [Item]
 
   strategies: [StrategyItem]
+
+  strategy(id: String): StrategyItem
 }
 
 input SpaceWhere {

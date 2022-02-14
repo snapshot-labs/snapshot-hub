@@ -47,7 +47,7 @@ export async function getProposalScores(proposalId) {
     }
 
     // Get votes
-    let votes = await getVotes(
+    let votes: any = await getVotes(
       {},
       { first: 100000, where: { proposal: proposalId } },
       {},

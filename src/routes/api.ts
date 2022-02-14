@@ -1,12 +1,7 @@
 import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
-import {
-  spaces,
-  spaceProposals,
-  spaceFollowers,
-  spaceOneDayVoters
-} from '../helpers/spaces';
+import { spaces, spacesMetadata } from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
@@ -37,66 +32,7 @@ router.get('/scores/:proposalId', async (req, res) => {
 });
 
 router.get('/explore', (req, res) => {
-  const spacesMetadata = {};
-  const networks = {};
-  const strategies = {};
-  const plugins = {};
-  const skins = {};
-  const validations = {};
-
-  Object.entries(spaces).forEach(([id, space]: any) => {
-    if (space.skin)
-      skins[space.skin] = skins[space.skin] ? skins[space.skin] + 1 : 1;
-
-    if (space.validation)
-      validations[space.validation.name] = validations[space.validation.name]
-        ? validations[space.validation.name] + 1
-        : 1;
-
-    networks[space.network] = networks[space.network]
-      ? networks[space.network] + 1
-      : 1;
-
-    const uniqueStrategies = new Set<string>(
-      space.strategies.map(strategy => strategy.name)
-    );
-    uniqueStrategies.forEach(strategyName => {
-      strategies[strategyName] = strategies[strategyName]
-        ? strategies[strategyName] + 1
-        : 1;
-    });
-
-    Object.keys(space.plugins || {}).forEach(plugin => {
-      plugins[plugin] = plugins[plugin] ? plugins[plugin] + 1 : 1;
-    });
-
-    spacesMetadata[id] = {
-      name: space.name,
-      avatar: space.avatar || undefined,
-      private: space.private || undefined,
-      terms: space.terms || undefined,
-      network: space.network || undefined,
-      categories: space.categories || undefined,
-      activeProposals:
-        (spaceProposals[id] && spaceProposals[id].active) || undefined,
-      proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
-      proposals_1d:
-        (spaceProposals[id] && spaceProposals[id].count_1d) || undefined,
-      followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
-      followers_1d:
-        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined,
-      voters_1d: spaceOneDayVoters[id] || undefined
-    };
-  });
-
-  return res.json({
-    spaces: spacesMetadata,
-    networks,
-    strategies,
-    skins,
-    plugins,
-    validations
-  });
+  return res.json({ spaces: spacesMetadata });
 });
 
 router.get('/report/:id/:source?', async (req, res) => {

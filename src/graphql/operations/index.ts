@@ -12,6 +12,7 @@ import networks from './networks';
 import validations from './validations';
 import plugins from './plugins';
 import strategies from './strategies';
+import strategy from './strategy';
 
 export default {
   space,
@@ -27,5 +28,6 @@ export default {
   networks,
   validations,
   plugins,
-  strategies
+  strategies,
+  strategy
 };

@@ -28,7 +28,7 @@ export default async function(_parent, args) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 100) first = 100;
+  if (first > 1000) first = 1000;
   params.push(skip, first);
 
   const query = `
