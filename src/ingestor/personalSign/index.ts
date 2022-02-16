@@ -49,7 +49,9 @@ export default async function ingestor(body) {
   if (!msg.type || !Object.keys(writer).includes(msg.type))
     return Promise.reject('wrong message type');
 
-  if (!(await verifySignature(body.address, body.sig, hashMessage(body.msg))))
+  const network = spaces[msg.space].network;
+
+  if (!(await verifySignature(body.address, body.sig, hashMessage(body.msg), network)))
     return Promise.reject('wrong signature');
 
   try {

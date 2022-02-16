@@ -16,10 +16,10 @@ export function recoverPublicKey(sig: string, hash: string): string {
 export async function verifySignature(
   address: string,
   sig: string,
-  hash: string
-  // chainId: number
+  hash: string,
+  chainId: number
 ): Promise<boolean> {
-  const provider = snapshot.utils.getProvider('1');
+  const provider = snapshot.utils.getProvider(chainId?.toString() ?? '1');
   const bytecode = await provider.getCode(address);
   if (
     !bytecode ||
