@@ -266,7 +266,6 @@ type Proposal {
 
 type Strategy {
   name: String!
-  network: String
   params: Any
 }
 

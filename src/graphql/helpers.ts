@@ -26,11 +26,6 @@ export function formatSpace(id, settings) {
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
-  space.strategies = space.strategies.map(strategy => ({
-    ...strategy,
-    // By default return space network if strategy network is not defined
-    network: strategy.network || space.network
-  }));
   return space;
 }
 
