@@ -13,6 +13,7 @@ query Spaces {
     symbol
     strategies {
       name
+      network
       params
     }
     admins
