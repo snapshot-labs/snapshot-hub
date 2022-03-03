@@ -50,6 +50,7 @@ async function query(parent, args, context?, info?) {
   `;
   try {
     votes = await db.queryAsync(query, params);
+    // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
     votes = votes.map(vote => formatVote(vote));
   } catch (e) {
     console.log('[graphql]', e);
