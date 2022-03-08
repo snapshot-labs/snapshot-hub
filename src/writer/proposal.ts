@@ -53,6 +53,10 @@ export async function verify(body): Promise<any> {
     if (!isValidPeriod) return Promise.reject('invalid voting period');
   }
 
+  if (space.voting?.type) {
+    if (msg.payload.type !== space.voting.type) return Promise.reject('invalid voting type');
+  }
+
   try {
     const validationName = space.validation?.name || 'basic';
     const validationParams = space.validation?.params || {};
