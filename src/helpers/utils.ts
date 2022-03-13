@@ -22,8 +22,3 @@ export function sha256(str) {
     .update(str)
     .digest('hex');
 }
-
-export async function getJSON(uri) {
-  const url = snapshot.utils.getUrl(uri);
-  return fetch(url).then(res => res.json());
-}

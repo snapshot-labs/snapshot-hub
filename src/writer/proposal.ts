@@ -1,3 +1,4 @@
+import { sendEventToWebhook } from './../events/index';
 import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
@@ -138,38 +139,18 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     scores_updated: 0,
     votes: 0
   };
-  let query = 'INSERT IGNORE INTO proposals SET ?; ';
+  const query = 'INSERT IGNORE INTO proposals SET ?; ';
   const params: any[] = [proposal];
 
-  /* Store events in database */
+  // Store events in snapshot-webhook asynchronously
   const event = {
-    id: `proposal/${id}`,
-    space
-  };
-  const ts = Date.now() / 1e3;
-
-  query += 'INSERT IGNORE INTO events SET ?; ';
-  params.push({
     event: 'proposal/created',
-    expire: proposal.created,
-    ...event
-  });
+    id: `proposal/${id}`,
+    space,
+    proposal
+  };
 
-  query += 'INSERT IGNORE INTO events SET ?; ';
-  params.push({
-    event: 'proposal/start',
-    expire: proposal.start,
-    ...event
-  });
-
-  if (proposal.end > ts) {
-    query += 'INSERT IGNORE INTO events SET ?; ';
-    params.push({
-      event: 'proposal/end',
-      expire: proposal.end,
-      ...event
-    });
-  }
+  sendEventToWebhook(event);
 
   await db.queryAsync(query, params);
   console.log('Store proposal complete', space, id);

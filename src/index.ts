@@ -8,7 +8,6 @@ import upload from './routes/upload';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import './helpers/strategies';
-import './events';
 
 const app = express();
 app.use(bodyParser.json({ limit: '20mb' }));
