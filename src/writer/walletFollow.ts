@@ -13,7 +13,7 @@ export async function action(message, ipfs, receipt, id): Promise<void> {
     wallet: message.wallet,
     created: message.timestamp
   };
-  await db.queryAsync('INSERT IGNORE INTO walletFollows SET ?', params);
+  await db.queryAsync('INSERT IGNORE INTO walletfollows SET ?', params);
   console.log(
     `[writer] Stored: ${message.from} follow wallet ${message.wallet}`
   );

@@ -28,7 +28,7 @@ export default async function(parent, args) {
   params.push(skip, first);
 
   const query = `
-    SELECT f.* FROM walletFollows f
+    SELECT f.* FROM walletfollows f
     WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;

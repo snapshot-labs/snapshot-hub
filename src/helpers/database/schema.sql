@@ -122,7 +122,7 @@ CREATE TABLE follows (
   INDEX created (created)
 );
 
-CREATE TABLE walletFollows (
+CREATE TABLE walletfollows (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   follower VARCHAR(64) NOT NULL,
