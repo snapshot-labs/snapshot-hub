@@ -80,4 +80,13 @@ query Follows {
     created
   }
 }
+
+query WalletFollows {
+  walletFollows (where: { follower: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7" }) {
+    id
+    follower
+    wallet
+    created
+  }
+}
 `;

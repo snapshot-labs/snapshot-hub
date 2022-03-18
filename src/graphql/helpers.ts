@@ -60,7 +60,7 @@ export function formatVote(vote) {
 }
 
 export function formatFollow(follow) {
-  follow.space = formatSpace(follow.space, follow.settings);
+  follow.space = formatSpace(follow.space, {});
   return follow;
 }
 

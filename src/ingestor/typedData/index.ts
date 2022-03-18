@@ -49,7 +49,16 @@ export default async function ingestor(body) {
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
-    if (!['follow', 'unfollow', 'subscribe', 'unsubscribe'].includes(type))
+    if (
+      ![
+        'follow',
+        'unfollow',
+        'subscribe',
+        'unsubscribe',
+        'walletFollow',
+        'walletUnfollow'
+      ].includes(type)
+    )
       return Promise.reject('wrong from');
 
     if (!(await isValidAlias(message.from, body.address)))
@@ -106,6 +115,7 @@ export default async function ingestor(body) {
       version: domain.version,
       timestamp: message.timestamp,
       space: message.space,
+      wallet: message.wallet,
       type,
       payload
     }),
@@ -113,7 +123,15 @@ export default async function ingestor(body) {
   };
 
   if (
-    ['follow', 'unfollow', 'alias', 'subscribe', 'unsubscribe'].includes(type)
+    [
+      'follow',
+      'unfollow',
+      'alias',
+      'subscribe',
+      'unsubscribe',
+      'walletFollow',
+      'walletUnfollow'
+    ].includes(type)
   ) {
     legacyBody = message;
   }
@@ -143,6 +161,7 @@ export default async function ingestor(body) {
     '[ingestor]',
     `Address "${body.address}"\n`,
     `Space "${message.space}"\n`,
+    `Wallet "${message.wallet}"\n`,
     `Type "${type}"\n`,
     `Id "${id}"\n`,
     `IPFS "${ipfs}"`

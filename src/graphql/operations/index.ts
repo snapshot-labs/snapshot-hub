@@ -6,6 +6,7 @@ import vote from './vote';
 import votes from './votes';
 import aliases from './aliases';
 import follows from './follows';
+import walletFollows from './walletFollows';
 import subscriptions from './subscriptions';
 import skins from './skins';
 import networks from './networks';
@@ -23,6 +24,7 @@ export default {
   votes,
   aliases,
   follows,
+  walletFollows,
   subscriptions,
   skins,
   networks,

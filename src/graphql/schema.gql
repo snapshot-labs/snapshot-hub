@@ -49,6 +49,14 @@ type Query {
     orderDirection: OrderDirection
   ): [Follow]
 
+  walletFollows(
+    first: Int
+    skip: Int
+    where: WalletFollowWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [WalletFollow]
+
   subscriptions(
     first: Int
     skip: Int
@@ -164,6 +172,23 @@ input FollowWhere {
   follower_in: [String]
   space: String
   space_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
+input WalletFollowWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  follower: String
+  follower_in: [String]
+  wallet: String
+  wallet_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -297,6 +322,14 @@ type Follow {
   ipfs: String
   follower: String!
   space: Space!
+  created: Int!
+}
+
+type WalletFollow {
+  id: String!
+  ipfs: String
+  follower: String!
+  wallet: String!
   created: Int!
 }
 
