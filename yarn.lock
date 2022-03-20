@@ -1725,9 +1725,9 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
-"@snapshot-labs/snapshot.js@midgerate/snapshot.js#0.3.57":
-  version "0.3.54"
-  resolved "https://codeload.github.com/midgerate/snapshot.js/tar.gz/c4277a6f80fce74169f2c590a325ba536d20737a"
+"@snapshot-labs/snapshot.js@midgerate/snapshot.js#0.3.60":
+  version "0.3.58"
+  resolved "https://codeload.github.com/midgerate/snapshot.js/tar.gz/0d9a0164ee675f614fd340c5be6957ee6faf4a73"
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.0.4"
