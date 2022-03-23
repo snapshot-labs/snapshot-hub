@@ -57,7 +57,7 @@ async function loadSpaces() {
     );
     const totalSpaces = Object.keys(spaces).length;
     console.log('[spaces] Total spaces', totalSpaces);
-    
+
     loadSpacesMetrics();
   });
 }

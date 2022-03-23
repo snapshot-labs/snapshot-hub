@@ -166,17 +166,19 @@ export async function getProposalScores(proposalId) {
 }
 
 async function run() {
+  console.log('[scores] Run scores');
   const [
     proposal
   ] = await db.queryAsync(
-    'SELECT id FROM proposals WHERE scores_state = ? ORDER BY created ASC LIMIT 1',
-    ['']
+    'SELECT id, space FROM proposals WHERE scores_state IN (?) ORDER BY scores_updated ASC LIMIT 1',
+    [['', 'pending', 'invalid']]
   );
   if (proposal && proposal.id) {
-    console.log('[scores] Get proposal', proposal.id);
+    console.log('[scores] Get proposal', proposal.space, proposal.id);
     await getProposalScores(proposal.id);
+    await snapshot.utils.sleep(5e3);
     await run();
   }
 }
 
-// snapshot.utils.sleep(5000).then(() => run());
+snapshot.utils.sleep(10e3).then(() => run());
