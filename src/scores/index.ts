@@ -93,7 +93,7 @@ export async function getProposalScores(proposalId) {
     };
 
     // Store vp
-    if (results.scores_state === 'final') {
+    if (['final', 'pending'].includes(results.scores_state)) {
       const max = 256;
       const pages = Math.ceil(votes.length / max);
       const votesInPages: any = [];
