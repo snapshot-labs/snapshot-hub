@@ -167,11 +167,14 @@ export async function getProposalScores(proposalId) {
 
 async function run() {
   console.log('[scores] Run scores');
+  const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
+  const ts = parseInt((Date.now() / 1e3).toFixed());
+  console.log('Ts', ts);
   const [
     proposal
   ] = await db.queryAsync(
-    'SELECT id, space FROM proposals WHERE scores_state IN (?) ORDER BY scores_updated ASC LIMIT 1',
-    [['', 'pending', 'invalid']]
+    'SELECT id, space FROM proposals WHERE created >= ? AND start <= ? AND scores_state IN (?) ORDER BY scores_updated ASC LIMIT 1',
+    [expires, ts, ['', 'pending', 'invalid']]
   );
   if (proposal && proposal.id) {
     console.log('[scores] Get proposal', proposal.space, proposal.id);
