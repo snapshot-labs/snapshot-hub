@@ -4,6 +4,12 @@ import getProposal from '../graphql/operations/proposal';
 import getVotes from '../graphql/operations/votes';
 import db from '../helpers/mysql';
 
+/**
+ * Copied from https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L147-L173
+ * to return the whole result (obj.result) instead of just the scores property (obj.result.scores).
+ * This should be implemented in snapshot.js, leading to either a breaking change or a new
+ * function, e.g. named getFullScores while getScores still returns just the scores prop.
+ */
 export async function getScores(
   space: string,
   strategies: any[],
@@ -87,7 +93,7 @@ export async function getProposalScores(proposalId) {
     };
 
     // Store vp
-    if (results.scores_state === 'final') {
+    if (['final', 'pending'].includes(results.scores_state)) {
       const max = 256;
       const pages = Math.ceil(votes.length / max);
       const votesInPages: any = [];
@@ -160,17 +166,22 @@ export async function getProposalScores(proposalId) {
 }
 
 async function run() {
+  console.log('[scores] Run scores');
+  const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
+  const ts = parseInt((Date.now() / 1e3).toFixed());
+  console.log('Ts', ts);
   const [
     proposal
   ] = await db.queryAsync(
-    'SELECT id FROM proposals WHERE scores_state = ? ORDER BY created ASC LIMIT 1',
-    ['']
+    'SELECT id, space FROM proposals WHERE created >= ? AND start <= ? AND scores_state IN (?) ORDER BY scores_updated ASC LIMIT 1',
+    [expires, ts, ['', 'pending', 'invalid']]
   );
   if (proposal && proposal.id) {
-    console.log('[scores] Get proposal', proposal.id);
+    console.log('[scores] Get proposal', proposal.space, proposal.id);
     await getProposalScores(proposal.id);
+    // await snapshot.utils.sleep(5e3);
     await run();
   }
 }
 
-// snapshot.utils.sleep(5000).then(() => run());
+snapshot.utils.sleep(10e3).then(() => run());

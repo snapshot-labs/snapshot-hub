@@ -54,7 +54,8 @@ export async function verify(body): Promise<any> {
   }
 
   if (space.voting?.type) {
-    if (msg.payload.type !== space.voting.type) return Promise.reject('invalid voting type');
+    if (msg.payload.type !== space.voting.type)
+      return Promise.reject('invalid voting type');
   }
 
   try {
