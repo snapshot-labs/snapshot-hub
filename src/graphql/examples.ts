@@ -71,9 +71,10 @@ query Votes {
 }
 
 query Follows {
-  follows (where: { follower: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7" }) {
+  follows (where: { follower: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7", type: 'space' }) {
     id
     follower
+    following
     space {
       id
     }
@@ -82,11 +83,10 @@ query Follows {
 }
 
 query WalletFollows {
-  walletFollows (where: { follower: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7" }) {
+  follows (where: { follower: "0xeF8305E140ac520225DAf050e2f71d5fBcC543e7", type: 'account' }) {
     id
     follower
-    wallet
+    following
     created
   }
 }
-`;

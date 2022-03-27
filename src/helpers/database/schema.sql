@@ -122,16 +122,6 @@ CREATE TABLE follows (
   INDEX created (created)
 );
 
-CREATE TABLE walletfollows (
-  id VARCHAR(66) NOT NULL,
-  ipfs VARCHAR(64) NOT NULL,
-  follower VARCHAR(64) NOT NULL,
-  wallet VARCHAR(64) NOT NULL,
-  created INT(11) NOT NULL,
-  PRIMARY KEY (follower, wallet),
-  INDEX ipfs (ipfs),
-  INDEX created (created)
-);
 
 CREATE TABLE aliases (
   id VARCHAR(66) NOT NULL,
@@ -153,3 +143,7 @@ CREATE TABLE subscriptions (
   INDEX ipfs (ipfs),
   INDEX created (created)
 );
+
+ALTER TABLE follows 
+ADD type VARCHAR(64) NOT NULL DEFAULT 'space',
+RENAME COLUMN space TO following;

@@ -10,7 +10,7 @@ export async function action(message, ipfs, receipt, id): Promise<void> {
     id,
     ipfs,
     follower: getAddress(message.from),
-    space: message.space,
+    following: message.space,
     created: message.timestamp
   };
   await db.queryAsync('INSERT IGNORE INTO follows SET ?', params);

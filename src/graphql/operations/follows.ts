@@ -2,15 +2,34 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, formatFollow } from '../helpers';
 
 export default async function(parent, args) {
-  const { where = {} } = args;
+  let { where = {} } = args;
 
   const fields = {
     id: 'string',
     ipfs: 'string',
     follower: 'string',
-    space: 'string',
-    created: 'number'
+    following: 'string',
+    created: 'number',
+    type: 'string'
   };
+
+  // Assuming its a deprecated query, we need to default it to space.
+  if (!where.type) {
+    where = {
+      ...where,
+      type: 'space'
+    };
+  }
+
+  // Assuming its a deprecated query, we need to remove space from where and add the value to following as space is renamed to following.
+  if (where.space) {
+    where = {
+      ...where,
+      following: where.space
+    };
+    delete where.space;
+  }
+
   const whereQuery = buildWhereQuery(fields, 'f', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
@@ -29,9 +48,10 @@ export default async function(parent, args) {
 
   let follows: any[] = [];
 
+  // Left join for cases where type is an account and we dont have space id.
   const query = `
     SELECT f.*, spaces.settings FROM follows f
-    INNER JOIN spaces ON spaces.id = f.space
+    LEFT JOIN spaces ON spaces.id = f.following
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;

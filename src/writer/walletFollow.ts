@@ -10,10 +10,11 @@ export async function action(message, ipfs, receipt, id): Promise<void> {
     id,
     ipfs,
     follower: getAddress(message.from),
-    wallet: message.wallet,
-    created: message.timestamp
+    following: message.wallet,
+    created: message.timestamp,
+    type: 'account'
   };
-  await db.queryAsync('INSERT IGNORE INTO walletfollows SET ?', params);
+  await db.queryAsync('INSERT IGNORE INTO follows SET ?', params);
   console.log(
     `[writer] Stored: ${message.from} follow wallet ${message.wallet}`
   );
