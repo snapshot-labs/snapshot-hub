@@ -10,6 +10,10 @@ import pkg from '../../package.json';
 import db from '../helpers/mysql';
 import { hashMessage } from '@ethersproject/hash';
 import { getProposalScores } from '../scores';
+import { MerkleTree } from 'merkletreejs';
+import { utils } from 'ethers';
+import { Wallet } from '@ethersproject/wallet';
+import keccak256 from "keccak256";
 
 const gateway = gateways[0];
 
@@ -23,6 +27,35 @@ router.get('/', (req, res) => {
     version: pkg.version,
     tag: 'alpha',
     relayer: relayer.address
+  });
+});
+
+router.get('/merkle/:proposalId', async (req, res) => {
+  const { proposalId } = req.params;
+  const users = [
+    {
+      proposalId,
+      to: '0x27711f9c07230632F2EE1A21a967a9AC4729E520',
+      amount: 1000000000000000 // 0.001
+    }
+  ];
+
+  const elements = users.map((x) =>
+    utils.solidityKeccak256(["bytes32", "address", "uint256"], [x.proposalId, x.to, x.amount])
+  );
+
+  const merkleTree = new MerkleTree(elements, keccak256, { sort: true });
+  const root = merkleTree.getHexRoot();
+
+  const message = utils.arrayify(utils.solidityKeccak256(
+    ['bytes32', 'bytes32'],
+    [proposalId, root]
+  ))
+  const wallet = new Wallet('6a0554707ce860357770eaa09ffffd939232b79d6b82c01949c081e0f0f0b364')
+  const signature = await wallet.signMessage(message)
+  return res.json({
+    root,
+    signature
   });
 });
 
