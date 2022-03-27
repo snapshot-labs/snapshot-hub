@@ -61,9 +61,9 @@ export async function getProposals() {
   return await db.queryAsync(query, [ts, ts]);
 }
 
-export async function getFollowers() {
+export async function getSpaceFollowers() {
   const query = `
-    SELECT space, COUNT(id) as count, count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d FROM follows GROUP BY space
+    SELECT following as space, COUNT(id) as count, count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d FROM follows GROUP BY following
   `;
   return await db.queryAsync(query);
 }

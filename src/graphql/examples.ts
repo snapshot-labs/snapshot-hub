@@ -89,4 +89,4 @@ query WalletFollows {
     following
     created
   }
-}
+}`;

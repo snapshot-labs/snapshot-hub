@@ -1,4 +1,8 @@
-import { getProposals, getFollowers, getOneDayVoters } from './adapters/mysql';
+import {
+  getProposals,
+  getSpaceFollowers,
+  getOneDayVoters
+} from './adapters/mysql';
 import db from './mysql';
 
 export let spaces = {};
@@ -9,7 +13,7 @@ export const spaceOneDayVoters = {};
 
 async function loadSpacesMetrics() {
   console.log('[spaces] Load spaces metrics');
-  Promise.all([getProposals(), getFollowers(), getOneDayVoters()]).then(
+  Promise.all([getProposals(), getSpaceFollowers(), getOneDayVoters()]).then(
     metrics => {
       metrics[0].forEach(proposals => {
         if (spaces[proposals.space])
@@ -57,7 +61,7 @@ async function loadSpaces() {
     );
     const totalSpaces = Object.keys(spaces).length;
     console.log('[spaces] Total spaces', totalSpaces);
-    
+
     loadSpacesMetrics();
   });
 }

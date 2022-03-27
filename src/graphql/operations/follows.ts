@@ -52,12 +52,16 @@ export default async function(parent, args) {
   const query = `
     SELECT f.*, spaces.settings FROM follows f
     LEFT JOIN spaces ON spaces.id = f.following
-    WHERE spaces.settings IS NOT NULL ${queryStr}
+    WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+
   try {
     follows = await db.queryAsync(query, params);
-    return follows.map(follow => formatFollow(follow));
+    return follows.map(follow => {
+      if (follow.type === 'space') return formatFollow(follow);
+      return follow;
+    });
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');
