@@ -48,6 +48,11 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace(proposal.space, proposal.settings);
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
+  proposal.strategies = proposal.strategies.map(strategy => ({
+    ...strategy,
+    // By default return proposal network if strategy network is not defined
+    network: strategy.network || proposal.network
+  }));
   return proposal;
 }
 
