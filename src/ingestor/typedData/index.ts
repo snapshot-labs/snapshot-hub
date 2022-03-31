@@ -74,6 +74,7 @@ export default async function ingestor(body) {
     payload = {
       name: message.title,
       body: message.body,
+      discussion: message.discussion || '',
       choices: message.choices,
       start: message.start,
       end: message.end,
