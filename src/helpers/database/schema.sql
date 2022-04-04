@@ -59,7 +59,7 @@ CREATE TABLE proposals (
   choices JSON NOT NULL,
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
-  quorum INT(32) NOT NULL,
+  quorum DECIMAL(64,30) NOT NULL,
   snapshot INT(24) NOT NULL,
   scores JSON NOT NULL,
   scores_by_strategy JSON NOT NULL,

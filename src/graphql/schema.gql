@@ -255,7 +255,7 @@ type Proposal {
   choices: [String]!
   start: Int!
   end: Int!
-  quorum: Int!
+  quorum: Float!
   snapshot: String
   state: String
   link: String
