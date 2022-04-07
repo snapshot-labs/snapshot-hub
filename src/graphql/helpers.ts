@@ -31,6 +31,8 @@ export function formatSpace(id, settings) {
     // By default return space network if strategy network is not defined
     network: strategy.network || space.network
   }));
+  space.parent = space.parent || null;
+  space.children = space.children || [];
   return space;
 }
 

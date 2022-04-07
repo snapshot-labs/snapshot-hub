@@ -222,6 +222,8 @@ type Space {
   validation: Strategy
   followersCount: Int
   proposalsCount: Int
+  parent: String
+  children: [String]
 }
 
 type SpaceFilters {
