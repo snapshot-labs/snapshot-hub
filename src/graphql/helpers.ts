@@ -1,5 +1,6 @@
 import { jsonParse } from '../helpers/utils';
 import { spaceProposals, spaceFollowers } from '../helpers/spaces';
+import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
 
@@ -31,9 +32,55 @@ export function formatSpace(id, settings) {
     // By default return space network if strategy network is not defined
     network: strategy.network || space.network
   }));
-  space.parent = space.parent || null;
-  space.children = space.children || [];
+
+  // always return parent and children in child node format
+  // will be overwritten if other fields than id are requested
+  space.parent = space.parent ? { id: space.parent } : null;
+  space.children = space.children?.map(child => ({ id: child })) || [];
   return space;
+}
+
+export async function fetchSpaces(args) {
+  const { where = {} } = args;
+  let queryStr = '';
+  const params: any[] = [];
+
+  const fields = ['id'];
+  fields.forEach(field => {
+    if (where[field]) {
+      queryStr += `AND s.${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      queryStr += `AND s.${field} IN (?) `;
+      params.push(fieldIn);
+    }
+  });
+
+  let orderBy = args.orderBy || 'created_at';
+  let orderDirection = args.orderDirection || 'desc';
+  if (!['created_at', 'updated_at', 'id'].includes(orderBy))
+    orderBy = 'created_at';
+  orderDirection = orderDirection.toUpperCase();
+  if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
+  let { first = 20 } = args;
+  const { skip = 0 } = args;
+  if (first > 1000) first = 1000;
+  params.push(skip, first);
+
+  const query = `
+    SELECT s.* FROM spaces s
+    WHERE 1 = 1 ${queryStr}
+    GROUP BY s.id
+    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
+  `;
+
+  const spaces = await db.queryAsync(query, params);
+  return spaces.map(space =>
+    Object.assign(space, formatSpace(space.id, space.settings))
+  );
 }
 
 export function formatProposal(proposal) {
