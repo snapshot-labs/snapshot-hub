@@ -245,14 +245,17 @@ type Proposal {
   created: Int!
   space: Space
   network: String!
+  symbol: String!
   type: String
   strategies: [Strategy]!
   plugins: Any!
   title: String!
   body: String
+  discussion: String!
   choices: [String]!
   start: Int!
   end: Int!
+  quorum: Float!
   snapshot: String
   state: String
   link: String
