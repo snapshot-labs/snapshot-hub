@@ -8,7 +8,16 @@ import defaultQuery from './examples';
 
 const schemaFile = path.join(__dirname, './schema.gql');
 const typeDefs = fs.readFileSync(schemaFile, 'utf8');
-const rootValue = { Query };
+const rootValue = {
+  Query,
+  ActivityPayload: {
+    __resolveType(obj) {
+      if (obj.author) return 'ProposalActivity';
+      if (obj.voter) return 'VoteActivity';
+      return 'Unknown';
+    }
+  }
+};
 const schema = makeExecutableSchema({ typeDefs, resolvers: rootValue });
 
 export default graphqlHTTP({

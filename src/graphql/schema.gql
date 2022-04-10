@@ -68,6 +68,12 @@ type Query {
   strategies: [StrategyItem]
 
   strategy(id: String): StrategyItem
+
+  activities(
+    where: ActivityWhere
+    orderDirection: OrderDirection
+    seek: Int
+  ): ActivityResult
 }
 
 input SpaceWhere {
@@ -183,6 +189,16 @@ input SubscriptionWhere {
   space_in: [String]
   created: Int
   created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
+input ActivityWhere {
+  account: String!
+  type: ActivityType
+  type_in: [ActivityType]
   created_gt: Int
   created_gte: Int
   created_lt: Int
@@ -324,4 +340,40 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
+}
+
+enum ActivityType {
+  voted
+  proposal_created
+}
+
+type VoteActivity {
+  id: String!
+  ipfs: String
+  voter: String!
+  space: Space
+  proposal_id: String!
+  choice: Any!
+}
+
+type ProposalActivity {
+  id: String!
+  ipfs: String
+  author: String!
+  space: Space
+  title: String!
+}
+union ActivityPayload = VoteActivity | ProposalActivity
+
+type ActivityResult {
+  activities: [Activity]
+  seek: Int
+  count: Int
+}
+
+type Activity {
+  created: Int!
+  type: ActivityType!
+  account: String!
+  payload: ActivityPayload
 }
