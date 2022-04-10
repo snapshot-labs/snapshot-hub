@@ -42,11 +42,11 @@ export default async function(_parent, args, _context, info) {
       spaces = spaces.map(space => {
         if (space.children) {
           space.children = space.children
-            .map(c => relatedSpaces.find(s => s.id === c.id && s.parent && s.parent.id === space.id))
+            .map(c => relatedSpaces.find(s => s.id === c.id))
             .filter(s => s);
         }
         if (space.parent) {
-          space.parent = relatedSpaces.find(s => s.id === space.parent.id && s.children.map(c => c.id).includes(space.id));
+          space.parent = relatedSpaces.find(s => s.id === space.parent.id);
         }
         return space;
       });
