@@ -42,7 +42,7 @@ export default async function ingestor(body) {
   let type = hashTypes[hash];
 
   if (
-    !['settings', 'alias'].includes(type) &&
+    !['settings', 'alias', 'profile'].includes(type) &&
     (!message.space || !spaces[message.space])
   )
     return Promise.reject('unknown space');
