@@ -57,6 +57,14 @@ type Query {
     orderDirection: OrderDirection
   ): [Subscription]
 
+  users(
+    first: Int
+    skip: Int
+    where: UsersWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [User]
+
   skins: [Item]
 
   networks: [Item]
@@ -189,6 +197,23 @@ input SubscriptionWhere {
   created_lte: Int
 }
 
+input UsersWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  address: String
+  address_in: [String]
+  username: String
+  username_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
 enum OrderDirection {
   asc
   desc
@@ -308,6 +333,16 @@ type Subscription {
   ipfs: String
   address: String!
   space: Space!
+  created: Int!
+}
+
+type User {
+  id: String!
+  ipfs: String
+  address: String!
+  username: String
+  bio: String
+  avatar: String
   created: Int!
 }
 

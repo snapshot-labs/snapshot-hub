@@ -145,3 +145,17 @@ CREATE TABLE subscriptions (
   INDEX ipfs (ipfs),
   INDEX created (created)
 );
+
+
+CREATE TABLE users (
+  id VARCHAR(66) NOT NULL,
+  ipfs VARCHAR(64) NOT NULL,
+  address VARCHAR(64) NOT NULL,
+  username VARCHAR(64),
+  bio TEXT,
+  avatar VARCHAR(64),
+  created INT(11) NOT NULL,
+  PRIMARY KEY (address),
+  INDEX ipfs (ipfs),
+  INDEX created (created)
+);

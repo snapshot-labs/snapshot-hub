@@ -49,7 +49,11 @@ export default async function ingestor(body) {
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
-    if (!['follow', 'unfollow', 'subscribe', 'unsubscribe'].includes(type))
+    if (
+      !['follow', 'unfollow', 'subscribe', 'unsubscribe', 'profile'].includes(
+        type
+      )
+    )
       return Promise.reject('wrong from');
 
     if (!(await isValidAlias(message.from, body.address)))
@@ -114,7 +118,14 @@ export default async function ingestor(body) {
   };
 
   if (
-    ['follow', 'unfollow', 'alias', 'subscribe', 'unsubscribe'].includes(type)
+    [
+      'follow',
+      'unfollow',
+      'alias',
+      'subscribe',
+      'unsubscribe',
+      'profile'
+    ].includes(type)
   ) {
     legacyBody = message;
   }
