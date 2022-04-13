@@ -4,6 +4,8 @@ import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
 
+export class PublicError extends Error {};
+
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
@@ -81,6 +83,65 @@ export async function fetchSpaces(args) {
   return spaces.map(space =>
     Object.assign(space, formatSpace(space.id, space.settings))
   );
+}
+
+// fetch parents and children for a list of spaces if more than their id is
+// requested (id alone doesn't require any additional database query, since
+// it's already in the original result of fetchSpaces)
+export async function fetchRelatedSpaces(spaces, requestedFields) {
+  if (
+    (requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')) ||
+    (requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id'))
+  ) {
+    // throw error if anything other than id is requested on second level
+    // (e.g. children.parent.name or parent.children.name)
+    if (
+      (requestedFields.parent?.children &&
+        Object.keys(requestedFields.parent.children).some(key => key !== 'id')) ||
+      (requestedFields.children?.parent &&
+        Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
+    ) {
+      throw new PublicError(
+        'Unsupported nested fields for related spaces. Only id is supported for children\'s parent or parent\'s children.'
+      );
+    }
+
+    // throw error if parent's parent or children's children are requested
+    if (requestedFields.parent?.parent || requestedFields.children?.children) {
+      throw new PublicError(
+        'Unsupported nesting. Parent\'s parent or children\'s children are not supported.'
+      );
+    }
+
+    // collect all parent and child ids of all returned spaces
+    const relatedSpaceIDs = spaces.reduce((ids, space) => {
+      if (space.children) ids.push(...space.children.map(c => c.id));
+      if (space.parent) ids.push(space.parent.id);
+      return ids;
+    }, []);
+
+    // fetch all related spaces
+    return await fetchSpaces({ where: { id_in: relatedSpaceIDs } });
+  }
+
+  return [];
+}
+
+// map related spaces to main list of spaces (where parent and child match)
+export function mapRelatedSpaces(spaces, relatedSpaces) {
+  return spaces.map(space => {
+    if (space.children) {
+      space.children = space.children
+        .map(c => relatedSpaces.find(s => s.id === c.id))
+        .filter(s => s);
+    }
+    if (space.parent) {
+      space.parent = relatedSpaces.find(s => s.id === space.parent.id);
+    }
+    return space;
+  });
 }
 
 export function formatProposal(proposal) {

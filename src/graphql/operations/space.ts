@@ -1,22 +1,20 @@
-import db from '../../helpers/mysql';
-import { formatSpace } from '../helpers';
+import graphqlFields from 'graphql-fields';
+import {
+  fetchSpaces,
+  fetchRelatedSpaces,
+  mapRelatedSpaces,
+  PublicError
+} from '../helpers';
 
-export default async function(_parent, { id }) {
-  const query = `
-    SELECT s.* FROM spaces s
-    WHERE s.id = ? AND s.settings IS NOT NULL
-    GROUP BY s.id
-    LIMIT 1
-  `;
+export default async function(_parent, { id }, _context, info) {
   try {
-    const spaces = await db.queryAsync(query, [id]);
-    return (
-      spaces.map(space =>
-        Object.assign(space, formatSpace(space.id, space.settings))
-      )[0] || null
-    );
+    const requestedFields = info ? graphqlFields(info) : {};
+    const spaces = await fetchSpaces({ first: 1, where: { id } });
+    const relatedSpaces = await fetchRelatedSpaces(spaces, requestedFields);
+    return mapRelatedSpaces(spaces, relatedSpaces)[0];
   } catch (e) {
     console.log('[graphql]', e);
-    return Promise.reject('request failed');
+    if (e instanceof PublicError) return e;
+    return new Error('Unexpected error');
   }
 }
