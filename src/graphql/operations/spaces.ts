@@ -26,6 +26,13 @@ export default async function(_parent, args, _context, info) {
         );
       }
 
+      // throw error if parent's parent or children's children are requested
+      if (requestedFields.parent?.parent || requestedFields.children?.children) {
+        return new Error(
+          'Unsupported nesting. Parent\'s parent or children\'s children are not supported.'
+        );
+      }
+
       // collect all parent and child ids of all returned spaces
       const relatedSpaceIDs = spaces.reduce((ids, space) => {
         if (space.children) ids.push(...space.children.map(c => c.id));
