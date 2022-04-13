@@ -153,7 +153,7 @@ CREATE TABLE users (
   address VARCHAR(64) NOT NULL,
   username VARCHAR(64),
   bio TEXT,
-  avatar VARCHAR(64),
+  avatar VARCHAR(128),
   created INT(11) NOT NULL,
   PRIMARY KEY (address),
   INDEX ipfs (ipfs),

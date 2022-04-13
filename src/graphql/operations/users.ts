@@ -11,14 +11,14 @@ export default async function(parent, args) {
     username: 'string',
     created: 'number'
   };
-  const whereQuery = buildWhereQuery(fields, 'f', where);
+  const whereQuery = buildWhereQuery(fields, 'u', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created'].includes(orderBy)) orderBy = 'created';
-  orderBy = `f.${orderBy}`;
+  orderBy = `u.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
