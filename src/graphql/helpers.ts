@@ -129,7 +129,7 @@ export async function fetchRelatedSpaces(spaces, requestedFields) {
   return [];
 }
 
-// map related spaces to main list of spaces (where parent and child match)
+// map related spaces to main list of spaces
 export function mapRelatedSpaces(spaces, relatedSpaces) {
   return spaces.map(space => {
     if (space.children) {
