@@ -39,10 +39,10 @@ export async function getScores(
 }
 
 export async function getProposalScores(proposalId) {
-  try {
-    // Get proposal
-    const proposal = await getProposal({}, { id: proposalId });
+  // Get proposal
+  const proposal = await getProposal({}, { id: proposalId });
 
+  try {
     if (proposal.scores_state === 'final') {
       return {
         scores_state: proposal.scores_state,
@@ -158,7 +158,9 @@ export async function getProposalScores(proposalId) {
       scores_updated = ?
       WHERE id = ? LIMIT 1;
     `;
-    await db.queryAsync(query, ['invalid', ts, proposalId]);
+    const failedState =
+      proposal.space.id === 'arbitrum-odyssey.eth' ? 'pending' : 'invalid';
+    await db.queryAsync(query, [failedState, ts, proposalId]);
     console.log('[scores] Proposal invalid');
 
     return { scores_state: 'invalid' };
