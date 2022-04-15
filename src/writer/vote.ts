@@ -3,18 +3,25 @@ import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../helpers/utils';
 import { getProposal } from '../helpers/adapters/mysql';
 import db from '../helpers/mysql';
+import { getScores } from '../scores/utils';
 
 async function getVp(body, msg, proposal) {
-  const scores = await snapshot.utils.getScores(
+  const strategies = jsonParse(proposal.strategies);
+  const { scores, state } = await getScores(
     msg.space,
-    jsonParse(proposal.strategies),
+    strategies,
     proposal.network,
     [body.address],
     proposal.snapshot
   );
-  return scores
-    .map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0))
-    .reduce((a, b: any) => a + b, 0);
+  const vpByStrategy = strategies.map(
+    (strategy, i) => scores[i][body.address] || 0
+  );
+  return {
+    vp: vpByStrategy.reduce((a, b: any) => a + b, 0),
+    vp_by_strategy: vpByStrategy,
+    vp_state: state
+  };
 }
 
 export async function verify(body): Promise<any> {
@@ -68,8 +75,8 @@ export async function verify(body): Promise<any> {
   }
 
   try {
-    const vp = await getVp(body, msg, proposal);
-    if (vp === 0) return Promise.reject('no voting power');
+    const scores = await getVp(body, msg, proposal);
+    if (scores.vp === 0) return Promise.reject('no voting power');
   } catch (e) {
     console.log(
       '[writer] Failed to check voting power (vote)',
@@ -86,6 +93,8 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
   const voter = getAddress(body.address);
   let vp = 0;
+  let vpByStrategy = [];
+  let vpState = '';
 
   // Check if voter already voted
   const votes = await db.queryAsync(
@@ -117,7 +126,10 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   // @TODO check if snapshot is in past
   if (!withDelegation) {
     try {
-      vp = await getVp(body, msg, proposal);
+      const scores = await getVp(body, msg, proposal);
+      vp = scores.vp;
+      vpByStrategy = scores.vp_by_strategy;
+      vpState = scores.vp_state;
     } catch (e) {
       console.log(
         '[writer] Failed to check voting power action (vote)',
@@ -157,8 +169,8 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     choice: JSON.stringify(msg.payload.choice),
     metadata: JSON.stringify(msg.payload.metadata || {}),
     vp,
-    vp_by_strategy: JSON.stringify([]),
-    vp_state: '',
+    vp_by_strategy: JSON.stringify(vpByStrategy),
+    vp_state: vpState,
     cb: 0
   };
 
