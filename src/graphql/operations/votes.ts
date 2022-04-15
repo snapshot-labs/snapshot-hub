@@ -37,7 +37,7 @@ async function query(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > LIMIT && !context.internal) first = LIMIT;
+  if (first > LIMIT && !context?.internal) first = LIMIT;
   params.push(skip, first);
 
   let votes: any[] = [];
