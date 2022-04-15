@@ -8,6 +8,8 @@ import {
 } from '../helpers';
 import serve from '../../helpers/ee';
 
+const LIMIT = 20000;
+
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {} } = args;
@@ -35,7 +37,7 @@ async function query(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 50000) first = 50000;
+  if (first > LIMIT && !context.internal) first = LIMIT;
   params.push(skip, first);
 
   let votes: any[] = [];

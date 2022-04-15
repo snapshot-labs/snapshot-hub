@@ -56,7 +56,7 @@ export async function getProposalScores(proposalId) {
     let votes: any = await getVotes(
       {},
       { first: 100000, where: { proposal: proposalId } },
-      {},
+      { internal: true },
       false
     );
     const voters = votes.map(vote => vote.voter);
