@@ -77,7 +77,7 @@ export async function getOneDayVoters() {
 }
 
 export async function getProposal(space, id) {
-  const query = `SELECT * FROM proposals WHERE space = ? AND id = ?`;
+  const query = `SELECT * FROM proposals WHERE space = ? AND id = ? LIMIT 1`;
   const proposals = await db.queryAsync(query, [space, id]);
   return proposals[0];
 }
