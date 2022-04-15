@@ -111,6 +111,11 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
       if (localCompare <= 0)
         return Promise.reject('already voted same time with lower index');
     }
+    // Mark previous vote as invalid
+    await db.queryAsync(
+      'UPDATE votes SET cb = ? WHERE voter = ? AND proposal = ? LIMIT 10',
+      [1, voter, msg.payload.proposal]
+    );
   }
 
   //
