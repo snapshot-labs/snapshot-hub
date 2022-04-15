@@ -35,7 +35,7 @@ async function query(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 30000) first = 30000;
+  if (first > 40000) first = 40000;
   params.push(skip, first);
 
   let votes: any[] = [];
