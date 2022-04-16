@@ -33,7 +33,7 @@ export async function verify(body): Promise<any> {
     (!proposal.type ||
       proposal.type === 'single-choice' ||
       proposal.type === 'basic') &&
-    typeof msg.payload.choice !== 'number'
+    (typeof msg.payload.choice !== 'number' || msg.payload.choice < 1)
   )
     return Promise.reject('invalid choice');
 
