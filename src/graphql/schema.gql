@@ -65,6 +65,8 @@ type Query {
     orderDirection: OrderDirection
   ): [User]
 
+  user(address: String): User
+
   skins: [Item]
 
   networks: [Item]
@@ -204,8 +206,6 @@ input UsersWhere {
   ipfs_in: [String]
   address: String
   address_in: [String]
-  username: String
-  username_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -340,9 +340,10 @@ type User {
   id: String!
   ipfs: String
   address: String!
-  username: String
-  bio: String
+  name: String
+  about: String
   avatar: String
+  twitter: String
   created: Int!
 }
 

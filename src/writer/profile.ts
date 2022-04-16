@@ -1,19 +1,18 @@
 import { getAddress } from '@ethersproject/address';
 import db from '../helpers/mysql';
-import { jsonParse } from '../helpers/utils';
 import snapshot from '@snapshot-labs/snapshot.js';
 
 export async function verify(body): Promise<any> {
-  const msg = jsonParse(body.msg);
-
   const schemaIsValid = snapshot.utils.validateSchema(
     snapshot.schemas.profile,
-    msg.payload
+    body.profile
   );
   if (schemaIsValid !== true) {
     console.log('[writer] Wrong profile format', schemaIsValid);
     return Promise.reject('wrong profile format');
   }
+
+  return true;
 }
 
 export async function action(message, ipfs, receipt, id): Promise<void> {
@@ -21,11 +20,10 @@ export async function action(message, ipfs, receipt, id): Promise<void> {
     id,
     ipfs,
     address: getAddress(message.from),
-    username: message.username,
-    bio: message.bio,
-    avatar: message.avatar,
-    created: message.timestamp
+    created: message.timestamp,
+    profile: JSON.stringify(message.profile)
   };
-  await db.queryAsync('INSERT IGNORE INTO users SET ?', params);
+
+  await db.queryAsync('REPLACE INTO users SET ?', params);
   console.log(`[writer] Stored: ${message.from} updated their profile`);
 }
