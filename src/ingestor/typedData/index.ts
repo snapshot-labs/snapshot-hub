@@ -36,7 +36,6 @@ export default async function ingestor(body) {
     return Promise.reject('wrong domain');
 
   const hash = sha256(JSON.stringify(types));
-
   if (!Object.keys(hashTypes).includes(hash))
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
@@ -44,12 +43,7 @@ export default async function ingestor(body) {
   if (
     [
       'proposal',
-      'proposal',
       'delete-proposal',
-      'delete-proposal',
-      'vote',
-      'vote-array',
-      'vote-string',
       'vote',
       'vote-array',
       'vote-string',
