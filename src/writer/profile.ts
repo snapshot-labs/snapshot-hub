@@ -3,14 +3,15 @@ import db from '../helpers/mysql';
 import snapshot from '@snapshot-labs/snapshot.js';
 
 export async function verify(body): Promise<any> {
-  const schemaIsValid = snapshot.utils.validateSchema(
-    snapshot.schemas.profile,
-    body.profile
-  );
-  if (schemaIsValid !== true) {
-    console.log('[writer] Wrong profile format', schemaIsValid);
-    return Promise.reject('wrong profile format');
-  }
+  // TODO: add this code once snapshot.js update is released with the profile schema.
+  // const schemaIsValid = snapshot.utils.validateSchema(
+  //   snapshot.schemas.profile,
+  //   body.profile
+  // );
+  // if (schemaIsValid !== true) {
+  //   console.log('[writer] Wrong profile format', schemaIsValid);
+  //   return Promise.reject('wrong profile format');
+  // }
 
   return true;
 }
