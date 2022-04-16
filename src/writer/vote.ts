@@ -39,12 +39,17 @@ export async function verify(body): Promise<any> {
 
   if (
     ['approval', 'ranked-choice'].includes(proposal.type) &&
-    !Array.isArray(msg.payload.choice)
+    (!Array.isArray(msg.payload.choice) || Math.min(...msg.payload.choice) < 1)
   )
     return Promise.reject('invalid choice');
 
   if (['weighted', 'quadratic'].includes(proposal.type)) {
-    if (typeof msg.payload.choice !== 'object')
+    if (
+      typeof msg.payload.choice !== 'object' ||
+      Math.min(
+        ...Object.keys(msg.payload.choice).map(choice => Number(choice))
+      ) < 1
+    )
       return Promise.reject('invalid choice');
 
     let choiceIsValid = true;
