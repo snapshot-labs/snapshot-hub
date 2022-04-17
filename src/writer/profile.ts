@@ -1,17 +1,18 @@
 import { getAddress } from '@ethersproject/address';
 import db from '../helpers/mysql';
 import snapshot from '@snapshot-labs/snapshot.js';
+import { jsonParse } from '../helpers/utils';
 
 export async function verify(body): Promise<any> {
-  // TODO: add this code once snapshot.js update is released with the profile schema.
-  // const schemaIsValid = snapshot.utils.validateSchema(
-  //   snapshot.schemas.profile,
-  //   body.profile
-  // );
-  // if (schemaIsValid !== true) {
-  //   console.log('[writer] Wrong profile format', schemaIsValid);
-  //   return Promise.reject('wrong profile format');
-  // }
+  const profile = jsonParse(body.profile, {});
+  const schemaIsValid = snapshot.utils.validateSchema(
+    snapshot.schemas.profile,
+    profile
+  );
+  if (schemaIsValid !== true) {
+    console.log('[writer] Wrong profile format', schemaIsValid);
+    return Promise.reject('wrong profile format');
+  }
 
   return true;
 }
