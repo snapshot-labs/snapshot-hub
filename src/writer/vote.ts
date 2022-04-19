@@ -33,18 +33,23 @@ export async function verify(body): Promise<any> {
     (!proposal.type ||
       proposal.type === 'single-choice' ||
       proposal.type === 'basic') &&
-    typeof msg.payload.choice !== 'number'
+    (typeof msg.payload.choice !== 'number' || msg.payload.choice < 1)
   )
     return Promise.reject('invalid choice');
 
   if (
     ['approval', 'ranked-choice'].includes(proposal.type) &&
-    !Array.isArray(msg.payload.choice)
+    (!Array.isArray(msg.payload.choice) || Math.min(...msg.payload.choice) < 1)
   )
     return Promise.reject('invalid choice');
 
   if (['weighted', 'quadratic'].includes(proposal.type)) {
-    if (typeof msg.payload.choice !== 'object')
+    if (
+      typeof msg.payload.choice !== 'object' ||
+      Math.min(
+        ...Object.keys(msg.payload.choice).map(choice => Number(choice))
+      ) < 1
+    )
       return Promise.reject('invalid choice');
 
     let choiceIsValid = true;
