@@ -343,7 +343,6 @@ type User {
   name: String
   about: String
   avatar: String
-  twitter: String
   created: Int!
 }
 
