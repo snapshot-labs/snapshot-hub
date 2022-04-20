@@ -19,10 +19,6 @@ export async function verify(body): Promise<any> {
 
 export async function action(message, ipfs, receipt, id): Promise<void> {
   const profile = jsonParse(message.profile, {});
-  // Do not store twitter temporarily. Once we have verification in place, remove this.
-  if (profile.twitter) {
-    profile.twitter = undefined;
-  }
 
   const params = {
     id,
