@@ -35,7 +35,7 @@ export function formatSpace(id, settings) {
 }
 
 export function formatUser(user) {
-  const profile = jsonParse(user.profile ?? {});
+  const profile = jsonParse(user.profile, {});
   delete user.profile;
   return {
     ...user,
