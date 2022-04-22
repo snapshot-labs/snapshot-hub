@@ -8,12 +8,12 @@ import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
 import ingestor from '../ingestor';
 import pkg from '../../package.json';
 import db from '../helpers/mysql';
-import { hashMessage } from '@ethersproject/hash';
+import { hashMessage, id } from '@ethersproject/hash';
 import { getProposalScores } from '../scores';
-import { MerkleTree } from 'merkletreejs';
-import { utils } from 'ethers';
 import { Wallet } from '@ethersproject/wallet';
-import keccak256 from "keccak256";
+import { keccak256 } from '@ethersproject/solidity';
+import { arrayify } from '@ethersproject/bytes';
+import { pinJson } from '../helpers/ipfs';
 
 const gateway = gateways[0];
 
@@ -30,33 +30,73 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/merkle/:proposalId', async (req, res) => {
+router.get('/boost/:proposalId', async (req, res) => {
   const { proposalId } = req.params;
-  const users = [
-    {
-      proposalId,
-      to: '0x27711f9c07230632F2EE1A21a967a9AC4729E520',
-      amount: 1000000000000000 // 0.001
+
+  let proposal: any;
+  let plugins: any;
+  let votes: any;
+
+  try {
+    proposal = await db.queryAsync(
+      `SELECT p.plugins FROM proposals p
+      WHERE p.id = ? AND p.end < UNIX_TIMESTAMP() AND p.scores_state = 'final'
+      LIMIT 1`,
+      [proposalId]
+    );
+  } catch (e) {
+    console.log('[api]', e);
+    return Promise.reject('request failed');
+  }
+
+  if (!proposal.length) {
+    return Promise.reject('proposal not found');
+  }
+
+  proposal = proposal[0];
+  plugins = JSON.parse(proposal.plugins);
+
+  if (plugins?.boost) {
+    if (plugins.boost.ipfs) {
+      return res.json({ ipfsHash: plugins.boost.ipfs });
     }
-  ];
 
-  const elements = users.map((x) =>
-    utils.solidityKeccak256(["bytes32", "address", "uint256"], [x.proposalId, x.to, x.amount])
-  );
+    try {
+      votes = await db.queryAsync(
+        `SELECT v.id, v.voter, v.vp FROM votes v
+        LEFT OUTER JOIN votes v2 ON
+          v.voter = v2.voter AND v.proposal = v2.proposal
+          AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
+        WHERE v2.voter IS NULL AND v.vp_state = 'final' AND v.proposal = ?
+        ORDER BY v.created DESC`,
+        [proposalId]
+      );
+    } catch (e) {
+      console.log('[api]', e);
+      return Promise.reject('request failed');
+    }
+  
+    // sign votes
+    const signatures: Record<string, string> = {};
+    const wallet = new Wallet(process.env.BOOST_GUARD_PK as string);
+    for (const vote of votes) {
+      const message = arrayify(keccak256(
+        ['bytes32', 'address'],
+        [id(proposalId), vote.voter.toLowerCase()]
+      ))
+      const signature = await wallet.signMessage(message);
+      signatures[vote.voter.toLowerCase()] = signature;
+    }
+  
+    const ipfsHash = await pinJson(`boost/${proposalId}`, signatures);
+    plugins.boost.ipfs = ipfsHash;
+  
+    await db.queryAsync(`UPDATE proposals SET plugins = ? WHERE id = ?`, [JSON.stringify(plugins), proposalId]);
+  
+    return res.json({ ipfsHash });
+  }
 
-  const merkleTree = new MerkleTree(elements, keccak256, { sort: true });
-  const root = merkleTree.getHexRoot();
-
-  const message = utils.arrayify(utils.solidityKeccak256(
-    ['bytes32', 'bytes32'],
-    [proposalId, root]
-  ))
-  const wallet = new Wallet('6a0554707ce860357770eaa09ffffd939232b79d6b82c01949c081e0f0f0b364')
-  const signature = await wallet.signMessage(message)
-  return res.json({
-    root,
-    signature
-  });
+  return Promise.reject('boost not configured for this proposal');
 });
 
 router.get('/scores/:proposalId', async (req, res) => {

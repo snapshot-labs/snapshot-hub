@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@ethersproject/address": "^5.0.1",
+    "@ethersproject/bytes": "^5.6.1",
     "@ethersproject/hash": "^5.5.0",
+    "@ethersproject/solidity": "^5.6.0",
     "@ethersproject/wallet": "^5.0.1",
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pinata/sdk": "^1.1.14",
