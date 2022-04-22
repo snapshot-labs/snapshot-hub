@@ -3,6 +3,7 @@ import fs from 'fs';
 import { graphqlHTTP } from 'express-graphql';
 import { makeExecutableSchema } from 'graphql-tools';
 import queryCountLimit from 'graphql-query-count-limit';
+import depthLimit from 'graphql-depth-limit'
 import Query from './operations';
 import defaultQuery from './examples';
 
@@ -15,5 +16,5 @@ export default graphqlHTTP({
   schema,
   rootValue,
   graphiql: { defaultQuery },
-  validationRules: [queryCountLimit(5, 5)]
+  validationRules: [queryCountLimit(5, 5), depthLimit(5)],
 });
