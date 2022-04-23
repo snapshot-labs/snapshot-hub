@@ -1,4 +1,5 @@
 import express from 'express';
+import dns from 'dns';
 import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 import { spaces, spacesMetadata } from '../helpers/spaces';
@@ -114,6 +115,16 @@ router.post('/msg', async (req, res) => {
   try {
     const result = await ingestor(req.body, 'typed-data');
     return res.json(result);
+  } catch (e) {
+    return sendError(res, e);
+  }
+});
+
+router.get('/cname/:domain', async (req, res) => {
+  const { domain } = req.params;
+  try {
+    const cnames = await dns.promises.resolveCname(domain);
+    return res.json(cnames);
   } catch (e) {
     return sendError(res, e);
   }

@@ -1,3 +1,4 @@
+import dns from 'dns';
 import snapshot from '@snapshot-labs/snapshot.js';
 import isEqual from 'lodash/isEqual';
 import { storeSettings } from '../helpers/adapters/mysql';
@@ -16,6 +17,18 @@ export async function verify(body): Promise<any> {
   if (schemaIsValid !== true) {
     console.log('[writer] Wrong space format', schemaIsValid);
     return Promise.reject('wrong space format');
+  }
+
+  // check domain cname
+  if (msg.payload.domain) {
+    try {
+      const cnames = await dns.promises.resolveCname(msg.payload.domain);
+      if (!cnames.includes('cname.snapshot.org')) {
+        return Promise.reject('custom domain must have CNAME record (cname.snapshot.org)');
+      }
+    } catch (e) {
+      return Promise.reject('could not verify custom domain CNAME');
+    }
   }
 
   const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
