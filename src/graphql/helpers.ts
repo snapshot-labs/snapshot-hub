@@ -134,11 +134,11 @@ export function mapRelatedSpaces(spaces, relatedSpaces) {
   return spaces.map(space => {
     if (space.children) {
       space.children = space.children
-        .map(c => relatedSpaces.find(s => s.id === c.id))
+        .map(c => relatedSpaces.find(s => s.id === c.id) || c)
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent = relatedSpaces.find(s => s.id === space.parent.id);
+      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
