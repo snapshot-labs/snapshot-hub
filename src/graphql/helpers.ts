@@ -131,6 +131,8 @@ export async function fetchRelatedSpaces(spaces, requestedFields) {
 
 // map related spaces to main list of spaces
 export function mapRelatedSpaces(spaces, relatedSpaces) {
+  if (!relatedSpaces.length) return spaces;
+  
   return spaces.map(space => {
     if (space.children) {
       space.children = space.children
