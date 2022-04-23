@@ -7,7 +7,6 @@ export default async function(parent, args) {
   const fields = {
     id: 'string',
     ipfs: 'string',
-    address: 'string',
     created: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'u', where);

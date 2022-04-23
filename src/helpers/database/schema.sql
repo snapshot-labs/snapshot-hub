@@ -148,12 +148,11 @@ CREATE TABLE subscriptions (
 
 
 CREATE TABLE users (
-  id VARCHAR(66) NOT NULL,
+  id VARCHAR(64) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  address VARCHAR(64) NOT NULL,
   profile JSON,
   created INT(11) NOT NULL,
-  PRIMARY KEY (address),
+  PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX created (created)
 );

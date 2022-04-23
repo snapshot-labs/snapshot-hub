@@ -21,9 +21,8 @@ export async function action(message, ipfs, receipt, id): Promise<void> {
   const profile = jsonParse(message.profile, {});
 
   const params = {
-    id,
+    id: getAddress(message.from),
     ipfs,
-    address: getAddress(message.from),
     created: message.timestamp,
     profile: JSON.stringify(profile)
   };
