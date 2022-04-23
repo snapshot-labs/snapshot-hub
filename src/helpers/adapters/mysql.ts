@@ -5,15 +5,18 @@ import { getSpace } from '../ens';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
   if (!settings || !settings.name) return false;
+  const domain = settings.domain || null;
+  delete settings.domain;
   const ts = (Date.now() / 1e3).toFixed();
   const query =
-    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?';
+    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?, domain = ?';
   await db.queryAsync(query, [
     {
       id: space,
       created_at: ts,
       updated_at: ts,
-      settings: JSON.stringify(settings)
+      settings: JSON.stringify(settings),
+      domain
     },
     ts,
     JSON.stringify(settings)
