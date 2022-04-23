@@ -40,7 +40,7 @@ export default async function(_parent, args) {
   try {
     const spaces = await db.queryAsync(query, params);
     return spaces.map(space =>
-      Object.assign(space, formatSpace(space.id, space.settings))
+      Object.assign(space, formatSpace(space.id, space.settings, space.domain))
     );
   } catch (e) {
     console.log('[graphql]', e);

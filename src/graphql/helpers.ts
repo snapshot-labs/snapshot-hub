@@ -3,9 +3,10 @@ import { spaceProposals, spaceFollowers } from '../helpers/spaces';
 
 const network = process.env.NETWORK || 'testnet';
 
-export function formatSpace(id, settings) {
+export function formatSpace(id, settings, domain = null) {
   const space = jsonParse(settings, {});
   space.id = id;
+  space.domain = domain || space.domain;
   space.private = space.private || false;
   space.avatar = space.avatar || '';
   space.about = space.about || '';
