@@ -146,7 +146,6 @@ CREATE TABLE subscriptions (
   INDEX created (created)
 );
 
-
 CREATE TABLE users (
   id VARCHAR(64) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
