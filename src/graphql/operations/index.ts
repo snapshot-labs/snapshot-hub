@@ -13,6 +13,8 @@ import validations from './validations';
 import plugins from './plugins';
 import strategies from './strategies';
 import strategy from './strategy';
+import users from './users';
+import user from './user';
 
 export default {
   space,
@@ -29,5 +31,7 @@ export default {
   validations,
   plugins,
   strategies,
-  strategy
+  strategy,
+  users,
+  user
 };
