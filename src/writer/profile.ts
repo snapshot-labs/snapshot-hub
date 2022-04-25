@@ -17,7 +17,7 @@ export async function verify(body): Promise<any> {
   return true;
 }
 
-export async function action(message, ipfs, receipt, id): Promise<void> {
+export async function action(message, ipfs): Promise<void> {
   const profile = jsonParse(message.profile, {});
 
   const params = {
