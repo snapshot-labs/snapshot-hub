@@ -144,6 +144,15 @@ export function mapRelatedSpaces(spaces, relatedSpaces) {
     }
     return space;
   });
+};
+
+export function formatUser(user) {
+  const profile = jsonParse(user.profile, {});
+  delete user.profile;
+  return {
+    ...user,
+    ...profile
+  };
 }
 
 export function formatProposal(proposal) {
