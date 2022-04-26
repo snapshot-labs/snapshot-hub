@@ -36,20 +36,23 @@ export default async function ingestor(body) {
     return Promise.reject('wrong domain');
 
   const hash = sha256(JSON.stringify(types));
-
   if (!Object.keys(hashTypes).includes(hash))
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
   if (
-    !['settings', 'alias'].includes(type) &&
+    !['settings', 'alias', 'profile'].includes(type) &&
     (!message.space || !spaces[message.space])
   )
     return Promise.reject('unknown space');
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
-    if (!['follow', 'unfollow', 'subscribe', 'unsubscribe'].includes(type))
+    if (
+      !['follow', 'unfollow', 'subscribe', 'unsubscribe', 'profile'].includes(
+        type
+      )
+    )
       return Promise.reject('wrong from');
 
     if (!(await isValidAlias(message.from, body.address)))
@@ -114,7 +117,14 @@ export default async function ingestor(body) {
   };
 
   if (
-    ['follow', 'unfollow', 'alias', 'subscribe', 'unsubscribe'].includes(type)
+    [
+      'follow',
+      'unfollow',
+      'alias',
+      'subscribe',
+      'unsubscribe',
+      'profile'
+    ].includes(type)
   ) {
     legacyBody = message;
   }
