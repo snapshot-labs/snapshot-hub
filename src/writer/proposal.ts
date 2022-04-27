@@ -149,8 +149,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const event = {
     event: 'proposal/created',
     id: `proposal/${id}`,
-    space,
-    proposal
+    space
   };
 
   sendEventToWebhook(event);

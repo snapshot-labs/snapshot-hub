@@ -13,8 +13,7 @@ const serviceEventsSalt = parseInt(process.env.SERVICE_EVENTS_SALT || '12345');
 const servicePushNotifications = parseInt(
   process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
 );
-const webHookURL =
-  process.env.SNAPSHOT_WEBHOOK_URL || 'https://snapshot-discord.herokuapp.com';
+const webhookURL = process.env.SNAPSHOT_WEBHOOK_URL || '';
 
 const getProposal = async proposalId => {
   try {
@@ -64,11 +63,12 @@ async function sendEvent(event, to) {
 }
 
 export async function sendEventToWebhook(event) {
-  // TODO: handle errors and retry, maybe save in temp table
+  if (!webhookURL) return;
+  // TODO: handle errors and retry, maybe save in temporary table
   try {
     // TODO: This secret is temporary key, replace this with event URL once events code is removed
-    const secret = sha256(`${webHookURL + '/api/webhook'}${serviceEventsSalt}`);
-    const res = await fetch(webHookURL + '/api/event', {
+    const secret = sha256(`${webhookURL}/api/webhook'${serviceEventsSalt}`);
+    const res = await fetch(webhookURL + '/api/event', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
