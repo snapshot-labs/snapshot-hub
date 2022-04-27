@@ -118,12 +118,10 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     }
     // Mark previous vote as invalid
     await db.queryAsync(
-      'UPDATE votes SET cb = ? WHERE voter = ? AND proposal = ? LIMIT 10',
-      [1, voter, msg.payload.proposal]
+      'UPDATE votes SET cb = ? WHERE voter = ? AND proposal = ? AND cb = ?',
+      [1, voter, msg.payload.proposal, 0]
     );
   }
-
-  //
 
   // Store message
   const query = 'INSERT IGNORE INTO messages SET ?';
