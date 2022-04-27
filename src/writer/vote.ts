@@ -116,11 +116,11 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
       if (localCompare <= 0)
         return Promise.reject('already voted same time with lower index');
     }
-    // Mark previous vote as invalid
-    await db.queryAsync(
-      'UPDATE votes SET cb = ? WHERE voter = ? AND proposal = ? AND cb = ?',
-      [1, voter, msg.payload.proposal, 0]
-    );
+    // Temporary fix
+    return Promise.reject('already voted');
+  } else {
+    // Store vote in dedicated table
+    await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   }
 
   // Store message
@@ -139,7 +139,5 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     }
   ]);
 
-  // Store vote in dedicated table
-  await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }
