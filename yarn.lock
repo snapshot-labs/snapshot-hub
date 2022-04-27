@@ -1725,10 +1725,10 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
-"@snapshot-labs/snapshot.js@^0.3.75":
-  version "0.3.75"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.3.75.tgz#bff5bfe89243577ea32b0598568d8cdc66cbd026"
-  integrity sha512-zyKJRWKcL4m9i6ZvVMK+SUaPAjNZZC0Z62IYInOUCGxNDf7MH+JsqzJ6VvvIvqkDBGKbELrp1/WIaWi2hOYvAQ==
+"@snapshot-labs/snapshot.js@^0.3.76":
+  version "0.3.76"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.3.76.tgz#64203ff46f484028d90e70be5acbade9377e5558"
+  integrity sha512-fV/TtwzVJ++Sf47RD7tBPEUeTk6UTX34wMFMJk/tRY2USHUgiCLbgMU4tcvq8UPep4qzn/klyMYxq0PQuibilw==
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.0.4"
