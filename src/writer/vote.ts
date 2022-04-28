@@ -86,15 +86,18 @@ export async function verify(body): Promise<any> {
 export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
   const voter = getAddress(body.address);
+  const created = parseInt(msg.timestamp);
+  const choice = JSON.stringify(msg.payload.choice);
+  const metadata = JSON.stringify(msg.payload.metadata || {});
   const params = {
     id,
     ipfs,
     voter,
-    created: parseInt(msg.timestamp),
+    created,
     space: msg.space,
     proposal: msg.payload.proposal,
-    choice: JSON.stringify(msg.payload.choice),
-    metadata: JSON.stringify(msg.payload.metadata || {}),
+    choice,
+    metadata,
     vp: 0,
     vp_by_strategy: JSON.stringify([]),
     vp_state: '',
@@ -103,8 +106,8 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
 
   // Check if voter already voted
   const votes = await db.queryAsync(
-    'SELECT id, created FROM votes WHERE voter = ? AND proposal = ? ORDER BY created DESC LIMIT 1',
-    [voter, msg.payload.proposal]
+    'SELECT id, created FROM votes WHERE voter = ? AND proposal = ? AND space = ? ORDER BY created DESC LIMIT 1',
+    [voter, msg.payload.proposal, msg.space]
   );
 
   // Reject vote with later timestamp
@@ -116,8 +119,25 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
       if (localCompare <= 0)
         return Promise.reject('already voted same time with lower index');
     }
-    // Temporary fix
-    return Promise.reject('already voted');
+    // Update previous vote
+    console.log('Update previous vote', voter, msg.payload.proposal);
+    await db.queryAsync(
+      `
+      UPDATE votes
+      SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?
+      WHERE voter = ? AND proposal = ? AND space = ?
+    `,
+      [
+        id,
+        ipfs,
+        created,
+        choice,
+        metadata,
+        voter,
+        msg.payload.proposal,
+        msg.space
+      ]
+    );
   } else {
     // Store vote in dedicated table
     await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
