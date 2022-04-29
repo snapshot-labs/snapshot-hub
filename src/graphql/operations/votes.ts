@@ -56,6 +56,39 @@ async function query(parent, args, context?, info?) {
     return Promise.reject('request failed');
   }
 
+  // filter by choice
+  if (where.choice) {
+    votes = votes.filter(v => {
+      if (typeof v.choice === 'number') {
+        return v.choice === where.choice;
+      }
+      if (typeof v.choice === 'object') {
+        if (Array.isArray(v.choice)) {
+          return v.choice.includes(where.choice);
+        } else {
+          return Object.keys(v.choice).includes(where.choice.toString());
+        }
+      }
+      return false;
+    });
+  } else if (where.choice_in) {
+    votes = votes.filter(v => {
+      if (typeof v.choice === 'number') {
+        return where.choice_in.includes(v.choice);
+      }
+      if (typeof v.choice === 'object') {
+        if (Array.isArray(v.choice)) {
+          return where.choice_in.some((c: number) => v.choice.includes(c));
+        } else {
+          return where.choice_in.some((c: number) =>
+            Object.keys(v.choice).includes(c.toString())
+          );
+        }
+      }
+      return false;
+    });
+  }
+
   if (requestedFields.space && votes.length > 0) {
     const spaceIds = votes
       .map(vote => vote.space.id)
