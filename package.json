@@ -17,7 +17,7 @@
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pinata/sdk": "^1.1.14",
     "@pusher/push-notifications-server": "^1.2.4",
-    "@snapshot-labs/snapshot.js": "^0.3.72",
+    "@snapshot-labs/snapshot.js": "^0.3.77",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "connection-string": "^1.0.1",

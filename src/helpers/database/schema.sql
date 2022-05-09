@@ -93,7 +93,8 @@ CREATE TABLE votes (
   vp_by_strategy JSON NOT NULL,
   vp_state VARCHAR(24) NOT NULL,
   cb INT(11) NOT NULL,
-  PRIMARY KEY (id),
+  PRIMARY KEY (voter, space, proposal),
+  UNIQUE KEY id (id),
   INDEX ipfs (ipfs),
   INDEX voter (voter),
   INDEX created (created),
@@ -142,6 +143,16 @@ CREATE TABLE subscriptions (
   space VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
   PRIMARY KEY (address, space),
+  INDEX ipfs (ipfs),
+  INDEX created (created)
+);
+
+CREATE TABLE users (
+  id VARCHAR(64) NOT NULL,
+  ipfs VARCHAR(64) NOT NULL,
+  profile JSON,
+  created INT(11) NOT NULL,
+  PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX created (created)
 );
