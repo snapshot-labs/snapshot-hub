@@ -63,11 +63,8 @@ router.get('/boost/:proposalId', async (req, res) => {
 
     try {
       votes = await db.queryAsync(
-        `SELECT v.id, v.voter, v.vp FROM votes v
-        LEFT OUTER JOIN votes v2 ON
-          v.voter = v2.voter AND v.proposal = v2.proposal
-          AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-        WHERE v2.voter IS NULL AND v.vp_state = 'final' AND v.proposal = ?
+        `SELECT v.voter FROM votes v
+        WHERE v.vp_state = 'final' AND v.proposal = ?
         ORDER BY v.created DESC`,
         [proposalId]
       );
