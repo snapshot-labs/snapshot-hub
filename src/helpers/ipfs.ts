@@ -6,12 +6,12 @@ const service = process.env.PINNING_SERVICE || 'pinata';
 const serviceArweave = parseInt(process.env.SERVICE_ARWEAVE || '0');
 
 const pinata = pinataSDK(
-  process.env.PINATA_API_KEY,
-  process.env.PINATA_SECRET_API_KEY
+  process.env.PINATA_API_KEY || '',
+  process.env.PINATA_SECRET_API_KEY || ''
 );
 const config: any = {
-  apiKey: process.env.FLEEK_API_KEY,
-  apiSecret: process.env.FLEEK_API_SECRET
+  apiKey: process.env.FLEEK_API_KEY || '',
+  apiSecret: process.env.FLEEK_API_SECRET || ''
 };
 
 export async function pinJson(key: string, body) {
