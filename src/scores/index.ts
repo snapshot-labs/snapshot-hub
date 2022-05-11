@@ -118,10 +118,10 @@ export async function getProposalScores(proposalId) {
         await db.queryAsync(query2, params);
         if (i) await snapshot.utils.sleep(200);
         i++;
-        console.log('[scores] Updated votes');
+        // console.log('[scores] Updated votes');
       }
 
-      console.log('[scores] Votes updated', votes.length);
+      // console.log('[scores] Votes updated', votes.length);
     }
 
     // Store scores
@@ -145,7 +145,7 @@ export async function getProposalScores(proposalId) {
       votes.length,
       proposalId
     ]);
-    console.log('[scores] Proposal', results.scores_state);
+    // console.log('[scores] Proposal', results.scores_state);
 
     return results;
   } catch (e) {
@@ -158,9 +158,7 @@ export async function getProposalScores(proposalId) {
       scores_updated = ?
       WHERE id = ? LIMIT 1;
     `;
-    const failedState =
-      proposal.space.id === 'arbitrum-odyssey.eth' ? 'pending' : 'invalid';
-    await db.queryAsync(query, [failedState, ts, proposalId]);
+    await db.queryAsync(query, ['invalid', ts, proposalId]);
     console.log('[scores] Proposal invalid');
 
     return { scores_state: 'invalid' };
@@ -168,10 +166,10 @@ export async function getProposalScores(proposalId) {
 }
 
 async function run() {
-  console.log('[scores] Run scores');
+  // console.log('[scores] Run scores');
   const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
   const ts = parseInt((Date.now() / 1e3).toFixed());
-  console.log('Ts', ts);
+  // console.log('Ts', ts);
   const [
     proposal
   ] = await db.queryAsync(
@@ -179,7 +177,7 @@ async function run() {
     [expires, ts, ['', 'pending', 'invalid']]
   );
   if (proposal && proposal.id) {
-    console.log('[scores] Get proposal', proposal.space, proposal.id);
+    // console.log('[scores] Get proposal', proposal.space, proposal.id);
     await getProposalScores(proposal.id);
     // await snapshot.utils.sleep(5e3);
     await run();

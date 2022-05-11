@@ -79,11 +79,11 @@ export default async function ingestor(body) {
   }
 
   console.log(
-    '[ingestor]',
-    `Address "${body.address}"\n`,
-    `Space "${msg.space}"\n`,
-    `Type "${msg.type}"\n`,
-    `Id "${id}"\n`,
+    '[ingestor] ',
+    `Address "${body.address}", `,
+    `Space "${msg.space}", `,
+    `Type "${msg.type}", `,
+    `Id "${id}", `,
     `IPFS "${ipfs}"`
   );
 
