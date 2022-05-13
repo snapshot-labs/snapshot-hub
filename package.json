@@ -14,7 +14,7 @@
     "@ethersproject/wallet": "^5.0.1",
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pinata/sdk": "^1.1.14",
-    "@pusher/push-notifications-server": "^1.2.4",
+    "@pusher/push-notifications-server": "^1.2.5",
     "@snapshot-labs/pineapple": "^0.1.0-beta.0",
     "@snapshot-labs/snapshot.js": "^0.3.78",
     "bluebird": "^3.7.2",

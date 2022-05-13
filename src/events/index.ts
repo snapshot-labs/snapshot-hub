@@ -39,6 +39,28 @@ const sendPushNotification = async event => {
 
   for await (const walletsChunk of walletsChunks) {
     await beams.publishToInterests(walletsChunk, {
+      apns: {
+        aps: {
+          alert: {
+            title: event.space,
+            body: proposal.title
+          }
+        },
+        data: {
+          spaceId: event.space,
+          proposalId: event.id.replace('proposal/', '')
+        }
+      },
+      fcm: {
+        notification: {
+          title: event.space,
+          body: proposal.title
+        },
+        data: {
+          spaceId: event.space,
+          proposalId: event.id.replace('proposal/', '')
+        }
+      },
       web: {
         notification: {
           title: event.space,
