@@ -4,8 +4,7 @@ import { pin } from '@snapshot-labs/pineapple';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
 import { spaces } from '../../helpers/spaces';
-import writer from '../../writer';
-// import gossip from '../../helpers/gossip';
+import writer from '../writer';
 import { sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
 
@@ -136,13 +135,13 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
-  // @TODO gossip to typed data endpoint
-  // gossip(body, message.space);
-
-  const [pinned, receipt] = await Promise.all([
-    pin(body),
-    issueReceipt(body.sig)
-  ]);
+  let pinned;
+  let receipt;
+  try {
+    [pinned, receipt] = await Promise.all([pin(body), issueReceipt(body.sig)]);
+  } catch (e) {
+    return Promise.reject('pinning failed');
+  }
   const ipfs = pinned.cid;
 
   try {

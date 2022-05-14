@@ -1,7 +1,7 @@
 import { getAddress } from '@ethersproject/address';
-import db from '../helpers/mysql';
 import snapshot from '@snapshot-labs/snapshot.js';
-import { jsonParse } from '../helpers/utils';
+import db from '../../helpers/mysql';
+import { jsonParse } from '../../helpers/utils';
 
 export async function verify(body): Promise<any> {
   const profile = jsonParse(body.profile, {});

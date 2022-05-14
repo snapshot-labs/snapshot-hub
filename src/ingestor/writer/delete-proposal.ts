@@ -1,7 +1,7 @@
-import { getProposal } from '../helpers/adapters/mysql';
-import { spaces } from '../helpers/spaces';
-import { jsonParse } from '../helpers/utils';
-import db from '../helpers/mysql';
+import { getProposal } from '../../helpers/adapters/mysql';
+import { spaces } from '../../helpers/spaces';
+import { jsonParse } from '../../helpers/utils';
+import db from '../../helpers/mysql';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
