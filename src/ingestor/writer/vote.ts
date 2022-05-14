@@ -1,8 +1,8 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
-import { jsonParse } from '../helpers/utils';
-import { getProposal } from '../helpers/adapters/mysql';
-import db from '../helpers/mysql';
+import { jsonParse } from '../../helpers/utils';
+import { getProposal } from '../../helpers/adapters/mysql';
+import db from '../../helpers/mysql';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);

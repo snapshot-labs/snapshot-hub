@@ -3,8 +3,7 @@ import { pin } from '@snapshot-labs/pineapple';
 import { verifySignature } from './utils';
 import { jsonParse } from '../../helpers/utils';
 import { spaces } from '../../helpers/spaces';
-import writer from '../../writer';
-import gossip from '../../helpers/gossip';
+import writer from '../writer';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
 
@@ -58,17 +57,21 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
-  gossip(body, msg.space);
-
-  const [pinned, receipt] = await Promise.all([
-    pin({
-      address: body.address,
-      msg: body.msg,
-      sig: body.sig,
-      version: '2'
-    }),
-    issueReceipt(body.sig)
-  ]);
+  let pinned;
+  let receipt;
+  try {
+    [pinned, receipt] = await Promise.all([
+      pin({
+        address: body.address,
+        msg: body.msg,
+        sig: body.sig,
+        version: '2'
+      }),
+      issueReceipt(body.sig)
+    ]);
+  } catch (e) {
+    return Promise.reject('pinning failed');
+  }
   const ipfs = pinned.cid;
   const id = ipfs;
 

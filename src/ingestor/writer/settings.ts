@@ -1,8 +1,8 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import isEqual from 'lodash/isEqual';
-import { storeSettings } from '../helpers/adapters/mysql';
-import { jsonParse } from '../helpers/utils';
-import { spaces } from '../helpers/spaces';
+import { storeSettings } from '../../helpers/adapters/mysql';
+import { jsonParse } from '../../helpers/utils';
+import { spaces } from '../../helpers/spaces';
 
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
 

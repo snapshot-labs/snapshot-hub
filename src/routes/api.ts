@@ -5,7 +5,6 @@ import { spaces, spacesMetadata } from '../helpers/spaces';
 import relayer from '../helpers/relayer';
 import { sendError } from '../helpers/utils';
 import { addOrUpdateSpace, loadSpace } from '../helpers/adapters/mysql';
-import ingestor from '../ingestor';
 import pkg from '../../package.json';
 import db from '../helpers/mysql';
 import { hashMessage } from '@ethersproject/hash';
@@ -99,24 +98,6 @@ router.get('/spaces/:key/poke', async (req, res) => {
     spaces[key] = space;
   }
   return res.json(space);
-});
-
-router.post('/message', async (req, res) => {
-  try {
-    const result = await ingestor(req.body, 'personal-sign');
-    return res.json(result);
-  } catch (e) {
-    return sendError(res, e);
-  }
-});
-
-router.post('/msg', async (req, res) => {
-  try {
-    const result = await ingestor(req.body, 'typed-data');
-    return res.json(result);
-  } catch (e) {
-    return sendError(res, e);
-  }
 });
 
 export default router;
