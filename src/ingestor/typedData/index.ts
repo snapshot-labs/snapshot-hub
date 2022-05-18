@@ -1,11 +1,10 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import hashTypes from '@snapshot-labs/snapshot.js/src/sign/types.json';
+import { pin } from '@snapshot-labs/pineapple';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
 import { spaces } from '../../helpers/spaces';
-import writer from '../../writer';
-// import gossip from '../../helpers/gossip';
-import { pinJson } from '../../helpers/ipfs';
+import writer from '../writer';
 import { sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
 
@@ -136,13 +135,14 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
-  // @TODO gossip to typed data endpoint
-  // gossip(body, message.space);
-
-  const [ipfs, receipt] = await Promise.all([
-    pinJson(`snapshot/${body.sig}`, body),
-    issueReceipt(body.sig)
-  ]);
+  let pinned;
+  let receipt;
+  try {
+    [pinned, receipt] = await Promise.all([pin(body), issueReceipt(body.sig)]);
+  } catch (e) {
+    return Promise.reject('pinning failed');
+  }
+  const ipfs = pinned.cid;
 
   try {
     await writer[type].action(legacyBody, ipfs, receipt, id);
@@ -151,11 +151,11 @@ export default async function ingestor(body) {
   }
 
   console.log(
-    '[ingestor]',
-    `Address "${body.address}"\n`,
-    `Space "${message.space}"\n`,
-    `Type "${type}"\n`,
-    `Id "${id}"\n`,
+    '[ingestor] ',
+    `Address "${body.address}", `,
+    `Space "${message.space}", `,
+    `Type "${type}", `,
+    `Id "${id}", `,
     `IPFS "${ipfs}"`
   );
 

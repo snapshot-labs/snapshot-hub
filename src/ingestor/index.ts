@@ -1,17 +1,30 @@
 import personalSign from './personalSign';
 import typedData from './typedData';
+import express from 'express';
+import { sendError } from '../helpers/utils';
 
-export default async function(body, version) {
+const router = express.Router();
+
+router.post('/message', async (req, res) => {
   if (process.env.MAINTENANCE)
     return Promise.reject('update in progress, try later');
-
   try {
-    if (version === 'personal-sign') {
-      return await personalSign(body);
-    } else if (version === 'typed-data') {
-      return await typedData(body);
-    }
+    const result = await personalSign(req.body);
+    return res.json(result);
   } catch (e) {
-    return Promise.reject(e);
+    return sendError(res, e);
   }
-}
+});
+
+router.post('/msg', async (req, res) => {
+  if (process.env.MAINTENANCE)
+    return Promise.reject('update in progress, try later');
+  try {
+    const result = await typedData(req.body);
+    return res.json(result);
+  } catch (e) {
+    return sendError(res, e);
+  }
+});
+
+export default router;

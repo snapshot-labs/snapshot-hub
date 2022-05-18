@@ -1,9 +1,9 @@
 import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
-import { jsonParse } from '../helpers/utils';
-import { spaces } from '../helpers/spaces';
-import db from '../helpers/mysql';
+import { jsonParse } from '../../helpers/utils';
+import { spaces } from '../../helpers/spaces';
+import db from '../../helpers/mysql';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;
