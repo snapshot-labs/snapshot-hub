@@ -7,16 +7,18 @@ export async function addOrUpdateSpace(space: string, settings: any) {
   if (!settings || !settings.name) return false;
   const ts = (Date.now() / 1e3).toFixed();
   const query =
-    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?';
+    'INSERT IGNORE INTO spaces SET ? ON DUPLICATE KEY UPDATE updated_at = ?, settings = ?, domain = ?';
   await db.queryAsync(query, [
     {
       id: space,
+      domain: settings.domain,
       created_at: ts,
       updated_at: ts,
       settings: JSON.stringify(settings)
     },
     ts,
-    JSON.stringify(settings)
+    JSON.stringify(settings),
+    settings.domain
   ]);
 }
 
