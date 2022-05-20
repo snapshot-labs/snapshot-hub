@@ -3,7 +3,7 @@ scalar Any
 # Queries
 
 type Query {
-  space(id: String): Space
+  space(id: String, domain: String): Space
 
   spaces(
     first: Int
