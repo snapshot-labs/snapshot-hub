@@ -46,6 +46,9 @@ export function formatUser(user) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
+  proposal.strategies = Array.isArray(proposal.strategies)
+    ? proposal.strategies
+    : [];
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
