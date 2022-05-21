@@ -2,8 +2,8 @@ import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
-import { spaces } from '../../helpers/spaces';
 import db from '../../helpers/mysql';
+import { getSpace } from '../../helpers/adapters/mysql';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;
@@ -37,7 +37,7 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong choices for basic type voting');
   }
 
-  const space = spaces[msg.space];
+  const space = await getSpace(msg.space);
   space.id = msg.space;
 
   if (space.voting?.delay) {
@@ -107,7 +107,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   ]);
 
   /* Store the proposal in dedicated table 'proposals' */
-  const spaceSettings = spaces[space];
+  const spaceSettings = await getSpace(space);
   const author = getAddress(body.address);
   const created = parseInt(msg.timestamp);
   const metadata = msg.payload.metadata || {};
