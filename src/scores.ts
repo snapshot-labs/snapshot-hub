@@ -1,6 +1,5 @@
 import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
-import getVotes from './graphql/operations/votes';
 import db from './helpers/mysql';
 
 async function getProposal(id) {
@@ -12,6 +11,15 @@ async function getProposal(id) {
   proposal.scores = JSON.parse(proposal.scores);
   proposal.scores_by_strategy = JSON.parse(proposal.scores_by_strategy);
   return proposal;
+}
+
+async function getVotes(proposalId) {
+  const query = 'SELECT id, choice, voter FROM votes WHERE proposal = ?';
+  const votes = await db.queryAsync(query, [proposalId]);
+  return votes.map(vote => {
+    vote.choice = JSON.parse(vote.choice);
+    return vote;
+  });
 }
 
 /**
@@ -62,12 +70,7 @@ export async function getProposalScores(proposalId) {
     }
 
     // Get votes
-    let votes: any = await getVotes(
-      {},
-      { first: 100000, where: { proposal: proposalId } },
-      { internal: true },
-      false
-    );
+    let votes: any = await getVotes(proposalId);
     const voters = votes.map(vote => vote.voter);
 
     // Get scores
@@ -183,7 +186,7 @@ export async function getProposalScores(proposalId) {
 }
 
 async function run() {
-  console.log('[scores] Run scores');
+  // console.log('[scores] Run scores');
   const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const [
