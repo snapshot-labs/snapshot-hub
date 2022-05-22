@@ -6,7 +6,7 @@ import envelope from './envelope.json';
 import writer from '../writer';
 import { sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
-import { getSpace } from '../../helpers/adapters/mysql';
+import { getSpace } from '../../helpers/actions';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';

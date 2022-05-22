@@ -5,7 +5,7 @@ import { jsonParse } from '../../helpers/utils';
 import writer from '../writer';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
-import { getSpace } from '../../helpers/adapters/mysql';
+import { getSpace } from '../../helpers/actions';
 
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;

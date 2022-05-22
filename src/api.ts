@@ -1,7 +1,7 @@
 import express from 'express';
 import { spaces, spacesMetadata } from './helpers/spaces';
 import relayer from './helpers/relayer';
-import { addOrUpdateSpace, loadSpace } from './helpers/adapters/mysql';
+import { addOrUpdateSpace, loadSpace } from './helpers/actions';
 import { name, version } from '../package.json';
 import { getProposalScores } from './scores';
 

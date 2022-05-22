@@ -3,7 +3,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
-import { getSpace } from '../../helpers/adapters/mysql';
+import { getSpace } from '../../helpers/actions';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;

@@ -1,4 +1,4 @@
-import { getProposal, getSpace } from '../../helpers/adapters/mysql';
+import { getProposal, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
 
