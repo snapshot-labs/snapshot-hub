@@ -16,7 +16,7 @@
     "@pinata/sdk": "^1.1.14",
     "@pusher/push-notifications-server": "^1.2.4",
     "@snapshot-labs/pineapple": "^0.1.0-beta.0",
-    "@snapshot-labs/snapshot.js": "^0.3.81",
+    "@snapshot-labs/snapshot.js": "^0.3.83",
     "bluebird": "^3.7.2",
     "connection-string": "^1.0.1",
     "cors": "^2.8.5",
