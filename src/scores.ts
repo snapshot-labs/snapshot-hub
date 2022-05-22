@@ -1,8 +1,18 @@
 import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
-import getProposal from '../graphql/operations/proposal';
-import getVotes from '../graphql/operations/votes';
-import db from '../helpers/mysql';
+import getVotes from './graphql/operations/votes';
+import db from './helpers/mysql';
+
+async function getProposal(id) {
+  const query = 'SELECT * FROM proposals WHERE id = ?';
+  const [proposal] = await db.queryAsync(query, [id]);
+  proposal.strategies = JSON.parse(proposal.strategies);
+  proposal.plugins = JSON.parse(proposal.plugins);
+  proposal.choices = JSON.parse(proposal.choices);
+  proposal.scores = JSON.parse(proposal.scores);
+  proposal.scores_by_strategy = JSON.parse(proposal.scores_by_strategy);
+  return proposal;
+}
 
 /**
  * Copied from https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L147-L173
@@ -39,8 +49,7 @@ export async function getScores(
 }
 
 export async function getProposalScores(proposalId) {
-  // Get proposal
-  const proposal = await getProposal({}, { id: proposalId });
+  const proposal = await getProposal(proposalId);
 
   try {
     if (proposal.scores_state === 'final') {
@@ -145,12 +154,15 @@ export async function getProposalScores(proposalId) {
       votes.length,
       proposalId
     ]);
-    // console.log('[scores] Proposal', results.scores_state);
+    console.log(
+      '[scores] Proposal updated',
+      proposal.id,
+      proposal.space,
+      results.scores_state
+    );
 
     return results;
   } catch (e) {
-    console.log('[scores] Failed!', proposalId);
-
     const ts = (Date.now() / 1e3).toFixed();
     const query = `
       UPDATE proposals
@@ -159,17 +171,21 @@ export async function getProposalScores(proposalId) {
       WHERE id = ? LIMIT 1;
     `;
     await db.queryAsync(query, ['invalid', ts, proposalId]);
-    console.log('[scores] Proposal invalid');
+    console.log(
+      '[scores] Proposal invalid',
+      proposal.space,
+      proposal.id,
+      proposal.score_state
+    );
 
     return { scores_state: 'invalid' };
   }
 }
 
 async function run() {
-  // console.log('[scores] Run scores');
+  console.log('[scores] Run scores');
   const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
   const ts = parseInt((Date.now() / 1e3).toFixed());
-  // console.log('Ts', ts);
   const [
     proposal
   ] = await db.queryAsync(

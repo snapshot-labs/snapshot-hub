@@ -1,5 +1,4 @@
-import { getProposal } from '../../helpers/adapters/mysql';
-import { spaces } from '../../helpers/spaces';
+import { getProposal, getSpace } from '../../helpers/adapters/mysql';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
 
@@ -7,9 +6,8 @@ export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
   const proposal = await getProposal(msg.space, msg.payload.proposal);
 
-  const admins = (spaces[msg.space]?.admins || []).map(admin =>
-    admin.toLowerCase()
-  );
+  const space = await getSpace(msg.space);
+  const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   if (
     !admins.includes(body.address.toLowerCase()) &&
     proposal.author !== body.address
