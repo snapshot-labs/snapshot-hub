@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
-import api from './routes/api';
+import api from './api';
+import upload from './upload';
 import ingestor from './ingestor';
-import upload from './routes/upload';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import './helpers/strategies';

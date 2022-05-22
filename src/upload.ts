@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import pinataSDK from '@pinata/sdk';
-import { sendError } from '../helpers/utils';
+import { sendError } from './helpers/utils';
 
 const router = express.Router();
 
