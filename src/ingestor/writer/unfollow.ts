@@ -1,4 +1,4 @@
-import db from '../helpers/mysql';
+import db from '../../helpers/mysql';
 
 export async function verify(): Promise<any> {
   return true;

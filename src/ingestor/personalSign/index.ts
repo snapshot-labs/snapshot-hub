@@ -1,12 +1,12 @@
 import { hashMessage } from '@ethersproject/hash';
+import { pin } from '@snapshot-labs/pineapple';
 import { verifySignature } from './utils';
 import { jsonParse } from '../../helpers/utils';
-import { spaces } from '../../helpers/spaces';
-import writer from '../../writer';
-import gossip from '../../helpers/gossip';
-import { pinJson } from '../../helpers/ipfs';
+import writer from '../writer';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
+import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
@@ -31,8 +31,10 @@ export default async function ingestor(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
-  if (!spaces[msg.space] && msg.type !== 'settings')
-    return Promise.reject('unknown space');
+  if (msg.type !== 'settings') {
+    const space = await getSpace(msg.space);
+    if (!space) return Promise.reject('unknown space');
+  }
 
   if (
     !msg.timestamp ||
@@ -58,31 +60,47 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
-  gossip(body, msg.space);
-
-  const [ipfs, receipt] = await Promise.all([
-    pinJson(`snapshot/${body.sig}`, {
-      address: body.address,
-      msg: body.msg,
-      sig: body.sig,
-      version: '2'
-    }),
-    issueReceipt(body.sig)
-  ]);
+  let pinned;
+  let receipt;
+  try {
+    [pinned, receipt] = await Promise.all([
+      pin({
+        address: body.address,
+        msg: body.msg,
+        sig: body.sig,
+        version: '2'
+      }),
+      issueReceipt(body.sig)
+    ]);
+  } catch (e) {
+    return Promise.reject('pinning failed');
+  }
+  const ipfs = pinned.cid;
   const id = ipfs;
 
   try {
     await writer[msg.type].action(body, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }
 
   console.log(
-    '[ingestor]',
-    `Address "${body.address}"\n`,
-    `Space "${msg.space}"\n`,
-    `Type "${msg.type}"\n`,
-    `Id "${id}"\n`,
+    '[ingestor] ',
+    `Address "${body.address}", `,
+    `Space "${msg.space}", `,
+    `Type "${msg.type}", `,
+    `Id "${id}", `,
     `IPFS "${ipfs}"`
   );
 
