@@ -1,5 +1,4 @@
 import snapshot from '@snapshot-labs/snapshot.js';
-import fleek from '@fleekhq/fleek-storage-js';
 import db from './mysql';
 import { getSpace as getSpaceENS } from './ens';
 import { jsonParse } from './utils';
@@ -32,23 +31,6 @@ export async function loadSpace(id) {
     console.log('Load space failed', id);
   }
   return space;
-}
-
-export async function storeSettings(space, body) {
-  const msg = JSON.parse(body.msg);
-
-  const key = `registry/${body.address}/${space}`;
-  const result = await fleek.upload({
-    apiKey: process.env.FLEEK_API_KEY || '',
-    apiSecret: process.env.FLEEK_API_SECRET || '',
-    bucket: process.env.FLEEK_BUCKET || 'snapshot-team-bucket',
-    key,
-    data: JSON.stringify(msg.payload)
-  });
-  const ipfsHash = result.hashV0;
-  console.log('Settings updated', space, ipfsHash);
-
-  await addOrUpdateSpace(space, msg.payload);
 }
 
 export async function getProposal(space, id) {

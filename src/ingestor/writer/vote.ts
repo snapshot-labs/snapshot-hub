@@ -142,22 +142,5 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     // Store vote in dedicated table
     await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   }
-
-  // Store message
-  const query = 'INSERT IGNORE INTO messages SET ?';
-  await db.queryAsync(query, [
-    {
-      id,
-      ipfs,
-      address: voter,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      space: msg.space,
-      type: 'vote',
-      sig: body.sig,
-      receipt
-    }
-  ]);
-
   console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }

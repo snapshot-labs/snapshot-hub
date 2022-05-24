@@ -92,20 +92,6 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
 
-  await db.queryAsync('INSERT IGNORE INTO messages SET ?', [
-    {
-      id,
-      ipfs,
-      address: body.address,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      space,
-      type: 'proposal',
-      sig: body.sig,
-      receipt
-    }
-  ]);
-
   /* Store the proposal in dedicated table 'proposals' */
   const spaceSettings = await getSpace(space);
   const author = getAddress(body.address);

@@ -28,18 +28,10 @@ export async function action(body): Promise<void> {
   };
 
   const query = `
-    UPDATE messages SET type = ? WHERE id = ? AND type = 'proposal' LIMIT 1;
     DELETE FROM proposals WHERE id = ? LIMIT 1;
     DELETE FROM votes WHERE proposal = ?;
     DELETE FROM events WHERE id = ?;
     INSERT IGNORE INTO events SET ?;
   `;
-  await db.queryAsync(query, [
-    'archive-proposal',
-    id,
-    id,
-    id,
-    `proposal/${id}`,
-    event
-  ]);
+  await db.queryAsync(query, [id, id, `proposal/${id}`, event]);
 }

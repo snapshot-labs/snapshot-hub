@@ -6,6 +6,7 @@ import writer from '../writer';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
 import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
@@ -79,6 +80,17 @@ export default async function ingestor(body) {
 
   try {
     await writer[msg.type].action(body, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }
