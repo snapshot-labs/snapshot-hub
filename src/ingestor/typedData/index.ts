@@ -4,9 +4,10 @@ import { pin } from '@snapshot-labs/pineapple';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
 import writer from '../writer';
-import { sha256 } from '../../helpers/utils';
+import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
 import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -114,6 +115,7 @@ export default async function ingestor(body) {
     }),
     sig: body.sig
   };
+  const msg = jsonParse(legacyBody.msg);
 
   if (
     [
@@ -146,6 +148,17 @@ export default async function ingestor(body) {
 
   try {
     await writer[type].action(legacyBody, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }
