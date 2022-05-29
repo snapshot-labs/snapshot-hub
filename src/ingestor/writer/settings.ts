@@ -50,5 +50,6 @@ export async function action(body): Promise<void> {
     await addOrUpdateSpace(space, msg.payload);
   } catch (e) {
     console.log('[writer] Failed to store settings', msg.space, e);
+    return Promise.reject('Failed to store settings');
   }
 }
