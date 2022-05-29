@@ -1,6 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from './mysql';
-import { getSpace as getSpaceENS } from './ens';
+import { getSpaceENS } from './ens';
 import { jsonParse } from './utils';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
