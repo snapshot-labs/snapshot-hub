@@ -2,16 +2,14 @@ import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import pinataSDK from '@pinata/sdk';
-import { sendError } from '../helpers/utils';
+import { sendError } from './helpers/utils';
 
 const router = express.Router();
-
+const PINATA_API_KEY = process.env.PINATA_API_KEY || '';
+const PINATA_SECRET_API_KEY = process.env.PINATA_SECRET_API_KEY || '';
 const fileSize = 1000 * 1000;
 const upload = multer({ dest: 'uploads/', limits: { fileSize } });
-const pinata = pinataSDK(
-  process.env.PINATA_API_KEY || '',
-  process.env.PINATA_SECRET_API_KEY || ''
-);
+const pinata = pinataSDK(PINATA_API_KEY, PINATA_SECRET_API_KEY);
 
 router.post('/upload', upload.single('file'), async (req, res) => {
   const path = `${req.file.destination}${req.file.filename}`;

@@ -3,10 +3,11 @@ import hashTypes from '@snapshot-labs/snapshot.js/src/sign/types.json';
 import { pin } from '@snapshot-labs/pineapple';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
-import { spaces } from '../../helpers/spaces';
 import writer from '../writer';
-import { sha256 } from '../../helpers/utils';
+import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
+import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -39,11 +40,11 @@ export default async function ingestor(body) {
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
-  if (
-    !['settings', 'alias', 'profile'].includes(type) &&
-    (!message.space || !spaces[message.space])
-  )
-    return Promise.reject('unknown space');
+  if (!['settings', 'alias', 'profile'].includes(type)) {
+    if (!message.space) return Promise.reject('unknown space');
+    const space = await getSpace(message.space);
+    if (!space) return Promise.reject('unknown space');
+  }
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
@@ -114,6 +115,7 @@ export default async function ingestor(body) {
     }),
     sig: body.sig
   };
+  const msg = jsonParse(legacyBody.msg);
 
   if (
     [
@@ -146,6 +148,17 @@ export default async function ingestor(body) {
 
   try {
     await writer[type].action(legacyBody, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }

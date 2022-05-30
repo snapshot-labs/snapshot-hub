@@ -1,9 +1,9 @@
 import fetch from 'cross-fetch';
-import beams from '../helpers/beams';
-import db from '../helpers/mysql';
+import beams from './helpers/beams';
+import db from './helpers/mysql';
 import chunk from 'lodash/chunk';
-import { getProposalScores } from '../scores';
-import { getJSON, sha256 } from '../helpers/utils';
+import { getProposalScores } from './scores';
+import { getJSON, sha256 } from './helpers/utils';
 
 const delay = 5;
 const interval = 30;

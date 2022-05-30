@@ -7,7 +7,7 @@ CREATE TABLE messages (
   space VARCHAR(64),
   type VARCHAR(24) NOT NULL,
   sig VARCHAR(256) NOT NULL,
-  receipt VARCHAR(128) NOT NULL,
+  receipt VARCHAR(256) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX address (address),

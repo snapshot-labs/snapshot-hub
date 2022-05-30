@@ -1,7 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
-import { getProposal } from '../../helpers/adapters/mysql';
+import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 
 export async function verify(body): Promise<any> {
@@ -142,22 +142,5 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     // Store vote in dedicated table
     await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   }
-
-  // Store message
-  const query = 'INSERT IGNORE INTO messages SET ?';
-  await db.queryAsync(query, [
-    {
-      id,
-      ipfs,
-      address: voter,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      space: msg.space,
-      type: 'vote',
-      sig: body.sig,
-      receipt
-    }
-  ]);
-
   console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }

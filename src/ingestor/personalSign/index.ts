@@ -2,10 +2,11 @@ import { hashMessage } from '@ethersproject/hash';
 import { pin } from '@snapshot-labs/pineapple';
 import { verifySignature } from './utils';
 import { jsonParse } from '../../helpers/utils';
-import { spaces } from '../../helpers/spaces';
 import writer from '../writer';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
+import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
@@ -30,8 +31,10 @@ export default async function ingestor(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
-  if (!spaces[msg.space] && msg.type !== 'settings')
-    return Promise.reject('unknown space');
+  if (msg.type !== 'settings') {
+    const space = await getSpace(msg.space);
+    if (!space) return Promise.reject('unknown space');
+  }
 
   if (
     !msg.timestamp ||
@@ -77,6 +80,17 @@ export default async function ingestor(body) {
 
   try {
     await writer[msg.type].action(body, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }
