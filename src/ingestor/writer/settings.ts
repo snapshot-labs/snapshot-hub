@@ -5,6 +5,7 @@ import { addOrUpdateSpace, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
+const networkPath = DEFAULT_NETWORK === '1' ? '' : 'testnet/';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -19,18 +20,7 @@ export async function verify(body): Promise<any> {
   }
 
   const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
-
-  let isOwner = false;
-  let isSameSpace = false;
-  const spaceUriArray = spaceUri?.split('/') ?? [];
-  if (DEFAULT_NETWORK === '1') {
-    isOwner = spaceUriArray[4] === body.address;
-    isSameSpace = spaceUriArray[5] === msg.space;
-  } else if (spaceUriArray[4] === 'testnet') {
-    isOwner = spaceUriArray[5] === body.address;
-    isSameSpace = spaceUriArray[6] === msg.space;
-  }
-
+  const isOwner = spaceUri === `ipns://storage.snapshot.page/registry/${networkPath}${body.address}/${msg.space}`
   const space = await getSpace(msg.space);
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());
@@ -38,7 +28,6 @@ export async function verify(body): Promise<any> {
     admin.toLowerCase()
   );
 
-  if (!isSameSpace) return Promise.reject('not allowed');
   if (!isAdmin && !isOwner) return Promise.reject('not allowed');
 
   if (!isOwner && !isEqual(admins, newAdmins))
@@ -48,9 +37,8 @@ export async function verify(body): Promise<any> {
 export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
-  const registryNetworkPath = DEFAULT_NETWORK === '1' ? '' : 'testnet/';
   try {
-    const key = `registry/${registryNetworkPath}${body.address}/${space}`;
+    const key = `registry/${networkPath}${body.address}/${space}`;
     const result = await fleek.upload({
       apiKey: process.env.FLEEK_API_KEY || '',
       apiSecret: process.env.FLEEK_API_SECRET || '',
