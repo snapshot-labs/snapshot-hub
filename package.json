@@ -15,6 +15,7 @@
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pinata/sdk": "^1.1.14",
     "@pusher/push-notifications-server": "^1.2.4",
+    "@snapshot-labs/boost": "file:../boost/guard",
     "@snapshot-labs/pineapple": "^0.1.0-beta.0",
     "@snapshot-labs/snapshot.js": "^0.3.83",
     "bluebird": "^3.7.2",

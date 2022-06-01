@@ -78,6 +78,8 @@ type Query {
   strategies: [StrategyItem]
 
   strategy(id: String): StrategyItem
+
+  boosts(ref: String): [Boost]
 }
 
 input SpaceWhere {
@@ -356,4 +358,14 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
+}
+
+type Boost {
+  id: ID!
+  ref: String!
+  token: String!
+  balance: String!
+  guard: String!
+  expires: Int!
+  owner: String!
 }
