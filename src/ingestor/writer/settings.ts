@@ -20,7 +20,9 @@ export async function verify(body): Promise<any> {
   }
 
   const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
-  const isOwner = spaceUri === `ipns://storage.snapshot.page/registry/${networkPath}${body.address}/${msg.space}`
+  const isOwner =
+    spaceUri ===
+    `ipns://storage.snapshot.page/registry/${networkPath}${body.address}/${msg.space}`;
   const space = await getSpace(msg.space);
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());
