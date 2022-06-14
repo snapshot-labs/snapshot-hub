@@ -2,7 +2,6 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 import api from './api';
-import upload from './upload';
 import ingestor from './ingestor';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
@@ -17,7 +16,6 @@ app.set('trust proxy', 1);
 app.use(rateLimit);
 app.use('/api', api);
 app.use('/api', ingestor);
-app.use('/api', upload);
 app.use('/graphql', graphql);
 app.get('/*', (req, res) => res.redirect('/api'));
 
