@@ -1,17 +1,21 @@
 import graphqlFields from 'graphql-fields';
 import {
   fetchSpaces,
-  fetchRelatedSpaces,
-  mapRelatedSpaces,
-  PublicError
+  addRelatedSpaces,
+  PublicError,
+  needsFetchRelatedSpaces
 } from '../helpers';
 
 export default async function(_parent, args, _context, info) {
   try {
+    let spaces = await fetchSpaces(args);
+    
     const requestedFields = info ? graphqlFields(info) : {};
-    const spaces = await fetchSpaces(args);
-    const relatedSpaces = await fetchRelatedSpaces(spaces, requestedFields);
-    return mapRelatedSpaces(spaces, relatedSpaces);
+    if (needsFetchRelatedSpaces(requestedFields)) {
+      spaces = await addRelatedSpaces(spaces);
+    }
+
+    return spaces;
   } catch (e) {
     console.log('[graphql]', e);
     if (e instanceof PublicError) return e;

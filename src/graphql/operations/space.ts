@@ -1,18 +1,23 @@
 import graphqlFields from 'graphql-fields';
 import {
   fetchSpaces,
-  fetchRelatedSpaces,
-  mapRelatedSpaces,
-  PublicError
+  addRelatedSpaces,
+  PublicError,
+  needsFetchRelatedSpaces
 } from '../helpers';
 
 export default async function(_parent, { id }, _context, info) {
   if (!id) return new PublicError('Missing id');
   try {
+    let spaces = await fetchSpaces({ first: 1, where: { id } });
+    if (spaces.length !== 1) return null;
+    
     const requestedFields = info ? graphqlFields(info) : {};
-    const spaces = await fetchSpaces({ first: 1, where: { id } });
-    const relatedSpaces = await fetchRelatedSpaces(spaces, requestedFields);
-    return mapRelatedSpaces(spaces, relatedSpaces)[0];
+    if (needsFetchRelatedSpaces(requestedFields)) {
+      spaces = await addRelatedSpaces(spaces);
+    }
+
+    return spaces[0];
   } catch (e) {
     console.log('[graphql]', e);
     if (e instanceof PublicError) return e;

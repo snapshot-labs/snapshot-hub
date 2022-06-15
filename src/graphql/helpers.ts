@@ -114,53 +114,57 @@ export async function fetchSpaces(args) {
   );
 }
 
-// fetch parents and children for a list of spaces if more than their id is
-// requested (id alone doesn't require any additional database query, since
-// it's already in the original result of fetchSpaces)
-export async function fetchRelatedSpaces(spaces, requestedFields) {
+export function needsFetchRelatedSpaces(requestedFields): boolean {
+  // id's of parent/children are already included in the result from fetchSpaces
+  // an additional query is only needed if other fields are requested
   if (
-    (requestedFields.parent &&
-      Object.keys(requestedFields.parent).some(key => key !== 'id')) ||
-    (requestedFields.children &&
+    !(requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
+    !(requestedFields.children &&
       Object.keys(requestedFields.children).some(key => key !== 'id'))
   ) {
-    // throw error if anything other than id is requested on second level
-    // (e.g. children.parent.name or parent.children.name)
-    if (
-      (requestedFields.parent?.children &&
-        Object.keys(requestedFields.parent.children).some(
-          key => key !== 'id'
-        )) ||
-      (requestedFields.children?.parent &&
-        Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
-    ) {
-      throw new PublicError(
-        "Unsupported nested fields for related spaces. Only id is supported for children's parent or parent's children."
-      );
-    }
-
-    // throw error if parent's parent or children's children are requested
-    if (requestedFields.parent?.parent || requestedFields.children?.children) {
-      throw new PublicError(
-        "Unsupported nesting. Parent's parent or children's children are not supported."
-      );
-    }
-
-    // collect all parent and child ids of all returned spaces
-    const relatedSpaceIDs = spaces.reduce((ids, space) => {
-      if (space.children) ids.push(...space.children.map(c => c.id));
-      if (space.parent) ids.push(space.parent.id);
-      return ids;
-    }, []);
-
-    // fetch all related spaces
-    return await fetchSpaces({ where: { id_in: relatedSpaceIDs } });
+    return false;
   }
 
-  return [];
+  // on the other hand, for a children's parent or a parent's children, you can ONLY query id
+  // (for the purpose of easier cross-checking of relations in frontend)
+  if (
+    (requestedFields.parent?.children &&
+      Object.keys(requestedFields.parent.children).some(
+        key => key !== 'id'
+      )) ||
+    (requestedFields.children?.parent &&
+      Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
+  ) {
+    throw new PublicError(
+      "Unsupported nesting. Only the id field can be queried for children's parents or parent's children."
+    );
+  }
+
+  if (requestedFields.parent?.parent || requestedFields.children?.children) {
+    throw new PublicError(
+      "Unsupported nesting. Parent's parent or children's children are not supported."
+    );
+  }
+
+  return true;
 }
 
-// map related spaces to main list of spaces
+export async function addRelatedSpaces(spaces) {
+  // collect all parent and child ids of all spaces
+  const relatedSpaceIDs = spaces.reduce((ids, space) => {
+    if (space.children) ids.push(...space.children.map(c => c.id));
+    if (space.parent) ids.push(space.parent.id);
+    return ids;
+  }, []);
+
+  // fetch all related spaces
+  const relatedSpaces = await fetchSpaces({ where: { id_in: relatedSpaceIDs } });
+
+  return mapRelatedSpaces(spaces, relatedSpaces);
+}
+
+// map related spaces to each other
 export function mapRelatedSpaces(spaces, relatedSpaces) {
   if (!relatedSpaces.length) return spaces;
 
