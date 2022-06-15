@@ -34,11 +34,13 @@ export function formatSpace(id, settings) {
     // By default return space network if strategy network is not defined
     network: strategy.network || space.network
   }));
+  space.treasuries = space.treasuries || [];
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
   space.parent = space.parent ? { id: space.parent } : null;
   space.children = space.children?.map(child => ({ id: child })) || [];
+
   return space;
 }
 
