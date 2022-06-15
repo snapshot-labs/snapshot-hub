@@ -7,6 +7,7 @@ import {
 } from '../helpers';
 
 export default async function(_parent, { id }, _context, info) {
+  if (!id) return new PublicError('Missing id');
   try {
     const requestedFields = info ? graphqlFields(info) : {};
     const spaces = await fetchSpaces({ first: 1, where: { id } });
