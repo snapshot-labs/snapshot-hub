@@ -4,7 +4,7 @@ import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
 
-export class PublicError extends Error {};
+export class PublicError extends Error {}
 
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
@@ -42,12 +42,51 @@ export function formatSpace(id, settings) {
   return space;
 }
 
+export function buildWhereQuery(fields, alias, where) {
+  let query: any = '';
+  const params: any[] = [];
+  Object.entries(fields).forEach(([field, type]) => {
+    if (where[field]) {
+      query += `AND ${alias}.${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      query += `AND ${alias}.${field} IN (?) `;
+      params.push(fieldIn);
+    }
+    if (type === 'number') {
+      const fieldGt = where[`${field}_gt`];
+      const fieldGte = where[`${field}_gte`];
+      const fieldLt = where[`${field}_lt`];
+      const fieldLte = where[`${field}_lte`];
+      if (fieldGt) {
+        query += `AND ${alias}.${field} > ? `;
+        params.push(fieldGt);
+      }
+      if (fieldGte) {
+        query += `AND ${alias}.${field} >= ? `;
+        params.push(fieldGte);
+      }
+      if (fieldLt) {
+        query += `AND ${alias}.${field} < ? `;
+        params.push(fieldLt);
+      }
+      if (fieldLte) {
+        query += `AND ${alias}.${field} <= ? `;
+        params.push(fieldLte);
+      }
+    }
+  });
+  return { query, params };
+}
+
 export async function fetchSpaces(args) {
   const { where = {} } = args;
 
   const fields = { id: 'string' };
   const whereQuery = buildWhereQuery(fields, 's', where);
-  let queryStr = whereQuery.query;
+  const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created_at';
@@ -89,19 +128,21 @@ export async function fetchRelatedSpaces(spaces, requestedFields) {
     // (e.g. children.parent.name or parent.children.name)
     if (
       (requestedFields.parent?.children &&
-        Object.keys(requestedFields.parent.children).some(key => key !== 'id')) ||
+        Object.keys(requestedFields.parent.children).some(
+          key => key !== 'id'
+        )) ||
       (requestedFields.children?.parent &&
         Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
     ) {
       throw new PublicError(
-        'Unsupported nested fields for related spaces. Only id is supported for children\'s parent or parent\'s children.'
+        "Unsupported nested fields for related spaces. Only id is supported for children's parent or parent's children."
       );
     }
 
     // throw error if parent's parent or children's children are requested
     if (requestedFields.parent?.parent || requestedFields.children?.children) {
       throw new PublicError(
-        'Unsupported nesting. Parent\'s parent or children\'s children are not supported.'
+        "Unsupported nesting. Parent's parent or children's children are not supported."
       );
     }
 
@@ -122,7 +163,7 @@ export async function fetchRelatedSpaces(spaces, requestedFields) {
 // map related spaces to main list of spaces
 export function mapRelatedSpaces(spaces, relatedSpaces) {
   if (!relatedSpaces.length) return spaces;
-  
+
   return spaces.map(space => {
     if (space.children) {
       space.children = space.children
@@ -130,11 +171,12 @@ export function mapRelatedSpaces(spaces, relatedSpaces) {
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent =
+        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
-};
+}
 
 export function formatUser(user) {
   const profile = jsonParse(user.profile, {});
@@ -183,43 +225,4 @@ export function formatFollow(follow) {
 export function formatSubscription(subscription) {
   subscription.space = formatSpace(subscription.space, subscription.settings);
   return subscription;
-}
-
-export function buildWhereQuery(fields, alias, where) {
-  let query: any = '';
-  const params: any[] = [];
-  Object.entries(fields).forEach(([field, type]) => {
-    if (where[field]) {
-      query += `AND ${alias}.${field} = ? `;
-      params.push(where[field]);
-    }
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      query += `AND ${alias}.${field} IN (?) `;
-      params.push(fieldIn);
-    }
-    if (type === 'number') {
-      const fieldGt = where[`${field}_gt`];
-      const fieldGte = where[`${field}_gte`];
-      const fieldLt = where[`${field}_lt`];
-      const fieldLte = where[`${field}_lte`];
-      if (fieldGt) {
-        query += `AND ${alias}.${field} > ? `;
-        params.push(fieldGt);
-      }
-      if (fieldGte) {
-        query += `AND ${alias}.${field} >= ? `;
-        params.push(fieldGte);
-      }
-      if (fieldLt) {
-        query += `AND ${alias}.${field} < ? `;
-        params.push(fieldLt);
-      }
-      if (fieldLte) {
-        query += `AND ${alias}.${field} <= ? `;
-        params.push(fieldLte);
-      }
-    }
-  });
-  return { query, params };
 }
