@@ -44,21 +44,11 @@ export function formatSpace(id, settings) {
 
 export async function fetchSpaces(args) {
   const { where = {} } = args;
-  let queryStr = '';
-  const params: any[] = [];
 
-  const fields = ['id'];
-  fields.forEach(field => {
-    if (where[field]) {
-      queryStr += `AND s.${field} = ? `;
-      params.push(where[field]);
-    }
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      queryStr += `AND s.${field} IN (?) `;
-      params.push(fieldIn);
-    }
-  });
+  const fields = { id: 'string' };
+  const whereQuery = buildWhereQuery(fields, 's', where);
+  let queryStr = whereQuery.query;
+  const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
