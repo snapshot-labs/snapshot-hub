@@ -11,7 +11,7 @@ export default async function(_parent, { id }, _context, info) {
   try {
     let spaces = await fetchSpaces({ first: 1, where: { id } });
     if (spaces.length !== 1) return null;
-    
+
     const requestedFields = info ? graphqlFields(info) : {};
     if (needsFetchRelatedSpaces(requestedFields)) {
       spaces = await addRelatedSpaces(spaces);

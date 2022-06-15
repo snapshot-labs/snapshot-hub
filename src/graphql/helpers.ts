@@ -118,10 +118,14 @@ export function needsFetchRelatedSpaces(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   if (
-    !(requestedFields.parent &&
-      Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
-    !(requestedFields.children &&
-      Object.keys(requestedFields.children).some(key => key !== 'id'))
+    !(
+      requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')
+    ) &&
+    !(
+      requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id')
+    )
   ) {
     return false;
   }
@@ -130,9 +134,7 @@ export function needsFetchRelatedSpaces(requestedFields): boolean {
   // (for the purpose of easier cross-checking of relations in frontend)
   if (
     (requestedFields.parent?.children &&
-      Object.keys(requestedFields.parent.children).some(
-        key => key !== 'id'
-      )) ||
+      Object.keys(requestedFields.parent.children).some(key => key !== 'id')) ||
     (requestedFields.children?.parent &&
       Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
   ) {
@@ -148,20 +150,6 @@ export function needsFetchRelatedSpaces(requestedFields): boolean {
   }
 
   return true;
-}
-
-export async function addRelatedSpaces(spaces) {
-  // collect all parent and child ids of all spaces
-  const relatedSpaceIDs = spaces.reduce((ids, space) => {
-    if (space.children) ids.push(...space.children.map(c => c.id));
-    if (space.parent) ids.push(space.parent.id);
-    return ids;
-  }, []);
-
-  // fetch all related spaces
-  const relatedSpaces = await fetchSpaces({ where: { id_in: relatedSpaceIDs } });
-
-  return mapRelatedSpaces(spaces, relatedSpaces);
 }
 
 // map related spaces to each other
@@ -180,6 +168,22 @@ export function mapRelatedSpaces(spaces, relatedSpaces) {
     }
     return space;
   });
+}
+
+export async function addRelatedSpaces(spaces) {
+  // collect all parent and child ids of all spaces
+  const relatedSpaceIDs = spaces.reduce((ids, space) => {
+    if (space.children) ids.push(...space.children.map(c => c.id));
+    if (space.parent) ids.push(space.parent.id);
+    return ids;
+  }, []);
+
+  // fetch all related spaces
+  const relatedSpaces = await fetchSpaces({
+    where: { id_in: relatedSpaceIDs }
+  });
+
+  return mapRelatedSpaces(spaces, relatedSpaces);
 }
 
 export function formatUser(user) {

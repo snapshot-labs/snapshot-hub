@@ -9,7 +9,7 @@ import {
 export default async function(_parent, args, _context, info) {
   try {
     let spaces = await fetchSpaces(args);
-    
+
     const requestedFields = info ? graphqlFields(info) : {};
     if (needsFetchRelatedSpaces(requestedFields)) {
       spaces = await addRelatedSpaces(spaces);
