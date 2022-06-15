@@ -243,6 +243,7 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
 }
@@ -356,4 +357,10 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
+}
+
+type Treasury {
+  name: String
+  address: String
+  network: String
 }
