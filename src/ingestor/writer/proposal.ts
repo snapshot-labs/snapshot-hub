@@ -99,7 +99,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const metadata = msg.payload.metadata || {};
   const strategies = JSON.stringify(spaceSettings.strategies);
   const plugins = JSON.stringify(metadata.plugins || {});
-  const network = metadata.network || spaceSettings.network;
+  const network = spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
 
   const proposal = {

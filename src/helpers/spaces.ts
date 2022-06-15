@@ -1,4 +1,5 @@
 import snapshot from '@snapshot-labs/snapshot.js';
+import { uniq } from 'lodash';
 import db from './mysql';
 
 export let spaces = {};
@@ -65,10 +66,12 @@ async function loadSpacesMetrics() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     spacesMetadata[id] = {
       name: space.name,
-      avatar: space.avatar || undefined,
       private: space.private || undefined,
       terms: space.terms || undefined,
       network: space.network || undefined,
+      networks: uniq(
+        space.strategies.map(strategy => strategy.network || space.network)
+      ),
       categories: space.categories || undefined,
       activeProposals:
         (spaceProposals[id] && spaceProposals[id].active) || undefined,
