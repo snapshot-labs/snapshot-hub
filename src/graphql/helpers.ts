@@ -26,7 +26,22 @@ export function formatSpace(id, settings) {
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
+  space.strategies = space.strategies?.map(strategy => ({
+    ...strategy,
+    // By default return space network if strategy network is not defined
+    network: strategy.network || space.network
+  }));
+  space.treasuries = space.treasuries || [];
   return space;
+}
+
+export function formatUser(user) {
+  const profile = jsonParse(user.profile, {});
+  delete user.profile;
+  return {
+    ...user,
+    ...profile
+  };
 }
 
 export function formatProposal(proposal) {
@@ -43,12 +58,17 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace(proposal.space, proposal.settings);
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
+  proposal.strategies = proposal.strategies.map(strategy => ({
+    ...strategy,
+    // By default return proposal network if strategy network is not defined
+    network: strategy.network || proposal.network
+  }));
   return proposal;
 }
 
 export function formatVote(vote) {
   vote.choice = jsonParse(vote.choice);
-  vote.metadata = jsonParse(vote.metadata, {});
+  vote.metadata = {};
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
   vote.space = formatSpace(vote.space, vote.settings);
   return vote;

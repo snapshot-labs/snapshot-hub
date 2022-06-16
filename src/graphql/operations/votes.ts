@@ -8,6 +8,8 @@ import {
 } from '../helpers';
 import serve from '../../helpers/ee';
 
+const LIMIT = 20000;
+
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {} } = args;
@@ -35,21 +37,19 @@ async function query(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 30000) first = 30000;
+  if (first > LIMIT) first = LIMIT;
   params.push(skip, first);
 
   let votes: any[] = [];
 
   const query = `
     SELECT v.* FROM votes v
-    LEFT OUTER JOIN votes v2 ON
-      v.voter = v2.voter AND v.proposal = v2.proposal
-      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-    WHERE v2.voter IS NULL AND v.cb = 0 ${queryStr}
+    WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
     votes = await db.queryAsync(query, params);
+    // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
     votes = votes.map(vote => formatVote(vote));
   } catch (e) {
     console.log('[graphql]', e);

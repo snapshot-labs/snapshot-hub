@@ -1,13 +1,13 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import hashTypes from '@snapshot-labs/snapshot.js/src/sign/types.json';
+import { pin } from '@snapshot-labs/pineapple';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
-import { spaces } from '../../helpers/spaces';
-import writer from '../../writer';
-// import gossip from '../../helpers/gossip';
-import { pinJson } from '../../helpers/ipfs';
-import { sha256 } from '../../helpers/utils';
+import writer from '../writer';
+import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
+import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -36,20 +36,23 @@ export default async function ingestor(body) {
     return Promise.reject('wrong domain');
 
   const hash = sha256(JSON.stringify(types));
-
   if (!Object.keys(hashTypes).includes(hash))
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
-  if (
-    !['settings', 'alias'].includes(type) &&
-    (!message.space || !spaces[message.space])
-  )
-    return Promise.reject('unknown space');
+  if (!['settings', 'alias', 'profile'].includes(type)) {
+    if (!message.space) return Promise.reject('unknown space');
+    const space = await getSpace(message.space);
+    if (!space) return Promise.reject('unknown space');
+  }
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
-    if (!['follow', 'unfollow', 'subscribe', 'unsubscribe'].includes(type))
+    if (
+      !['follow', 'unfollow', 'subscribe', 'unsubscribe', 'profile'].includes(
+        type
+      )
+    )
       return Promise.reject('wrong from');
 
     if (!(await isValidAlias(message.from, body.address)))
@@ -74,15 +77,13 @@ export default async function ingestor(body) {
     payload = {
       name: message.title,
       body: message.body,
+      discussion: message.discussion || '',
       choices: message.choices,
       start: message.start,
       end: message.end,
       snapshot: message.snapshot,
       metadata: {
-        plugins: JSON.parse(message.plugins),
-        network: message.network,
-        strategies: JSON.parse(message.strategies),
-        ...JSON.parse(message.metadata)
+        plugins: JSON.parse(message.plugins)
       },
       type: message.type
     };
@@ -94,8 +95,7 @@ export default async function ingestor(body) {
     if (type === 'vote-string') choice = JSON.parse(message.choice);
     payload = {
       proposal: message.proposal,
-      choice,
-      metadata: JSON.parse(message.metadata)
+      choice
     };
     type = 'vote';
   }
@@ -111,9 +111,17 @@ export default async function ingestor(body) {
     }),
     sig: body.sig
   };
+  const msg = jsonParse(legacyBody.msg);
 
   if (
-    ['follow', 'unfollow', 'alias', 'subscribe', 'unsubscribe'].includes(type)
+    [
+      'follow',
+      'unfollow',
+      'alias',
+      'subscribe',
+      'unsubscribe',
+      'profile'
+    ].includes(type)
   ) {
     legacyBody = message;
   }
@@ -125,26 +133,38 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
-  // @TODO gossip to typed data endpoint
-  // gossip(body, message.space);
-
-  const [ipfs, receipt] = await Promise.all([
-    pinJson(`snapshot/${body.sig}`, body),
-    issueReceipt(body.sig)
-  ]);
+  let pinned;
+  let receipt;
+  try {
+    [pinned, receipt] = await Promise.all([pin(body), issueReceipt(body.sig)]);
+  } catch (e) {
+    return Promise.reject('pinning failed');
+  }
+  const ipfs = pinned.cid;
 
   try {
     await writer[type].action(legacyBody, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }
 
   console.log(
-    '[ingestor]',
-    `Address "${body.address}"\n`,
-    `Space "${message.space}"\n`,
-    `Type "${type}"\n`,
-    `Id "${id}"\n`,
+    '[ingestor] ',
+    `Address "${body.address}", `,
+    `Space "${message.space}", `,
+    `Type "${type}", `,
+    `Id "${id}", `,
     `IPFS "${ipfs}"`
   );
 
