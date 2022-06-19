@@ -25,7 +25,8 @@ async function getProposals() {
   const query = `
     SELECT space, COUNT(id) AS count,
     COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active,
-    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d
+    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM proposals GROUP BY space
   `;
   return await db.queryAsync(query, [ts, ts]);
@@ -34,7 +35,8 @@ async function getProposals() {
 async function getVotes() {
   const query = `
     SELECT space, COUNT(id) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d
+    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM votes GROUP BY space
   `;
   return await db.queryAsync(query);
@@ -43,7 +45,8 @@ async function getVotes() {
 async function getVoters() {
   const query = `
     SELECT space, COUNT(DISTINCT(voter)) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d
+    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM votes GROUP BY space
   `;
   return await db.queryAsync(query);
@@ -51,7 +54,10 @@ async function getVoters() {
 
 async function getFollowers() {
   const query = `
-    SELECT space, COUNT(id) as count, count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d FROM follows GROUP BY space
+    SELECT space, COUNT(id) as count,
+    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
+    FROM follows GROUP BY space
   `;
   return await db.queryAsync(query);
 }
@@ -95,13 +101,19 @@ async function loadSpacesMetrics() {
         (spaceProposals[id] && spaceProposals[id].active) || undefined,
       proposals_1d:
         (spaceProposals[id] && spaceProposals[id].count_1d) || undefined,
+      proposals_7d:
+        (spaceProposals[id] && spaceProposals[id].count_7d) || undefined,
       votes: (spaceVotes[id] && spaceVotes[id].count) || undefined,
       votes_1d: (spaceVotes[id] && spaceVotes[id].count_1d) || undefined,
+      votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
       voters: (spaceVoters[id] && spaceVoters[id].count) || undefined,
       voters_1d: (spaceVoters[id] && spaceVoters[id].count_1d) || undefined,
+      voters_7d: (spaceVoters[id] && spaceVoters[id].count_7d) || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
       followers_1d:
-        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined
+        (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined,
+      followers_7d:
+        (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
     };
   });
   console.log('[spaces] Space metrics loaded');
