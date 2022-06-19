@@ -44,9 +44,7 @@ export async function verify(body): Promise<any> {
   // if (msg.payload.start < created) return Promise.reject('invalid start date');
 
   if (space.voting?.delay) {
-    const isValidDelay =
-      msg.payload.start === parseInt(msg.timestamp) + space.voting.delay;
-
+    const isValidDelay = msg.payload.start === created + space.voting.delay;
     if (!isValidDelay) return Promise.reject('invalid voting delay');
   }
 
