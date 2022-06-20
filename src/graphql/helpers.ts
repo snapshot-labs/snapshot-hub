@@ -116,24 +116,10 @@ export async function fetchSpaces(args) {
   );
 }
 
-export function needsFetchRelatedSpaces(requestedFields): boolean {
-  // id's of parent/children are already included in the result from fetchSpaces
-  // an additional query is only needed if other fields are requested
-  if (
-    !(
-      requestedFields.parent &&
-      Object.keys(requestedFields.parent).some(key => key !== 'id')
-    ) &&
-    !(
-      requestedFields.children &&
-      Object.keys(requestedFields.children).some(key => key !== 'id')
-    )
-  ) {
-    return false;
-  }
-
-  // on the other hand, for a children's parent or a parent's children, you can ONLY query id
+export function checkRelatedSpacesNesting(requestedFields): void {
+  // for a children's parent or a parent's children, you can ONLY query id
   // (for the purpose of easier cross-checking of relations in frontend)
+  // other than that, deeper nesting is not supported
   if (
     (requestedFields.parent?.children &&
       Object.keys(requestedFields.parent.children).some(key => key !== 'id')) ||
@@ -149,6 +135,23 @@ export function needsFetchRelatedSpaces(requestedFields): boolean {
     throw new PublicError(
       "Unsupported nesting. Parent's parent or children's children are not supported."
     );
+  }
+}
+
+export function needsFetchRelatedSpaces(requestedFields): boolean {
+  // id's of parent/children are already included in the result from fetchSpaces
+  // an additional query is only needed if other fields are requested
+  if (
+    !(
+      requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')
+    ) &&
+    !(
+      requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id')
+    )
+  ) {
+    return false;
   }
 
   return true;

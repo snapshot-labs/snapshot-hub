@@ -3,7 +3,8 @@ import {
   fetchSpaces,
   addRelatedSpaces,
   PublicError,
-  needsFetchRelatedSpaces
+  needsFetchRelatedSpaces,
+  checkRelatedSpacesNesting
 } from '../helpers';
 
 export default async function(_parent, { id }, _context, info) {
@@ -14,6 +15,7 @@ export default async function(_parent, { id }, _context, info) {
 
     const requestedFields = info ? graphqlFields(info) : {};
     if (needsFetchRelatedSpaces(requestedFields)) {
+      checkRelatedSpacesNesting(requestedFields);
       spaces = await addRelatedSpaces(spaces);
     }
 
