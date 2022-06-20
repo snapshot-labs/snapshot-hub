@@ -64,6 +64,7 @@ export function formatProposal(proposal) {
     // By default return proposal network if strategy network is not defined
     network: strategy.network || proposal.network
   }));
+  proposal.privacy = proposal.privacy || '';
   return proposal;
 }
 
