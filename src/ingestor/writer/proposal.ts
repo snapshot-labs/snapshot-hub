@@ -41,12 +41,10 @@ export async function verify(body): Promise<any> {
   const space = await getSpace(msg.space);
   space.id = msg.space;
 
-  if (msg.payload.start < created) return Promise.reject('invalid start date');
+  // if (msg.payload.start < created) return Promise.reject('invalid start date');
 
   if (space.voting?.delay) {
-    const isValidDelay =
-      msg.payload.start === parseInt(msg.timestamp) + space.voting.delay;
-
+    const isValidDelay = msg.payload.start === created + space.voting.delay;
     if (!isValidDelay) return Promise.reject('invalid voting delay');
   }
 
