@@ -1,3 +1,4 @@
+import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
 import { spaceProposals, spaceFollowers } from '../helpers/spaces';
 import db from '../helpers/mysql';
@@ -116,7 +117,7 @@ export async function fetchSpaces(args) {
   );
 }
 
-export function checkRelatedSpacesNesting(requestedFields): void {
+function checkRelatedSpacesNesting(requestedFields): void {
   // for a children's parent or a parent's children, you can ONLY query id
   // (for the purpose of easier cross-checking of relations in frontend)
   // other than that, deeper nesting is not supported
@@ -138,7 +139,7 @@ export function checkRelatedSpacesNesting(requestedFields): void {
   }
 }
 
-export function needsFetchRelatedSpaces(requestedFields): boolean {
+function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   if (
@@ -157,7 +158,7 @@ export function needsFetchRelatedSpaces(requestedFields): boolean {
   return true;
 }
 
-export function mapRelatedSpaces(spaces, relatedSpaces) {
+function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
   if (!relatedSpaces.length) return spaces;
 
   return spaces.map(space => {
@@ -174,7 +175,7 @@ export function mapRelatedSpaces(spaces, relatedSpaces) {
   });
 }
 
-export async function addRelatedSpaces(spaces) {
+async function fetchRelatedSpaces(spaces) {
   // collect all parent and child ids of all spaces
   const relatedSpaceIDs = spaces.reduce((ids, space) => {
     if (space.children) ids.push(...space.children.map(c => c.id));
@@ -182,12 +183,19 @@ export async function addRelatedSpaces(spaces) {
     return ids;
   }, []);
 
-  // fetch all related spaces
-  const relatedSpaces = await fetchSpaces({
+  return await fetchSpaces({
     where: { id_in: relatedSpaceIDs }
   });
+}
 
-  return mapRelatedSpaces(spaces, relatedSpaces);
+export async function handleRelatedSpaces(info: any, spaces: [any]) {
+  const requestedFields = info ? graphqlFields(info) : {};
+  if (needsRelatedSpacesData(requestedFields)) {
+    checkRelatedSpacesNesting(requestedFields);
+    const relatedSpaces = await fetchRelatedSpaces(spaces);
+    spaces = mapRelatedSpacesToSpaces(spaces, relatedSpaces);
+  }
+  return spaces;
 }
 
 export function formatUser(user) {

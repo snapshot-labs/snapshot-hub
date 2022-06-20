@@ -1,21 +1,10 @@
-import graphqlFields from 'graphql-fields';
-import {
-  fetchSpaces,
-  addRelatedSpaces,
-  PublicError,
-  needsFetchRelatedSpaces,
-  checkRelatedSpacesNesting
-} from '../helpers';
+import { fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 
 export default async function(_parent, args, _context, info) {
   try {
     let spaces = await fetchSpaces(args);
 
-    const requestedFields = info ? graphqlFields(info) : {};
-    if (needsFetchRelatedSpaces(requestedFields)) {
-      checkRelatedSpacesNesting(requestedFields);
-      spaces = await addRelatedSpaces(spaces);
-    }
+    spaces = await handleRelatedSpaces(info, spaces);
 
     return spaces;
   } catch (e) {
