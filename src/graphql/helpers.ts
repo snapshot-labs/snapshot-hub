@@ -154,7 +154,6 @@ export function needsFetchRelatedSpaces(requestedFields): boolean {
   return true;
 }
 
-// map related spaces to each other
 export function mapRelatedSpaces(spaces, relatedSpaces) {
   if (!relatedSpaces.length) return spaces;
 
