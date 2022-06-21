@@ -260,6 +260,7 @@ type SpaceVoting {
   quorum: Float
   blind: Boolean
   hideAbstain: Boolean
+  privacy: String
 }
 
 type Proposal {
@@ -280,6 +281,7 @@ type Proposal {
   start: Int!
   end: Int!
   quorum: Float!
+  privacy: String
   snapshot: String
   state: String
   link: String
