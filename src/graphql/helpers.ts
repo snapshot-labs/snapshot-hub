@@ -26,6 +26,7 @@ export function formatSpace(id, settings) {
   space.voting.type = space.voting.type || null;
   space.voting.quorum = space.voting.quorum || null;
   space.voting.blind = space.voting.blind || false;
+  space.voting.privacy = space.voting.privacy || '';
   space.followersCount = spaceFollowers[id]?.count || 0;
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
@@ -226,6 +227,7 @@ export function formatProposal(proposal) {
     // By default return proposal network if strategy network is not defined
     network: strategy.network || proposal.network
   }));
+  proposal.privacy = proposal.privacy || '';
   return proposal;
 }
 
