@@ -27,6 +27,7 @@
     "express-graphql": "^0.12.0",
     "express-rate-limit": "^5.2.6",
     "graphql": "^15.5.0",
+    "graphql-depth-limit": "^1.1.0",
     "graphql-fields": "^2.0.3",
     "graphql-query-count-limit": "^1.0.0",
     "graphql-tools": "^7.0.5",

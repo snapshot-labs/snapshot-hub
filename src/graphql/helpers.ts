@@ -1,7 +1,11 @@
+import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
 import { spaceProposals, spaceFollowers } from '../helpers/spaces';
+import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
+
+export class PublicError extends Error {}
 
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
@@ -33,7 +37,166 @@ export function formatSpace(id, settings) {
     network: strategy.network || space.network
   }));
   space.treasuries = space.treasuries || [];
+
+  // always return parent and children in child node format
+  // will be overwritten if other fields than id are requested
+  space.parent = space.parent ? { id: space.parent } : null;
+  space.children = space.children?.map(child => ({ id: child })) || [];
+
   return space;
+}
+
+export function buildWhereQuery(fields, alias, where) {
+  let query: any = '';
+  const params: any[] = [];
+  Object.entries(fields).forEach(([field, type]) => {
+    if (where[field]) {
+      query += `AND ${alias}.${field} = ? `;
+      params.push(where[field]);
+    }
+    const fieldIn = where[`${field}_in`] || [];
+    if (fieldIn.length > 0) {
+      query += `AND ${alias}.${field} IN (?) `;
+      params.push(fieldIn);
+    }
+    if (type === 'number') {
+      const fieldGt = where[`${field}_gt`];
+      const fieldGte = where[`${field}_gte`];
+      const fieldLt = where[`${field}_lt`];
+      const fieldLte = where[`${field}_lte`];
+      if (fieldGt) {
+        query += `AND ${alias}.${field} > ? `;
+        params.push(fieldGt);
+      }
+      if (fieldGte) {
+        query += `AND ${alias}.${field} >= ? `;
+        params.push(fieldGte);
+      }
+      if (fieldLt) {
+        query += `AND ${alias}.${field} < ? `;
+        params.push(fieldLt);
+      }
+      if (fieldLte) {
+        query += `AND ${alias}.${field} <= ? `;
+        params.push(fieldLte);
+      }
+    }
+  });
+  return { query, params };
+}
+
+export async function fetchSpaces(args) {
+  const { where = {} } = args;
+
+  const fields = { id: 'string' };
+  const whereQuery = buildWhereQuery(fields, 's', where);
+  const queryStr = whereQuery.query;
+  const params: any[] = whereQuery.params;
+
+  let orderBy = args.orderBy || 'created_at';
+  let orderDirection = args.orderDirection || 'desc';
+  if (!['created_at', 'updated_at', 'id'].includes(orderBy))
+    orderBy = 'created_at';
+  orderDirection = orderDirection.toUpperCase();
+  if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
+  let { first = 20 } = args;
+  const { skip = 0 } = args;
+  if (first > 1000) first = 1000;
+  params.push(skip, first);
+
+  const query = `
+    SELECT s.* FROM spaces s
+    WHERE 1 = 1 ${queryStr}
+    GROUP BY s.id
+    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
+  `;
+
+  const spaces = await db.queryAsync(query, params);
+  return spaces.map(space =>
+    Object.assign(space, formatSpace(space.id, space.settings))
+  );
+}
+
+function checkRelatedSpacesNesting(requestedFields): void {
+  // for a children's parent or a parent's children, you can ONLY query id
+  // (for the purpose of easier cross-checking of relations in frontend)
+  // other than that, deeper nesting is not supported
+  if (
+    (requestedFields.parent?.children &&
+      Object.keys(requestedFields.parent.children).some(key => key !== 'id')) ||
+    (requestedFields.children?.parent &&
+      Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
+  ) {
+    throw new PublicError(
+      "Unsupported nesting. Only the id field can be queried for children's parents or parent's children."
+    );
+  }
+
+  if (requestedFields.parent?.parent || requestedFields.children?.children) {
+    throw new PublicError(
+      "Unsupported nesting. Parent's parent or children's children are not supported."
+    );
+  }
+}
+
+function needsRelatedSpacesData(requestedFields): boolean {
+  // id's of parent/children are already included in the result from fetchSpaces
+  // an additional query is only needed if other fields are requested
+  if (
+    !(
+      requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')
+    ) &&
+    !(
+      requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id')
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
+  if (!relatedSpaces.length) return spaces;
+
+  return spaces.map(space => {
+    if (space.children) {
+      space.children = space.children
+        .map(c => relatedSpaces.find(s => s.id === c.id) || c)
+        .filter(s => s);
+    }
+    if (space.parent) {
+      space.parent =
+        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+    }
+    return space;
+  });
+}
+
+async function fetchRelatedSpaces(spaces) {
+  // collect all parent and child ids of all spaces
+  const relatedSpaceIDs = spaces.reduce((ids, space) => {
+    if (space.children) ids.push(...space.children.map(c => c.id));
+    if (space.parent) ids.push(space.parent.id);
+    return ids;
+  }, []);
+
+  return await fetchSpaces({
+    where: { id_in: relatedSpaceIDs }
+  });
+}
+
+export async function handleRelatedSpaces(info: any, spaces: [any]) {
+  const requestedFields = info ? graphqlFields(info) : {};
+  if (needsRelatedSpacesData(requestedFields)) {
+    checkRelatedSpacesNesting(requestedFields);
+    const relatedSpaces = await fetchRelatedSpaces(spaces);
+    spaces = mapRelatedSpacesToSpaces(spaces, relatedSpaces);
+  }
+  return spaces;
 }
 
 export function formatUser(user) {
@@ -84,43 +247,4 @@ export function formatFollow(follow) {
 export function formatSubscription(subscription) {
   subscription.space = formatSpace(subscription.space, subscription.settings);
   return subscription;
-}
-
-export function buildWhereQuery(fields, alias, where) {
-  let query: any = '';
-  const params: any[] = [];
-  Object.entries(fields).forEach(([field, type]) => {
-    if (where[field]) {
-      query += `AND ${alias}.${field} = ? `;
-      params.push(where[field]);
-    }
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      query += `AND ${alias}.${field} IN (?) `;
-      params.push(fieldIn);
-    }
-    if (type === 'number') {
-      const fieldGt = where[`${field}_gt`];
-      const fieldGte = where[`${field}_gte`];
-      const fieldLt = where[`${field}_lt`];
-      const fieldLte = where[`${field}_lte`];
-      if (fieldGt) {
-        query += `AND ${alias}.${field} > ? `;
-        params.push(fieldGt);
-      }
-      if (fieldGte) {
-        query += `AND ${alias}.${field} >= ? `;
-        params.push(fieldGte);
-      }
-      if (fieldLt) {
-        query += `AND ${alias}.${field} < ? `;
-        params.push(fieldLt);
-      }
-      if (fieldLte) {
-        query += `AND ${alias}.${field} <= ? `;
-        params.push(fieldLte);
-      }
-    }
-  });
-  return { query, params };
 }
