@@ -20,6 +20,7 @@ async function getRecentProposalsCount(space) {
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
+  const created = parseInt(msg.timestamp);
 
   const schemaIsValid = snapshot.utils.validateSchema(
     snapshot.schemas.proposal,
@@ -40,10 +41,10 @@ export async function verify(body): Promise<any> {
   const space = await getSpace(msg.space);
   space.id = msg.space;
 
-  if (space.voting?.delay) {
-    const isValidDelay =
-      msg.payload.start === parseInt(msg.timestamp) + space.voting.delay;
+  // if (msg.payload.start < created) return Promise.reject('invalid start date');
 
+  if (space.voting?.delay) {
+    const isValidDelay = msg.payload.start === created + space.voting.delay;
     if (!isValidDelay) return Promise.reject('invalid voting delay');
   }
 
@@ -99,7 +100,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const metadata = msg.payload.metadata || {};
   const strategies = JSON.stringify(spaceSettings.strategies);
   const plugins = JSON.stringify(metadata.plugins || {});
-  const network = metadata.network || spaceSettings.network;
+  const network = spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
 
   const proposal = {
@@ -120,6 +121,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     start: parseInt(msg.payload.start || '0'),
     end: parseInt(msg.payload.end || '0'),
     quorum: spaceSettings?.voting?.quorum || 0,
+    privacy: spaceSettings?.voting?.privacy || '',
     snapshot: proposalSnapshot || 0,
     scores: JSON.stringify([]),
     scores_by_strategy: JSON.stringify([]),

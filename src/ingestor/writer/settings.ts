@@ -5,6 +5,7 @@ import { addOrUpdateSpace, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
+const networkPath = DEFAULT_NETWORK === '1' ? '' : 'testnet/';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -19,7 +20,9 @@ export async function verify(body): Promise<any> {
   }
 
   const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
-  const isOwner = spaceUri.includes(body.address);
+  const isOwner =
+    spaceUri ===
+    `ipns://storage.snapshot.page/registry/${networkPath}${body.address}/${msg.space}`;
   const space = await getSpace(msg.space);
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());
@@ -37,7 +40,7 @@ export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
   try {
-    const key = `registry/${body.address}/${space}`;
+    const key = `registry/${networkPath}${body.address}/${space}`;
     const result = await fleek.upload({
       apiKey: process.env.FLEEK_API_KEY || '',
       apiSecret: process.env.FLEEK_API_SECRET || '',
@@ -50,5 +53,6 @@ export async function action(body): Promise<void> {
     await addOrUpdateSpace(space, msg.payload);
   } catch (e) {
     console.log('[writer] Failed to store settings', msg.space, e);
+    return Promise.reject('failed store settings on IPNS');
   }
 }

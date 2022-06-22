@@ -83,10 +83,7 @@ export default async function ingestor(body) {
       end: message.end,
       snapshot: message.snapshot,
       metadata: {
-        plugins: JSON.parse(message.plugins),
-        network: message.network,
-        strategies: JSON.parse(message.strategies),
-        ...JSON.parse(message.metadata)
+        plugins: JSON.parse(message.plugins)
       },
       type: message.type
     };
@@ -98,8 +95,7 @@ export default async function ingestor(body) {
     if (type === 'vote-string') choice = JSON.parse(message.choice);
     payload = {
       proposal: message.proposal,
-      choice,
-      metadata: JSON.parse(message.metadata)
+      choice
     };
     type = 'vote';
   }
