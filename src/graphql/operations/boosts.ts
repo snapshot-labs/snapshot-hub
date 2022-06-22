@@ -7,7 +7,7 @@ async function querySubgraph(
   apiKey: string
 ) {
   const apiUrls: string[] = [];
-  apiUrls[4] = `https://api.studio.thegraph.com/query/12054/boost/0.1.1`;
+  apiUrls[4] = `https://api.studio.thegraph.com/query/12054/boost/0.1.2`;
 
   return await fetch(apiUrls[chainId], {
     method: 'POST',
