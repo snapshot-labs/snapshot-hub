@@ -374,6 +374,7 @@ type Treasury {
 type Boost {
   id: ID!
   strategyURI: String!
+  ref: String!
   token: String!
   balance: String!
   guard: String!
