@@ -14,7 +14,6 @@
     "@ethersproject/wallet": "^5.0.1",
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pusher/push-notifications-server": "^1.2.4",
-    "@snapshot-labs/boost": "file:../boost/guard",
     "@snapshot-labs/pineapple": "^0.1.0-beta.0",
     "@snapshot-labs/snapshot.js": "^0.3.102",
     "bluebird": "^3.7.2",
