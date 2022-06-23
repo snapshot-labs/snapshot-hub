@@ -121,6 +121,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     start: parseInt(msg.payload.start || '0'),
     end: parseInt(msg.payload.end || '0'),
     quorum: spaceSettings?.voting?.quorum || 0,
+    privacy: spaceSettings?.voting?.privacy || '',
     snapshot: proposalSnapshot || 0,
     scores: JSON.stringify([]),
     scores_by_strategy: JSON.stringify([]),

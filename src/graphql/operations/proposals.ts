@@ -49,7 +49,7 @@ export default async function(parent, args) {
     SELECT p.*, spaces.settings FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE spaces.settings IS NOT NULL ${queryStr}
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;
   try {
     const proposals = await db.queryAsync(query, params);
