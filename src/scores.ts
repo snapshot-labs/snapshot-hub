@@ -104,9 +104,9 @@ export async function getProposalScores(proposalId) {
     );
     const results = {
       scores_state: proposal.state === 'closed' ? state : 'pending',
-      scores: votingClass.resultsByVoteBalance(),
-      scores_by_strategy: votingClass.resultsByStrategyScore(),
-      scores_total: votingClass.sumOfResultsBalance()
+      scores: votingClass.getScores(),
+      scores_by_strategy: votingClass.getScoresByStrategy(),
+      scores_total: votingClass.getScoresTotal()
     };
 
     // Store vp
@@ -183,7 +183,7 @@ export async function getProposalScores(proposalId) {
       '[scores] Proposal invalid',
       proposal.space,
       proposal.id,
-      proposal.score_state
+      proposal.scores_state
     );
 
     return { scores_state: 'invalid' };
