@@ -17,9 +17,9 @@ export async function verifySignature(
   address: string,
   sig: string,
   hash: string,
-  chainId: string = '1'
+  network = '1'
 ): Promise<boolean> {
-  const provider = snapshot.utils.getProvider(chainId, 'brovider');
+  const provider = snapshot.utils.getProvider(network, 'brovider');
   const bytecode = await provider.getCode(address);
   if (
     !bytecode ||

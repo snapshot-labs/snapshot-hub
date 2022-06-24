@@ -31,9 +31,11 @@ export default async function ingestor(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
+  let network = '1';
   if (msg.type !== 'settings') {
     const space = await getSpace(msg.space);
     if (!space) return Promise.reject('unknown space');
+    network = space.network;
   }
 
   if (
@@ -51,9 +53,14 @@ export default async function ingestor(body) {
   if (!msg.type || !Object.keys(writer).includes(msg.type))
     return Promise.reject('wrong message type');
 
-  const network = spaces[msg.space].network;
-
-  if (!(await verifySignature(body.address, body.sig, hashMessage(body.msg), network)))
+  if (
+    !(await verifySignature(
+      body.address,
+      body.sig,
+      hashMessage(body.msg),
+      network
+    ))
+  )
     return Promise.reject('wrong signature');
 
   try {
