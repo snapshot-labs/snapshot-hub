@@ -134,13 +134,13 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const query = 'INSERT IGNORE INTO proposals SET ?; ';
   const params: any[] = [proposal];
 
+  await db.queryAsync(query, params);
+  console.log('Store proposal complete', space, id);
+
   const event = {
     event: 'proposal/created',
     id: `proposal/${id}`,
     space
   };
-
-  await db.queryAsync(query, params);
-  console.log('Store proposal complete', space, id);
   sendEventToWebhook(event);
 }

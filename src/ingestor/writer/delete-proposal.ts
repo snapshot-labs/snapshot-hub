@@ -21,17 +21,18 @@ export async function action(body): Promise<void> {
   const id = msg.payload.proposal;
 
   const ts = parseInt((Date.now() / 1e3).toFixed());
+
+  const query = `
+  DELETE FROM proposals WHERE id = ? LIMIT 1;
+  DELETE FROM votes WHERE proposal = ?;
+  `;
+  await db.queryAsync(query, [id, id]);
+
   const event = {
     id: `proposal/${id}`,
     space: msg.space,
     event: 'proposal/deleted',
     expire: ts
   };
-
-  const query = `
-  DELETE FROM proposals WHERE id = ? LIMIT 1;
-    DELETE FROM votes WHERE proposal = ?;
-    `;
-  await db.queryAsync(query, [id, id]);
   sendEventToWebhook(event);
 }
