@@ -1,7 +1,7 @@
 import { getAddress } from '@ethersproject/address';
-import db from '../helpers/mysql';
 import snapshot from '@snapshot-labs/snapshot.js';
-import { jsonParse } from '../helpers/utils';
+import db from '../../helpers/mysql';
+import { jsonParse } from '../../helpers/utils';
 
 export async function verify(body): Promise<any> {
   const profile = jsonParse(body.profile, {});
@@ -17,7 +17,7 @@ export async function verify(body): Promise<any> {
   return true;
 }
 
-export async function action(message, ipfs, receipt, id): Promise<void> {
+export async function action(message, ipfs): Promise<void> {
   const profile = jsonParse(message.profile, {});
 
   const params = {

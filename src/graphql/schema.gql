@@ -243,8 +243,11 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
+  parent: Space
+  children: [Space]
 }
 
 type SpaceFilters {
@@ -259,6 +262,7 @@ type SpaceVoting {
   quorum: Float
   blind: Boolean
   hideAbstain: Boolean
+  privacy: String
 }
 
 type Proposal {
@@ -279,6 +283,7 @@ type Proposal {
   start: Int!
   end: Int!
   quorum: Float!
+  privacy: String
   snapshot: String
   state: String
   link: String
@@ -356,4 +361,10 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
+}
+
+type Treasury {
+  name: String
+  address: String
+  network: String
 }

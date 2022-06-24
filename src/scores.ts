@@ -1,8 +1,31 @@
 import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
-import getProposal from '../graphql/operations/proposal';
-import getVotes from '../graphql/operations/votes';
-import db from '../helpers/mysql';
+import db from './helpers/mysql';
+
+async function getProposal(id) {
+  const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
+  const [proposal] = await db.queryAsync(query, [id]);
+  proposal.strategies = JSON.parse(proposal.strategies);
+  proposal.plugins = JSON.parse(proposal.plugins);
+  proposal.choices = JSON.parse(proposal.choices);
+  proposal.scores = JSON.parse(proposal.scores);
+  proposal.scores_by_strategy = JSON.parse(proposal.scores_by_strategy);
+  let proposalState = 'pending';
+  const ts = parseInt((Date.now() / 1e3).toFixed());
+  if (ts > proposal.start) proposalState = 'active';
+  if (ts > proposal.end) proposalState = 'closed';
+  proposal.state = proposalState;
+  return proposal;
+}
+
+async function getVotes(proposalId) {
+  const query = 'SELECT id, choice, voter FROM votes WHERE proposal = ?';
+  const votes = await db.queryAsync(query, [proposalId]);
+  return votes.map(vote => {
+    vote.choice = JSON.parse(vote.choice);
+    return vote;
+  });
+}
 
 /**
  * Copied from https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L147-L173
@@ -39,8 +62,7 @@ export async function getScores(
 }
 
 export async function getProposalScores(proposalId) {
-  // Get proposal
-  const proposal = await getProposal({}, { id: proposalId });
+  const proposal = await getProposal(proposalId);
 
   try {
     if (proposal.scores_state === 'final') {
@@ -53,17 +75,12 @@ export async function getProposalScores(proposalId) {
     }
 
     // Get votes
-    let votes: any = await getVotes(
-      {},
-      { first: 100000, where: { proposal: proposalId } },
-      { internal: true },
-      false
-    );
+    let votes: any = await getVotes(proposalId);
     const voters = votes.map(vote => vote.voter);
 
     // Get scores
     const { scores, state } = await getScores(
-      proposal.space.id,
+      proposal.space,
       proposal.strategies,
       proposal.network,
       voters,
@@ -118,10 +135,10 @@ export async function getProposalScores(proposalId) {
         await db.queryAsync(query2, params);
         if (i) await snapshot.utils.sleep(200);
         i++;
-        console.log('[scores] Updated votes');
+        // console.log('[scores] Updated votes');
       }
 
-      console.log('[scores] Votes updated', votes.length);
+      // console.log('[scores] Votes updated', votes.length);
     }
 
     // Store scores
@@ -145,12 +162,15 @@ export async function getProposalScores(proposalId) {
       votes.length,
       proposalId
     ]);
-    console.log('[scores] Proposal', results.scores_state);
+    console.log(
+      '[scores] Proposal updated',
+      proposal.id,
+      proposal.space,
+      results.scores_state
+    );
 
     return results;
   } catch (e) {
-    console.log('[scores] Failed!', proposalId);
-
     const ts = (Date.now() / 1e3).toFixed();
     const query = `
       UPDATE proposals
@@ -158,20 +178,22 @@ export async function getProposalScores(proposalId) {
       scores_updated = ?
       WHERE id = ? LIMIT 1;
     `;
-    const failedState =
-      proposal.space.id === 'arbitrum-odyssey.eth' ? 'pending' : 'invalid';
-    await db.queryAsync(query, [failedState, ts, proposalId]);
-    console.log('[scores] Proposal invalid');
+    await db.queryAsync(query, ['invalid', ts, proposalId]);
+    console.log(
+      '[scores] Proposal invalid',
+      proposal.space,
+      proposal.id,
+      proposal.score_state
+    );
 
     return { scores_state: 'invalid' };
   }
 }
 
 async function run() {
-  console.log('[scores] Run scores');
+  // console.log('[scores] Run scores');
   const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
   const ts = parseInt((Date.now() / 1e3).toFixed());
-  console.log('Ts', ts);
   const [
     proposal
   ] = await db.queryAsync(
@@ -179,7 +201,7 @@ async function run() {
     [expires, ts, ['', 'pending', 'invalid']]
   );
   if (proposal && proposal.id) {
-    console.log('[scores] Get proposal', proposal.space, proposal.id);
+    // console.log('[scores] Get proposal', proposal.space, proposal.id);
     await getProposalScores(proposal.id);
     // await snapshot.utils.sleep(5e3);
     await run();

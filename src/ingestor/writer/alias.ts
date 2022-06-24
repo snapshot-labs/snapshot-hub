@@ -1,5 +1,5 @@
 import { getAddress } from '@ethersproject/address';
-import db from '../helpers/mysql';
+import db from '../../helpers/mysql';
 
 export async function verify(message): Promise<any> {
   return message.from !== message.alias;

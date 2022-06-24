@@ -1,22 +1,17 @@
-import db from '../../helpers/mysql';
-import { formatSpace } from '../helpers';
+import { fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 
-export default async function(_parent, { id }) {
-  const query = `
-    SELECT s.* FROM spaces s
-    WHERE s.id = ? AND s.settings IS NOT NULL
-    GROUP BY s.id
-    LIMIT 1
-  `;
+export default async function(_parent, { id }, _context, info) {
+  if (!id) return new PublicError('Missing id');
   try {
-    const spaces = await db.queryAsync(query, [id]);
-    return (
-      spaces.map(space =>
-        Object.assign(space, formatSpace(space.id, space.settings))
-      )[0] || null
-    );
+    let spaces = await fetchSpaces({ first: 1, where: { id } });
+    if (spaces.length !== 1) return null;
+
+    spaces = await handleRelatedSpaces(info, spaces);
+
+    return spaces[0];
   } catch (e) {
     console.log('[graphql]', e);
-    return Promise.reject('request failed');
+    if (e instanceof PublicError) return e;
+    return new Error('Unexpected error');
   }
 }

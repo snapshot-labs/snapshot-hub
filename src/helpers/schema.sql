@@ -1,15 +1,3 @@
-CREATE TABLE hubs (
-  host VARCHAR(64) NOT NULL,
-  address VARCHAR(64),
-  is_self INT DEFAULT 0,
-  is_active INT DEFAULT 1,
-  scope TEXT NOT NULL,
-  PRIMARY KEY (host),
-  INDEX address (address),
-  INDEX is_self (is_self),
-  INDEX is_active (is_active)
-);
-
 CREATE TABLE messages (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
@@ -19,7 +7,7 @@ CREATE TABLE messages (
   space VARCHAR(64),
   type VARCHAR(24) NOT NULL,
   sig VARCHAR(256) NOT NULL,
-  receipt VARCHAR(128) NOT NULL,
+  receipt VARCHAR(256) NOT NULL,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX address (address),
@@ -60,6 +48,7 @@ CREATE TABLE proposals (
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
   quorum DECIMAL(64,30) NOT NULL,
+  privacy VARCHAR(24) NOT NULL,
   snapshot INT(24) NOT NULL,
   scores JSON NOT NULL,
   scores_by_strategy JSON NOT NULL,
@@ -93,7 +82,8 @@ CREATE TABLE votes (
   vp_by_strategy JSON NOT NULL,
   vp_state VARCHAR(24) NOT NULL,
   cb INT(11) NOT NULL,
-  PRIMARY KEY (id),
+  PRIMARY KEY (voter, space, proposal),
+  UNIQUE KEY id (id),
   INDEX ipfs (ipfs),
   INDEX voter (voter),
   INDEX created (created),

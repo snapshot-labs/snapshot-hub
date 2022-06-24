@@ -37,17 +37,14 @@ async function query(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > LIMIT && !context?.internal) first = LIMIT;
+  if (first > LIMIT) first = LIMIT;
   params.push(skip, first);
 
   let votes: any[] = [];
 
   const query = `
     SELECT v.* FROM votes v
-    LEFT OUTER JOIN votes v2 ON
-      v.voter = v2.voter AND v.proposal = v2.proposal
-      AND ((v.created < v2.created) OR (v.created = v2.created AND v.id < v2.id))
-    WHERE v2.voter IS NULL AND v.cb = 0 ${queryStr}
+    WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   try {
