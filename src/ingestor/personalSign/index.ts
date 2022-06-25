@@ -31,11 +31,11 @@ export default async function ingestor(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
-  let network = '1';
+  const network = '1';
   if (msg.type !== 'settings') {
     const space = await getSpace(msg.space);
     if (!space) return Promise.reject('unknown space');
-    network = space.network;
+    // network = space.network;
   }
 
   if (
