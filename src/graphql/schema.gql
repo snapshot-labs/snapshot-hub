@@ -96,6 +96,7 @@ input ProposalWhere {
   author_in: [String]
   network: String
   network_in: [String]
+  title_contain: String
   type: String
   type_in: [String]
   created: Int
@@ -119,7 +120,6 @@ input ProposalWhere {
   scores_state: String
   scores_state_in: [String]
   state: String
-  search: String
 }
 
 input VoteWhere {
