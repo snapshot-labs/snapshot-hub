@@ -33,6 +33,12 @@ export default async function(parent, args) {
     params.push(ts);
   }
 
+  let searchSql = '';
+  if (where.title_contain) {
+    searchSql = 'AND p.title LIKE ?';
+    params.push(`%${where.title_contain}%`);
+  }
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
@@ -48,7 +54,7 @@ export default async function(parent, args) {
   const query = `
     SELECT p.*, spaces.settings FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
-    WHERE spaces.settings IS NOT NULL ${queryStr}
+    WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;
   try {
