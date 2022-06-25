@@ -34,9 +34,9 @@ export default async function(parent, args) {
   }
 
   let searchSql = '';
-  if (where.title_contain) {
+  if (where.title_contains) {
     searchSql = 'AND p.title LIKE ?';
-    params.push(`%${where.title_contain}%`);
+    params.push(`%${where.title_contains}%`);
   }
 
   let orderBy = args.orderBy || 'created';
