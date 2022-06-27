@@ -61,8 +61,9 @@ export async function getScores(
   }
 }
 
-export async function getProposalScores(proposalId) {
+export async function getProposalScores(proposalId, force = false) {
   const proposal = await getProposal(proposalId);
+  if (!force && proposal.privacy === 'shutter') return;
 
   try {
     if (proposal.scores_state === 'final') {
@@ -194,11 +195,11 @@ async function run() {
   // console.log('[scores] Run scores');
   const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
   const ts = parseInt((Date.now() / 1e3).toFixed());
-  const [
-    proposal
-  ] = await db.queryAsync(
-    'SELECT id, space FROM proposals WHERE created >= ? AND start <= ? AND scores_state IN (?) ORDER BY scores_updated ASC LIMIT 1',
-    [expires, ts, ['', 'pending', 'invalid']]
+  const [proposal] = await db.queryAsync(
+    `SELECT id, space FROM proposals
+    WHERE created >= ? AND start <= ? AND scores_state IN (?) AND privacy != ?
+    ORDER BY scores_updated ASC LIMIT 1`,
+    [expires, ts, ['', 'pending', 'invalid'], 'shutter']
   );
   if (proposal && proposal.id) {
     // console.log('[scores] Get proposal', proposal.space, proposal.id);

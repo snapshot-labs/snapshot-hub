@@ -80,7 +80,7 @@ async function processEvents(subscribers) {
         const scores = await getProposalScores(proposalId);
         console.log(
           '[events] Stored scores on proposal/end',
-          scores.scores_state,
+          scores?.scores_state || 'without scores',
           proposalId
         );
       } catch (e) {

@@ -29,34 +29,40 @@ export async function verify(body): Promise<any> {
   )
     return Promise.reject('not in voting window');
 
-  if (
-    (!proposal.type ||
-      proposal.type === 'single-choice' ||
-      proposal.type === 'basic') &&
-    (typeof msg.payload.choice !== 'number' || msg.payload.choice < 1)
-  )
-    return Promise.reject('invalid choice');
-
-  if (
-    ['approval', 'ranked-choice'].includes(proposal.type) &&
-    (!Array.isArray(msg.payload.choice) || Math.min(...msg.payload.choice) < 1)
-  )
-    return Promise.reject('invalid choice');
-
-  if (['weighted', 'quadratic'].includes(proposal.type)) {
+  if (proposal.privacy === 'shutter') {
+    if (typeof msg.payload.choice !== 'string')
+      return Promise.reject('invalid choice');
+  } else {
     if (
-      typeof msg.payload.choice !== 'object' ||
-      Math.min(
-        ...Object.keys(msg.payload.choice).map(choice => Number(choice))
-      ) < 1
+      (!proposal.type ||
+        proposal.type === 'single-choice' ||
+        proposal.type === 'basic') &&
+      (typeof msg.payload.choice !== 'number' || msg.payload.choice < 1)
     )
       return Promise.reject('invalid choice');
 
-    let choiceIsValid = true;
-    Object.values(msg.payload.choice).forEach(value => {
-      if (typeof value !== 'number' || value < 0) choiceIsValid = false;
-    });
-    if (!choiceIsValid) return Promise.reject('invalid choice');
+    if (
+      ['approval', 'ranked-choice'].includes(proposal.type) &&
+      (!Array.isArray(msg.payload.choice) ||
+        Math.min(...msg.payload.choice) < 1)
+    )
+      return Promise.reject('invalid choice');
+
+    if (['weighted', 'quadratic'].includes(proposal.type)) {
+      if (
+        typeof msg.payload.choice !== 'object' ||
+        Math.min(
+          ...Object.keys(msg.payload.choice).map(choice => Number(choice))
+        ) < 1
+      )
+        return Promise.reject('invalid choice');
+
+      let choiceIsValid = true;
+      Object.values(msg.payload.choice).forEach(value => {
+        if (typeof value !== 'number' || value < 0) choiceIsValid = false;
+      });
+      if (!choiceIsValid) return Promise.reject('invalid choice');
+    }
   }
 
   try {
