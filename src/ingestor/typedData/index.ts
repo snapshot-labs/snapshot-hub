@@ -6,7 +6,7 @@ import envelope from './envelope.json';
 import writer from '../writer';
 import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
-import { getSpace } from '../../helpers/actions';
+import { getProposal, getSpace } from '../../helpers/actions';
 import { storeMsg } from '../highlight';
 
 const NAME = 'snapshot';
@@ -92,7 +92,10 @@ export default async function ingestor(body) {
 
   if (['vote', 'vote-array', 'vote-string'].includes(type)) {
     let choice = message.choice;
-    if (type === 'vote-string') choice = JSON.parse(message.choice);
+    if (type === 'vote-string') {
+      const proposal = await getProposal(message.space, message.proposal);
+      if (proposal.privacy !== 'shutter') choice = JSON.parse(message.choice);
+    }
     payload = {
       proposal: message.proposal,
       choice
