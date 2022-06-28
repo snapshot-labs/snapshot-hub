@@ -12,6 +12,7 @@ router.post('/message', async (req, res) => {
     const result = await personalSign(req.body);
     return res.json(result);
   } catch (e) {
+    console.log('[ingestor] personalSign msg failed', e);
     return sendError(res, e);
   }
 });
@@ -23,6 +24,7 @@ router.post('/msg', async (req, res) => {
     const result = await typedData(req.body);
     return res.json(result);
   } catch (e) {
+    console.log('[ingestor] typedData msg failed', e);
     return sendError(res, e);
   }
 });
