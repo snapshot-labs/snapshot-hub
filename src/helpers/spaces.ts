@@ -6,7 +6,6 @@ export let spaces = {};
 export const spacesMetadata = {};
 export const spaceProposals = {};
 export const spaceVotes = {};
-export const spaceVoters = {};
 export const spaceFollowers = {};
 
 async function loadSpaces() {
@@ -42,16 +41,6 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
-async function getVoters() {
-  const query = `
-    SELECT space, COUNT(DISTINCT(voter)) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d,
-    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
-    FROM votes GROUP BY space
-  `;
-  return await db.queryAsync(query);
-}
-
 async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count,
@@ -68,7 +57,6 @@ async function loadSpacesMetrics() {
   const metrics = await Promise.all([
     getProposals(),
     getVotes(),
-    getVoters(),
     getFollowers()
   ]);
   metrics[0].forEach(proposals => {
@@ -77,10 +65,7 @@ async function loadSpacesMetrics() {
   metrics[1].forEach(votes => {
     if (spaces[votes.space]) spaceVotes[votes.space] = votes;
   });
-  metrics[2].forEach(voters => {
-    if (spaces[voters.space]) spaceVoters[voters.space] = voters;
-  });
-  metrics[3].forEach(followers => {
+  metrics[2].forEach(followers => {
     if (spaces[followers.space]) spaceFollowers[followers.space] = followers;
   });
 
@@ -106,9 +91,6 @@ async function loadSpacesMetrics() {
       votes: (spaceVotes[id] && spaceVotes[id].count) || undefined,
       votes_1d: (spaceVotes[id] && spaceVotes[id].count_1d) || undefined,
       votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
-      voters: (spaceVoters[id] && spaceVoters[id].count) || undefined,
-      voters_1d: (spaceVoters[id] && spaceVoters[id].count_1d) || undefined,
-      voters_7d: (spaceVoters[id] && spaceVoters[id].count_7d) || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
       followers_1d:
         (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined,
@@ -120,8 +102,12 @@ async function loadSpacesMetrics() {
 }
 
 async function run() {
-  await loadSpaces();
-  await loadSpacesMetrics();
+  try {
+    await loadSpaces();
+    await loadSpacesMetrics();
+  } catch (e) {
+    console.log('[spaces] Failed to run', e);
+  }
   await snapshot.utils.sleep(20e3);
   await run();
 }
