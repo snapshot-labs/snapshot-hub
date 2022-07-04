@@ -20,11 +20,13 @@ CREATE TABLE messages (
 
 CREATE TABLE spaces (
   id VARCHAR(64) NOT NULL,
+  name VARCHAR(64) NOT NULL,
   settings JSON,
   verified INT NOT NULL DEFAULT '0',
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
   PRIMARY KEY (id),
+  INDEX name (name),
   INDEX verified (verified),
   INDEX created_at (created_at),
   INDEX updated_at (updated_at)
@@ -47,6 +49,7 @@ CREATE TABLE proposals (
   choices JSON NOT NULL,
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
+  delegation INT(1) NOT NULL,
   quorum DECIMAL(64,30) NOT NULL,
   privacy VARCHAR(24) NOT NULL,
   snapshot INT(24) NOT NULL,
@@ -64,6 +67,7 @@ CREATE TABLE proposals (
   INDEX space (space),
   INDEX start (start),
   INDEX end (end),
+  INDEX delegation (delegation),
   INDEX scores_state (scores_state),
   INDEX scores_updated (scores_updated),
   INDEX votes (votes)

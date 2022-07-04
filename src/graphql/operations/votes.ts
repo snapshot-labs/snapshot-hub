@@ -45,7 +45,7 @@ async function query(parent, args, context?, info?) {
   const query = `
     SELECT v.* FROM votes v
     WHERE 1 = 1 ${queryStr}
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    ORDER BY ${orderBy} ${orderDirection}, v.id ASC LIMIT ?, ?
   `;
   try {
     votes = await db.queryAsync(query, params);
