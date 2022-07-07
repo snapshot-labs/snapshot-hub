@@ -40,10 +40,12 @@ export default async function ingestor(body) {
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
+  let network = '1';
   if (!['settings', 'alias', 'profile'].includes(type)) {
     if (!message.space) return Promise.reject('unknown space');
     const space = await getSpace(message.space);
     if (!space) return Promise.reject('unknown space');
+    network = space.network;
   }
 
   // Check if signing address is an alias
@@ -63,7 +65,8 @@ export default async function ingestor(body) {
   const isValid = await snapshot.utils.verify(
     body.address,
     body.sig,
-    body.data
+    body.data,
+    network
   );
   const id = snapshot.utils.getHash(body.data);
   if (!isValid) return Promise.reject('wrong signature');
