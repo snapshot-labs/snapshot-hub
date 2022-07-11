@@ -11,11 +11,11 @@
   "dependencies": {
     "@ethersproject/address": "^5.0.1",
     "@ethersproject/hash": "^5.5.0",
-    "@ethersproject/wallet": "^5.0.1",
+    "@ethersproject/wallet": "^5.6.2",
     "@fleekhq/fleek-storage-js": "^1.0.15",
     "@pusher/push-notifications-server": "^1.2.4",
     "@snapshot-labs/pineapple": "^0.1.0-beta.1",
-    "@snapshot-labs/snapshot.js": "^0.4.7",
+    "@snapshot-labs/snapshot.js": "^0.4.8",
     "bluebird": "^3.7.2",
     "connection-string": "^1.0.1",
     "cors": "^2.8.5",
@@ -33,8 +33,8 @@
     "graphql-tools": "^7.0.5",
     "lodash": "^4.17.20",
     "mysql": "^2.18.1",
-    "node-fetch": "^2.6.1",
-    "ts-node": "^9.1.1",
+    "node-fetch": "^3.2.6",
+    "ts-node": "^10.8.2",
     "typescript": "~3.9.3"
   },
   "devDependencies": {
