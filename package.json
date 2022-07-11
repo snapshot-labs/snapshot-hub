@@ -23,7 +23,7 @@
     "eslint": "^6.7.2",
     "ethereumjs-util": "^7.0.6",
     "ethers": "^5.3.1",
-    "express": "^4.17.1",
+    "express": "^4.18.1",
     "express-graphql": "^0.12.0",
     "express-rate-limit": "^5.2.6",
     "graphql": "^15.8.0",
