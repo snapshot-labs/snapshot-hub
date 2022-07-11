@@ -1,9 +1,9 @@
 import fetch from 'cross-fetch';
-import beams from '../helpers/beams';
-import db from '../helpers/mysql';
+import beams from './helpers/beams';
+import db from './helpers/mysql';
 import chunk from 'lodash/chunk';
-import { getProposalScores } from '../scores';
-import { getJSON, sha256 } from '../helpers/utils';
+import { getProposalScores } from './scores';
+import { getJSON, sha256 } from './helpers/utils';
 
 const delay = 5;
 const interval = 30;
@@ -53,9 +53,13 @@ const sendPushNotification = async event => {
 async function sendEvent(event, to) {
   event.token = sha256(`${to}${serviceEventsSalt}`);
   event.secret = sha256(`${to}${serviceEventsSalt}`);
+  const headerSecret = sha256(`${to}${process.env.SERVICE_EVENTS_SALT}`);
   const res = await fetch(to, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authentication: headerSecret
+    },
     body: JSON.stringify(event)
   });
   return res.json();
@@ -76,7 +80,7 @@ async function processEvents(subscribers) {
         const scores = await getProposalScores(proposalId);
         console.log(
           '[events] Stored scores on proposal/end',
-          scores.scores_state,
+          scores?.scores_state || 'without scores',
           proposalId
         );
       } catch (e) {

@@ -35,6 +35,6 @@ async function loadStrategies() {
   );
 }
 
-setInterval(async () => await loadStrategies(), 16e3);
+setInterval(async () => await loadStrategies(), 60e3);
 
 loadStrategies();

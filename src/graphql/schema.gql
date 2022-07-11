@@ -57,6 +57,16 @@ type Query {
     orderDirection: OrderDirection
   ): [Subscription]
 
+  users(
+    first: Int
+    skip: Int
+    where: UsersWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [User]
+
+  user(id: String): User
+
   skins: [Item]
 
   networks: [Item]
@@ -86,6 +96,7 @@ input ProposalWhere {
   author_in: [String]
   network: String
   network_in: [String]
+  title_contains: String
   type: String
   type_in: [String]
   created: Int
@@ -189,6 +200,19 @@ input SubscriptionWhere {
   created_lte: Int
 }
 
+input UsersWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
 enum OrderDirection {
   asc
   desc
@@ -220,8 +244,11 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
+  parent: Space
+  children: [Space]
 }
 
 type SpaceFilters {
@@ -236,6 +263,7 @@ type SpaceVoting {
   quorum: Float
   blind: Boolean
   hideAbstain: Boolean
+  privacy: String
 }
 
 type Proposal {
@@ -245,14 +273,18 @@ type Proposal {
   created: Int!
   space: Space
   network: String!
+  symbol: String!
   type: String
   strategies: [Strategy]!
   plugins: Any!
   title: String!
   body: String
+  discussion: String!
   choices: [String]!
   start: Int!
   end: Int!
+  quorum: Float!
+  privacy: String
   snapshot: String
   state: String
   link: String
@@ -308,6 +340,15 @@ type Subscription {
   created: Int!
 }
 
+type User {
+  id: String!
+  ipfs: String
+  name: String
+  about: String
+  avatar: String
+  created: Int!
+}
+
 type Item {
   id: String!
   spacesCount: Int
@@ -321,4 +362,10 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
+}
+
+type Treasury {
+  name: String
+  address: String
+  network: String
 }

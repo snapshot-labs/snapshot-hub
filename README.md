@@ -34,15 +34,14 @@ yarn
 
 - `DATABASE_URL`: The database connection string. You will need to run your own MySQL database or use a Cloud service like [JawsDB](https://jawsdb.com).
 - `RELAYER_PK`: This is the private key of the hub. The hub counter-sign every accepted message with this key.
-- `PINNING_SERVICE`: This value must be "fleek" or "pinata". The hub support [Pinata](https://pinata.cloud/) or [Fleek](https://fleek.co) IPFS pinning services.
-- `FLEEK_API_KEY` and `FLEEK_API_SECRET` or `PINATA_API_KEY` and `PINATA_SECRET_API_KEY`: You need to setup API keys for the pinning service you've defined.
+- `FLEEK_API_KEY`, `FLEEK_API_SECRET` and `FLEEK_BUCKET` are required keys from [Fleek](https://fleek.co) for pinning on IPNS.
 
 3. Create the database schema
 
-Run this query on the MySQL database to create the initial schema with the required tables:
-https://github.com/snapshot-labs/snapshot-hub/blob/master/src/helpers/database/schema.sql
+Run this query on the MySQL database to create the initial schema with the required tables: 
+https://github.com/snapshot-labs/snapshot-hub/blob/master/src/helpers/schema.sql
 
-## Run
+### Run
 
 - Use this command to run the hub:
 
