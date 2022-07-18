@@ -66,17 +66,16 @@ export async function verify(body): Promise<any> {
   }
 
   try {
-    const scores = await snapshot.utils.getScores(
-      msg.space,
-      jsonParse(proposal.strategies),
+    const result = await snapshot.utils.getVp(
+      body.address,
       proposal.network,
-      [body.address],
-      proposal.snapshot
+      jsonParse(proposal.strategies),
+      proposal.snapshot,
+      msg.space,
+      proposal.delegation === 1,
+      {}
     );
-    const totalScore = scores
-      .map((score: any) => Object.values(score).reduce((a, b: any) => a + b, 0))
-      .reduce((a, b: any) => a + b, 0);
-    if (totalScore === 0) return Promise.reject('no voting power');
+    if (result.vp === 0) return Promise.reject('no voting power');
   } catch (e) {
     console.log(
       '[writer] Failed to check voting power (vote)',

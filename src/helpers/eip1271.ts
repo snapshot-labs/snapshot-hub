@@ -1,62 +1,19 @@
-// https://github.com/WalletConnect/walletconnect-example-dapp/blob/961727c2fe4e33587bd1543393afa51033f95a4e/src/helpers/eip1271.ts
-import { Contract, providers, utils } from 'ethers';
+import { Provider } from '@ethersproject/providers';
+import { Contract } from '@ethersproject/contracts';
+import { arrayify } from '@ethersproject/bytes';
 
 export const spec = {
   magicValue: '0x1626ba7e',
   abi: [
-    {
-      constant: true,
-      inputs: [
-        {
-          name: '_hash',
-          type: 'bytes32'
-        },
-        {
-          name: '_sig',
-          type: 'bytes'
-        }
-      ],
-      name: 'isValidSignature',
-      outputs: [
-        {
-          name: 'magicValue',
-          type: 'bytes4'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    }
+    'function isValidSignature(bytes32 _hash, bytes _sig) view returns (bytes4 magicValue)'
   ]
 };
 
 // support for older eip1271 implementations
-const spec_oldVersion = {
+const specOldVersion = {
   magicValue: '0x20c13b0b',
   abi: [
-    {
-      constant: true,
-      inputs: [
-        {
-          name: '_hash',
-          type: 'bytes'
-        },
-        {
-          name: '_sig',
-          type: 'bytes'
-        }
-      ],
-      name: 'isValidSignature',
-      outputs: [
-        {
-          name: 'magicValue',
-          type: 'bytes4'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    }
+    'function isValidSignature(bytes _hash, bytes _sig) view returns (bytes4 magicValue)'
   ]
 };
 
@@ -64,26 +21,27 @@ export async function isValidSignature(
   address: string,
   sig: string,
   data: string,
-  provider: providers.Provider,
+  provider: Provider,
   abi = spec.abi,
   magicValue = spec.magicValue
 ): Promise<boolean> {
   let returnValue;
+
   try {
     returnValue = await new Contract(address, abi, provider).isValidSignature(
-      utils.arrayify(data),
+      arrayify(data),
       sig
     );
   } catch (e) {
-    // if failed is latest then it might be older implementation
+    // If failed is latest then it might be older implementation
     if (magicValue === spec.magicValue) {
       return isValidSignature(
         address,
         sig,
         data,
         provider,
-        spec_oldVersion.abi, // old spec version abi
-        spec_oldVersion.magicValue // old spec version magicValue
+        specOldVersion.abi, // old spec version abi
+        specOldVersion.magicValue // old spec version magicValue
       );
     }
 
