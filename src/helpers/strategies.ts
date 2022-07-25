@@ -39,7 +39,7 @@ async function run() {
   try {
     await loadStrategies();
   } catch (e) {
-    console.log('[spaces] Failed to load', e);
+    console.log('[strategies] Failed to load', e);
   }
   await snapshot.utils.sleep(60e3);
   await run();
