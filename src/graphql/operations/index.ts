@@ -15,6 +15,7 @@ import strategies from './strategies';
 import strategy from './strategy';
 import users from './users';
 import user from './user';
+import vp from './vp';
 
 export default {
   space,
@@ -33,5 +34,6 @@ export default {
   strategies,
   strategy,
   users,
-  user
+  user,
+  vp
 };

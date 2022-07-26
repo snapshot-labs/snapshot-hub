@@ -35,6 +35,14 @@ async function loadStrategies() {
   );
 }
 
-setInterval(async () => await loadStrategies(), 60e3);
+async function run() {
+  try {
+    await loadStrategies();
+  } catch (e) {
+    console.log('[strategies] Failed to load', e);
+  }
+  await snapshot.utils.sleep(60e3);
+  run();
+}
 
-loadStrategies();
+run();
