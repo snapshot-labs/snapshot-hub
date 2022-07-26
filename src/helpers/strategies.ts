@@ -42,7 +42,7 @@ async function run() {
     console.log('[strategies] Failed to load', e);
   }
   await snapshot.utils.sleep(60e3);
-  await run();
+  run();
 }
 
 run();
