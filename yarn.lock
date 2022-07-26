@@ -1166,10 +1166,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@pusher/push-notifications-server@^1.2.4":
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/@pusher/push-notifications-server/-/push-notifications-server-1.2.4.tgz#0fc43181a750741c5e855a042c7cf97dfbf353e9"
-  integrity sha512-hMuwVHkeTYoLb6QNvGWOTehe/IsnG8zT2nIR9bWPuJ2t4rt4xMl5TGcglDLnH14Hd8LlBmvuvgAh1q/gnP19BQ==
+"@pusher/push-notifications-server@^1.2.5":
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@pusher/push-notifications-server/-/push-notifications-server-1.2.5.tgz#a7266941cb720b2bb32c19ed2b969c3686d54a60"
+  integrity sha512-GCnUsufoiumbWDh0+892SQFV9dxTMbXGWgYGiEKbaUZJWQiNdYyoe/FsesUWdmHPWq2jWTHNBLgdDo/BYhRX2g==
   dependencies:
     jsonwebtoken "^8.4.0"
 
