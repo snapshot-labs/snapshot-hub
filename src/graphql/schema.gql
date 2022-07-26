@@ -78,6 +78,12 @@ type Query {
   strategies: [StrategyItem]
 
   strategy(id: String): StrategyItem
+
+  vp(
+    voter: String!
+    space: String,
+    proposal: String
+  ): Vp
 }
 
 input SpaceWhere {
@@ -368,4 +374,10 @@ type Treasury {
   name: String
   address: String
   network: String
+}
+
+type Vp {
+  vp: Float
+  vp_by_strategy: [Float]
+  vp_state: String
 }
