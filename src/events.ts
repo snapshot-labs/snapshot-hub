@@ -72,7 +72,7 @@ export async function sendEventToWebhook(event) {
   try {
     // TODO: This secret is temporary key, replace this with event URL once events code is removed
     const secret = sha256(`${webhookURL}/api/webhook?cb=1${serviceEventsSalt}`);
-    const res = await fetch(webhookURL + '/api/event', {
+    const res = await fetch(`${webhookURL}/api/event`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
