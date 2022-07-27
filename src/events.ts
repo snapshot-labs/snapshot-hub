@@ -13,6 +13,7 @@ const serviceEventsSalt = parseInt(process.env.SERVICE_EVENTS_SALT || '12345');
 const servicePushNotifications = parseInt(
   process.env.SERVICE_PUSH_NOTIFICATIONS || '0'
 );
+const webhookURL = process.env.SNAPSHOT_WEBHOOK_URL || '';
 
 const getProposal = async proposalId => {
   try {
@@ -63,6 +64,30 @@ async function sendEvent(event, to) {
     body: JSON.stringify(event)
   });
   return res.json();
+}
+
+export async function sendEventToWebhook(event) {
+  if (!webhookURL) return;
+  // TODO: handle errors and retry, maybe save in temporary table
+  try {
+    // TODO: This secret is temporary key, replace this with event URL once events code is removed
+    const secret = sha256(`${webhookURL}/api/webhook?cb=1${serviceEventsSalt}`);
+    const res = await fetch(`${webhookURL}/api/event`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authentication: secret
+      },
+      body: JSON.stringify(event)
+    });
+    const responseJSON = await res.json();
+    if (responseJSON.error) {
+      console.log('[sendEventToWebhook]', responseJSON);
+    }
+    return responseJSON;
+  } catch (error) {
+    console.log('[sendEventToWebhook]', error);
+  }
 }
 
 async function processEvents(subscribers) {

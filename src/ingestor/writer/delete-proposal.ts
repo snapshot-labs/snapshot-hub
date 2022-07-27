@@ -1,6 +1,7 @@
 import { getProposal, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
+import { sendEventToWebhook } from '../../events';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -20,18 +21,18 @@ export async function action(body): Promise<void> {
   const id = msg.payload.proposal;
 
   const ts = parseInt((Date.now() / 1e3).toFixed());
+
+  const query = `
+  DELETE FROM proposals WHERE id = ? LIMIT 1;
+  DELETE FROM votes WHERE proposal = ?;
+  `;
+  await db.queryAsync(query, [id, id]);
+
   const event = {
     id: `proposal/${id}`,
     space: msg.space,
     event: 'proposal/deleted',
     expire: ts
   };
-
-  const query = `
-    DELETE FROM proposals WHERE id = ? LIMIT 1;
-    DELETE FROM votes WHERE proposal = ?;
-    DELETE FROM events WHERE id = ?;
-    INSERT IGNORE INTO events SET ?;
-  `;
-  await db.queryAsync(query, [id, id, `proposal/${id}`, event]);
+  sendEventToWebhook(event);
 }
