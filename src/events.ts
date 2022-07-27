@@ -71,7 +71,7 @@ export async function sendEventToWebhook(event) {
   // TODO: handle errors and retry, maybe save in temporary table
   try {
     // TODO: This secret is temporary key, replace this with event URL once events code is removed
-    const secret = sha256(`${webhookURL}/api/webhook?cb=1${process.env.SNAPSHOT_WEBHOOK_URL}`);
+    const secret = sha256(`${webhookURL}/api/webhook?cb=1${process.env.SERVICE_EVENTS_SALT}`);
     const res = await fetch(`${webhookURL}/api/event`, {
       method: 'POST',
       headers: {
