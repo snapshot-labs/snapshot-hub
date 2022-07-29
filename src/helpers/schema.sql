@@ -98,16 +98,6 @@ CREATE TABLE votes (
   INDEX cb (cb)
 );
 
-CREATE TABLE events (
-  id VARCHAR(128) NOT NULL,
-  event VARCHAR(64) NOT NULL,
-  space VARCHAR(64) NOT NULL,
-  expire INT(11) NOT NULL,
-  PRIMARY KEY (id, event),
-  INDEX space (space),
-  INDEX expire (expire)
-);
-
 CREATE TABLE follows (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,

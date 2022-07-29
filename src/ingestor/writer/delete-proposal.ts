@@ -1,7 +1,7 @@
 import { getProposal, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
-import { sendEventToWebhook } from '../../events';
+import { sendToWebhook } from '../../helpers/webhook';
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
@@ -34,5 +34,5 @@ export async function action(body): Promise<void> {
     event: 'proposal/deleted',
     expire: ts
   };
-  sendEventToWebhook(event);
+  sendToWebhook(event);
 }

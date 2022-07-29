@@ -4,7 +4,7 @@ import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
 import { getSpace } from '../../helpers/actions';
-import { sendEventToWebhook } from '../../events';
+import { sendToWebhook } from '../../helpers/webhook';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;
@@ -142,5 +142,5 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     id: `proposal/${id}`,
     space
   };
-  sendEventToWebhook(event);
+  sendToWebhook(event);
 }
