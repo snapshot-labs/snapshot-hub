@@ -6,7 +6,6 @@ import ingestor from './ingestor';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import './helpers/strategies';
-import './events';
 
 const app = express();
 app.use(express.json({ limit: '20mb' }));
