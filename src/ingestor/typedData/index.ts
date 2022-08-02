@@ -3,10 +3,11 @@ import hashTypes from '@snapshot-labs/snapshot.js/src/sign/types.json';
 import { pin } from '@snapshot-labs/pineapple';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
-import { spaces } from '../../helpers/spaces';
 import writer from '../writer';
-import { sha256 } from '../../helpers/utils';
+import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
+import { getProposal, getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -39,11 +40,13 @@ export default async function ingestor(body) {
     return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
-  if (
-    !['settings', 'alias', 'profile'].includes(type) &&
-    (!message.space || !spaces[message.space])
-  )
-    return Promise.reject('unknown space');
+  let network = '1';
+  if (!['settings', 'alias', 'profile'].includes(type)) {
+    if (!message.space) return Promise.reject('unknown space');
+    const space = await getSpace(message.space);
+    if (!space) return Promise.reject('unknown space');
+    network = space.network;
+  }
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
@@ -62,7 +65,8 @@ export default async function ingestor(body) {
   const isValid = await snapshot.utils.verify(
     body.address,
     body.sig,
-    body.data
+    body.data,
+    network
   );
   const id = snapshot.utils.getHash(body.data);
   if (!isValid) return Promise.reject('wrong signature');
@@ -82,10 +86,7 @@ export default async function ingestor(body) {
       end: message.end,
       snapshot: message.snapshot,
       metadata: {
-        plugins: JSON.parse(message.plugins),
-        network: message.network,
-        strategies: JSON.parse(message.strategies),
-        ...JSON.parse(message.metadata)
+        plugins: JSON.parse(message.plugins)
       },
       type: message.type
     };
@@ -94,11 +95,13 @@ export default async function ingestor(body) {
 
   if (['vote', 'vote-array', 'vote-string'].includes(type)) {
     let choice = message.choice;
-    if (type === 'vote-string') choice = JSON.parse(message.choice);
+    if (type === 'vote-string') {
+      const proposal = await getProposal(message.space, message.proposal);
+      if (proposal.privacy !== 'shutter') choice = JSON.parse(message.choice);
+    }
     payload = {
       proposal: message.proposal,
-      choice,
-      metadata: JSON.parse(message.metadata)
+      choice
     };
     type = 'vote';
   }
@@ -114,6 +117,7 @@ export default async function ingestor(body) {
     }),
     sig: body.sig
   };
+  const msg = jsonParse(legacyBody.msg);
 
   if (
     [
@@ -146,6 +150,17 @@ export default async function ingestor(body) {
 
   try {
     await writer[type].action(legacyBody, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }

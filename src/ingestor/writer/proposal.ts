@@ -2,8 +2,9 @@ import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
-import { spaces } from '../../helpers/spaces';
 import db from '../../helpers/mysql';
+import { getSpace } from '../../helpers/actions';
+import { sendToWebhook } from '../../helpers/webhook';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;
@@ -20,6 +21,7 @@ async function getRecentProposalsCount(space) {
 
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
+  const created = parseInt(msg.timestamp);
 
   const schemaIsValid = snapshot.utils.validateSchema(
     snapshot.schemas.proposal,
@@ -37,13 +39,13 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong choices for basic type voting');
   }
 
-  const space = spaces[msg.space];
+  const space = await getSpace(msg.space);
   space.id = msg.space;
 
-  if (space.voting?.delay) {
-    const isValidDelay =
-      msg.payload.start === parseInt(msg.timestamp) + space.voting.delay;
+  // if (msg.payload.start < created) return Promise.reject('invalid start date');
 
+  if (space.voting?.delay) {
+    const isValidDelay = msg.payload.start === created + space.voting.delay;
     if (!isValidDelay) return Promise.reject('invalid voting delay');
   }
 
@@ -92,28 +94,14 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
 
-  await db.queryAsync('INSERT IGNORE INTO messages SET ?', [
-    {
-      id,
-      ipfs,
-      address: body.address,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      space,
-      type: 'proposal',
-      sig: body.sig,
-      receipt
-    }
-  ]);
-
   /* Store the proposal in dedicated table 'proposals' */
-  const spaceSettings = spaces[space];
+  const spaceSettings = await getSpace(space);
   const author = getAddress(body.address);
   const created = parseInt(msg.timestamp);
   const metadata = msg.payload.metadata || {};
   const strategies = JSON.stringify(spaceSettings.strategies);
   const plugins = JSON.stringify(metadata.plugins || {});
-  const network = metadata.network || spaceSettings.network;
+  const network = spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
 
   const proposal = {
@@ -134,6 +122,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     start: parseInt(msg.payload.start || '0'),
     end: parseInt(msg.payload.end || '0'),
     quorum: spaceSettings?.voting?.quorum || 0,
+    privacy: spaceSettings?.voting?.privacy || '',
     snapshot: proposalSnapshot || 0,
     scores: JSON.stringify([]),
     scores_by_strategy: JSON.stringify([]),
@@ -142,39 +131,16 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     scores_updated: 0,
     votes: 0
   };
-  let query = 'INSERT IGNORE INTO proposals SET ?; ';
+  const query = 'INSERT IGNORE INTO proposals SET ?; ';
   const params: any[] = [proposal];
-
-  /* Store events in database */
-  const event = {
-    id: `proposal/${id}`,
-    space
-  };
-  const ts = Date.now() / 1e3;
-
-  query += 'INSERT IGNORE INTO events SET ?; ';
-  params.push({
-    event: 'proposal/created',
-    expire: proposal.created,
-    ...event
-  });
-
-  query += 'INSERT IGNORE INTO events SET ?; ';
-  params.push({
-    event: 'proposal/start',
-    expire: proposal.start,
-    ...event
-  });
-
-  if (proposal.end > ts) {
-    query += 'INSERT IGNORE INTO events SET ?; ';
-    params.push({
-      event: 'proposal/end',
-      expire: proposal.end,
-      ...event
-    });
-  }
 
   await db.queryAsync(query, params);
   console.log('Store proposal complete', space, id);
+
+  const event = {
+    event: 'proposal/created',
+    id: `proposal/${id}`,
+    space
+  };
+  sendToWebhook(event);
 }

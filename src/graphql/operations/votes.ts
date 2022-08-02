@@ -37,7 +37,7 @@ async function query(parent, args, context?, info?) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > LIMIT && !context?.internal) first = LIMIT;
+  if (first > LIMIT) first = LIMIT;
   params.push(skip, first);
 
   let votes: any[] = [];
@@ -45,7 +45,7 @@ async function query(parent, args, context?, info?) {
   const query = `
     SELECT v.* FROM votes v
     WHERE 1 = 1 ${queryStr}
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    ORDER BY ${orderBy} ${orderDirection}, v.id ASC LIMIT ?, ?
   `;
   try {
     votes = await db.queryAsync(query, params);

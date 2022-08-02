@@ -2,10 +2,11 @@ import { hashMessage } from '@ethersproject/hash';
 import { pin } from '@snapshot-labs/pineapple';
 import { verifySignature } from './utils';
 import { jsonParse } from '../../helpers/utils';
-import { spaces } from '../../helpers/spaces';
 import writer from '../writer';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
+import { getSpace } from '../../helpers/actions';
+import { storeMsg } from '../highlight';
 
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
@@ -30,8 +31,12 @@ export default async function ingestor(body) {
   if (JSON.stringify(body).length > 1e5)
     return Promise.reject('too large message');
 
-  if (!spaces[msg.space] && msg.type !== 'settings')
-    return Promise.reject('unknown space');
+  let network = '1';
+  if (msg.type !== 'settings') {
+    const space = await getSpace(msg.space);
+    if (!space) return Promise.reject('unknown space');
+    network = space.network;
+  }
 
   if (
     !msg.timestamp ||
@@ -48,8 +53,19 @@ export default async function ingestor(body) {
   if (!msg.type || !Object.keys(writer).includes(msg.type))
     return Promise.reject('wrong message type');
 
-  if (!(await verifySignature(body.address, body.sig, hashMessage(body.msg))))
-    return Promise.reject('wrong signature');
+  try {
+    if (
+      !(await verifySignature(
+        body.address,
+        body.sig,
+        hashMessage(body.msg),
+        network
+      ))
+    )
+      return Promise.reject('wrong signature');
+  } catch (e) {
+    return Promise.reject('signature verification failed');
+  }
 
   try {
     await writer[msg.type].verify(body);
@@ -77,6 +93,17 @@ export default async function ingestor(body) {
 
   try {
     await writer[msg.type].action(body, ipfs, receipt, id);
+    await storeMsg(
+      id,
+      ipfs,
+      body.address,
+      msg.version,
+      msg.timestamp,
+      msg.space || '',
+      msg.type,
+      body.sig,
+      receipt
+    );
   } catch (e) {
     return Promise.reject(e);
   }

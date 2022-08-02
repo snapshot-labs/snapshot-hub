@@ -78,6 +78,12 @@ type Query {
   strategies: [StrategyItem]
 
   strategy(id: String): StrategyItem
+
+  vp(
+    voter: String!
+    space: String,
+    proposal: String
+  ): Vp
 }
 
 input SpaceWhere {
@@ -96,6 +102,7 @@ input ProposalWhere {
   author_in: [String]
   network: String
   network_in: [String]
+  title_contains: String
   type: String
   type_in: [String]
   created: Int
@@ -243,8 +250,11 @@ type Space {
   voting: SpaceVoting
   categories: [String]
   validation: Strategy
+  treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
+  parent: Space
+  children: [Space]
 }
 
 type SpaceFilters {
@@ -259,6 +269,7 @@ type SpaceVoting {
   quorum: Float
   blind: Boolean
   hideAbstain: Boolean
+  privacy: String
 }
 
 type Proposal {
@@ -279,6 +290,7 @@ type Proposal {
   start: Int!
   end: Int!
   quorum: Float!
+  privacy: String
   snapshot: String
   state: String
   link: String
@@ -356,4 +368,16 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
+}
+
+type Treasury {
+  name: String
+  address: String
+  network: String
+}
+
+type Vp {
+  vp: Float
+  vp_by_strategy: [Float]
+  vp_state: String
 }
