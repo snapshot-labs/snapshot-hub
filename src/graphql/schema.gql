@@ -81,7 +81,7 @@ type Query {
 
   vp(
     voter: String!
-    space: String,
+    space: String!
     proposal: String
   ): Vp
 }
