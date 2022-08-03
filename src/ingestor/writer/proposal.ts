@@ -23,10 +23,7 @@ export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
   const created = parseInt(msg.timestamp);
 
-  const schemaIsValid = snapshot.utils.validateSchema(
-    snapshot.schemas.proposal,
-    msg.payload
-  );
+  const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.proposal, msg.payload);
   if (schemaIsValid !== true) {
     console.log('[writer] Wrong proposal format', schemaIsValid);
     return Promise.reject('wrong proposal format');
@@ -50,14 +47,12 @@ export async function verify(body): Promise<any> {
   }
 
   if (space.voting?.period) {
-    const isValidPeriod =
-      msg.payload.end - msg.payload.start === space.voting.period;
+    const isValidPeriod = msg.payload.end - msg.payload.start === space.voting.period;
     if (!isValidPeriod) return Promise.reject('invalid voting period');
   }
 
   if (space.voting?.type) {
-    if (msg.payload.type !== space.voting.type)
-      return Promise.reject('invalid voting type');
+    if (msg.payload.type !== space.voting.type) return Promise.reject('invalid voting type');
   }
 
   try {
@@ -75,9 +70,8 @@ export async function verify(body): Promise<any> {
   }
 
   try {
-    const [
-      { count_1d: proposalsDayCount, count_30d: proposalsMonthCount }
-    ] = await getRecentProposalsCount(space.id);
+    const [{ count_1d: proposalsDayCount, count_30d: proposalsMonthCount }] =
+      await getRecentProposalsCount(space.id);
 
     if (proposalsDayCount >= proposalDayLimit) {
       return Promise.reject('daily proposal limit reached');

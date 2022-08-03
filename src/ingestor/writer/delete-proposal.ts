@@ -8,11 +8,8 @@ export async function verify(body): Promise<any> {
   const proposal = await getProposal(msg.space, msg.payload.proposal);
 
   const space = await getSpace(msg.space);
-  const admins = (space?.admins || []).map(admin => admin.toLowerCase());
-  if (
-    !admins.includes(body.address.toLowerCase()) &&
-    proposal.author !== body.address
-  )
+  const admins = (space?.admins || []).map((admin) => admin.toLowerCase());
+  if (!admins.includes(body.address.toLowerCase()) && proposal.author !== body.address)
     return Promise.reject('wrong signer');
 }
 

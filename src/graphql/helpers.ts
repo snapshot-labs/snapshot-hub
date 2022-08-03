@@ -31,7 +31,7 @@ export function formatSpace(id, settings) {
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
-  space.strategies = space.strategies?.map(strategy => ({
+  space.strategies = space.strategies?.map((strategy) => ({
     ...strategy,
     // By default return space network if strategy network is not defined
     network: strategy.network || space.network
@@ -41,7 +41,7 @@ export function formatSpace(id, settings) {
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
   space.parent = space.parent ? { id: space.parent } : null;
-  space.children = space.children?.map(child => ({ id: child })) || [];
+  space.children = space.children?.map((child) => ({ id: child })) || [];
 
   return space;
 }
@@ -95,8 +95,7 @@ export async function fetchSpaces(args) {
 
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created_at', 'updated_at', 'id'].includes(orderBy))
-    orderBy = 'created_at';
+  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
@@ -113,9 +112,7 @@ export async function fetchSpaces(args) {
   `;
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space =>
-    Object.assign(space, formatSpace(space.id, space.settings))
-  );
+  return spaces.map((space) => Object.assign(space, formatSpace(space.id, space.settings)));
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
@@ -124,9 +121,9 @@ function checkRelatedSpacesNesting(requestedFields): void {
   // other than that, deeper nesting is not supported
   if (
     (requestedFields.parent?.children &&
-      Object.keys(requestedFields.parent.children).some(key => key !== 'id')) ||
+      Object.keys(requestedFields.parent.children).some((key) => key !== 'id')) ||
     (requestedFields.children?.parent &&
-      Object.keys(requestedFields.children.parent).some(key => key !== 'id'))
+      Object.keys(requestedFields.children.parent).some((key) => key !== 'id'))
   ) {
     throw new PublicError(
       "Unsupported nesting. Only the id field can be queried for children's parents or parent's children."
@@ -144,14 +141,8 @@ function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   if (
-    !(
-      requestedFields.parent &&
-      Object.keys(requestedFields.parent).some(key => key !== 'id')
-    ) &&
-    !(
-      requestedFields.children &&
-      Object.keys(requestedFields.children).some(key => key !== 'id')
-    )
+    !(requestedFields.parent && Object.keys(requestedFields.parent).some((key) => key !== 'id')) &&
+    !(requestedFields.children && Object.keys(requestedFields.children).some((key) => key !== 'id'))
   ) {
     return false;
   }
@@ -162,15 +153,14 @@ function needsRelatedSpacesData(requestedFields): boolean {
 function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
   if (!relatedSpaces.length) return spaces;
 
-  return spaces.map(space => {
+  return spaces.map((space) => {
     if (space.children) {
       space.children = space.children
-        .map(c => relatedSpaces.find(s => s.id === c.id) || c)
-        .filter(s => s);
+        .map((c) => relatedSpaces.find((s) => s.id === c.id) || c)
+        .filter((s) => s);
     }
     if (space.parent) {
-      space.parent =
-        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent = relatedSpaces.find((s) => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
@@ -179,7 +169,7 @@ function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
 async function fetchRelatedSpaces(spaces) {
   // collect all parent and child ids of all spaces
   const relatedSpaceIDs = spaces.reduce((ids, space) => {
-    if (space.children) ids.push(...space.children.map(c => c.id));
+    if (space.children) ids.push(...space.children.map((c) => c.id));
     if (space.parent) ids.push(space.parent.id);
     return ids;
   }, []);
@@ -222,7 +212,7 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace(proposal.space, proposal.settings);
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
-  proposal.strategies = proposal.strategies.map(strategy => ({
+  proposal.strategies = proposal.strategies.map((strategy) => ({
     ...strategy,
     // By default return proposal network if strategy network is not defined
     network: strategy.network || proposal.network

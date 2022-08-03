@@ -15,8 +15,7 @@ export default async function ingestor(body) {
   const overTs = (ts + over).toFixed();
   const underTs = (ts - under).toFixed();
 
-  if (!body || !body.address || !body.msg || !body.sig)
-    return Promise.reject('wrong message body');
+  if (!body || !body.address || !body.msg || !body.sig) return Promise.reject('wrong message body');
 
   const msg = jsonParse(body.msg);
 
@@ -28,8 +27,7 @@ export default async function ingestor(body) {
   )
     return Promise.reject('wrong signed message');
 
-  if (JSON.stringify(body).length > 1e5)
-    return Promise.reject('too large message');
+  if (JSON.stringify(body).length > 1e5) return Promise.reject('too large message');
 
   let network = '1';
   if (msg.type !== 'settings') {
@@ -47,21 +45,13 @@ export default async function ingestor(body) {
   )
     return Promise.reject('wrong timestamp');
 
-  if (!msg.version || msg.version !== pkg.version)
-    return Promise.reject('wrong version');
+  if (!msg.version || msg.version !== pkg.version) return Promise.reject('wrong version');
 
   if (!msg.type || !Object.keys(writer).includes(msg.type))
     return Promise.reject('wrong message type');
 
   try {
-    if (
-      !(await verifySignature(
-        body.address,
-        body.sig,
-        hashMessage(body.msg),
-        network
-      ))
-    )
+    if (!(await verifySignature(body.address, body.sig, hashMessage(body.msg), network)))
       return Promise.reject('wrong signature');
   } catch (e) {
     return Promise.reject('signature verification failed');

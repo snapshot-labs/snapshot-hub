@@ -1,7 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery } from '../helpers';
 
-export default async function(parent, args) {
+export default async function (parent, args) {
   const { where = {} } = args;
 
   const fields = {

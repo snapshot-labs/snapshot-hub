@@ -1,6 +1,6 @@
 import { fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 
-export default async function(_parent, args, _context, info) {
+export default async function (_parent, args, _context, info) {
   try {
     let spaces = await fetchSpaces(args);
 

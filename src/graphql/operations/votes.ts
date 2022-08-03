@@ -1,11 +1,6 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import {
-  buildWhereQuery,
-  formatProposal,
-  formatSpace,
-  formatVote
-} from '../helpers';
+import { buildWhereQuery, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 
 const LIMIT = 20000;
@@ -50,16 +45,14 @@ async function query(parent, args, context?, info?) {
   try {
     votes = await db.queryAsync(query, params);
     // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
-    votes = votes.map(vote => formatVote(vote));
+    votes = votes.map((vote) => formatVote(vote));
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');
   }
 
   if (requestedFields.space && votes.length > 0) {
-    const spaceIds = votes
-      .map(vote => vote.space.id)
-      .filter((v, i, a) => a.indexOf(v) === i);
+    const spaceIds = votes.map((vote) => vote.space.id).filter((v, i, a) => a.indexOf(v) === i);
     const query = `
       SELECT id, settings FROM spaces
       WHERE id IN (?) AND settings IS NOT NULL
@@ -68,11 +61,10 @@ async function query(parent, args, context?, info?) {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
       spaces = Object.fromEntries(
-        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+        spaces.map((space) => [space.id, formatSpace(space.id, space.settings)])
       );
-      votes = votes.map(vote => {
-        if (spaces[vote.space.id])
-          return { ...vote, space: spaces[vote.space.id] };
+      votes = votes.map((vote) => {
+        if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
         return vote;
       });
     } catch (e) {
@@ -82,7 +74,7 @@ async function query(parent, args, context?, info?) {
   }
 
   if (requestedFields.proposal && votes.length > 0) {
-    const proposalIds = votes.map(vote => vote.proposal);
+    const proposalIds = votes.map((vote) => vote.proposal);
     const query = `
       SELECT p.*, spaces.settings FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
@@ -91,9 +83,9 @@ async function query(parent, args, context?, info?) {
     try {
       let proposals = await db.queryAsync(query, [proposalIds]);
       proposals = Object.fromEntries(
-        proposals.map(proposal => [proposal.id, formatProposal(proposal)])
+        proposals.map((proposal) => [proposal.id, formatProposal(proposal)])
       );
-      votes = votes.map(vote => {
+      votes = votes.map((vote) => {
         vote.proposal = proposals[vote.proposal];
         return vote;
       });
@@ -106,7 +98,7 @@ async function query(parent, args, context?, info?) {
   return votes;
 }
 
-export default async function(parent, args, context?, info?) {
+export default async function (parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   return await serve(JSON.stringify({ args, requestedFields }), query, [
     parent,

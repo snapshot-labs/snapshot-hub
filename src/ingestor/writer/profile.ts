@@ -5,10 +5,7 @@ import { jsonParse } from '../../helpers/utils';
 
 export async function verify(body): Promise<any> {
   const profile = jsonParse(body.profile, {});
-  const schemaIsValid = snapshot.utils.validateSchema(
-    snapshot.schemas.profile,
-    profile
-  );
+  const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.profile, profile);
   if (schemaIsValid !== true) {
     console.log('[writer] Wrong profile format', schemaIsValid);
     return Promise.reject('wrong profile format');
