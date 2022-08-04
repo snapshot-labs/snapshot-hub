@@ -10,10 +10,7 @@ const networkPath = DEFAULT_NETWORK === '1' ? '' : 'testnet/';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
-  const schemaIsValid = snapshot.utils.validateSchema(
-    snapshot.schemas.space,
-    msg.payload
-  );
+  const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.space, msg.payload);
   if (schemaIsValid !== true) {
     console.log('[writer] Wrong space format', schemaIsValid);
     return Promise.reject('wrong space format');
@@ -25,16 +22,13 @@ export async function verify(body): Promise<any> {
     spaceUri ===
     `ipns://storage.snapshot.page/registry/${networkPath}${body.address}/${spaceIdUri}`;
   const space = await getSpace(msg.space);
-  const admins = (space?.admins || []).map(admin => admin.toLowerCase());
+  const admins = (space?.admins || []).map((admin) => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());
-  const newAdmins = (msg.payload.admins || []).map(admin =>
-    admin.toLowerCase()
-  );
+  const newAdmins = (msg.payload.admins || []).map((admin) => admin.toLowerCase());
 
   if (!isAdmin && !isOwner) return Promise.reject('not allowed');
 
-  if (!isOwner && !isEqual(admins, newAdmins))
-    return Promise.reject('not allowed change admins');
+  if (!isOwner && !isEqual(admins, newAdmins)) return Promise.reject('not allowed change admins');
 }
 
 export async function action(body): Promise<void> {

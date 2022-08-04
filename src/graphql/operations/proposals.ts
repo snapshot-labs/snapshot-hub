@@ -1,7 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal } from '../helpers';
 
-export default async function(parent, args) {
+export default async function (parent, args) {
   const { where = {} } = args;
 
   const fields = {
@@ -59,7 +59,7 @@ export default async function(parent, args) {
   `;
   try {
     const proposals = await db.queryAsync(query, params);
-    return proposals.map(proposal => formatProposal(proposal));
+    return proposals.map((proposal) => formatProposal(proposal));
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');

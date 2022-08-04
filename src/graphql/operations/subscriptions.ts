@@ -1,7 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatSubscription } from '../helpers';
 
-export default async function(parent, args) {
+export default async function (parent, args) {
   const { where = {} } = args;
 
   const fields = {
@@ -37,7 +37,7 @@ export default async function(parent, args) {
   `;
   try {
     subscriptions = await db.queryAsync(query, params);
-    return subscriptions.map(subscription => formatSubscription(subscription));
+    return subscriptions.map((subscription) => formatSubscription(subscription));
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');

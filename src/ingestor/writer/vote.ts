@@ -7,10 +7,7 @@ import db from '../../helpers/mysql';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
-  const schemaIsValid = snapshot.utils.validateSchema(
-    snapshot.schemas.vote,
-    msg.payload
-  );
+  const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.vote, msg.payload);
   if (schemaIsValid !== true) {
     console.log('[writer] Wrong vote format', schemaIsValid);
     return Promise.reject('wrong vote format');
@@ -30,35 +27,29 @@ export async function verify(body): Promise<any> {
     return Promise.reject('not in voting window');
 
   if (proposal.privacy === 'shutter') {
-    if (typeof msg.payload.choice !== 'string')
-      return Promise.reject('invalid choice');
+    if (typeof msg.payload.choice !== 'string') return Promise.reject('invalid choice');
   } else {
     if (
-      (!proposal.type ||
-        proposal.type === 'single-choice' ||
-        proposal.type === 'basic') &&
+      (!proposal.type || proposal.type === 'single-choice' || proposal.type === 'basic') &&
       (typeof msg.payload.choice !== 'number' || msg.payload.choice < 1)
     )
       return Promise.reject('invalid choice');
 
     if (
       ['approval', 'ranked-choice'].includes(proposal.type) &&
-      (!Array.isArray(msg.payload.choice) ||
-        Math.min(...msg.payload.choice) < 1)
+      (!Array.isArray(msg.payload.choice) || Math.min(...msg.payload.choice) < 1)
     )
       return Promise.reject('invalid choice');
 
     if (['weighted', 'quadratic'].includes(proposal.type)) {
       if (
         typeof msg.payload.choice !== 'object' ||
-        Math.min(
-          ...Object.keys(msg.payload.choice).map(choice => Number(choice))
-        ) < 1
+        Math.min(...Object.keys(msg.payload.choice).map((choice) => Number(choice))) < 1
       )
         return Promise.reject('invalid choice');
 
       let choiceIsValid = true;
-      Object.values(msg.payload.choice).forEach(value => {
+      Object.values(msg.payload.choice).forEach((value) => {
         if (typeof value !== 'number' || value < 0) choiceIsValid = false;
       });
       if (!choiceIsValid) return Promise.reject('invalid choice');
@@ -121,8 +112,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
       return Promise.reject('already voted at later time');
     } else if (votes[0].created === parseInt(msg.timestamp)) {
       const localCompare = id.localeCompare(votes[0].id);
-      if (localCompare <= 0)
-        return Promise.reject('already voted same time with lower index');
+      if (localCompare <= 0) return Promise.reject('already voted same time with lower index');
     }
     // Update previous vote
     console.log('Update previous vote', voter, msg.payload.proposal);
@@ -132,16 +122,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
       SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?
       WHERE voter = ? AND proposal = ? AND space = ?
     `,
-      [
-        id,
-        ipfs,
-        created,
-        choice,
-        metadata,
-        voter,
-        msg.payload.proposal,
-        msg.space
-      ]
+      [id, ipfs, created, choice, metadata, voter, msg.payload.proposal, msg.space]
     );
   } else {
     // Store vote in dedicated table

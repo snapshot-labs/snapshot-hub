@@ -26,18 +26,15 @@ export default async function ingestor(body) {
   const underTs = (ts - under).toFixed();
   const { domain, message, types } = body.data;
 
-  if (JSON.stringify(body).length > 1e5)
-    return Promise.reject('too large message');
+  if (JSON.stringify(body).length > 1e5) return Promise.reject('too large message');
 
   if (message.timestamp > overTs || message.timestamp < underTs)
     return Promise.reject('wrong timestamp');
 
-  if (domain.name !== NAME || domain.version !== VERSION)
-    return Promise.reject('wrong domain');
+  if (domain.name !== NAME || domain.version !== VERSION) return Promise.reject('wrong domain');
 
   const hash = sha256(JSON.stringify(types));
-  if (!Object.keys(hashTypes).includes(hash))
-    return Promise.reject('wrong types');
+  if (!Object.keys(hashTypes).includes(hash)) return Promise.reject('wrong types');
   let type = hashTypes[hash];
 
   let network = '1';
@@ -50,24 +47,14 @@ export default async function ingestor(body) {
 
   // Check if signing address is an alias
   if (body.address !== message.from) {
-    if (
-      !['follow', 'unfollow', 'subscribe', 'unsubscribe', 'profile'].includes(
-        type
-      )
-    )
+    if (!['follow', 'unfollow', 'subscribe', 'unsubscribe', 'profile'].includes(type))
       return Promise.reject('wrong from');
 
-    if (!(await isValidAlias(message.from, body.address)))
-      return Promise.reject('wrong alias');
+    if (!(await isValidAlias(message.from, body.address))) return Promise.reject('wrong alias');
   }
 
   // Check if signature is valid
-  const isValid = await snapshot.utils.verify(
-    body.address,
-    body.sig,
-    body.data,
-    network
-  );
+  const isValid = await snapshot.utils.verify(body.address, body.sig, body.data, network);
   const id = snapshot.utils.getHash(body.data);
   if (!isValid) return Promise.reject('wrong signature');
   console.log('[ingestor] Signature is valid');
@@ -119,16 +106,7 @@ export default async function ingestor(body) {
   };
   const msg = jsonParse(legacyBody.msg);
 
-  if (
-    [
-      'follow',
-      'unfollow',
-      'alias',
-      'subscribe',
-      'unsubscribe',
-      'profile'
-    ].includes(type)
-  ) {
+  if (['follow', 'unfollow', 'alias', 'subscribe', 'unsubscribe', 'profile'].includes(type)) {
     legacyBody = message;
   }
 

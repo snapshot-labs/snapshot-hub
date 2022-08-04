@@ -5,20 +5,12 @@ import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
 const gateway = gateways[0];
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
 
-export async function uriGet(
-  gateway: string,
-  key: string,
-  protocolType = 'ipfs'
-) {
-  key = key.replace(
-    'storage.snapshot.page',
-    'storageapi.fleek.co/snapshot-team-bucket'
-  );
+export async function uriGet(gateway: string, key: string, protocolType = 'ipfs') {
+  key = key.replace('storage.snapshot.page', 'storageapi.fleek.co/snapshot-team-bucket');
   if (key.includes('storageapi.fleek.co')) protocolType = 'https';
   let url = `https://${gateway}/${protocolType}/${key}`;
-  if (['https', 'http'].includes(protocolType))
-    url = `${protocolType}://${key}`;
-  return fetch(url).then(res => res.json());
+  if (['https', 'http'].includes(protocolType)) url = `${protocolType}://${key}`;
+  return fetch(url).then((res) => res.json());
 }
 
 export async function getSpaceENS(id) {

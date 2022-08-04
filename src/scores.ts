@@ -21,7 +21,7 @@ async function getProposal(id) {
 async function getVotes(proposalId) {
   const query = 'SELECT id, choice, voter FROM votes WHERE proposal = ?';
   const votes = await db.queryAsync(query, [proposalId]);
-  return votes.map(vote => {
+  return votes.map((vote) => {
     vote.choice = JSON.parse(vote.choice);
     return vote;
   });
@@ -77,7 +77,7 @@ export async function getProposalScores(proposalId, force = false) {
 
     // Get votes
     let votes: any = await getVotes(proposalId);
-    const voters = votes.map(vote => vote.voter);
+    const voters = votes.map((vote) => vote.voter);
 
     // Get scores
     const { scores, state } = await getScores(
@@ -90,9 +90,7 @@ export async function getProposalScores(proposalId, force = false) {
 
     // Add vp to votes
     votes = votes.map((vote: any) => {
-      vote.scores = proposal.strategies.map(
-        (strategy, i) => scores[i][vote.voter] || 0
-      );
+      vote.scores = proposal.strategies.map((strategy, i) => scores[i][vote.voter] || 0);
       vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
       return vote;
     });
@@ -163,12 +161,7 @@ export async function getProposalScores(proposalId, force = false) {
       votes.length,
       proposalId
     ]);
-    console.log(
-      '[scores] Proposal updated',
-      proposal.id,
-      proposal.space,
-      results.scores_state
-    );
+    console.log('[scores] Proposal updated', proposal.id, proposal.space, results.scores_state);
 
     return results;
   } catch (e) {
@@ -180,12 +173,7 @@ export async function getProposalScores(proposalId, force = false) {
       WHERE id = ? LIMIT 1;
     `;
     await db.queryAsync(query, ['invalid', ts, proposalId]);
-    console.log(
-      '[scores] Proposal invalid',
-      proposal.space,
-      proposal.id,
-      proposal.scores_state
-    );
+    console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
 
     return { scores_state: 'invalid' };
   }

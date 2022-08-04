@@ -1,5 +1,5 @@
 import { strategies } from '../../helpers/strategies';
 
-export default function() {
+export default function () {
   return strategies;
 }

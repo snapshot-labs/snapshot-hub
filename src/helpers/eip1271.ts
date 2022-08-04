@@ -4,17 +4,13 @@ import { arrayify } from '@ethersproject/bytes';
 
 export const spec = {
   magicValue: '0x1626ba7e',
-  abi: [
-    'function isValidSignature(bytes32 _hash, bytes _sig) view returns (bytes4 magicValue)'
-  ]
+  abi: ['function isValidSignature(bytes32 _hash, bytes _sig) view returns (bytes4 magicValue)']
 };
 
 // support for older eip1271 implementations
 const specOldVersion = {
   magicValue: '0x20c13b0b',
-  abi: [
-    'function isValidSignature(bytes _hash, bytes _sig) view returns (bytes4 magicValue)'
-  ]
+  abi: ['function isValidSignature(bytes _hash, bytes _sig) view returns (bytes4 magicValue)']
 };
 
 export async function isValidSignature(
@@ -28,10 +24,7 @@ export async function isValidSignature(
   let returnValue;
 
   try {
-    returnValue = await new Contract(address, abi, provider).isValidSignature(
-      arrayify(data),
-      sig
-    );
+    returnValue = await new Contract(address, abi, provider).isValidSignature(arrayify(data), sig);
   } catch (e) {
     // If failed is latest then it might be older implementation
     if (magicValue === spec.magicValue) {
