@@ -294,6 +294,7 @@ type Proposal {
   snapshot: String
   state: String
   link: String
+  app: String
   scores: [Float]
   scores_by_strategy: Any
   scores_state: String
@@ -317,6 +318,7 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+  app: String
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
