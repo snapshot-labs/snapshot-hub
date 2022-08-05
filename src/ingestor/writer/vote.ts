@@ -94,6 +94,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     proposal: msg.payload.proposal,
     choice,
     metadata,
+    app: msg.payload.app || '',
     vp: 0,
     vp_by_strategy: JSON.stringify([]),
     vp_state: '',

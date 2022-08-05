@@ -118,6 +118,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     quorum: spaceSettings?.voting?.quorum || 0,
     privacy: spaceSettings?.voting?.privacy || '',
     snapshot: proposalSnapshot || 0,
+    app: msg.payload.app || '',
     scores: JSON.stringify([]),
     scores_by_strategy: JSON.stringify([]),
     scores_state: '',

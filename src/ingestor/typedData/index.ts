@@ -75,7 +75,8 @@ export default async function ingestor(body) {
       metadata: {
         plugins: JSON.parse(message.plugins)
       },
-      type: message.type
+      type: message.type,
+      app: message.app || ''
     };
 
   if (type === 'delete-proposal') payload = { proposal: message.proposal };
@@ -88,7 +89,8 @@ export default async function ingestor(body) {
     }
     payload = {
       proposal: message.proposal,
-      choice
+      choice,
+      app: message.app || ''
     };
     type = 'vote';
   }

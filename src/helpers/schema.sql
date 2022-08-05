@@ -53,6 +53,7 @@ CREATE TABLE proposals (
   quorum DECIMAL(64,30) NOT NULL,
   privacy VARCHAR(24) NOT NULL,
   snapshot INT(24) NOT NULL,
+  app VARCHAR(24) NOT NULL,
   scores JSON NOT NULL,
   scores_by_strategy JSON NOT NULL,
   scores_state VARCHAR(24) NOT NULL,
@@ -68,6 +69,7 @@ CREATE TABLE proposals (
   INDEX start (start),
   INDEX end (end),
   INDEX delegation (delegation),
+  INDEX app (app),
   INDEX scores_state (scores_state),
   INDEX scores_updated (scores_updated),
   INDEX votes (votes)
@@ -82,6 +84,7 @@ CREATE TABLE votes (
   proposal VARCHAR(66) NOT NULL,
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
+  app VARCHAR(24) NOT NULL,
   vp DECIMAL(64,30) NOT NULL,
   vp_by_strategy JSON NOT NULL,
   vp_state VARCHAR(24) NOT NULL,
@@ -93,6 +96,7 @@ CREATE TABLE votes (
   INDEX created (created),
   INDEX space (space),
   INDEX proposal (proposal),
+  INDEX app (app),
   INDEX vp (vp),
   INDEX vp_state (vp_state),
   INDEX cb (cb)
