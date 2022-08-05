@@ -31,10 +31,10 @@
     "graphql-fields": "^2.0.3",
     "graphql-query-count-limit": "^1.0.0",
     "graphql-tools": "^7.0.5",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "mysql": "^2.18.1",
-    "ts-node": "^10.8.2",
-    "typescript": "~3.9.3"
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
   },
   "devDependencies": {
     "@snapshot-labs/eslint-config": "^0.1.0-beta.4",
