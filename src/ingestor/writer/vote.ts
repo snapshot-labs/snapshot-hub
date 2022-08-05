@@ -85,6 +85,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const created = parseInt(msg.timestamp);
   const choice = JSON.stringify(msg.payload.choice);
   const metadata = JSON.stringify(msg.payload.metadata || {});
+  const app = msg.payload.app || '';
   const params = {
     id,
     ipfs,
@@ -94,7 +95,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     proposal: msg.payload.proposal,
     choice,
     metadata,
-    app: msg.payload.app || '',
+    app,
     vp: 0,
     vp_by_strategy: JSON.stringify([]),
     vp_state: '',
@@ -120,10 +121,10 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     await db.queryAsync(
       `
       UPDATE votes
-      SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?
+      SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?, app = ?
       WHERE voter = ? AND proposal = ? AND space = ?
     `,
-      [id, ipfs, created, choice, metadata, voter, msg.payload.proposal, msg.space]
+      [id, ipfs, created, choice, metadata, app, voter, msg.payload.proposal, msg.space]
     );
   } else {
     // Store vote in dedicated table
