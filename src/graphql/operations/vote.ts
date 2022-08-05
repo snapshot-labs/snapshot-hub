@@ -12,7 +12,7 @@ export default async function (parent, { id }, context, info) {
   `;
   try {
     const votes = await db.queryAsync(query, [id]);
-    const result = votes.map((vote) => formatVote(vote))[0] || null;
+    const result = votes.map(vote => formatVote(vote))[0] || null;
     if (requestedFields.proposal && result?.proposal) {
       const proposalId = result.proposal;
       const query = `

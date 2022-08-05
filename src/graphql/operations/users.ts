@@ -34,7 +34,7 @@ export default async function (parent, args) {
   `;
   try {
     users = await db.queryAsync(query, params);
-    return users.map((user) => formatUser(user));
+    return users.map(user => formatUser(user));
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');

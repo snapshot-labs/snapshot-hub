@@ -59,7 +59,7 @@ export default async function (parent, args) {
   `;
   try {
     const proposals = await db.queryAsync(query, params);
-    return proposals.map((proposal) => formatProposal(proposal));
+    return proposals.map(proposal => formatProposal(proposal));
   } catch (e) {
     console.log('[graphql]', e);
     return Promise.reject('request failed');

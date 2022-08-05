@@ -23,5 +23,5 @@ export function sha256(str) {
 
 export async function getJSON(uri) {
   const url = snapshot.utils.getUrl(uri);
-  return fetch(url).then((res) => res.json());
+  return fetch(url).then(res => res.json());
 }

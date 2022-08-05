@@ -7,6 +7,7 @@ import parse from 'connection-string';
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
 console.log('Connection limit', connectionLimit);
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const config = parse(process.env.DATABASE_URL);
 config.connectionLimit = connectionLimit;

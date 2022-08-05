@@ -10,7 +10,7 @@ export async function uriGet(gateway: string, key: string, protocolType = 'ipfs'
   if (key.includes('storageapi.fleek.co')) protocolType = 'https';
   let url = `https://${gateway}/${protocolType}/${key}`;
   if (['https', 'http'].includes(protocolType)) url = `${protocolType}://${key}`;
-  return fetch(url).then((res) => res.json());
+  return fetch(url).then(res => res.json());
 }
 
 export async function getSpaceENS(id) {

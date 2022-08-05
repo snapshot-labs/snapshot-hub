@@ -44,12 +44,12 @@ export async function verify(body): Promise<any> {
     if (['weighted', 'quadratic'].includes(proposal.type)) {
       if (
         typeof msg.payload.choice !== 'object' ||
-        Math.min(...Object.keys(msg.payload.choice).map((choice) => Number(choice))) < 1
+        Math.min(...Object.keys(msg.payload.choice).map(choice => Number(choice))) < 1
       )
         return Promise.reject('invalid choice');
 
       let choiceIsValid = true;
-      Object.values(msg.payload.choice).forEach((value) => {
+      Object.values(msg.payload.choice).forEach(value => {
         if (typeof value !== 'number' || value < 0) choiceIsValid = false;
       });
       if (!choiceIsValid) return Promise.reject('invalid choice');

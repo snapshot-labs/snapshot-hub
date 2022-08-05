@@ -21,7 +21,7 @@ async function getProposal(id) {
 async function getVotes(proposalId) {
   const query = 'SELECT id, choice, voter FROM votes WHERE proposal = ?';
   const votes = await db.queryAsync(query, [proposalId]);
-  return votes.map((vote) => {
+  return votes.map(vote => {
     vote.choice = JSON.parse(vote.choice);
     return vote;
   });
@@ -77,7 +77,7 @@ export async function getProposalScores(proposalId, force = false) {
 
     // Get votes
     let votes: any = await getVotes(proposalId);
-    const voters = votes.map((vote) => vote.voter);
+    const voters = votes.map(vote => vote.voter);
 
     // Get scores
     const { scores, state } = await getScores(
