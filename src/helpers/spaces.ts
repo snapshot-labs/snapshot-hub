@@ -12,7 +12,7 @@ async function loadSpaces() {
   console.log('[spaces] Load spaces from db');
   const query = 'SELECT id, settings FROM spaces ORDER BY id ASC';
   const s = await db.queryAsync(query);
-  spaces = Object.fromEntries(s.map((ensSpace) => [ensSpace.id, JSON.parse(ensSpace.settings)]));
+  spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
   const totalSpaces = Object.keys(spaces).length;
   console.log('[spaces] Total spaces', totalSpaces);
 }
@@ -53,13 +53,13 @@ async function loadSpacesMetrics() {
   console.log('[spaces] Load spaces metrics');
 
   const metrics = await Promise.all([getProposals(), getVotes(), getFollowers()]);
-  metrics[0].forEach((proposals) => {
+  metrics[0].forEach(proposals => {
     if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
   });
-  metrics[1].forEach((votes) => {
+  metrics[1].forEach(votes => {
     if (spaces[votes.space]) spaceVotes[votes.space] = votes;
   });
-  metrics[2].forEach((followers) => {
+  metrics[2].forEach(followers => {
     if (spaces[followers.space]) spaceFollowers[followers.space] = followers;
   });
 
@@ -69,7 +69,7 @@ async function loadSpacesMetrics() {
       private: space.private || undefined,
       terms: space.terms || undefined,
       network: space.network || undefined,
-      networks: uniq(space.strategies.map((strategy) => strategy.network || space.network)),
+      networks: uniq(space.strategies.map(strategy => strategy.network || space.network)),
       categories: space.categories || undefined,
       activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined,
       proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,

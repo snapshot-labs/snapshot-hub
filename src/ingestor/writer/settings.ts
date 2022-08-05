@@ -22,9 +22,9 @@ export async function verify(body): Promise<any> {
     spaceUri ===
     `ipns://storage.snapshot.page/registry/${networkPath}${body.address}/${spaceIdUri}`;
   const space = await getSpace(msg.space);
-  const admins = (space?.admins || []).map((admin) => admin.toLowerCase());
+  const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());
-  const newAdmins = (msg.payload.admins || []).map((admin) => admin.toLowerCase());
+  const newAdmins = (msg.payload.admins || []).map(admin => admin.toLowerCase());
 
   if (!isAdmin && !isOwner) return Promise.reject('not allowed');
 
