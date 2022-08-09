@@ -1,5 +1,5 @@
 # Node version matching the version declared in the package.json 
-FROM node:14.0-slim
+FROM node:16-slim
 
 # Update O.S.
 RUN apt-get update && apt-get upgrade -y 
