@@ -14,6 +14,7 @@ export async function verify(body): Promise<any> {
   }
 
   const proposal = await getProposal(msg.space, msg.payload.proposal);
+  proposal.choices = jsonParse(proposal.choices);
   if (!proposal) return Promise.reject('unknown proposal');
 
   const tsInt = (Date.now() / 1e3).toFixed();
