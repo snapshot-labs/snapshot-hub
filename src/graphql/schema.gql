@@ -84,11 +84,44 @@ type Query {
     space: String!
     proposal: String
   ): Vp
+
+  messages(
+    first: Int
+    skip: Int
+    where: MessageWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Message]
 }
 
 input SpaceWhere {
   id: String
   id_in: [String]
+}
+
+input MessageWhere {
+  timestamp: Int
+  timestamp_in: [Int]
+  timestamp_gt: Int
+  timestamp_gte: Int
+  timestamp_lt: Int
+  timestamp_lte: Int
+  space: String
+  space_in: [String]
+  type: String
+  type_in: [String]
+}
+
+type Message {
+  id: String
+  ipfs: String
+  address: String
+  version: String
+  timestamp: Int
+  space: String
+  type: String
+  sig: String
+  receipt: String
 }
 
 input ProposalWhere {
