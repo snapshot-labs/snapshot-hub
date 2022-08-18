@@ -1,4 +1,5 @@
 CREATE TABLE messages (
+  mci INT NOT NULL AUTO_INCREMENT,
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   address VARCHAR(64) NOT NULL,
@@ -9,6 +10,7 @@ CREATE TABLE messages (
   sig VARCHAR(256) NOT NULL,
   receipt VARCHAR(256) NOT NULL,
   PRIMARY KEY (id),
+  INDEX mci (mci),
   INDEX ipfs (ipfs),
   INDEX address (address),
   INDEX version (version),

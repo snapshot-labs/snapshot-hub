@@ -5,8 +5,10 @@ import { sendError } from '../helpers/utils';
 
 const router = express.Router();
 
+const maintenanceMsg = 'update in progress, try later';
+
 router.post('/message', async (req, res) => {
-  if (process.env.MAINTENANCE) return Promise.reject('update in progress, try later');
+  if (process.env.MAINTENANCE) return sendError(res, maintenanceMsg);
   try {
     const result = await personalSign(req.body);
     return res.json(result);
@@ -17,7 +19,7 @@ router.post('/message', async (req, res) => {
 });
 
 router.post('/msg', async (req, res) => {
-  if (process.env.MAINTENANCE) return Promise.reject('update in progress, try later');
+  if (process.env.MAINTENANCE) return sendError(res, maintenanceMsg);
   try {
     const result = await typedData(req.body);
     return res.json(result);
