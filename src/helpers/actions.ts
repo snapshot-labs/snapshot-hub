@@ -26,7 +26,7 @@ export async function loadSpace(id) {
   let space = false;
   try {
     const result = await getSpaceENS(id);
-    if (snapshot.utils.validateSchema(snapshot.schemas.space, result)) space = result;
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, result) === true) space = result;
     console.log('Load space', id);
   } catch (e) {
     console.log('Load space failed', id);
