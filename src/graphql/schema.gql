@@ -100,6 +100,12 @@ input SpaceWhere {
 }
 
 input MessageWhere {
+  mci: Int
+  mci_in: [Int]
+  mci_gt: Int
+  mci_gte: Int
+  mci_lt: Int
+  mci_lte: Int
   timestamp: Int
   timestamp_in: [Int]
   timestamp_gt: Int
@@ -113,6 +119,7 @@ input MessageWhere {
 }
 
 type Message {
+  mci: Int
   id: String
   ipfs: String
   address: String

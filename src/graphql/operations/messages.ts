@@ -5,6 +5,7 @@ export default async function (parent, args) {
   const { where = {} } = args;
 
   const fields = {
+    mci: 'number',
     timestamp: 'number',
     space: 'string',
     type: 'string'
@@ -15,7 +16,7 @@ export default async function (parent, args) {
 
   let orderBy = args.orderBy || 'timestamp';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['timestamp'].includes(orderBy)) orderBy = 'timestamp';
+  if (!['mci', 'timestamp'].includes(orderBy)) orderBy = 'mci';
   orderBy = `m.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
