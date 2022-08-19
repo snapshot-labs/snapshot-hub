@@ -1,6 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import * as ethUtil from 'ethereumjs-util';
-import { isValidSignature } from '../../helpers/eip1271';
+import { isValidSignature } from './eip1271';
 
 export function recoverPublicKey(sig: string, hash: string): string {
   const params = ethUtil.fromRpcSig(sig);
