@@ -69,16 +69,16 @@ export async function verify(body): Promise<any> {
     return Promise.reject('failed to check validation');
   }
 
+  const provider = snapshot.utils.getProvider(space.network);
+  const currentBlockNum = parseInt(await provider.getBlockNumber());
+  if (msg.payload.snapshot > currentBlockNum)
+    return Promise.reject('proposal snapshot must be in past');
+
   try {
     const [{ count_1d: proposalsDayCount, count_30d: proposalsMonthCount }] =
       await getRecentProposalsCount(space.id);
-
-    if (proposalsDayCount >= proposalDayLimit) {
-      return Promise.reject('daily proposal limit reached');
-    }
-    if (proposalsMonthCount >= proposalMonthLimit) {
-      return Promise.reject('monthly proposal limit reached');
-    }
+    if (proposalsDayCount >= proposalDayLimit || proposalsMonthCount >= proposalMonthLimit)
+      return Promise.reject('proposal limit reached');
   } catch (e) {
     return Promise.reject('failed to check proposals limit');
   }
@@ -132,10 +132,9 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   await db.queryAsync(query, params);
   console.log('Store proposal complete', space, id);
 
-  const event = {
+  sendToWebhook({
     event: 'proposal/created',
     id: `proposal/${id}`,
     space
-  };
-  sendToWebhook(event);
+  });
 }
