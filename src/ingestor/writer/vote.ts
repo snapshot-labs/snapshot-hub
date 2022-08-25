@@ -64,6 +64,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const choice = JSON.stringify(msg.payload.choice);
   const metadata = JSON.stringify(msg.payload.metadata || {});
   const app = msg.payload.app || '';
+  const reason = msg.payload.reason || '';
   const params = {
     id,
     ipfs,
@@ -73,6 +74,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     proposal: msg.payload.proposal,
     choice,
     metadata,
+    reason,
     app,
     vp: 0,
     vp_by_strategy: JSON.stringify([]),

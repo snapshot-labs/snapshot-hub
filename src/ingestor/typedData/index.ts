@@ -90,6 +90,7 @@ export default async function ingestor(body) {
     payload = {
       proposal: message.proposal,
       choice,
+      reason: message.reason || '',
       app: message.app || ''
     };
     type = 'vote';
