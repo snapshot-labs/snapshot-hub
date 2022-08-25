@@ -358,6 +358,7 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+  reason: String
   app: String
   vp: Float
   vp_by_strategy: [Float]
