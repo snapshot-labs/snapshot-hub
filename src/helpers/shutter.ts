@@ -1,18 +1,28 @@
+import express from 'express';
+import { randomBytes } from 'crypto';
 import fetch from 'cross-fetch';
 import * as shutter from '@shutter-network/shutter-crypto';
 import { arrayify } from '@ethersproject/bytes';
 import { toUtf8String, formatBytes32String } from '@ethersproject/strings';
+import { rpcError, rpcSuccess } from './utils';
 
 const SHUTTER_URL = 'https://preview.snapshot.shutter.network/api/v1/rpc';
-// const SHUTTER_EON_PUBKEY = process.env.SHUTTER_EON_PUBKEY;
+const router = express.Router();
+
+router.post('/', (req, res) => {
+  const { id, params } = req.body;
+  try {
+    console.log('Shutter', params);
+    return rpcSuccess(res, true, id);
+  } catch (e) {
+    console.log(e);
+    return rpcError(res, 500, e, id);
+  }
+});
 
 export async function getDecryptionKey(proposal: string, url: string = SHUTTER_URL) {
   const isByte32 = proposal.startsWith('0x');
   const id = (isByte32 ? proposal : formatBytes32String(proposal)).slice(2);
-  const params = {
-    eon_id: 0,
-    proposal: id
-  };
   const init = {
     method: 'POST',
     headers: {
@@ -22,12 +32,13 @@ export async function getDecryptionKey(proposal: string, url: string = SHUTTER_U
     body: JSON.stringify({
       jsonrpc: '2.0',
       method: 'get_decryption_key',
-      params,
-      id: null
+      params: ['1', id],
+      id: randomBytes(6).toString('hex')
     })
   };
   const res = await fetch(url, init);
-  return (await res.json()).result;
+  const { result } = await res.json();
+  return result;
 }
 
 export async function decrypt(encryptedMsg, decryptionKey) {
@@ -39,3 +50,5 @@ export async function decrypt(encryptedMsg, decryptionKey) {
   const decryptedMsg = await shutter.decrypt(encryptedMsgArr, decryptionKeyArr);
   return toUtf8String(decryptedMsg);
 }
+
+export default router;
