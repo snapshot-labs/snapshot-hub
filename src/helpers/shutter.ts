@@ -9,7 +9,7 @@ import { rpcError, rpcSuccess } from './utils';
 const SHUTTER_URL = 'https://preview.snapshot.shutter.network/api/v1/rpc';
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.all('/', (req, res) => {
   console.log('[shutter] New request');
   const { id, params } = req.body;
   try {
