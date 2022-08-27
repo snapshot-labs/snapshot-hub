@@ -10,7 +10,7 @@ const SHUTTER_URL = 'https://preview.snapshot.shutter.network/api/v1/rpc';
 const router = express.Router();
 
 router.all('/', (req, res) => {
-  console.log('Shutter request');
+  console.log('[shutter] New request');
   const { id } = req.body;
   try {
     console.log('[shutter] Body', JSON.stringify(req.body));
