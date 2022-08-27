@@ -192,7 +192,7 @@ async function run() {
   if (proposal && proposal.id) {
     // console.log('[scores] Get proposal', proposal.space, proposal.id);
     await getProposalScores(proposal.id);
-    // await snapshot.utils.sleep(5e3);
+    await snapshot.utils.sleep(1e3);
     await run();
   }
 }
