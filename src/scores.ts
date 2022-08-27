@@ -161,7 +161,7 @@ export async function getProposalScores(proposalId, force = false) {
       votes.length,
       proposalId
     ]);
-    console.log('[scores] Proposal updated', proposal.id, proposal.space, results.scores_state);
+    // console.log('[scores] Proposal updated', proposal.id, proposal.space, results.scores_state);
 
     return results;
   } catch (e) {
