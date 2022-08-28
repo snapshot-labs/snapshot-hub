@@ -1,29 +1,40 @@
 import express from 'express';
 import { randomBytes } from 'crypto';
 import fetch from 'cross-fetch';
-import * as shutter from '@shutter-network/shutter-crypto';
+import { init, decrypt } from '@shutter-network/shutter-crypto';
 import { arrayify } from '@ethersproject/bytes';
-import { toUtf8String, formatBytes32String } from '@ethersproject/strings';
+import { toUtf8String } from '@ethersproject/strings';
 import { rpcError, rpcSuccess } from './utils';
+import { getProposalScores } from '../scores';
+import db from './mysql';
+
+init().then(() => console.log('[shutter] Init'));
 
 const SHUTTER_URL = 'https://preview.snapshot.shutter.network/api/v1/rpc';
 const router = express.Router();
 
-router.all('/', (req, res) => {
-  console.log('[shutter] New request');
-  const { id } = req.body;
+export async function shutterDecrypt(encryptedMsg: string, decryptionKey: string) {
   try {
-    console.log('[shutter] Body', JSON.stringify(req.body));
-    return rpcSuccess(res, true, id);
+    const decryptedMsg = await decrypt(arrayify(encryptedMsg), arrayify(decryptionKey));
+    const result = toUtf8String(decryptedMsg);
+    console.log('[shutter] Decrypted', result);
+    return result;
   } catch (e) {
-    console.log(e);
-    return rpcError(res, 500, e, id);
+    console.log('[shutter] Error', e);
+    return false;
   }
-});
+}
 
-export async function getDecryptionKey(proposal: string, url: string = SHUTTER_URL) {
-  const isByte32 = proposal.startsWith('0x');
-  const id = (isByte32 ? proposal : formatBytes32String(proposal)).slice(2);
+export function proposalToId(proposal: string): string | boolean {
+  if (!proposal.startsWith('0x')) return false;
+  return proposal.slice(2);
+}
+
+export function idToProposal(id: string): string {
+  return `0x${id}`;
+}
+
+export async function rpcRequest(method, params, url: string = SHUTTER_URL) {
   const init = {
     method: 'POST',
     headers: {
@@ -32,8 +43,8 @@ export async function getDecryptionKey(proposal: string, url: string = SHUTTER_U
     },
     body: JSON.stringify({
       jsonrpc: '2.0',
-      method: 'get_decryption_key',
-      params: ['1', id],
+      method,
+      params,
       id: randomBytes(6).toString('hex')
     })
   };
@@ -42,14 +53,70 @@ export async function getDecryptionKey(proposal: string, url: string = SHUTTER_U
   return result;
 }
 
-export async function decrypt(encryptedMsg, decryptionKey) {
-  await shutter.init();
-  // const decryptionKey = '0x219BA688C8505178E50E7E4FEAEFA21BDA69172E71B980A365F6F873DC9B3AAA20076B6D92CB58B24D14B70789A0B37418A0508624C83A7C8E35ED0A8DBB0E4B';
-  const decryptionKeyArr = arrayify(decryptionKey);
-  // const encryptedMsg = '0x1c894825b72a15d6a0d5333270bf82800d8acb294fc1316f2caa549263f4ceb820c42da9d6d4a89c06de78b0c8726b83f28630dffa96cbac199dfef42eb72f4a08b9eea2e8283b34aaddf6c64ba6e8480e0577f6c7ea0e235f2083bed802836f29c69d21eac847cf0330ccefba1bc75c3a954e7242e0812d4399171fd7547d4285efd11438cdc5fd9e19aa143aae1f076d3b71a1971b578226f37ea2950899f4c07a186fdfe4bee88669179317c00383c8b20a8d8a96ad581baf161dd0673ec2459b6ad5cfec7d24cf0ce4a55a88b66858503e2a37af71544222cc8482c9af65';
-  const encryptedMsgArr = arrayify(encryptedMsg);
-  const decryptedMsg = await shutter.decrypt(encryptedMsgArr, decryptionKeyArr);
-  return toUtf8String(decryptedMsg);
+export async function getDecryptionKey(proposal: string, url: string = SHUTTER_URL) {
+  const id = proposalToId(proposal);
+  const result = await rpcRequest('get_decryption_key', ['1', id], url);
+  console.log('[shutter] get_decryption_key', result);
+  return result;
 }
+
+export async function requestEonKey(url: string = SHUTTER_URL) {
+  return await rpcRequest('request_eon_key', null, url);
+}
+
+async function setEonPubkey(params) {
+  console.log('[shutter] Set EON pubkey', params);
+  return true;
+}
+
+export async function setProposalKey(params) {
+  try {
+    const [id, key] = params;
+    const proposalId = idToProposal(id);
+    let query = 'SELECT id FROM proposals WHERE id = ? AND privacy = ? LIMIT 1';
+    const [proposal] = await db.queryAsync(query, [proposalId, 'shutter']);
+    if (!proposal) return false;
+    query = 'SELECT id, choice FROM votes WHERE proposal = ?';
+    const votes = await db.queryAsync(query, [proposal.id]);
+    const sqlParams: string[] = [];
+    let sqlQuery = '';
+    for (const vote of votes) {
+      const choice = await shutterDecrypt(JSON.parse(vote.choice), `0x${key}`);
+      console.log('[shutter] Choice', choice);
+      if (choice !== false) {
+        sqlQuery += `UPDATE votes SET choice = ? WHERE id = ? LIMIT 1; `;
+        sqlParams.push(choice);
+        sqlParams.push(vote.id);
+      }
+    }
+    if (sqlQuery) await db.queryAsync(sqlQuery, sqlParams);
+    console.log('[shutter] Choices decrypted and updated');
+    await getProposalScores(proposal.id, true);
+    console.log('[shutter] Proposal scores updated');
+  } catch (e) {
+    console.log('[shutter] setProposalKey failed', e);
+    return false;
+  }
+  return true;
+}
+
+router.all('/', async (req, res) => {
+  const id = req.body.id || null;
+  try {
+    const { method, params } = req.body;
+    if (method === 'shutter_set_eon_pubkey') {
+      setEonPubkey(params);
+      return rpcSuccess(res, true, id);
+    }
+    if (method === 'shutter_set_proposal_key') {
+      setProposalKey(params);
+      return rpcSuccess(res, true, id);
+    }
+    return rpcError(res, 500, 'wrong method', id);
+  } catch (e) {
+    console.log(e);
+    return rpcError(res, 500, e, id);
+  }
+});
 
 export default router;

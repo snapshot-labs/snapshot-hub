@@ -4,9 +4,9 @@ import express from 'express';
 import api from './api';
 import ingestor from './ingestor';
 import graphql from './graphql';
+import shutter from './helpers/shutter';
 import rateLimit from './helpers/rateLimit';
 import './helpers/strategies';
-import shutter from './helpers/shutter';
 
 const app = express();
 app.use(express.json({ limit: '20mb' }));

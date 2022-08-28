@@ -1,6 +1,7 @@
 import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
+import { getDecryptionKey } from './helpers/shutter';
 
 async function getProposal(id) {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
@@ -63,7 +64,6 @@ export async function getScores(
 
 export async function getProposalScores(proposalId, force = false) {
   const proposal = await getProposal(proposalId);
-  if (!force && proposal.privacy === 'shutter') return;
 
   try {
     if (proposal.scores_state === 'final') {
@@ -73,6 +73,12 @@ export async function getProposalScores(proposalId, force = false) {
         scores_by_strategy: proposal.scores_by_strategy,
         scores_total: proposal.scores_total
       };
+    }
+
+    if (!force && proposal.privacy === 'shutter') {
+      const ts = (Date.now() / 1e3).toFixed();
+      if (ts >= proposal.end) await getDecryptionKey(proposal.id);
+      return;
     }
 
     // Get votes
