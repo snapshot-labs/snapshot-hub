@@ -73,9 +73,10 @@ export async function setProposalKey(params) {
   try {
     const [id, key] = params;
     const proposalId = idToProposal(id);
-    let query = 'SELECT id FROM proposals WHERE id = ? AND privacy = ? LIMIT 1';
+    let query = 'SELECT id, end FROM proposals WHERE id = ? AND privacy = ? LIMIT 1';
     const [proposal] = await db.queryAsync(query, [proposalId, 'shutter']);
-    if (!proposal) return false;
+    const ts = (Date.now() / 1e3).toFixed();
+    if (!proposal || ts < proposal.end) return false;
     query = 'SELECT id, choice FROM votes WHERE proposal = ?';
     const votes = await db.queryAsync(query, [proposal.id]);
     const sqlParams: string[] = [];
