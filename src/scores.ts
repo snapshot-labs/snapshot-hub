@@ -63,24 +63,31 @@ export async function getScores(
 }
 
 export async function getProposalScores(proposalId, force = false) {
-  const proposal = await getProposal(proposalId);
+  let proposal;
 
   try {
-    if (proposal.scores_state === 'final') {
-      return {
-        scores_state: proposal.scores_state,
-        scores: proposal.scores,
-        scores_by_strategy: proposal.scores_by_strategy,
-        scores_total: proposal.scores_total
-      };
-    }
+    proposal = await getProposal(proposalId);
+    if (!proposal?.id) return;
+  } catch (e) {
+    return;
+  }
 
-    if (!force && proposal.privacy === 'shutter') {
-      const ts = (Date.now() / 1e3).toFixed();
-      if (ts >= proposal.end) await getDecryptionKey(proposal.id);
-      return;
-    }
+  if (proposal.scores_state === 'final') {
+    return {
+      scores_state: proposal.scores_state,
+      scores: proposal.scores,
+      scores_by_strategy: proposal.scores_by_strategy,
+      scores_total: proposal.scores_total
+    };
+  }
 
+  if (!force && proposal.privacy === 'shutter') {
+    const ts = (Date.now() / 1e3).toFixed();
+    if (ts >= proposal.end) await getDecryptionKey(proposal.id);
+    return;
+  }
+
+  try {
     // Get votes
     let votes: any = await getVotes(proposalId);
     const voters = votes.map(vote => vote.voter);
