@@ -7,7 +7,7 @@ export default async function (parent, { id }, context, info) {
   const query = `
     SELECT v.*, spaces.settings FROM votes v
     INNER JOIN spaces ON spaces.id = v.space
-    WHERE v.id = ? AND v.cb = 0 AND spaces.settings IS NOT NULL
+    WHERE v.id = ? AND spaces.settings IS NOT NULL
     LIMIT 1
   `;
   try {
