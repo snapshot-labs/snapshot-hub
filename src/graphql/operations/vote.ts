@@ -6,7 +6,7 @@ export default async function (parent, { id }, context, info) {
   const requestedFields = info ? graphqlFields(info) : {};
   const query = `
     SELECT v.*, spaces.settings FROM votes v
-    INNER JOIN spaces ON spaces.id = v.space
+    INNER JOIN spaces ON CONVERT(spaces.id USING utf8mb4) = v.space
     WHERE v.id = ? AND v.cb = 0 AND spaces.settings IS NOT NULL
     LIMIT 1
   `;
