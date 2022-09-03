@@ -16,7 +16,7 @@ async function getRecentProposalsCount(space) {
     COUNT(*) AS count_30d
     FROM proposals WHERE space = ? AND created > (UNIX_TIMESTAMP() - 2592000)
   `;
-  return await db.queryAsync(query, [space]);
+  return db.queryAsync(query, [space]);
 }
 
 export async function verify(body): Promise<any> {

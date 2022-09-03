@@ -4,6 +4,20 @@ import { jsonParse } from '../../helpers/utils';
 import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 
+const voteMonthLimit = 100e3;
+
+async function getRecentVotesCount(space) {
+  const query = `
+    SELECT COUNT(*) AS count_30d FROM votes 
+    WHERE EXISTS (
+      SELECT * FROM spaces
+      WHERE id = ? AND verified = 0 LIMIT 1
+    )
+    AND space = ? AND created > (UNIX_TIMESTAMP() - 2592000)
+  `;
+  return db.queryAsync(query, [space, space]);
+}
+
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
@@ -54,6 +68,13 @@ export async function verify(body): Promise<any> {
       e
     );
     return Promise.reject('failed to check voting power');
+  }
+  try {
+    // Get recent votes of space, for verified space count_30d will be always 0
+    const [{ count_30d: votesMonthCount }] = await getRecentVotesCount(msg.space);
+    if (votesMonthCount >= voteMonthLimit) return Promise.reject('vote limit reached');
+  } catch (e) {
+    return Promise.reject('failed to check votes limit');
   }
 }
 
