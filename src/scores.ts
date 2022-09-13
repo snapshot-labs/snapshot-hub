@@ -5,6 +5,7 @@ import db from './helpers/mysql';
 async function getProposal(id) {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
   const [proposal] = await db.queryAsync(query, [id]);
+  if (!proposal) return;
   proposal.strategies = JSON.parse(proposal.strategies);
   proposal.plugins = JSON.parse(proposal.plugins);
   proposal.choices = JSON.parse(proposal.choices);
@@ -63,7 +64,7 @@ export async function getScores(
 
 export async function getProposalScores(proposalId, force = false) {
   const proposal = await getProposal(proposalId);
-  if (!force && proposal.privacy === 'shutter') return;
+  if (!proposal || (!force && proposal.privacy === 'shutter')) return {};
 
   try {
     if (proposal.scores_state === 'final') {
@@ -197,4 +198,4 @@ async function run() {
   }
 }
 
-// snapshot.utils.sleep(10e3).then(() => run());
+snapshot.utils.sleep(10e3).then(() => run());
