@@ -5,20 +5,18 @@ import db from './helpers/mysql';
 async function getProposal(id) {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
   const [proposal] = await db.queryAsync(query, [id]);
-  if (proposal) {
-    proposal.strategies = JSON.parse(proposal.strategies);
-    proposal.plugins = JSON.parse(proposal.plugins);
-    proposal.choices = JSON.parse(proposal.choices);
-    proposal.scores = JSON.parse(proposal.scores);
-    proposal.scores_by_strategy = JSON.parse(proposal.scores_by_strategy);
-    let proposalState = 'pending';
-    const ts = parseInt((Date.now() / 1e3).toFixed());
-    if (ts > proposal.start) proposalState = 'active';
-    if (ts > proposal.end) proposalState = 'closed';
-    proposal.state = proposalState;
-    return proposal;
-  }
-  return null;
+  if (!proposal) return;
+  proposal.strategies = JSON.parse(proposal.strategies);
+  proposal.plugins = JSON.parse(proposal.plugins);
+  proposal.choices = JSON.parse(proposal.choices);
+  proposal.scores = JSON.parse(proposal.scores);
+  proposal.scores_by_strategy = JSON.parse(proposal.scores_by_strategy);
+  let proposalState = 'pending';
+  const ts = parseInt((Date.now() / 1e3).toFixed());
+  if (ts > proposal.start) proposalState = 'active';
+  if (ts > proposal.end) proposalState = 'closed';
+  proposal.state = proposalState;
+  return proposal;
 }
 
 async function getVotes(proposalId) {
