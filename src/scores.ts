@@ -166,16 +166,18 @@ export async function getProposalScores(proposalId, force = false) {
 
     return results;
   } catch (e) {
-    const ts = (Date.now() / 1e3).toFixed();
-    const query = `
-      UPDATE proposals
-      SET scores_state = ?,
-      scores_updated = ?
-      WHERE id = ? LIMIT 1;
-    `;
-    await db.queryAsync(query, ['invalid', ts, proposalId]);
-    console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
-
+    // Temporary trick to show pending cache scores on syncswapxyz.eth proposal
+    if (proposal.space !== 'syncswapxyz.eth') {
+      const ts = (Date.now() / 1e3).toFixed();
+      const query = `
+        UPDATE proposals
+        SET scores_state = ?,
+        scores_updated = ?
+        WHERE id = ? LIMIT 1;
+      `;
+      await db.queryAsync(query, ['invalid', ts, proposalId]);
+      console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
+    }
     return { scores_state: 'invalid' };
   }
 }
