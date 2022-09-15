@@ -188,9 +188,9 @@ async function run() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const [proposal] = await db.queryAsync(
     `SELECT id, space FROM proposals
-    WHERE created >= ? AND start <= ? AND scores_state IN (?) AND privacy != ?
+    WHERE created >= ? AND start <= ? AND scores_state IN (?) AND privacy != ? AND space != ?
     ORDER BY scores_updated ASC LIMIT 1`,
-    [expires, ts, ['', 'pending', 'invalid'], 'shutter']
+    [expires, ts, ['', 'pending', 'invalid'], 'shutter', 'syncswapxyz.eth']
   );
   if (proposal && proposal.id) {
     // console.log('[scores] Get proposal', proposal.space, proposal.id);
