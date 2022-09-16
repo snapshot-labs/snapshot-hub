@@ -1,6 +1,6 @@
-import snapshot from '@snapshot-labs/snapshot.js';
-import fleek from '@fleekhq/fleek-storage-js';
 import isEqual from 'lodash/isEqual';
+import snapshot from '@snapshot-labs/snapshot.js';
+import { pin } from '@snapshot-labs/pineapple';
 import { addOrUpdateSpace, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 
@@ -35,16 +35,8 @@ export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
   try {
-    const key = `registry/${networkPath}${body.address}/${space}`;
-    const result = await fleek.upload({
-      apiKey: process.env.FLEEK_API_KEY || '',
-      apiSecret: process.env.FLEEK_API_SECRET || '',
-      bucket: process.env.FLEEK_BUCKET || 'snapshot-team-bucket',
-      key,
-      data: JSON.stringify(msg.payload)
-    });
-    const ipfsHash = result.hashV0;
-    console.log('Settings updated', space, ipfsHash);
+    const pinned = await pin(msg.payload);
+    console.log('[writer] Settings updated', space, pinned.cid);
     await addOrUpdateSpace(space, msg.payload);
   } catch (e) {
     console.log('[writer] Failed to store settings', msg.space, e);
