@@ -36,8 +36,10 @@ export async function loadSpace(id) {
 
 export async function getProposal(space, id) {
   const query = `SELECT * FROM proposals WHERE space = ? AND id = ?`;
-  const proposals = await db.queryAsync(query, [space, id]);
-  return proposals[0];
+  const [proposal] = await db.queryAsync(query, [space, id]);
+  proposal.strategies = jsonParse(proposal.strategies);
+  proposal.choices = jsonParse(proposal.choices);
+  return proposal;
 }
 
 export async function getSpace(id) {
