@@ -113,8 +113,9 @@ export default async function ingestor(body) {
     legacyBody = message;
   }
 
+  let context;
   try {
-    await writer[type].verify(legacyBody);
+    context = await writer[type].verify(legacyBody);
   } catch (e) {
     console.log('[ingestor]', e);
     return Promise.reject(e);
@@ -130,7 +131,7 @@ export default async function ingestor(body) {
   const ipfs = pinned.cid;
 
   try {
-    await writer[type].action(legacyBody, ipfs, receipt, id);
+    await writer[type].action(legacyBody, ipfs, receipt, id, context);
     await storeMsg(
       id,
       ipfs,
