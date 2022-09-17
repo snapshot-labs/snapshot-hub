@@ -67,13 +67,8 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   const reason = msg.payload.reason || '';
 
   // Check if voting power is final
-  let withDelegation = false;
-  context.proposal.strategies
-    .map(strategy => strategy.name)
-    .forEach(name => {
-      if (name.includes('delegation')) withDelegation = true;
-    });
   let vpState = context.vp.vp_state;
+  const withDelegation = JSON.stringify(context.proposal.strategies).includes('delegation');
   if (vpState === 'final' && withDelegation) vpState = 'pending';
 
   const params = {
