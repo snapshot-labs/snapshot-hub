@@ -57,8 +57,9 @@ export default async function ingestor(body) {
     return Promise.reject('signature verification failed');
   }
 
+  let context;
   try {
-    await writer[msg.type].verify(body);
+    context = await writer[msg.type].verify(body);
   } catch (e) {
     return Promise.reject(e);
   }
@@ -82,7 +83,7 @@ export default async function ingestor(body) {
   const id = ipfs;
 
   try {
-    await writer[msg.type].action(body, ipfs, receipt, id);
+    await writer[msg.type].action(body, ipfs, receipt, id, context);
     await storeMsg(
       id,
       ipfs,

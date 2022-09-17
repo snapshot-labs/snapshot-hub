@@ -14,7 +14,6 @@ export async function verify(body): Promise<any> {
   }
 
   const proposal = await getProposal(msg.space, msg.payload.proposal);
-  proposal.choices = jsonParse(proposal.choices);
   if (!proposal) return Promise.reject('unknown proposal');
 
   const tsInt = (Date.now() / 1e3).toFixed();
@@ -35,16 +34,17 @@ export async function verify(body): Promise<any> {
   }
 
   try {
-    const result = await snapshot.utils.getVp(
+    const vp = await snapshot.utils.getVp(
       body.address,
       proposal.network,
-      jsonParse(proposal.strategies),
+      proposal.strategies,
       proposal.snapshot,
       msg.space,
       proposal.delegation === 1,
       {}
     );
-    if (result.vp === 0) return Promise.reject('no voting power');
+    if (vp.vp === 0) return Promise.reject('no voting power');
+    return { proposal, vp };
   } catch (e) {
     console.log(
       '[writer] Failed to check voting power (vote)',
@@ -57,7 +57,7 @@ export async function verify(body): Promise<any> {
   }
 }
 
-export async function action(body, ipfs, receipt, id): Promise<void> {
+export async function action(body, ipfs, receipt, id, context): Promise<void> {
   const msg = jsonParse(body.msg);
   const voter = getAddress(body.address);
   const created = parseInt(msg.timestamp);
@@ -65,6 +65,12 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const metadata = JSON.stringify(msg.payload.metadata || {});
   const app = msg.payload.app || '';
   const reason = msg.payload.reason || '';
+
+  // Check if voting power is final
+  let vpState = context.vp.vp_state;
+  const withDelegation = JSON.stringify(context.proposal.strategies).includes('delegation');
+  if (vpState === 'final' && withDelegation) vpState = 'pending';
+
   const params = {
     id,
     ipfs,
@@ -76,9 +82,9 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     metadata,
     reason,
     app,
-    vp: 0,
-    vp_by_strategy: JSON.stringify([]),
-    vp_state: '',
+    vp: context.vp.vp,
+    vp_by_strategy: JSON.stringify(context.vp.vp_by_strategy),
+    vp_state: vpState,
     cb: 0
   };
 
@@ -101,10 +107,23 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     await db.queryAsync(
       `
       UPDATE votes
-      SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?, app = ?
+      SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?, app = ?, vp = ?, vp_by_strategy = ?, vp_state = ?
       WHERE voter = ? AND proposal = ? AND space = ?
     `,
-      [id, ipfs, created, choice, metadata, app, voter, msg.payload.proposal, msg.space]
+      [
+        id,
+        ipfs,
+        created,
+        choice,
+        metadata,
+        app,
+        params.vp,
+        params.vp_by_strategy,
+        params.vp_state,
+        voter,
+        msg.payload.proposal,
+        msg.space
+      ]
     );
   } else {
     // Store vote in dedicated table
