@@ -40,9 +40,9 @@ export async function verify(body): Promise<any> {
       return Promise.reject('invalid choice');
   }
 
-  const vp = {};
+  let vp: any = {};
   try {
-    const vp = await snapshot.utils.getVp(
+    vp = await snapshot.utils.getVp(
       body.address,
       proposal.network,
       proposal.strategies,
