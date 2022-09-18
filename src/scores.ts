@@ -109,6 +109,11 @@ export async function getProposalScores(proposalId, force = false) {
       scores_total: votingClass.getScoresTotal()
     };
 
+    // Check if voting power is final
+    let vpState = state;
+    const withDelegation = JSON.stringify(proposal.strategies).includes('delegation');
+    if (vpState === 'final' && withDelegation && proposal.state !== 'closed') vpState = 'pending';
+
     // Store vp
     if (['final', 'pending'].includes(results.scores_state)) {
       const max = 256;
@@ -128,7 +133,7 @@ export async function getProposalScores(proposalId, force = false) {
         WHERE id = ? AND proposal = ? LIMIT 1; `;
           params.push(vote.balance);
           params.push(JSON.stringify(vote.scores));
-          params.push(results.scores_state);
+          params.push(vpState);
           params.push(vote.id);
           params.push(proposalId);
         });
