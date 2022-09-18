@@ -4,6 +4,13 @@ import { jsonParse } from '../../helpers/utils';
 import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 
+async function isLimitReached(space) {
+  const limit = 150000;
+  const query = `SELECT COUNT(*) AS count FROM messages WHERE space = ? AND timestamp > (UNIX_TIMESTAMP() - 2592000)`;
+  const [{ count }] = await db.queryAsync(query, [space]);
+  return count > limit;
+}
+
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
 
@@ -33,6 +40,7 @@ export async function verify(body): Promise<any> {
       return Promise.reject('invalid choice');
   }
 
+  const vp = {};
   try {
     const vp = await snapshot.utils.getVp(
       body.address,
@@ -44,7 +52,6 @@ export async function verify(body): Promise<any> {
       {}
     );
     if (vp.vp === 0) return Promise.reject('no voting power');
-    return { proposal, vp };
   } catch (e) {
     console.log(
       '[writer] Failed to check voting power (vote)',
@@ -55,6 +62,11 @@ export async function verify(body): Promise<any> {
     );
     return Promise.reject('failed to check voting power');
   }
+
+  if (await isLimitReached(msg.space))
+    return Promise.reject('too much activity, please contact an admin');
+
+  return { proposal, vp };
 }
 
 export async function action(body, ipfs, receipt, id, context): Promise<void> {
