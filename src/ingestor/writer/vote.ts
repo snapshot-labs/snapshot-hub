@@ -5,7 +5,7 @@ import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 
 async function isLimitReached(space) {
-  const limit = 150000;
+  const limit = 1500000;
   const query = `SELECT COUNT(*) AS count FROM messages WHERE space = ? AND timestamp > (UNIX_TIMESTAMP() - 2592000)`;
   const [{ count }] = await db.queryAsync(query, [space]);
   return count > limit;
