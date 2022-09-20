@@ -16,7 +16,7 @@
     "@ethersproject/providers": "^5.6.8",
     "@ethersproject/wallet": "^5.6.2",
     "@snapshot-labs/pineapple": "^0.1.0-beta.1",
-    "@snapshot-labs/snapshot.js": "^0.4.26",
+    "@snapshot-labs/snapshot.js": "^0.4.29",
     "bluebird": "^3.7.2",
     "connection-string": "^1.0.1",
     "cors": "^2.8.5",
