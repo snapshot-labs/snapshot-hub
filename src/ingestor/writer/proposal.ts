@@ -4,7 +4,6 @@ import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
 import { getSpace } from '../../helpers/actions';
-import { sendToWebhook } from '../../helpers/webhook';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;
@@ -131,10 +130,4 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
 
   await db.queryAsync(query, params);
   console.log('Store proposal complete', space, id);
-
-  sendToWebhook({
-    event: 'proposal/created',
-    id: `proposal/${id}`,
-    space
-  });
 }
