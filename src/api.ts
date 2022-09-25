@@ -21,7 +21,8 @@ router.get('/', (req, res) => {
 
 router.get('/scores/:proposalId', async (req, res) => {
   const { proposalId } = req.params;
-  return res.json(await getProposalScores(proposalId));
+  const success = await getProposalScores(proposalId);
+  return res.json({ success });
 });
 
 router.get('/explore', (req, res) => {

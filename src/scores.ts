@@ -2,7 +2,7 @@ import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
 
-async function getProposal(id) {
+async function getProposal(id): Promise<any | undefined> {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
   const [proposal] = await db.queryAsync(query, [id]);
   if (!proposal) return;
@@ -19,11 +19,15 @@ async function getProposal(id) {
   return proposal;
 }
 
-async function getVotes(proposalId) {
-  const query = 'SELECT id, choice, voter FROM votes WHERE proposal = ?';
+async function getVotes(proposalId: string): Promise<any[] | undefined> {
+  const query =
+    'SELECT id, choice, voter, vp, vp_by_strategy, vp_state FROM votes WHERE proposal = ?';
   const votes = await db.queryAsync(query, [proposalId]);
   return votes.map(vote => {
     vote.choice = JSON.parse(vote.choice);
+    vote.vp_by_strategy = JSON.parse(vote.vp_by_strategy);
+    vote.balance = vote.vp;
+    vote.scores = vote.vp_by_strategy;
     return vote;
   });
 }
@@ -62,20 +66,65 @@ export async function getScores(
   }
 }
 
+async function updateVotesVp(votes: any[], vpState: string, proposalId: string) {
+  const max = 200;
+  const pages = Math.ceil(votes.length / max);
+  const votesInPages: any = [];
+  Array.from(Array(pages)).forEach((x, i) => {
+    votesInPages.push(votes.slice(max * i, max * (i + 1)));
+  });
+
+  let i = 0;
+  for (const votesInPage of votesInPages) {
+    const params: any = [];
+    let query = '';
+    votesInPage.forEach((vote: any) => {
+      query += `UPDATE votes
+      SET vp = ?, vp_by_strategy = ?, vp_state = ?
+      WHERE id = ? AND proposal = ? LIMIT 1; `;
+      params.push(vote.balance);
+      params.push(JSON.stringify(vote.scores));
+      params.push(vpState);
+      params.push(vote.id);
+      params.push(proposalId);
+    });
+    await db.queryAsync(query, params);
+    if (i) await snapshot.utils.sleep(200);
+    i++;
+    // console.log('[scores] Votes page updated', i);
+  }
+  console.log('[scores] Votes updated', votes.length);
+}
+
+async function updateProposalScores(proposalId: string, scores: any, votes: number) {
+  const ts = (Date.now() / 1e3).toFixed();
+  const query = `
+    UPDATE proposals
+    SET scores_state = ?,
+    scores = ?,
+    scores_by_strategy = ?,
+    scores_total = ?,
+    scores_updated = ?,
+    votes = ?
+    WHERE id = ? LIMIT 1;
+  `;
+  await db.queryAsync(query, [
+    scores.scores_state,
+    JSON.stringify(scores.scores),
+    JSON.stringify(scores.scores_by_strategy),
+    scores.scores_total,
+    ts,
+    votes,
+    proposalId
+  ]);
+}
+
 export async function getProposalScores(proposalId, force = false) {
   const proposal = await getProposal(proposalId);
-  if (!proposal || (!force && proposal.privacy === 'shutter')) return {};
+  if (!proposal || (!force && proposal.privacy === 'shutter')) return false;
+  if (proposal.scores_state === 'final') return true;
 
   try {
-    if (proposal.scores_state === 'final') {
-      return {
-        scores_state: proposal.scores_state,
-        scores: proposal.scores,
-        scores_by_strategy: proposal.scores_by_strategy,
-        scores_total: proposal.scores_total
-      };
-    }
-
     // Get votes
     let votes: any = await getVotes(proposalId);
     const voters = votes.map(vote => vote.voter);
@@ -97,16 +146,12 @@ export async function getProposalScores(proposalId, force = false) {
     });
 
     // Get results
-    const votingClass = new snapshot.utils.voting[proposal.type](
-      proposal,
-      votes,
-      proposal.strategies
-    );
+    const voting = new snapshot.utils.voting[proposal.type](proposal, votes, proposal.strategies);
     const results = {
       scores_state: proposal.state === 'closed' ? state : 'pending',
-      scores: votingClass.getScores(),
-      scores_by_strategy: votingClass.getScoresByStrategy(),
-      scores_total: votingClass.getScoresTotal()
+      scores: voting.getScores(),
+      scores_by_strategy: voting.getScoresByStrategy(),
+      scores_total: voting.getScoresTotal()
     };
 
     // Check if voting power is final
@@ -116,73 +161,24 @@ export async function getProposalScores(proposalId, force = false) {
 
     // Store vp
     if (['final', 'pending'].includes(results.scores_state)) {
-      const max = 256;
-      const pages = Math.ceil(votes.length / max);
-      const votesInPages: any = [];
-      Array.from(Array(pages)).forEach((x, i) => {
-        votesInPages.push(votes.slice(max * i, max * (i + 1)));
-      });
-
-      let i = 0;
-      for (const votesInPage of votesInPages) {
-        const params: any = [];
-        let query2 = '';
-        votesInPage.forEach((vote: any) => {
-          query2 += `UPDATE votes
-        SET vp = ?, vp_by_strategy = ?, vp_state = ?
-        WHERE id = ? AND proposal = ? LIMIT 1; `;
-          params.push(vote.balance);
-          params.push(JSON.stringify(vote.scores));
-          params.push(vpState);
-          params.push(vote.id);
-          params.push(proposalId);
-        });
-        await db.queryAsync(query2, params);
-        if (i) await snapshot.utils.sleep(200);
-        i++;
-        // console.log('[scores] Updated votes');
-      }
-
-      // console.log('[scores] Votes updated', votes.length);
+      await updateVotesVp(votes, vpState, proposalId);
     }
 
     // Store scores
+    await updateProposalScores(proposalId, results, votes.length);
+    console.log('[scores] Proposal updated', proposal.id, proposal.space, results.scores_state);
+
+    return true;
+  } catch (e) {
     const ts = (Date.now() / 1e3).toFixed();
     const query = `
       UPDATE proposals
       SET scores_state = ?,
-      scores = ?,
-      scores_by_strategy = ?,
-      scores_total = ?,
-      scores_updated = ?,
-      votes = ?
+      scores_updated = ?
       WHERE id = ? LIMIT 1;
     `;
-    await db.queryAsync(query, [
-      results.scores_state,
-      JSON.stringify(results.scores),
-      JSON.stringify(results.scores_by_strategy),
-      results.scores_total,
-      ts,
-      votes.length,
-      proposalId
-    ]);
-    console.log('[scores] Proposal updated', proposal.id, proposal.space, results.scores_state);
-
-    return results;
-  } catch (e) {
-    // Temporary trick to show pending cache scores on syncswapxyz.eth proposal
-    if (proposal.space !== 'syncswapxyz.eth') {
-      const ts = (Date.now() / 1e3).toFixed();
-      const query = `
-        UPDATE proposals
-        SET scores_state = ?,
-        scores_updated = ?
-        WHERE id = ? LIMIT 1;
-      `;
-      await db.queryAsync(query, ['invalid', ts, proposalId]);
-      console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
-    }
+    await db.queryAsync(query, ['invalid', ts, proposalId]);
+    console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
     return { scores_state: 'invalid' };
   }
 }
@@ -205,4 +201,4 @@ async function run() {
   }
 }
 
-snapshot.utils.sleep(10e3).then(() => run());
+// snapshot.utils.sleep(10e3).then(() => run());
