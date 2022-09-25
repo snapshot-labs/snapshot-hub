@@ -181,7 +181,8 @@ export async function getProposalScores(proposalId, force = false) {
       proposal.id,
       proposal.space,
       results.scores_state,
-      results.scores
+      results.scores,
+      votes.length
     );
 
     return true;
