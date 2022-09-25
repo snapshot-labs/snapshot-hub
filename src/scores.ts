@@ -172,7 +172,7 @@ export async function getProposalScores(proposalId, force = false) {
     if (vpState === 'final' && withDelegation && proposal.state !== 'closed') vpState = 'pending';
 
     // Update votes voting power
-    await updateVotesVp(votes, vpState, proposalId);
+    if (!isFinal) await updateVotesVp(votes, vpState, proposalId);
 
     // Store scores
     await updateProposalScores(proposalId, results, votes.length);
