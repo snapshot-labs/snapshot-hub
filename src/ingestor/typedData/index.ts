@@ -57,7 +57,7 @@ export default async function ingestor(body) {
   const isValid = await snapshot.utils.verify(body.address, body.sig, body.data, network);
   const id = snapshot.utils.getHash(body.data);
   if (!isValid) return Promise.reject('wrong signature');
-  console.log('[ingestor] Signature is valid');
+  // console.log('[ingestor] Signature is valid');
 
   let payload = {};
 
@@ -148,12 +148,7 @@ export default async function ingestor(body) {
   }
 
   console.log(
-    '[ingestor] ',
-    `Address "${body.address}", `,
-    `Space "${message.space}", `,
-    `Type "${type}", `,
-    `Id "${id}", `,
-    `IPFS "${ipfs}"`
+    `[ingestor] New "${type}" confirmed for "${body.address}" on "${message.space}", id: ${id} (typed data)`
   );
 
   return {

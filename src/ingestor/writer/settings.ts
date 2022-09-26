@@ -35,8 +35,7 @@ export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
   try {
-    const pinned = await pin(msg.payload);
-    console.log('[writer] Settings updated', space, pinned.cid);
+    await pin(msg.payload);
     await addOrUpdateSpace(space, msg.payload);
   } catch (e) {
     console.log('[writer] Failed to store settings', msg.space, e);

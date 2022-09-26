@@ -100,12 +100,7 @@ export default async function ingestor(body) {
   }
 
   console.log(
-    '[ingestor] ',
-    `Address "${body.address}", `,
-    `Space "${msg.space}", `,
-    `Type "${msg.type}", `,
-    `Id "${id}", `,
-    `IPFS "${ipfs}"`
+    `[ingestor] New "${msg.type}" confirmed for "${body.address}" on "${msg.space}", id: ${id} (personal sign)`
   );
 
   return {

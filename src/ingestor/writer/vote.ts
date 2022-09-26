@@ -59,7 +59,7 @@ export async function verify(body): Promise<any> {
       msg.space,
       body.address,
       proposal.snapshot,
-      e
+      JSON.stringify(e)
     );
     return Promise.reject('failed to check voting power');
   }
@@ -152,5 +152,5 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
     console.log('[writer] updateProposalAndVotes() failed', proposalId, e);
   }
 
-  console.log('[writer] Store vote complete', msg.space, id, ipfs);
+  // console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }
