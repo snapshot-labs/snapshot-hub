@@ -195,7 +195,7 @@ export async function getProposalScores(proposalId, force = false) {
     `;
     await db.queryAsync(query, ['invalid', ts, proposalId]);
     console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
-    return { scores_state: 'invalid' };
+    return false;
   }
 }
 
