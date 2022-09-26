@@ -134,8 +134,7 @@ export async function getProposalScores(proposalId, force = false) {
   try {
     // Get votes
     let votes: any = await getVotes(proposalId);
-    let isFinal = true;
-    votes.forEach(vote => (isFinal = vote.vp_state !== 'final' ? false : isFinal));
+    const isFinal = votes.every(vote => vote.vp_state === 'final');
     let vpState = 'final';
 
     if (!isFinal) {
