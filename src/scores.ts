@@ -3,7 +3,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
 import { sha256 } from './helpers/utils';
 
-async function getProposal(id): Promise<any | undefined> {
+async function getProposal(id: string): Promise<any | undefined> {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
   const [proposal] = await db.queryAsync(query, [id]);
   if (!proposal) return;
