@@ -3,6 +3,7 @@ import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
 import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
+import { updateProposalAndVotes } from '../../scores';
 
 async function isLimitReached(space) {
   const limit = 1500000;
@@ -77,6 +78,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   const metadata = JSON.stringify(msg.payload.metadata || {});
   const app = msg.payload.app || '';
   const reason = msg.payload.reason || '';
+  const proposalId = msg.payload.proposal;
 
   // Check if voting power is final
   let vpState = context.vp.vp_state;
@@ -89,7 +91,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
     voter,
     created,
     space: msg.space,
-    proposal: msg.payload.proposal,
+    proposal: proposalId,
     choice,
     metadata,
     reason,
@@ -103,7 +105,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   // Check if voter already voted
   const votes = await db.queryAsync(
     'SELECT id, created FROM votes WHERE voter = ? AND proposal = ? AND space = ? ORDER BY created DESC LIMIT 1',
-    [voter, msg.payload.proposal, msg.space]
+    [voter, proposalId, msg.space]
   );
 
   // Reject vote with later timestamp
@@ -115,7 +117,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
       if (localCompare <= 0) return Promise.reject('already voted same time with lower index');
     }
     // Update previous vote
-    console.log('Update previous vote', voter, msg.payload.proposal);
+    console.log('[writer] Update previous vote', voter, proposalId);
     await db.queryAsync(
       `
       UPDATE votes
@@ -133,7 +135,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
         params.vp_by_strategy,
         params.vp_state,
         voter,
-        msg.payload.proposal,
+        proposalId,
         msg.space
       ]
     );
@@ -141,5 +143,14 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
     // Store vote in dedicated table
     await db.queryAsync('INSERT IGNORE INTO votes SET ?', params);
   }
+
+  // Update proposal scores and voters vp
+  try {
+    const result = await updateProposalAndVotes(proposalId);
+    if (!result) console.log('[writer] updateProposalAndVotes() false', proposalId);
+  } catch (e) {
+    console.log('[writer] updateProposalAndVotes() failed', proposalId, e);
+  }
+
   console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }

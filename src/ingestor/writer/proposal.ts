@@ -129,5 +129,5 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const params: any[] = [proposal];
 
   await db.queryAsync(query, params);
-  console.log('Store proposal complete', space, id);
+  console.log('[writer] Store proposal complete', space, id);
 }
