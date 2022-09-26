@@ -126,95 +126,63 @@ async function updateProposalScores(proposalId: string, scores: any, votes: numb
   ]);
 }
 
-export async function getProposalScores(proposalId, force = false) {
+export async function updateProposalAndVotes(proposalId: string, force = false) {
   const proposal = await getProposal(proposalId);
   if (!proposal || (!force && proposal.privacy === 'shutter')) return false;
   if (proposal.scores_state === 'final') return true;
 
-  try {
-    // Get votes
-    let votes: any = await getVotes(proposalId);
-    const isFinal = votes.every(vote => vote.vp_state === 'final');
-    let vpState = 'final';
+  // Get votes
+  let votes: any = await getVotes(proposalId);
+  const isFinal = votes.every(vote => vote.vp_state === 'final');
+  let vpState = 'final';
 
-    if (!isFinal) {
-      console.log('[scores] Get scores', proposalId);
-      // Get scores
-      const { scores, state } = await getScores(
-        proposal.space,
-        proposal.strategies,
-        proposal.network,
-        votes.map(vote => vote.voter),
-        parseInt(proposal.snapshot)
-      );
-      vpState = state;
+  if (!isFinal) {
+    console.log('[scores] Get scores', proposalId);
 
-      // Add vp to votes
-      votes = votes.map((vote: any) => {
-        vote.scores = proposal.strategies.map((strategy, i) => scores[i][vote.voter] || 0);
-        vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
-        return vote;
-      });
-    }
-
-    // Get results
-    const voting = new snapshot.utils.voting[proposal.type](proposal, votes, proposal.strategies);
-    const results = {
-      scores_state: proposal.state === 'closed' ? 'final' : 'pending',
-      scores: voting.getScores(),
-      scores_by_strategy: voting.getScoresByStrategy(),
-      scores_total: voting.getScoresTotal()
-    };
-
-    // Check if voting power is final
-    const withDelegation = JSON.stringify(proposal.strategies).includes('delegation');
-    if (vpState === 'final' && withDelegation && proposal.state !== 'closed') vpState = 'pending';
-
-    // Update votes voting power
-    if (!isFinal) await updateVotesVp(votes, vpState, proposalId);
-
-    // Store scores
-    await updateProposalScores(proposalId, results, votes.length);
-    console.log(
-      '[scores] Proposal updated',
-      proposal.id,
+    // Get scores
+    const { scores, state } = await getScores(
       proposal.space,
-      results.scores_state,
-      results.scores,
-      votes.length
+      proposal.strategies,
+      proposal.network,
+      votes.map(vote => vote.voter),
+      parseInt(proposal.snapshot)
     );
+    vpState = state;
 
-    return true;
-  } catch (e) {
-    const ts = (Date.now() / 1e3).toFixed();
-    const query = `
-      UPDATE proposals
-      SET scores_state = ?,
-      scores_updated = ?
-      WHERE id = ? LIMIT 1;
-    `;
-    await db.queryAsync(query, ['invalid', ts, proposalId]);
-    console.log('[scores] Proposal invalid', proposal.space, proposal.id, proposal.scores_state);
-    return false;
+    // Add vp to votes
+    votes = votes.map((vote: any) => {
+      vote.scores = proposal.strategies.map((strategy, i) => scores[i][vote.voter] || 0);
+      vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
+      return vote;
+    });
   }
-}
 
-async function run() {
-  // console.log('[scores] Run scores');
-  const expires = parseInt((Date.now() / 1e3).toFixed()) - 60 * 60 * 24 * 14;
-  const ts = parseInt((Date.now() / 1e3).toFixed());
-  const [proposal] = await db.queryAsync(
-    `SELECT id, space FROM proposals
-    WHERE created >= ? AND start <= ? AND scores_state IN (?) AND privacy != ? AND space != ?
-    ORDER BY scores_updated ASC LIMIT 1`,
-    [expires, ts, ['', 'pending', 'invalid'], 'shutter', 'syncswapxyz.eth']
+  // Get results
+  const voting = new snapshot.utils.voting[proposal.type](proposal, votes, proposal.strategies);
+  const results = {
+    scores_state: proposal.state === 'closed' ? 'final' : 'pending',
+    scores: voting.getScores(),
+    scores_by_strategy: voting.getScoresByStrategy(),
+    scores_total: voting.getScoresTotal()
+  };
+
+  // Check if voting power is final
+  const withDelegation = JSON.stringify(proposal.strategies).includes('delegation');
+  if (vpState === 'final' && withDelegation && proposal.state !== 'closed') vpState = 'pending';
+
+  // Update votes voting power
+  if (!isFinal) await updateVotesVp(votes, vpState, proposalId);
+
+  // Store scores
+  await updateProposalScores(proposalId, results, votes.length);
+  console.log(
+    '[scores] Proposal updated',
+    proposal.id,
+    proposal.space,
+    results.scores_state,
+    results.scores,
+    votes.length
   );
-  if (proposal && proposal.id) {
-    // console.log('[scores] Get proposal', proposal.space, proposal.id);
-    await getProposalScores(proposal.id);
-    // await snapshot.utils.sleep(5e3);
-    await run();
-  }
-}
 
-snapshot.utils.sleep(10e3).then(() => run());
+  return true;
+}

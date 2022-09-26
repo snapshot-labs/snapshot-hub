@@ -3,7 +3,7 @@ import { spaces, spacesMetadata } from './helpers/spaces';
 import relayer from './helpers/relayer';
 import { addOrUpdateSpace, loadSpace } from './helpers/actions';
 import { name, version } from '../package.json';
-import { getProposalScores } from './scores';
+import { updateProposalAndVotes } from './scores';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
@@ -21,8 +21,13 @@ router.get('/', (req, res) => {
 
 router.get('/scores/:proposalId', async (req, res) => {
   const { proposalId } = req.params;
-  const success = await getProposalScores(proposalId);
-  return res.json({ success });
+  try {
+    const result = await updateProposalAndVotes(proposalId);
+    return res.json({ result });
+  } catch (e) {
+    console.log('[api] updateProposalAndVotes() failed', proposalId, e);
+    return res.json({ error: 'failed', message: e });
+  }
 });
 
 router.get('/explore', (req, res) => {
