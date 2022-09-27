@@ -1,5 +1,6 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatFollow } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function (parent, args) {
   const { where = {} } = args;
@@ -39,7 +40,7 @@ export default async function (parent, args) {
     follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error('[graphql] follows', e);
     return Promise.reject('request failed');
   }
 }

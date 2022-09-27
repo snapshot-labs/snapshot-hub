@@ -16,7 +16,7 @@ const VERSION = '0.1.4';
 export default async function ingestor(body) {
   const schemaIsValid = snapshot.utils.validateSchema(envelope, body);
   if (schemaIsValid !== true) {
-    console.log('[ingestor] Wrong envelope format', schemaIsValid);
+    log.warn('[ingestor] Wrong envelope format', schemaIsValid);
     return Promise.reject('wrong envelope format');
   }
 
@@ -117,7 +117,7 @@ export default async function ingestor(body) {
   try {
     context = await writer[type].verify(legacyBody);
   } catch (e) {
-    console.log('[ingestor]', e);
+    log.warn('[ingestor] verify failed', e);
     return Promise.reject(e);
   }
 

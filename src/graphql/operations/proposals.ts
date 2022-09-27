@@ -1,5 +1,6 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function (parent, args) {
   const { where = {} } = args;
@@ -61,7 +62,7 @@ export default async function (parent, args) {
     const proposals = await db.queryAsync(query, params);
     return proposals.map(proposal => formatProposal(proposal));
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error('[graphql] proposals', e);
     return Promise.reject('request failed');
   }
 }

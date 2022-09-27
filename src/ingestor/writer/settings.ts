@@ -3,6 +3,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { pin } from '@snapshot-labs/pineapple';
 import { addOrUpdateSpace, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
+import log from '../../helpers/log';
 
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
 const networkPath = DEFAULT_NETWORK === '1' ? '' : 'testnet/';
@@ -12,7 +13,7 @@ export async function verify(body): Promise<any> {
 
   const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.space, msg.payload);
   if (schemaIsValid !== true) {
-    console.log('[writer] Wrong space format', schemaIsValid);
+    log.warn('[writer] Wrong space format', schemaIsValid);
     return Promise.reject('wrong space format');
   }
 
@@ -38,7 +39,7 @@ export async function action(body): Promise<void> {
     await pin(msg.payload);
     await addOrUpdateSpace(space, msg.payload);
   } catch (e) {
-    console.log('[writer] Failed to store settings', msg.space, e);
+    log.error('[writer] Failed to store settings', msg.space, e);
     return Promise.reject('failed store settings');
   }
 }

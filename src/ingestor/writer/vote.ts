@@ -18,7 +18,7 @@ export async function verify(body): Promise<any> {
 
   const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.vote, msg.payload);
   if (schemaIsValid !== true) {
-    console.log('[writer] Wrong vote format', schemaIsValid);
+    log.warn('[writer] Wrong vote format', schemaIsValid);
     return Promise.reject('wrong vote format');
   }
 
@@ -118,7 +118,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
       if (localCompare <= 0) return Promise.reject('already voted same time with lower index');
     }
     // Update previous vote
-    console.log('[writer] Update previous vote', voter, proposalId);
+    log.info('[writer] Update previous vote', voter, proposalId);
     await db.queryAsync(
       `
       UPDATE votes
@@ -148,8 +148,8 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   // Update proposal scores and voters vp
   try {
     const result = await updateProposalAndVotes(proposalId);
-    if (!result) console.log('[writer] updateProposalAndVotes() false', proposalId);
+    if (!result) log.warn('[writer] updateProposalAndVotes() false', proposalId);
   } catch (e) {
-    console.log('[writer] updateProposalAndVotes() failed', proposalId, e);
+    log.error('[writer] updateProposalAndVotes() failed', proposalId, e);
   }
 }

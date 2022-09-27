@@ -1,6 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { uniq } from 'lodash';
 import db from './mysql';
+import log from './log';
 
 export let spaces = {};
 export const spacesMetadata = {};
@@ -13,7 +14,7 @@ async function loadSpaces() {
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
   const totalSpaces = Object.keys(spaces).length;
-  console.log('[spaces] Total spaces', totalSpaces);
+  log.info('[spaces] Total spaces', totalSpaces);
 }
 
 async function getProposals() {
@@ -88,7 +89,7 @@ async function run() {
     await loadSpaces();
     await loadSpacesMetrics();
   } catch (e) {
-    console.log('[spaces] Failed to load spaces', e);
+    log.error('[spaces] Failed to load spaces', e);
   }
   await snapshot.utils.sleep(60e3);
   await run();
