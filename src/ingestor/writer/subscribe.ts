@@ -14,5 +14,4 @@ export async function action(message, ipfs, receipt, id): Promise<void> {
     created: message.timestamp
   };
   await db.queryAsync('INSERT IGNORE INTO subscriptions SET ?', params);
-  // console.log(`[writer] Stored: ${message.from} subscribed ${message.space}`);
 }

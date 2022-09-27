@@ -151,6 +151,4 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   } catch (e) {
     console.log('[writer] updateProposalAndVotes() failed', proposalId, e);
   }
-
-  // console.log('[writer] Store vote complete', msg.space, id, ipfs);
 }

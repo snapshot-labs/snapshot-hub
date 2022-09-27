@@ -99,8 +99,9 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
+  const shortId = `${id.slice(0, 7)}...`;
   console.log(
-    `[ingestor] New "${msg.type}" confirmed for "${body.address}" on "${msg.space}", id: ${id} (personal sign)`
+    `[ingestor] New "${msg.type}" on "${msg.space}",  for "${body.address}", id: ${shortId} (personal sign)`
   );
 
   return {

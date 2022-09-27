@@ -25,5 +25,4 @@ export async function action(message, ipfs): Promise<void> {
   };
 
   await db.queryAsync('REPLACE INTO users SET ?', params);
-  // console.log(`[writer] Stored: ${message.from} updated their profile`);
 }

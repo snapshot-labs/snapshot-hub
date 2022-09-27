@@ -7,7 +7,6 @@ export let strategiesObj: any = {};
 const uri = 'https://score.snapshot.org/api/strategies';
 
 async function loadStrategies() {
-  console.log('[strategies] Load strategies');
   const res = await snapshot.utils.getJSON(uri);
 
   Object.values(spaces).forEach((space: any) => {

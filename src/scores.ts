@@ -180,7 +180,6 @@ export async function updateProposalAndVotes(proposalId: string, force = false) 
     proposal.id,
     proposal.space,
     results.scores_state,
-    results.scores,
     votes.length
   );
 

@@ -7,6 +7,12 @@ import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import './helpers/strategies';
 
+import log from './helpers/log';
+
+log.info('Info message');
+log.warn('Warn message');
+log.error('Error message');
+
 const app = express();
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: false }));
