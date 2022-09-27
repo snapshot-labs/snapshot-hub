@@ -7,6 +7,7 @@ import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
 import { getSpace } from '../../helpers/actions';
 import { storeMsg } from '../highlight';
+import log from '../../helpers/log';
 
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
@@ -100,7 +101,7 @@ export default async function ingestor(body) {
   }
 
   const shortId = `${id.slice(0, 7)}...`;
-  console.log(
+  log.info(
     `[ingestor] New "${msg.type}" on "${msg.space}",  for "${body.address}", id: ${shortId} (personal sign)`
   );
 

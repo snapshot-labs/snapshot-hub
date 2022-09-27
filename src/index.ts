@@ -5,13 +5,8 @@ import api from './api';
 import ingestor from './ingestor';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
-import './helpers/strategies';
-
 import log from './helpers/log';
-
-log.info('Info message');
-log.warn('Warn message');
-log.error('Error message');
+import './helpers/strategies';
 
 const app = express();
 app.use(express.json({ limit: '20mb' }));
@@ -25,4 +20,4 @@ app.use('/graphql', graphql);
 app.get('/*', (req, res) => res.redirect('/api'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Started on: http://localhost:${PORT}`));
+app.listen(PORT, () => log.info(`Started on: http://localhost:${PORT}`));

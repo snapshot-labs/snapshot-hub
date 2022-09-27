@@ -1,6 +1,4 @@
-import snapshot from '@snapshot-labs/snapshot.js';
 import db from './mysql';
-import { getSpaceENS } from './ens';
 import { jsonParse } from './utils';
 
 export async function addOrUpdateSpace(space: string, settings: any) {
@@ -20,18 +18,6 @@ export async function addOrUpdateSpace(space: string, settings: any) {
     JSON.stringify(settings),
     settings.name
   ]);
-}
-
-export async function loadSpace(id) {
-  let space = false;
-  try {
-    const result = await getSpaceENS(id);
-    if (snapshot.utils.validateSchema(snapshot.schemas.space, result) === true) space = result;
-    console.log('Load space', id);
-  } catch (e) {
-    console.log('Load space failed', id);
-  }
-  return space;
 }
 
 export async function getProposal(space, id) {

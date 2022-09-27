@@ -8,6 +8,7 @@ import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
 import { getProposal, getSpace } from '../../helpers/actions';
 import { storeMsg } from '../highlight';
+import log from '../../helpers/log';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -147,7 +148,7 @@ export default async function ingestor(body) {
   }
 
   const shortId = `${id.slice(0, 7)}...`;
-  console.log(
+  log.info(
     `[ingestor] New "${type}" on "${message.space}",  for "${body.address}", id: ${shortId} (typed data)`
   );
 

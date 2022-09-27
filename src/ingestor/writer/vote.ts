@@ -4,6 +4,7 @@ import { jsonParse } from '../../helpers/utils';
 import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 import { updateProposalAndVotes } from '../../scores';
+import log from '../../helpers/log';
 
 async function isLimitReached(space) {
   const limit = 1500000;
@@ -54,7 +55,7 @@ export async function verify(body): Promise<any> {
     );
     if (vp.vp === 0) return Promise.reject('no voting power');
   } catch (e) {
-    console.log(
+    log.warn(
       '[writer] Failed to check voting power (vote)',
       msg.space,
       body.address,

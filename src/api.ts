@@ -1,9 +1,12 @@
 import express from 'express';
+import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces, spacesMetadata } from './helpers/spaces';
 import relayer from './helpers/relayer';
-import { addOrUpdateSpace, loadSpace } from './helpers/actions';
-import { name, version } from '../package.json';
+import { addOrUpdateSpace } from './helpers/actions';
+import { getSpaceENS } from './helpers/ens';
 import { updateProposalAndVotes } from './scores';
+import log from './helpers/log';
+import { name, version } from '../package.json';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
@@ -25,7 +28,7 @@ router.get('/scores/:proposalId', async (req, res) => {
     const result = await updateProposalAndVotes(proposalId);
     return res.json({ result });
   } catch (e) {
-    console.log('[api] updateProposalAndVotes() failed', proposalId, e);
+    log.warn('[api] updateProposalAndVotes() failed', proposalId, e);
     return res.json({ error: 'failed', message: e });
   }
 });
@@ -41,12 +44,19 @@ router.get('/spaces/:key', (req, res) => {
 
 router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
-  const space = await loadSpace(key);
-  if (space) {
-    await addOrUpdateSpace(key, space);
-    spaces[key] = space;
+  try {
+    let space = false;
+    const result = await getSpaceENS(key);
+    if (snapshot.utils.validateSchema(snapshot.schemas.space, result) === true) space = result;
+    if (space) {
+      await addOrUpdateSpace(key, space);
+      spaces[key] = space;
+    }
+    return res.json(space);
+  } catch (e) {
+    log.warn('[api] Load space failed', key);
+    return res.json(false);
   }
-  return res.json(space);
 });
 
 export default router;
