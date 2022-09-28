@@ -35,7 +35,7 @@ async function run() {
   try {
     await loadStrategies();
   } catch (e) {
-    log.error('[strategies] Failed to load', e);
+    log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(60e3);
   run();

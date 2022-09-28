@@ -9,7 +9,7 @@ export default async function (_parent, args, _context, info) {
 
     return spaces;
   } catch (e) {
-    log.error('[graphql] spaces', e);
+    log.error(`[graphql] spaces, ${JSON.stringify(e)}`);
     if (e instanceof PublicError) return e;
     return new Error('Unexpected error');
   }

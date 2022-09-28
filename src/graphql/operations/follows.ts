@@ -40,7 +40,7 @@ export default async function (parent, args) {
     follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));
   } catch (e) {
-    log.error('[graphql] follows', e);
+    log.error(`[graphql] follows, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

@@ -28,7 +28,7 @@ router.get('/scores/:proposalId', async (req, res) => {
     const result = await updateProposalAndVotes(proposalId);
     return res.json({ result });
   } catch (e) {
-    log.warn('[api] updateProposalAndVotes() failed', proposalId, e);
+    log.warn(`[api] updateProposalAndVotes() failed ${proposalId}, ${JSON.stringify(e)}`);
     return res.json({ error: 'failed', message: e });
   }
 });
@@ -54,7 +54,7 @@ router.get('/spaces/:key/poke', async (req, res) => {
     }
     return res.json(space);
   } catch (e) {
-    log.warn('[api] Load space failed', key);
+    log.warn(`[api] Load space failed ${key}`);
     return res.json(false);
   }
 });

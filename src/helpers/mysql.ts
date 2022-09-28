@@ -6,7 +6,7 @@ import parse from 'connection-string';
 import log from './log';
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
-log.info('[mysql] Connection limit', connectionLimit);
+log.info(`[mysql] connection limit ${connectionLimit}`);
 
 // @ts-ignore
 const config = parse(process.env.DATABASE_URL);

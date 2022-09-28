@@ -35,7 +35,7 @@ export default async function (parent, args) {
   try {
     return await db.queryAsync(query, params);
   } catch (e) {
-    log.error('[graphql] messages', e);
+    log.error(`[graphql] messages, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

@@ -8,7 +8,7 @@ export async function verify(body): Promise<any> {
   const profile = jsonParse(body.profile, {});
   const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.profile, profile);
   if (schemaIsValid !== true) {
-    log.warn('[writer] Wrong profile format', schemaIsValid);
+    log.warn(`[writer] Wrong profile format ${JSON.stringify(schemaIsValid)}`);
     return Promise.reject('wrong profile format');
   }
 

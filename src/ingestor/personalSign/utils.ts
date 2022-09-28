@@ -22,7 +22,7 @@ export async function verifySignature(
       const signer = recoverPublicKey(sig, hash);
       return signer.toLowerCase() === address.toLowerCase();
     } catch (e) {
-      log.warn('[utils] Wrong signature', e);
+      log.warn(`[utils] wrong signature, ${JSON.stringify(e)}`);
       return false;
     }
   } else {

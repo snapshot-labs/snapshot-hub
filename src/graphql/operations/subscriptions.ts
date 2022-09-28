@@ -40,7 +40,7 @@ export default async function (parent, args) {
     subscriptions = await db.queryAsync(query, params);
     return subscriptions.map(subscription => formatSubscription(subscription));
   } catch (e) {
-    log.error('[graphql] subscriptions', e);
+    log.error(`[graphql] subscriptions, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

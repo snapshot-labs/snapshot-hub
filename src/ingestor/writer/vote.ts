@@ -56,11 +56,9 @@ export async function verify(body): Promise<any> {
     if (vp.vp === 0) return Promise.reject('no voting power');
   } catch (e) {
     log.warn(
-      '[writer] Failed to check voting power (vote)',
-      msg.space,
-      body.address,
-      proposal.snapshot,
-      JSON.stringify(e)
+      `[writer] Failed to check voting power (vote), ${msg.space}, ${body.address}, ${
+        proposal.snapshot
+      }, ${JSON.stringify(e)}`
     );
     return Promise.reject('failed to check voting power');
   }
@@ -118,7 +116,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
       if (localCompare <= 0) return Promise.reject('already voted same time with lower index');
     }
     // Update previous vote
-    log.info('[writer] Update previous vote', voter, proposalId);
+    log.info(`[writer] Update previous vote, ${voter}, ${proposalId}`);
     await db.queryAsync(
       `
       UPDATE votes
@@ -148,8 +146,8 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   // Update proposal scores and voters vp
   try {
     const result = await updateProposalAndVotes(proposalId);
-    if (!result) log.warn('[writer] updateProposalAndVotes() false', proposalId);
+    if (!result) log.warn(`[writer] updateProposalAndVotes() false, ${proposalId}`);
   } catch (e) {
-    log.error('[writer] updateProposalAndVotes() failed', proposalId, e);
+    log.error(`[writer] updateProposalAndVotes() failed, ${proposalId}, ${JSON.stringify(e)}`);
   }
 }

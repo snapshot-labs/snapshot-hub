@@ -11,7 +11,7 @@ export default async function (_parent, { id }, _context, info) {
 
     return spaces[0];
   } catch (e) {
-    log.error('[graphql] space', e);
+    log.error(`[graphql] space, ${JSON.stringify(e)}`);
     if (e instanceof PublicError) return e;
     return new Error('Unexpected error');
   }

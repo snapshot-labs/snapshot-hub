@@ -14,7 +14,7 @@ router.post('/message', async (req, res) => {
     const result = await personalSign(req.body);
     return res.json(result);
   } catch (e) {
-    log.warn('[ingestor] msg validation failed (personal sign)', e);
+    log.warn(`[ingestor] msg validation failed (personal sign) ${JSON.stringify(e)}`);
     return sendError(res, e);
   }
 });
@@ -25,7 +25,7 @@ router.post('/msg', async (req, res) => {
     const result = await typedData(req.body);
     return res.json(result);
   } catch (e) {
-    log.warn('[ingestor] msg validation failed (typed data)', e);
+    log.warn(`[ingestor] msg validation failed (typed data) ${JSON.stringify(e)}`);
     return sendError(res, e);
   }
 });

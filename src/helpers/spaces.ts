@@ -14,7 +14,7 @@ async function loadSpaces() {
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
   const totalSpaces = Object.keys(spaces).length;
-  log.info('[spaces] Total spaces', totalSpaces);
+  log.info(`[spaces] total spaces ${totalSpaces}`);
 }
 
 async function getProposals() {
@@ -89,7 +89,7 @@ async function run() {
     await loadSpaces();
     await loadSpacesMetrics();
   } catch (e) {
-    log.error('[spaces] Failed to load spaces', e);
+    log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(60e3);
   await run();

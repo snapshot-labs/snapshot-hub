@@ -22,7 +22,7 @@ export async function getSpaceENS(id) {
       const [protocolType, key] = uri.split('://');
       space = await uriGet(gateway, key, protocolType);
     } catch (e) {
-      log.warn('[ens] getSpace failed', id, e);
+      log.warn(`[ens] getSpace failed ${id}, ${JSON.stringify(e)}`);
     }
   }
   return space;

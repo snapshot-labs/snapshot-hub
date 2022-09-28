@@ -25,13 +25,13 @@ export default async function (parent, { id }, context, info) {
         const proposals = await db.queryAsync(query, [proposalId]);
         result.proposal = formatProposal(proposals[0]);
       } catch (e) {
-        log.error('[graphql] vote', e);
+        log.error(`[graphql] vote, ${JSON.stringify(e)}`);
         return Promise.reject('request failed');
       }
     }
     return result;
   } catch (e) {
-    log.error('[graphql] vote', e);
+    log.error(`[graphql] vote, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

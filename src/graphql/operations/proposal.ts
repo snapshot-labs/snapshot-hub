@@ -13,7 +13,7 @@ export default async function (parent, { id }) {
     const proposals = await db.queryAsync(query, [id]);
     return proposals.map(proposal => formatProposal(proposal))[0] || null;
   } catch (e) {
-    log.error('[graphql] proposal', e);
+    log.error(`[graphql] proposal, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

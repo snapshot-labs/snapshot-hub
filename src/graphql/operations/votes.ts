@@ -48,7 +48,7 @@ async function query(parent, args, context?, info?) {
     // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
     votes = votes.map(vote => formatVote(vote));
   } catch (e) {
-    log.error('[graphql] votes', e);
+    log.error(`[graphql] votes, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 
@@ -69,7 +69,7 @@ async function query(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      log.error('[graphql] votes', e);
+      log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
   }
@@ -91,7 +91,7 @@ async function query(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      log.error('[graphql]', e);
+      log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
   }
