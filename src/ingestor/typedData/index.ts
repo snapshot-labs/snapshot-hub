@@ -55,10 +55,15 @@ export default async function ingestor(body) {
   }
 
   // Check if signature is valid
-  const isValid = await snapshot.utils.verify(body.address, body.sig, body.data, network);
-  const id = snapshot.utils.getHash(body.data);
-  if (!isValid) return Promise.reject('wrong signature');
+  try {
+    const isValidSig = await snapshot.utils.verify(body.address, body.sig, body.data, network);
+    if (!isValidSig) return Promise.reject('wrong signature');
+  } catch (e) {
+    log.warn(`signature validation failed for ${body.address}`);
+    return Promise.reject('signature validation failed');
+  }
 
+  const id = snapshot.utils.getHash(body.data);
   let payload = {};
 
   if (type === 'settings') payload = JSON.parse(message.settings);
