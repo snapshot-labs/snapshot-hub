@@ -2,6 +2,7 @@ import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
+import log from '../../helpers/log';
 
 const LIMIT = 20000;
 
@@ -47,7 +48,7 @@ async function query(parent, args, context?, info?) {
     // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
     votes = votes.map(vote => formatVote(vote));
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] votes, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 
@@ -68,7 +69,7 @@ async function query(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      console.log('[graphql]', e);
+      log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
   }
@@ -90,7 +91,7 @@ async function query(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      console.log('[graphql]', e);
+      log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
   }

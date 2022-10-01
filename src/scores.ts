@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
 import { sha256 } from './helpers/utils';
+import log from './helpers/log';
 
 async function getProposal(id: string): Promise<any | undefined> {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
@@ -100,7 +101,7 @@ async function updateVotesVp(votes: any[], vpState: string, proposalId: string) 
     if (i) await snapshot.utils.sleep(200);
     i++;
   }
-  console.log('[scores] Updated votes vp', votesWithChange.length, '/', votes.length, proposalId);
+  log.info(`[scores] updated votes vp, ${votesWithChange.length}/${votes.length} on ${proposalId}`);
 }
 
 async function updateProposalScores(proposalId: string, scores: any, votes: number) {
@@ -137,7 +138,7 @@ export async function updateProposalAndVotes(proposalId: string, force = false) 
   let vpState = 'final';
 
   if (!isFinal) {
-    console.log('[scores] Get scores', proposalId);
+    log.info(`[scores] Get scores', ${proposalId}`);
 
     // Get scores
     const { scores, state } = await getScores(
@@ -175,13 +176,8 @@ export async function updateProposalAndVotes(proposalId: string, force = false) 
 
   // Store scores
   await updateProposalScores(proposalId, results, votes.length);
-  console.log(
-    '[scores] Proposal updated',
-    proposal.id,
-    proposal.space,
-    results.scores_state,
-    results.scores,
-    votes.length
+  log.info(
+    `[scores] Proposal updated ${proposal.id}, ${proposal.space}, ${results.scores_state}, ${votes.length}`
   );
 
   return true;

@@ -1,6 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { uniq } from 'lodash';
 import db from './mysql';
+import log from './log';
 
 export let spaces = {};
 export const spacesMetadata = {};
@@ -9,12 +10,11 @@ export const spaceVotes = {};
 export const spaceFollowers = {};
 
 async function loadSpaces() {
-  console.log('[spaces] Load spaces from db');
   const query = 'SELECT id, settings FROM spaces ORDER BY id ASC';
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
   const totalSpaces = Object.keys(spaces).length;
-  console.log('[spaces] Total spaces', totalSpaces);
+  log.info(`[spaces] total spaces ${totalSpaces}`);
 }
 
 async function getProposals() {
@@ -50,8 +50,6 @@ async function getFollowers() {
 }
 
 async function loadSpacesMetrics() {
-  console.log('[spaces] Load spaces metrics');
-
   const metrics = await Promise.all([getProposals(), getVotes(), getFollowers()]);
   metrics[0].forEach(proposals => {
     if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
@@ -84,7 +82,6 @@ async function loadSpacesMetrics() {
       followers_7d: (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
     };
   });
-  console.log('[spaces] Space metrics loaded');
 }
 
 async function run() {
@@ -92,9 +89,9 @@ async function run() {
     await loadSpaces();
     await loadSpacesMetrics();
   } catch (e) {
-    console.log('[spaces] Failed to run', e);
+    log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(20e3);
+  await snapshot.utils.sleep(60e3);
   await run();
 }
 

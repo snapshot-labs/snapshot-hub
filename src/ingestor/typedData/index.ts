@@ -8,6 +8,7 @@ import { jsonParse, sha256 } from '../../helpers/utils';
 import { isValidAlias } from '../../helpers/alias';
 import { getProposal, getSpace } from '../../helpers/actions';
 import { storeMsg } from '../highlight';
+import log from '../../helpers/log';
 
 const NAME = 'snapshot';
 const VERSION = '0.1.4';
@@ -15,7 +16,7 @@ const VERSION = '0.1.4';
 export default async function ingestor(body) {
   const schemaIsValid = snapshot.utils.validateSchema(envelope, body);
   if (schemaIsValid !== true) {
-    console.log('[ingestor] Wrong envelope format', schemaIsValid);
+    log.warn(`[ingestor] Wrong envelope format ${JSON.stringify(schemaIsValid)}`);
     return Promise.reject('wrong envelope format');
   }
 
@@ -54,11 +55,15 @@ export default async function ingestor(body) {
   }
 
   // Check if signature is valid
-  const isValid = await snapshot.utils.verify(body.address, body.sig, body.data, network);
-  const id = snapshot.utils.getHash(body.data);
-  if (!isValid) return Promise.reject('wrong signature');
-  // console.log('[ingestor] Signature is valid');
+  try {
+    const isValidSig = await snapshot.utils.verify(body.address, body.sig, body.data, network);
+    if (!isValidSig) return Promise.reject('wrong signature');
+  } catch (e) {
+    log.warn(`signature validation failed for ${body.address}`);
+    return Promise.reject('signature validation failed');
+  }
 
+  const id = snapshot.utils.getHash(body.data);
   let payload = {};
 
   if (type === 'settings') payload = JSON.parse(message.settings);
@@ -117,7 +122,7 @@ export default async function ingestor(body) {
   try {
     context = await writer[type].verify(legacyBody);
   } catch (e) {
-    console.log('[ingestor]', e);
+    log.warn(`[ingestor] verify failed ${JSON.stringify(e)}`);
     return Promise.reject(e);
   }
 
@@ -147,8 +152,9 @@ export default async function ingestor(body) {
     return Promise.reject(e);
   }
 
-  console.log(
-    `[ingestor] New "${type}" confirmed for "${body.address}" on "${message.space}", id: ${id} (typed data)`
+  const shortId = `${id.slice(0, 7)}...`;
+  log.info(
+    `[ingestor] New "${type}" on "${message.space}",  for "${body.address}", id: ${shortId} (typed data)`
   );
 
   return {

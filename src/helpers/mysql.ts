@@ -3,9 +3,10 @@ import Pool from 'mysql/lib/Pool';
 import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
+import log from './log';
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
-console.log('Connection limit', connectionLimit);
+log.info(`[mysql] connection limit ${connectionLimit}`);
 
 // @ts-ignore
 const config = parse(process.env.DATABASE_URL);

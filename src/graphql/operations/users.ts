@@ -1,5 +1,6 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatUser } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function (parent, args) {
   const { where = {} } = args;
@@ -36,7 +37,7 @@ export default async function (parent, args) {
     users = await db.queryAsync(query, params);
     return users.map(user => formatUser(user));
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] users, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

@@ -4,6 +4,7 @@ import { getAddress } from '@ethersproject/address';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
 import { getSpace } from '../../helpers/actions';
+import log from '../../helpers/log';
 
 const proposalDayLimit = 32;
 const proposalMonthLimit = 320;
@@ -24,7 +25,7 @@ export async function verify(body): Promise<any> {
 
   const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.proposal, msg.payload);
   if (schemaIsValid !== true) {
-    console.log('[writer] Wrong proposal format', schemaIsValid);
+    log.warn('[writer] Wrong proposal format', schemaIsValid);
     return Promise.reject('wrong proposal format');
   }
 
@@ -129,5 +130,4 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const params: any[] = [proposal];
 
   await db.queryAsync(query, params);
-  // console.log('[writer] Store proposal complete', space, id);
 }

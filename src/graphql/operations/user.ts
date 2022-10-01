@@ -1,5 +1,6 @@
 import db from '../../helpers/mysql';
 import { formatUser } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function (parent, args) {
   const id = args.id;
@@ -9,7 +10,7 @@ export default async function (parent, args) {
     if (users.length === 1) return formatUser(users[0]);
     return null;
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] user, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

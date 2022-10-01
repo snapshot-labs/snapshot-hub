@@ -2,6 +2,7 @@ import personalSign from './personalSign';
 import typedData from './typedData';
 import express from 'express';
 import { sendError } from '../helpers/utils';
+import log from '../helpers/log';
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.post('/message', async (req, res) => {
     const result = await personalSign(req.body);
     return res.json(result);
   } catch (e) {
-    console.log('[ingestor] personalSign msg failed', e);
+    log.warn(`[ingestor] msg validation failed (personal sign) ${JSON.stringify(e)}`);
     return sendError(res, e);
   }
 });
@@ -24,7 +25,7 @@ router.post('/msg', async (req, res) => {
     const result = await typedData(req.body);
     return res.json(result);
   } catch (e) {
-    console.log('[ingestor] typedData msg failed', e);
+    log.warn(`[ingestor] msg validation failed (typed data) ${JSON.stringify(e)}`);
     return sendError(res, e);
   }
 });

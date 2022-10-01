@@ -1,6 +1,7 @@
 import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
 import gateways from '@snapshot-labs/snapshot.js/src/gateways.json';
+import log from './log';
 
 const gateway = gateways[0];
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
@@ -21,7 +22,7 @@ export async function getSpaceENS(id) {
       const [protocolType, key] = uri.split('://');
       space = await uriGet(gateway, key, protocolType);
     } catch (e) {
-      console.log('getSpace failed', id, e);
+      log.warn(`[ens] getSpace failed ${id}, ${JSON.stringify(e)}`);
     }
   }
   return space;

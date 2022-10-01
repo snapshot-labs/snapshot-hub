@@ -1,5 +1,6 @@
 import db from '../../helpers/mysql';
 import { formatProposal } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function (parent, { id }) {
   const query = `
@@ -12,7 +13,7 @@ export default async function (parent, { id }) {
     const proposals = await db.queryAsync(query, [id]);
     return proposals.map(proposal => formatProposal(proposal))[0] || null;
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] proposal, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }
