@@ -120,7 +120,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
     await db.queryAsync(
       `
       UPDATE votes
-      SET id = ?, ipfs = ?, created = ?, choice = ?, metadata = ?, app = ?, vp = ?, vp_by_strategy = ?, vp_state = ?
+      SET id = ?, ipfs = ?, created = ?, choice = ?, reason = ?, metadata = ?, app = ?, vp = ?, vp_by_strategy = ?, vp_state = ?
       WHERE voter = ? AND proposal = ? AND space = ?
     `,
       [
@@ -128,6 +128,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
         ipfs,
         created,
         choice,
+        reason,
         metadata,
         app,
         params.vp,
