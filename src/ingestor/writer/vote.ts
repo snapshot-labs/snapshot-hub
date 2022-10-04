@@ -1,6 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
-import { jsonParse } from '../../helpers/utils';
+import { hasStrategyOverride, jsonParse } from '../../helpers/utils';
 import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 import { updateProposalAndVotes } from '../../scores';
@@ -81,8 +81,8 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
 
   // Check if voting power is final
   let vpState = context.vp.vp_state;
-  const withDelegation = JSON.stringify(context.proposal.strategies).includes('delegation');
-  if (vpState === 'final' && withDelegation) vpState = 'pending';
+  const withOverride = hasStrategyOverride(context.proposal.strategies);
+  if (vpState === 'final' && withOverride) vpState = 'pending';
 
   const params = {
     id,

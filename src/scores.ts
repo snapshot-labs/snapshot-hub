@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
-import { sha256 } from './helpers/utils';
+import { hasStrategyOverride, sha256 } from './helpers/utils';
 import log from './helpers/log';
 
 async function getProposal(id: string): Promise<any | undefined> {
@@ -168,8 +168,8 @@ export async function updateProposalAndVotes(proposalId: string, force = false) 
   };
 
   // Check if voting power is final
-  const withDelegation = JSON.stringify(proposal.strategies).includes('delegation');
-  if (vpState === 'final' && withDelegation && proposal.state !== 'closed') vpState = 'pending';
+  const withOverride = hasStrategyOverride(proposal.strategies);
+  if (vpState === 'final' && withOverride && proposal.state !== 'closed') vpState = 'pending';
 
   // Update votes voting power
   if (!isFinal) await updateVotesVp(votes, vpState, proposalId);

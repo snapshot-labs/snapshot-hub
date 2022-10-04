@@ -25,3 +25,16 @@ export async function getJSON(uri) {
   const url = snapshot.utils.getUrl(uri);
   return fetch(url).then(res => res.json());
 }
+
+export function hasStrategyOverride(strategies: any[]) {
+  const overriders = [
+    'delegation',
+    'erc20-votes-with-override',
+    'erc20-balance-of-delegation',
+    'aura-balance-of-vlaura-vebal'
+  ];
+  const names = strategies.map(strategy => strategy.name || '');
+  if (names.some(name => overriders.includes(name))) return true;
+  if (JSON.stringify(strategies).toLowerCase().includes('delegation')) return true;
+  return false;
+}
