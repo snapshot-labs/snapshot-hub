@@ -27,14 +27,12 @@ export async function getJSON(uri) {
 }
 
 export function hasStrategyOverride(strategies: any[]) {
-  const overriders = [
+  const keywords = [
     'delegation',
     'erc20-votes-with-override',
     'erc20-balance-of-delegation',
     'aura-balance-of-vlaura-vebal'
   ];
-  const names = strategies.map(strategy => strategy.name || '');
-  if (names.some(name => overriders.includes(name))) return true;
-  if (JSON.stringify(strategies).toLowerCase().includes('delegation')) return true;
-  return false;
+  const strategiesStr = JSON.stringify(strategies).toLowerCase();
+  return keywords.some(keyword => strategiesStr.includes(keyword));
 }
