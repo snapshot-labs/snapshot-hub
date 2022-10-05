@@ -1186,6 +1186,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@shutter-network/shutter-crypto@^0.1.0-beta.3":
+  version "0.1.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@shutter-network/shutter-crypto/-/shutter-crypto-0.1.0-beta.3.tgz#0ec7a3beab87aed15363349d240dfdff8d462012"
+  integrity sha512-kX9gOODp/4HqRubM7Hx4bb36yuVxIB/FOb4CfhB3gGWO5H2u7i0EnvrdJzsYXtDSrELXv7ay5Ly9k6X2fAk1jA==
+  dependencies:
+    browser-or-node "^2.0.0"
+
 "@snapshot-labs/eslint-config@0.1.0-beta.6":
   version "0.1.0-beta.6"
   resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config/-/eslint-config-0.1.0-beta.6.tgz#85f5221a97d5292914384a6345a12028718223c0"
@@ -1675,6 +1682,11 @@ brorand@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
   integrity sha1-EsJe/kCkXjwyPrhnWgoM5XsiNx8=
+
+browser-or-node@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/browser-or-node/-/browser-or-node-2.0.0.tgz#808ea90282a670931cdc0ea98166538a50dd0d89"
+  integrity sha512-3Lrks/Okgof+/cRguUNG+qRXSeq79SO3hY4QrXJayJofwJwHiGC0qi99uDjsfTwULUFSr1OGVsBkdIkygKjTUA==
 
 browserify-aes@^1.2.0:
   version "1.2.0"

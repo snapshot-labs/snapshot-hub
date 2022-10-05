@@ -3,6 +3,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import db from './helpers/mysql';
 import { hasStrategyOverride, sha256 } from './helpers/utils';
 import log from './helpers/log';
+import { getDecryptionKey } from './helpers/shutter';
 
 async function getProposal(id: string): Promise<any | undefined> {
   const query = 'SELECT * FROM proposals WHERE id = ? LIMIT 1';
@@ -129,8 +130,13 @@ async function updateProposalScores(proposalId: string, scores: any, votes: numb
 
 export async function updateProposalAndVotes(proposalId: string, force = false) {
   const proposal = await getProposal(proposalId);
-  if (!proposal || (!force && proposal.privacy === 'shutter')) return false;
+  if (!proposal) return false;
   if (proposal.scores_state === 'final') return true;
+
+  if (!force && proposal.privacy === 'shutter') {
+    if (proposal.state === 'closed') await getDecryptionKey(proposal.id);
+    return true;
+  }
 
   // Get votes
   let votes: any = await getVotes(proposalId);
