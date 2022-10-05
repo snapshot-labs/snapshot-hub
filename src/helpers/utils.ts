@@ -45,3 +45,14 @@ export function rpcError(res, code, e, id) {
     id
   });
 }
+
+export function hasStrategyOverride(strategies: any[]) {
+  const keywords = [
+    'delegation',
+    'erc20-votes-with-override',
+    'erc20-balance-of-delegation',
+    'aura-balance-of-vlaura-vebal'
+  ];
+  const strategiesStr = JSON.stringify(strategies).toLowerCase();
+  return keywords.some(keyword => strategiesStr.includes(keyword));
+}
