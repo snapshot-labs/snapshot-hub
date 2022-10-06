@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
+import kebabCase from 'lodash/kebabCase';
 import { jsonParse } from '../../helpers/utils';
 import db from '../../helpers/mysql';
 import { getSpace } from '../../helpers/actions';
@@ -118,7 +119,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     quorum: spaceSettings?.voting?.quorum || 0,
     privacy: spaceSettings?.voting?.privacy || '',
     snapshot: proposalSnapshot || 0,
-    app: msg.payload.app || '',
+    app: kebabCase(msg.payload.app || ''),
     scores: JSON.stringify([]),
     scores_by_strategy: JSON.stringify([]),
     scores_state: '',
