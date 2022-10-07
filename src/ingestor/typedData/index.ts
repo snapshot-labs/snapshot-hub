@@ -1,6 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import hashTypes from '@snapshot-labs/snapshot.js/src/sign/types.json';
 import { pin } from '@snapshot-labs/pineapple';
+import kebabCase from 'lodash/kebabCase';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import envelope from './envelope.json';
 import writer from '../writer';
@@ -81,7 +82,7 @@ export default async function ingestor(body) {
         plugins: JSON.parse(message.plugins)
       },
       type: message.type,
-      app: message.app || ''
+      app: kebabCase(message.app || '')
     };
 
   if (type === 'delete-proposal') payload = { proposal: message.proposal };
@@ -96,7 +97,7 @@ export default async function ingestor(body) {
       proposal: message.proposal,
       choice,
       reason: message.reason || '',
-      app: message.app || ''
+      app: kebabCase(message.app || '')
     };
     type = 'vote';
   }
