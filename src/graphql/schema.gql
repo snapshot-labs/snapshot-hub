@@ -143,6 +143,7 @@ input ProposalWhere {
   network: String
   network_in: [String]
   title_contains: String
+  strategies_contains: String
   type: String
   type_in: [String]
   created: Int
