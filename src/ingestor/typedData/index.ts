@@ -90,6 +90,7 @@ export default async function ingestor(body) {
     let choice = message.choice;
     if (type === 'vote-string') {
       const proposal = await getProposal(message.space, message.proposal);
+      if (!proposal) return Promise.reject('unknown proposal');
       if (proposal.privacy !== 'shutter') choice = JSON.parse(message.choice);
     }
     payload = {
@@ -123,7 +124,7 @@ export default async function ingestor(body) {
     context = await writer[type].verify(legacyBody);
   } catch (e) {
     log.warn(`[ingestor] verify failed ${JSON.stringify(e)}`);
-    return Promise.reject(e);
+    return Promise.reject('validation failed');
   }
 
   let pinned;

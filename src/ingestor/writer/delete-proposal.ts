@@ -5,6 +5,7 @@ import db from '../../helpers/mysql';
 export async function verify(body): Promise<any> {
   const msg = jsonParse(body.msg);
   const proposal = await getProposal(msg.space, msg.payload.proposal);
+  if (!proposal) return Promise.reject('unknown proposal');
 
   const space = await getSpace(msg.space);
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());

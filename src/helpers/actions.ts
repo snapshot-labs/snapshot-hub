@@ -23,6 +23,7 @@ export async function addOrUpdateSpace(space: string, settings: any) {
 export async function getProposal(space, id) {
   const query = `SELECT * FROM proposals WHERE space = ? AND id = ?`;
   const [proposal] = await db.queryAsync(query, [space, id]);
+  if (!proposal) return null;
   proposal.strategies = jsonParse(proposal.strategies);
   proposal.choices = jsonParse(proposal.choices);
   return proposal;

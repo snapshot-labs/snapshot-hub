@@ -39,7 +39,7 @@ router.get('/explore', (req, res) => {
 
 router.get('/spaces/:key', (req, res) => {
   const { key } = req.params;
-  return res.json(spaces[key]);
+  return res.json(spaces[key] || false);
 });
 
 router.get('/spaces/:key/poke', async (req, res) => {

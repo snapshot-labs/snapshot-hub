@@ -13,7 +13,7 @@ export function jsonParse(input, fallback?) {
 export function sendError(res, description, status = 500) {
   return res.status(status).json({
     error: 'unauthorized',
-    error_description: description
+    error_description: typeof description === 'string' ? description : 'something went wrong'
   });
 }
 
