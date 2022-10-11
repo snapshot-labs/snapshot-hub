@@ -12,6 +12,7 @@ import log from './log';
 init().then(() => log.info('[shutter] init'));
 
 const SHUTTER_URL = process.env.SHUTTER_URL || '';
+const SHUTTER_IPS = ['164.92.221.74', '2a03:b0c0:2:d0::13be:6001'];
 const router = express.Router();
 
 export async function shutterDecrypt(encryptedMsg: string, decryptionKey: string) {
@@ -104,6 +105,10 @@ export async function setProposalKey(params) {
 
 router.all('/', async (req, res) => {
   log.info(`[shutter] incoming rpc request ${JSON.stringify(req.body)} from ${getIp(req)}`);
+  if (!SHUTTER_IPS.includes(getIp(req))) {
+    return rpcError(res, 500, 'not authorized', null);
+  }
+
   const id = req.body.id || null;
   try {
     const { method, params } = req.body;
