@@ -4,7 +4,7 @@ import fetch from 'cross-fetch';
 import { init, decrypt } from '@shutter-network/shutter-crypto';
 import { arrayify } from '@ethersproject/bytes';
 import { toUtf8String } from '@ethersproject/strings';
-import { jsonParse, rpcError, rpcSuccess} from './utils';
+import { getIp, jsonParse, rpcError, rpcSuccess } from './utils';
 import { updateProposalAndVotes } from '../scores';
 import db from './mysql';
 import log from './log';
@@ -103,7 +103,7 @@ export async function setProposalKey(params) {
 }
 
 router.all('/', async (req, res) => {
-  log.info(`[shutter] incoming rpc request ${JSON.stringify(req.body)} from ${req.ip}`);
+  log.info(`[shutter] incoming rpc request ${JSON.stringify(req.body)} from ${getIp(req)}`);
   const id = req.body.id || null;
   try {
     const { method, params } = req.body;

@@ -56,3 +56,7 @@ export function hasStrategyOverride(strategies: any[]) {
   const strategiesStr = JSON.stringify(strategies).toLowerCase();
   return keywords.some(keyword => strategiesStr.includes(keyword));
 }
+
+export function getIp(req) {
+  return req.headers['cf-connecting-ip'] || req.ip;
+}
