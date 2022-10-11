@@ -39,7 +39,7 @@ export default async function (parent, args) {
     searchSql = 'AND p.title LIKE ?';
     params.push(`%${where.title_contains}%`);
   }
-  
+
   if (where.strategies_contains) {
     searchSql += ' AND p.strategies LIKE ?';
     params.push(`%${where.strategies_contains}%`);

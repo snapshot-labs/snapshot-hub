@@ -4,7 +4,7 @@ import fetch from 'cross-fetch';
 import { init, decrypt } from '@shutter-network/shutter-crypto';
 import { arrayify } from '@ethersproject/bytes';
 import { toUtf8String } from '@ethersproject/strings';
-import { rpcError, rpcSuccess } from './utils';
+import { jsonParse, rpcError, rpcSuccess} from './utils';
 import { updateProposalAndVotes } from '../scores';
 import db from './mysql';
 import log from './log';
@@ -83,7 +83,7 @@ export async function setProposalKey(params) {
     const sqlParams: string[] = [];
     let sqlQuery = '';
     for (const vote of votes) {
-      const choice = await shutterDecrypt(JSON.parse(vote.choice), `0x${key}`);
+      const choice = await shutterDecrypt(jsonParse(vote.choice), `0x${key}`);
       log.info(`[shutter] decrypted choice ${JSON.stringify(choice)}`);
       if (choice !== false) {
         sqlQuery += `UPDATE votes SET choice = ? WHERE id = ? LIMIT 1; `;
@@ -103,7 +103,7 @@ export async function setProposalKey(params) {
 }
 
 router.all('/', async (req, res) => {
-  log.info(`[shutter] incoming rpc request ${JSON.stringify(req.body)}`);
+  log.info(`[shutter] incoming rpc request ${JSON.stringify(req.body)} from ${req.ip}`);
   const id = req.body.id || null;
   try {
     const { method, params } = req.body;

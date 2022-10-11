@@ -37,7 +37,8 @@ export async function verify(body): Promise<any> {
     return Promise.reject('not in voting window');
 
   if (proposal.privacy === 'shutter') {
-    if (typeof msg.payload.choice !== 'string') return Promise.reject('invalid choice');
+    if (typeof msg.payload.choice !== 'string' || !msg.payload.choice.startsWith('0x'))
+      return Promise.reject('invalid choice');
   } else {
     if (!snapshot.utils.voting[proposal.type].isValidChoice(msg.payload.choice, proposal.choices))
       return Promise.reject('invalid choice');
