@@ -17,6 +17,10 @@ export default async function ingestor(body) {
   const underTs = (ts - under).toFixed();
 
   if (!body || !body.address || !body.msg || !body.sig) return Promise.reject('wrong message body');
+  if (body.sig !== '0x')
+    return Promise.reject(
+      'The personal sign format is not supported anymore, please use typed data instead. Learn more here: https://snapshot.mirror.xyz/vuManI14DW8u2zhrlskndNgQcXOTbKIelQvkgmxOG2k'
+    );
 
   const msg = jsonParse(body.msg);
 
