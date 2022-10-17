@@ -55,7 +55,6 @@ export function hasStrategyOverride(strategies: any[]) {
     'delegation',
     'erc20-balance-of-fixed-total',
     'erc20-votes-with-override',
-    'gooddollar-multichain',
     'ocean-dao-brightid'
   ];
   const strategiesStr = JSON.stringify(strategies).toLowerCase();
