@@ -47,11 +47,16 @@ export function rpcError(res, code, e, id) {
 }
 
 export function hasStrategyOverride(strategies: any[]) {
-  const keywords = [
+  const keywords =  [
+    'api',
+    'aura-vlaura-vebal-with-overrides',
+    'balance-of-with-linear-vesting-power',
+    'cyberkongz',
     'delegation',
+    'erc20-balance-of-fixed-total',
     'erc20-votes-with-override',
-    'erc20-balance-of-delegation',
-    'aura-balance-of-vlaura-vebal'
+    'gooddollar-multichain',
+    'ocean-dao-brightid'
   ];
   const strategiesStr = JSON.stringify(strategies).toLowerCase();
   return keywords.some(keyword => strategiesStr.includes(keyword));
