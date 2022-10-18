@@ -2,7 +2,7 @@
     <img src="https://raw.githubusercontent.com/snapshot-labs/snapshot/develop/public/icon.svg" height="70" alt="Snapshot Logo">
     <h1>Snapshot hub</h1>
     <strong>
-      This is a hub for Snapshot network that stores the database and forwards new messages to peers. The hub hold a private keys to sign valid messages.
+      This is a hub for Snapshot network that stores the database and forwards new messages to peers. The hub holds a private key to sign valid messages.
     </strong>
 </div>
 <br>
