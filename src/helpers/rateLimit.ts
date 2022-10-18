@@ -6,6 +6,7 @@ export default rateLimit({
   windowMs: 16 * 1e3,
   max: 80,
   keyGenerator: req => getIp(req),
+  standardHeaders: true,
   handler: (req, res) => {
     // const id = sha256(getIp(req));
     log.info(`too many requests ${getIp(req).slice(0, 7)}`);
