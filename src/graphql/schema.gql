@@ -278,6 +278,7 @@ type Space {
   website: String
   twitter: String
   github: String
+  coingecko: String
   email: String
   network: String
   symbol: String
