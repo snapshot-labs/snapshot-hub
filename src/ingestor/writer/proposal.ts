@@ -56,18 +56,25 @@ export async function verify(body): Promise<any> {
     if (msg.payload.type !== space.voting.type) return Promise.reject('invalid voting type');
   }
 
-  try {
-    const validationName = space.validation?.name || 'basic';
-    const validationParams = space.validation?.params || {};
-    const isValid = await snapshot.utils.validations[validationName](
-      body.address,
-      space,
-      msg.payload,
-      validationParams
-    );
-    if (!isValid) return Promise.reject('validation failed');
-  } catch (e) {
-    return Promise.reject('failed to check validation');
+  const onlyAuthors = space.filters?.onlyMembers;
+  const authors = (space.members || []).map(address => address.toLowerCase());
+  const isAuthor = authors.includes(body.address.toLowerCase());
+  if (onlyAuthors && !isAuthor) return Promise.reject('only space authors can propose');
+
+  if (!isAuthor) {
+    try {
+      const validationName = space.validation?.name || 'basic';
+      const validationParams = space.validation?.params || {};
+      const isValid = await snapshot.utils.validations[validationName](
+        body.address,
+        space,
+        msg.payload,
+        validationParams
+      );
+      if (!isValid) return Promise.reject('validation failed');
+    } catch (e) {
+      return Promise.reject('failed to check validation');
+    }
   }
 
   const provider = snapshot.utils.getProvider(space.network);
