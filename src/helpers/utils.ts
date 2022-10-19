@@ -47,7 +47,7 @@ export function rpcError(res, code, e, id) {
 }
 
 export function hasStrategyOverride(strategies: any[]) {
-  const keywords =  [
+  const keywords = [
     '"api"',
     '"api-post"',
     '"aura-vlaura-vebal-with-overrides"',
