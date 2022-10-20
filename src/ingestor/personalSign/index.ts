@@ -12,7 +12,7 @@ import log from '../../helpers/log';
 export default async function ingestor(body) {
   const ts = Date.now() / 1e3;
   const over = 300;
-  const under = 60 * 60 * 24 * 2;
+  const under = 60 * 60 * 24 * 3;
   const overTs = (ts + over).toFixed();
   const underTs = (ts - under).toFixed();
 
