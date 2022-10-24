@@ -312,6 +312,7 @@ type SpaceVoting {
   blind: Boolean
   hideAbstain: Boolean
   privacy: String
+  aliased: Boolean
 }
 
 type Proposal {
