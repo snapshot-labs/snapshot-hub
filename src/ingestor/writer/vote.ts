@@ -175,7 +175,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
     const result = await updateProposalAndVotes(proposalId);
     if (!result) log.warn(`[writer] updateProposalAndVotes() false, ${proposalId}`);
   } catch (e) {
-    log.error(`[writer] updateProposalAndVotes() failed, ${proposalId}`);
+    log.error(`[writer] updateProposalAndVotes() failed, ${msg.space}, ${proposalId}`);
     console.log('[writer] updateProposalAndVotes() failed', e);
   }
 }
