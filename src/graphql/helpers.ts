@@ -27,6 +27,7 @@ export function formatSpace(id, settings) {
   space.voting.quorum = space.voting.quorum || null;
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
+  space.voting.aliased = space.voting.aliased || false;
   space.followersCount = spaceFollowers[id]?.count || 0;
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
