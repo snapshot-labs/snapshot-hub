@@ -366,6 +366,22 @@ type Vote {
   vp_state: String
 }
 
+type CustomVote {
+  id: String!
+  ipfs: String
+  voter: String!
+  created: Int!
+  space: Space!
+  proposal: Proposal
+  choice: Any!
+  metadata: Any
+  reason: String
+  app: String
+  vp: Float
+  vp_by_strategy: [Float]
+  vp_state: String
+}
+
 type Alias {
   id: String!
   ipfs: String
