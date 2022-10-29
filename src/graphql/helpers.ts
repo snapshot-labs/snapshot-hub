@@ -32,6 +32,7 @@ export function formatSpace(id, settings) {
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.validation = space.validation || { name: 'basic', params: {} };
+  space.voteValidation = space.voteValidation || null;
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
     // By default return space network if strategy network is not defined
@@ -202,6 +203,7 @@ export function formatUser(user) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
+  proposal.voteValidation = jsonParse(proposal.voteValidation, null);
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);

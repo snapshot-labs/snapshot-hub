@@ -24,6 +24,7 @@ export async function getProposal(space, id) {
   const query = `SELECT * FROM proposals WHERE space = ? AND id = ?`;
   const [proposal] = await db.queryAsync(query, [space, id]);
   proposal.strategies = jsonParse(proposal.strategies);
+  proposal.voteValidation = jsonParse(proposal.voteValidation, null);
   proposal.choices = jsonParse(proposal.choices);
   return proposal;
 }

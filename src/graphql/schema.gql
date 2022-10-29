@@ -291,7 +291,8 @@ type Space {
   plugins: Any
   voting: SpaceVoting
   categories: [String]
-  validation: Strategy
+  validation: NameAndParams
+  voteValidation: NameAndParams
   treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
@@ -325,6 +326,7 @@ type Proposal {
   symbol: String!
   type: String
   strategies: [Strategy]!
+  voteValidation: NameAndParams
   plugins: Any!
   title: String!
   body: String
@@ -349,6 +351,11 @@ type Proposal {
 type Strategy {
   name: String!
   network: String
+  params: Any
+}
+
+type NameAndParams {
+  name: String
   params: Any
 }
 
