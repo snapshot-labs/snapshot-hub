@@ -39,6 +39,8 @@ export async function verify(body): Promise<any> {
   if (proposal.privacy === 'shutter') {
     if (typeof msg.payload.choice !== 'string' || !msg.payload.choice.startsWith('0x'))
       return Promise.reject('invalid choice');
+    if (msg.payload.reason.length !== 0)
+      return Promise.reject('no reason allowed on proposal with Shutter privacy enabled');
   } else {
     if (!snapshot.utils.voting[proposal.type].isValidChoice(msg.payload.choice, proposal.choices))
       return Promise.reject('invalid choice');
@@ -58,8 +60,7 @@ export async function verify(body): Promise<any> {
     if (vp.vp === 0) return Promise.reject('no voting power');
   } catch (e) {
     log.warn(
-      `[writer] Failed to check voting power (vote), ${msg.space}, ${body.address}, ${
-        proposal.snapshot
+      `[writer] Failed to check voting power (vote), ${msg.space}, ${body.address}, ${proposal.snapshot
       }, ${JSON.stringify(e)}`
     );
     return Promise.reject('failed to check voting power');
