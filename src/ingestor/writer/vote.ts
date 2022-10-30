@@ -60,7 +60,8 @@ export async function verify(body): Promise<any> {
     if (vp.vp === 0) return Promise.reject('no voting power');
   } catch (e) {
     log.warn(
-      `[writer] Failed to check voting power (vote), ${msg.space}, ${body.address}, ${proposal.snapshot
+      `[writer] Failed to check voting power (vote), ${msg.space}, ${body.address}, ${
+        proposal.snapshot
       }, ${JSON.stringify(e)}`
     );
     return Promise.reject('failed to check voting power');
