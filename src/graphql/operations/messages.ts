@@ -6,6 +6,7 @@ export default async function (parent, args) {
   const { where = {} } = args;
 
   const fields = {
+    id: 'string',
     mci: 'number',
     timestamp: 'number',
     space: 'string',
