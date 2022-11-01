@@ -355,7 +355,7 @@ type Strategy {
 }
 
 type Validation {
-  name: String
+  name: String!
   params: Any
 }
 
