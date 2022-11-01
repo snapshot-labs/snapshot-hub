@@ -33,7 +33,6 @@ export function formatSpace(id, settings) {
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any' };
   space.validation = space.validation || { name: 'basic', params: {} };
-  space.voteValidation = space.voteValidation || null;
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
     // By default return space network if strategy network is not defined
