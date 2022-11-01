@@ -203,7 +203,7 @@ export function formatUser(user) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
-  proposal.validation = jsonParse(proposal.validation, null);
+  proposal.validation = jsonParse(proposal.validation, { name: 'any' });
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
