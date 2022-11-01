@@ -44,8 +44,7 @@ export async function verify(body): Promise<any> {
       return Promise.reject('invalid choice');
   }
 
-  const space = await getSpace(msg.space);
-  if (space.voteValidation?.name && space.voteValidation.name !== 'any') {
+  if (proposal.validation?.name && proposal.validation.name !== 'any') {
     try {
       const { validation } = proposal;
       const validate = await snapshot.utils.validate(
