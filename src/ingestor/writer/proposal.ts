@@ -102,6 +102,7 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
   const created = parseInt(msg.timestamp);
   const metadata = msg.payload.metadata || {};
   const strategies = JSON.stringify(spaceSettings.strategies);
+  const validation = JSON.stringify(spaceSettings.voteValidation);
   const plugins = JSON.stringify(metadata.plugins || {});
   const network = spaceSettings.network;
   const proposalSnapshot = parseInt(msg.payload.snapshot || '0');
@@ -132,7 +133,8 @@ export async function action(body, ipfs, receipt, id): Promise<void> {
     scores_state: '',
     scores_total: 0,
     scores_updated: 0,
-    votes: 0
+    votes: 0,
+    validation
   };
   const query = 'INSERT IGNORE INTO proposals SET ?; ';
   const params: any[] = [proposal];

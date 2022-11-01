@@ -326,6 +326,7 @@ type Proposal {
   symbol: String!
   type: String
   strategies: [Strategy]!
+  validation: Validation
   plugins: Any!
   title: String!
   body: String

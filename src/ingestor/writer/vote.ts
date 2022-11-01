@@ -2,7 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { getAddress } from '@ethersproject/address';
 import kebabCase from 'lodash/kebabCase';
 import { hasStrategyOverride, jsonParse } from '../../helpers/utils';
-import { getProposal, getSpace } from '../../helpers/actions';
+import { getProposal } from '../../helpers/actions';
 import db from '../../helpers/mysql';
 import { updateProposalAndVotes } from '../../scores';
 import log from '../../helpers/log';
@@ -44,10 +44,9 @@ export async function verify(body): Promise<any> {
       return Promise.reject('invalid choice');
   }
 
-  const space = await getSpace(msg.space);
-  if (space.voteValidation?.name && space.voteValidation.name !== 'any') {
+  if (proposal.validation?.name && proposal.validation.name !== 'any') {
     try {
-      const validation = space.voteValidation;
+      const { validation } = proposal;
       const validate = await snapshot.utils.validate(
         validation.name,
         body.address,

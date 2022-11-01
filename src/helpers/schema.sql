@@ -44,6 +44,7 @@ CREATE TABLE proposals (
   symbol VARCHAR(16) NOT NULL,
   type VARCHAR(24) NOT NULL,
   strategies JSON NOT NULL,
+  validation JSON NOT NULL,
   plugins JSON NOT NULL,
   title TEXT NOT NULL,
   body MEDIUMTEXT NOT NULL,
