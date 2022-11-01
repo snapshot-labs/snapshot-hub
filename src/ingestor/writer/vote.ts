@@ -45,7 +45,7 @@ export async function verify(body): Promise<any> {
   }
 
   const space = await getSpace(msg.space);
-  if (space.voteValidation?.name) {
+  if (space.voteValidation?.name && space.voteValidation.name !== 'any') {
     try {
       const validation = space.voteValidation;
       const validate = await snapshot.utils.validate(

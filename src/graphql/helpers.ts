@@ -31,6 +31,7 @@ export function formatSpace(id, settings) {
   space.followersCount = spaceFollowers[id]?.count || 0;
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
+  space.voteValidation = space.voteValidation || { name: 'any' };
   space.validation = space.validation || { name: 'basic', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
