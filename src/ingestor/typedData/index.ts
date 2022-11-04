@@ -23,7 +23,7 @@ export default async function ingestor(body) {
 
   const ts = Date.now() / 1e3;
   const over = 300;
-  const under = 60 * 60;
+  const under = 60 * 60 * 24 * 3; // 3 days
   const overTs = (ts + over).toFixed();
   const underTs = (ts - under).toFixed();
   const { domain, message, types } = body.data;
