@@ -103,7 +103,8 @@ export default async function ingestor(body) {
       proposal: message.proposal,
       choice,
       reason: message.reason || '',
-      app: kebabCase(message.app || '')
+      app: kebabCase(message.app || ''),
+      metadata: jsonParse(message.metadata, {})
     };
     type = 'vote';
   }
