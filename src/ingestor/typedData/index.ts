@@ -94,16 +94,21 @@ export default async function ingestor(body) {
   if (type === 'delete-proposal') payload = { proposal: message.proposal };
 
   if (['vote', 'vote-array', 'vote-string'].includes(type)) {
+    if (message.metadata && message.metadata.length > 2000)
+      return Promise.reject('too large metadata');
+
     let choice = message.choice;
     if (type === 'vote-string') {
       const proposal = await getProposal(message.space, message.proposal);
       if (proposal.privacy !== 'shutter') choice = JSON.parse(message.choice);
     }
+
     payload = {
       proposal: message.proposal,
       choice,
       reason: message.reason || '',
-      app: kebabCase(message.app || '')
+      app: kebabCase(message.app || ''),
+      metadata: jsonParse(message.metadata, {})
     };
     type = 'vote';
   }
