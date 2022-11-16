@@ -21,11 +21,6 @@ export function sha256(str) {
   return createHash('sha256').update(str).digest('hex');
 }
 
-export async function getJSON(uri) {
-  const url = snapshot.utils.getUrl(uri);
-  return fetch(url).then(res => res.json());
-}
-
 export function rpcSuccess(res, result, id) {
   res.json({
     jsonrpc: '2.0',
