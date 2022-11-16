@@ -7,7 +7,6 @@ export async function getSpaceENS(id) {
   let space = false;
   const uri: any = await snapshot.utils.getSpaceUri(id, DEFAULT_NETWORK);
   if (uri) {
-    console.log('uri', uri);
     try {
       space = await snapshot.utils.getJSON(uri);
     } catch (e) {
