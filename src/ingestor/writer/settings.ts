@@ -1,6 +1,5 @@
 import isEqual from 'lodash/isEqual';
 import snapshot from '@snapshot-labs/snapshot.js';
-import { pin } from '@snapshot-labs/pineapple';
 import { addOrUpdateSpace, getSpace } from '../../helpers/actions';
 import { jsonParse } from '../../helpers/utils';
 import log from '../../helpers/log';
@@ -36,7 +35,6 @@ export async function action(body): Promise<void> {
   const msg = jsonParse(body.msg);
   const space = msg.space;
   try {
-    await pin(msg.payload);
     await addOrUpdateSpace(space, msg.payload);
   } catch (e) {
     log.error('[writer] Failed to store settings', msg.space, e);

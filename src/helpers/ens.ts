@@ -20,7 +20,9 @@ export async function getSpaceENS(id) {
   if (uri) {
     try {
       const [protocolType, key] = uri.split('://');
-      space = await uriGet(gateway, key, protocolType);
+      if (protocolType === 'ipfs') {
+        space = await uriGet(gateway, key, protocolType);
+      }
     } catch (e) {
       log.warn(`[ens] getSpace failed ${id}, ${JSON.stringify(e)}`);
     }
