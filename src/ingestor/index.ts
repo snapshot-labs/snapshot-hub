@@ -1,6 +1,5 @@
-import personalSign from './personalSign';
-import typedData from './typedData';
 import express from 'express';
+import typedData from './ingestor';
 import { sendError } from '../helpers/utils';
 import log from '../helpers/log';
 
@@ -9,14 +8,7 @@ const router = express.Router();
 const maintenanceMsg = 'update in progress, try later';
 
 router.post('/message', async (req, res) => {
-  if (process.env.MAINTENANCE) return sendError(res, maintenanceMsg);
-  try {
-    const result = await personalSign(req.body);
-    return res.json(result);
-  } catch (e) {
-    log.warn(`[ingestor] msg validation failed (personal sign) ${JSON.stringify(e)}`);
-    return sendError(res, e);
-  }
+  return sendError(res, 'personal sign is not supported anymore');
 });
 
 router.post('/msg', async (req, res) => {
