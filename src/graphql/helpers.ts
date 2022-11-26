@@ -31,7 +31,7 @@ export function formatSpace(id, settings) {
   space.followersCount = spaceFollowers[id]?.count || 0;
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
-  space.voteValidation = space.voteValidation || { name: 'any' };
+  space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.validation = space.validation || { name: 'basic', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
@@ -203,7 +203,10 @@ export function formatUser(user) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
-  proposal.validation = jsonParse(proposal.validation, { name: 'any' }) || { name: 'any' };
+  proposal.validation = jsonParse(proposal.validation, { name: 'any', params: {} }) || {
+    name: 'any',
+    params: {}
+  };
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
