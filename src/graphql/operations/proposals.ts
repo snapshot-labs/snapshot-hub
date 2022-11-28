@@ -45,6 +45,11 @@ export default async function (parent, args) {
     params.push(`%${where.strategies_contains}%`);
   }
 
+  if (where.validation) {
+    searchSql += ' AND p.validation LIKE ?';
+    params.push(`%"name": "${where.validation}"%`);
+  }
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
