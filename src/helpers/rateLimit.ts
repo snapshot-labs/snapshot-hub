@@ -3,8 +3,8 @@ import { getIp, sendError } from './utils';
 import log from './log';
 
 export default rateLimit({
-  windowMs: 16 * 1e3,
-  max: 80,
+  windowMs: 20 * 1e3,
+  max: 60,
   keyGenerator: req => getIp(req),
   standardHeaders: true,
   handler: (req, res) => {
