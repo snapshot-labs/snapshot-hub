@@ -88,8 +88,7 @@ export async function verify(body): Promise<any> {
     return Promise.reject('failed to check voting power');
   }
 
-  if (await isLimitReached(msg.space))
-    return Promise.reject('too much activity, please contact an admin');
+  // if (await isLimitReached(msg.space)) return Promise.reject('too much activity, please contact an admin');
 
   return { proposal, vp };
 }
