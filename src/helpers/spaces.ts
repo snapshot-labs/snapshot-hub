@@ -76,7 +76,6 @@ async function loadSpacesMetrics() {
   log.info('[spaces] Followers metrics loaded');
   mapSpaces();
 
-  /*
   const proposalsMetrics = await getProposals();
   proposalsMetrics.forEach(proposals => {
     if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
@@ -90,7 +89,6 @@ async function loadSpacesMetrics() {
   });
   log.info('[spaces] Votes metrics loaded');
   mapSpaces();
-  */
 }
 
 async function run() {
@@ -105,3 +103,5 @@ async function run() {
 }
 
 setTimeout(() => run(), 3e3);
+// Run loadSpacesMetrics only once for now
+setTimeout(() => loadSpacesMetrics(), 3e3);
