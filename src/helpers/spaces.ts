@@ -69,18 +69,19 @@ async function getFollowers() {
 }
 
 async function loadSpacesMetrics() {
-  const proposalsMetrics = await getProposals();
-  proposalsMetrics.forEach(proposals => {
-    if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
-  });
-  log.info('[spaces] Proposals metrics loaded');
-  mapSpaces();
-
   const followersMetrics = await getFollowers();
   followersMetrics.forEach(followers => {
     if (spaces[followers.space]) spaceFollowers[followers.space] = followers;
   });
   log.info('[spaces] Followers metrics loaded');
+  mapSpaces();
+
+  /*
+  const proposalsMetrics = await getProposals();
+  proposalsMetrics.forEach(proposals => {
+    if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
+  });
+  log.info('[spaces] Proposals metrics loaded');
   mapSpaces();
 
   const votesMetrics = await getVotes();
@@ -89,16 +90,17 @@ async function loadSpacesMetrics() {
   });
   log.info('[spaces] Votes metrics loaded');
   mapSpaces();
+  */
 }
 
 async function run() {
   try {
     await loadSpaces();
-    // await loadSpacesMetrics();
+    await loadSpacesMetrics();
   } catch (e) {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(180e3);
+  await snapshot.utils.sleep(360e3);
   await run();
 }
 
