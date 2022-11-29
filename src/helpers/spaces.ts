@@ -22,7 +22,6 @@ async function getProposals() {
   const query = `
     SELECT space, COUNT(id) AS count,
     COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active,
-    COUNT(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) AS count_1d,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM proposals GROUP BY space
   `;
@@ -32,7 +31,6 @@ async function getProposals() {
 async function getVotes() {
   const query = `
     SELECT space, COUNT(id) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM votes GROUP BY space
   `;
@@ -42,7 +40,6 @@ async function getVotes() {
 async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 86400), 1, NULL)) as count_1d,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM follows GROUP BY space
   `;
@@ -72,13 +69,10 @@ async function loadSpacesMetrics() {
       activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined,
       proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
       proposals_active: (spaceProposals[id] && spaceProposals[id].active) || undefined,
-      proposals_1d: (spaceProposals[id] && spaceProposals[id].count_1d) || undefined,
       proposals_7d: (spaceProposals[id] && spaceProposals[id].count_7d) || undefined,
       votes: (spaceVotes[id] && spaceVotes[id].count) || undefined,
-      votes_1d: (spaceVotes[id] && spaceVotes[id].count_1d) || undefined,
       votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
-      followers_1d: (spaceFollowers[id] && spaceFollowers[id].count_1d) || undefined,
       followers_7d: (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
     };
   });
