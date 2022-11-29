@@ -94,7 +94,7 @@ async function loadSpacesMetrics() {
 async function run() {
   try {
     await loadSpaces();
-    await loadSpacesMetrics();
+    // await loadSpacesMetrics();
   } catch (e) {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
