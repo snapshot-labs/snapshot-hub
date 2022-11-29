@@ -4,7 +4,7 @@ import { buildWhereQuery, formatProposal, formatSpace, formatVote } from '../hel
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
 
-const LIMIT = 20000;
+const LIMIT = 5000;
 
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
