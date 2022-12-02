@@ -1,15 +1,24 @@
 import express from 'express';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces, spacesMetadata } from './helpers/spaces';
-import relayer from './helpers/relayer';
 import { addOrUpdateSpace } from './helpers/actions';
 import { getSpaceENS } from './helpers/ens';
 import { updateProposalAndVotes } from './scores';
 import log from './helpers/log';
 import { name, version } from '../package.json';
+import { sendError } from './helpers/utils';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
+const SEQUENCER_URL = process.env.SEQUENCER_URL || '';
+
+router.post('/message', async (req, res) => {
+  return sendError(res, 'personal sign is not supported anymore');
+});
+
+router.post('/msg', async (req, res) => {
+  res.redirect(307, SEQUENCER_URL);
+});
 
 router.get('/', (req, res) => {
   const commit = process.env.COMMIT_HASH || '';
@@ -17,8 +26,7 @@ router.get('/', (req, res) => {
   return res.json({
     name,
     network,
-    version: v,
-    relayer: relayer.address
+    version: v
   });
 });
 
