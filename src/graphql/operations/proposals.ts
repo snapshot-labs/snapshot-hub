@@ -5,6 +5,8 @@ import log from '../../helpers/log';
 export default async function (parent, args) {
   const { where = {} } = args;
 
+  if (where.space_in) return [];
+
   const fields = {
     id: 'string',
     ipfs: 'string',
