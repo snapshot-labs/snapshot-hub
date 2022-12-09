@@ -88,7 +88,7 @@ export function buildWhereQuery(fields, alias, where) {
 }
 
 export async function fetchSpaces(args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
   const fields = { id: 'string' };
   const whereQuery = buildWhereQuery(fields, 's', where);
@@ -101,18 +101,14 @@ export async function fetchSpaces(args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   const query = `
-    SELECT s.* FROM spaces s
-    WHERE 1 = 1 ${queryStr}
-    GROUP BY s.id
-    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
+  SELECT s.* FROM spaces s
+  WHERE 1 = 1 ${queryStr}
+  GROUP BY s.id
+  ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
-
+  params.push(skip, first);
+  
   const spaces = await db.queryAsync(query, params);
   return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
 }

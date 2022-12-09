@@ -3,8 +3,10 @@ import { buildWhereQuery } from '../helpers';
 import log from '../../helpers/log';
 
 export default async function (parent, args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
+  if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
+  
   const fields = {
     id: 'string',
     mci: 'number',
@@ -23,16 +25,12 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   const query = `
-    SELECT m.* FROM messages m
-    WHERE id IS NOT NULL ${queryStr}
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+  SELECT m.* FROM messages m
+  WHERE id IS NOT NULL ${queryStr}
+  ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+  params.push(skip, first);
   try {
     return await db.queryAsync(query, params);
   } catch (e) {

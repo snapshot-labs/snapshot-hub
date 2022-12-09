@@ -31,7 +31,7 @@ query Proposals {
     first: 20,
     skip: 0,
     where: {
-      space_in: ["balancer", "yam.eth"],
+      space_in: ["balancer.eth"],
       state: "closed"
     },
     orderBy: "created",

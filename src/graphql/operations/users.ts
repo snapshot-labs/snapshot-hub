@@ -3,8 +3,10 @@ import { buildWhereQuery, formatUser } from '../helpers';
 import log from '../../helpers/log';
 
 export default async function (parent, args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
+  if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
+  
   const fields = {
     id: 'string',
     ipfs: 'string',
@@ -21,11 +23,6 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   let users: any[] = [];
 
   const query = `
@@ -33,6 +30,7 @@ export default async function (parent, args) {
     WHERE 1=1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+  params.push(skip, first);
   try {
     users = await db.queryAsync(query, params);
     return users.map(user => formatUser(user));

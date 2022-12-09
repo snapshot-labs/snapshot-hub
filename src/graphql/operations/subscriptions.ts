@@ -3,8 +3,10 @@ import { buildWhereQuery, formatSubscription } from '../helpers';
 import log from '../../helpers/log';
 
 export default async function (parent, args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
+  if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
+  
   const fields = {
     id: 'string',
     ipfs: 'string',
@@ -25,17 +27,17 @@ export default async function (parent, args) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
+  
+  let subscriptions: any[] = [];
+  
+  const query = `
+  SELECT s.*, spaces.settings FROM subscriptions s
+  INNER JOIN spaces ON spaces.id = s.space
+  WHERE spaces.settings IS NOT NULL ${queryStr}
+  ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+  `;
   params.push(skip, first);
 
-  let subscriptions: any[] = [];
-
-  const query = `
-    SELECT s.*, spaces.settings FROM subscriptions s
-    INNER JOIN spaces ON spaces.id = s.space
-    WHERE spaces.settings IS NOT NULL ${queryStr}
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
-  `;
   try {
     subscriptions = await db.queryAsync(query, params);
     return subscriptions.map(subscription => formatSubscription(subscription));
