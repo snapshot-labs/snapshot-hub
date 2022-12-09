@@ -102,13 +102,13 @@ export async function fetchSpaces(args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-  SELECT s.* FROM spaces s
-  WHERE 1 = 1 ${queryStr}
-  GROUP BY s.id
-  ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
+    SELECT s.* FROM spaces s
+    WHERE 1 = 1 ${queryStr}
+    GROUP BY s.id
+    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
-  
+
   const spaces = await db.queryAsync(query, params);
   return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
 }

@@ -24,11 +24,11 @@ export default async function (parent, args) {
   orderBy = `a.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
-  
+
   const query = `
-  SELECT a.* FROM aliases a
-  WHERE id IS NOT NULL ${queryStr}
-  ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    SELECT a.* FROM aliases a
+    WHERE id IS NOT NULL ${queryStr}
+    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
 

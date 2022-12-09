@@ -6,7 +6,7 @@ export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
   if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
-  
+
   const fields = {
     id: 'string',
     mci: 'number',
@@ -26,9 +26,9 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-  SELECT m.* FROM messages m
-  WHERE id IS NOT NULL ${queryStr}
-  ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    SELECT m.* FROM messages m
+    WHERE id IS NOT NULL ${queryStr}
+    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
   try {

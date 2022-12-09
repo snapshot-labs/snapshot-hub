@@ -6,7 +6,7 @@ export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
   if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
-  
+
   const fields = {
     id: 'string',
     ipfs: 'string',
@@ -27,14 +27,14 @@ export default async function (parent, args) {
 
   let { first = 20 } = args;
   const { skip = 0 } = args;
-  
+
   let subscriptions: any[] = [];
-  
+
   const query = `
-  SELECT s.*, spaces.settings FROM subscriptions s
-  INNER JOIN spaces ON spaces.id = s.space
-  WHERE spaces.settings IS NOT NULL ${queryStr}
-  ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    SELECT s.*, spaces.settings FROM subscriptions s
+    INNER JOIN spaces ON spaces.id = s.space
+    WHERE spaces.settings IS NOT NULL ${queryStr}
+    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
 

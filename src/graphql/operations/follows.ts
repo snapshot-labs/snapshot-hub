@@ -27,14 +27,14 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-  SELECT f.*, spaces.settings FROM follows f
-  INNER JOIN spaces ON spaces.id = f.space
-  WHERE spaces.settings IS NOT NULL ${queryStr}
-  ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    SELECT f.*, spaces.settings FROM follows f
+    INNER JOIN spaces ON spaces.id = f.space
+    WHERE spaces.settings IS NOT NULL ${queryStr}
+    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
 
-  let follows: any[] = [];  
+  let follows: any[] = [];
   try {
     follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));

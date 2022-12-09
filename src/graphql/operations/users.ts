@@ -6,7 +6,7 @@ export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
   if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
-  
+
   const fields = {
     id: 'string',
     ipfs: 'string',
