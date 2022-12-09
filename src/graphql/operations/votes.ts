@@ -31,9 +31,9 @@ async function query(parent, args, context?, info?) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > LIMIT) first = LIMIT;
+  let { first = 20, skip = 0 } = args;
+  if (first > 1000) first = 1000;
+  if (skip > 5000) skip = 5000;
   params.push(skip, first);
 
   let votes: any[] = [];
