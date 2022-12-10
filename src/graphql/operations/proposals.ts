@@ -5,7 +5,7 @@ import log from '../../helpers/log';
 export default async function (parent, args) {
   const { where = {} } = args;
 
-  if (where.space_in && where.space_in.length > 1) return [];
+  if (where.space_in && where.space_in.length > 20) return [];
 
   const fields = {
     id: 'string',
