@@ -4,17 +4,25 @@ import { buildWhereQuery, formatProposal, formatSpace, formatVote } from '../hel
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
 
+const FIRST_LIMIT = 1000;
+const SKIP_LIMIT = 5000;
+const SKIP_LIMIT_WITH_FILTERS = 100000;
+
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {}, first = 20, skip = 0 } = args;
 
-  if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
+  if (first > FIRST_LIMIT)
+    return Promise.reject(`The \`first\` argument must not be greater than ${FIRST_LIMIT}`);
   if (where.proposal || where.proposal_in?.length || where.voter || where.voter_in?.length) {
-    if (skip > 100000) return Promise.reject('The `skip` argument must not be greater than 100000');
-  } else {
-    if (skip > 5000)
+    if (skip > SKIP_LIMIT_WITH_FILTERS)
       return Promise.reject(
-        'The `skip` argument must not be greater than 5000, try passing proposal or voter filters to get more `skip` limit'
+        `The \`skip\` argument must not be greater than ${SKIP_LIMIT_WITH_FILTERS}`
+      );
+  } else {
+    if (skip > SKIP_LIMIT)
+      return Promise.reject(
+        `The \`skip\` argument must not be greater than ${SKIP_LIMIT}, try passing proposal or voter filters to get more \`skip\` limit`
       );
   }
 

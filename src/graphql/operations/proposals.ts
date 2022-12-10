@@ -2,13 +2,21 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal } from '../helpers';
 import log from '../../helpers/log';
 
+const FIRST_LIMIT = 1000;
+const SKIP_LIMIT = 5000;
+const SPACE_IN_LIMIT = 20;
+
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  if (where.space_in && where.space_in.length > 10)
-    return Promise.reject('`space_in` argument length must not be greater than 10');
-  if (first > 1000) return Promise.reject('The `first` argument must not be greater than 1000');
-  if (skip > 5000) return Promise.reject('The `skip` argument must not be greater than 5000');
+  if (first > FIRST_LIMIT)
+    return Promise.reject(`The \`first\` argument must not be greater than ${FIRST_LIMIT}`);
+  if (skip > SKIP_LIMIT)
+    return Promise.reject(`The \`skip\` argument must not be greater than ${SKIP_LIMIT}`);
+  if (where.space_in?.length > SPACE_IN_LIMIT)
+    return Promise.reject(
+      `\`space_in\` argument length must not be greater than ${SPACE_IN_LIMIT}`
+    );
 
   const fields = {
     id: 'string',
