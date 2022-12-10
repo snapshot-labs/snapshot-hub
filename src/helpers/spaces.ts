@@ -82,7 +82,6 @@ async function loadSpacesMetrics() {
 
   metricsLoaded = true;
 
-  /*
   const proposalsMetrics = await getProposals();
   proposalsMetrics.forEach(proposals => {
     if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
@@ -90,6 +89,7 @@ async function loadSpacesMetrics() {
   log.info('[spaces] Proposals metrics loaded');
   mapSpaces();
 
+  /*
   const votesMetrics = await getVotes();
   votesMetrics.forEach(votes => {
     if (spaces[votes.space]) spaceVotes[votes.space] = votes;
@@ -106,7 +106,7 @@ async function run() {
   } catch (e) {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(360e3);
+  await snapshot.utils.sleep(180e3);
   await run();
 }
 
