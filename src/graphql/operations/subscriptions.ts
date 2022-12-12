@@ -6,7 +6,7 @@ export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
   await checkLimits(args, 'subscriptions');
-  
+
   const fields = {
     id: 'string',
     ipfs: 'string',

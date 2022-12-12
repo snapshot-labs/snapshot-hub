@@ -18,22 +18,22 @@ const limits = {
   spaces: {
     skip: 15000
   }
-}
+};
 
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
-  const currentLimits = {...limits.default, ...(limits[type] || {})};
-  
+  const currentLimits = { ...limits.default, ...(limits[type] || {}) };
+
   for (const key in currentLimits) {
     const limit = currentLimits[key];
     const firstLimitReached = key === 'first' && args[key] > limit;
     const skipLimitReached = key === 'skip' && args[key] > limit;
     const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
-    if (firstLimitReached || skipLimitReached || whereLimitReached) return Promise.reject(`The \`${key}\` argument must not be greater than ${limit}`);
+    if (firstLimitReached || skipLimitReached || whereLimitReached)
+      return Promise.reject(`The \`${key}\` argument must not be greater than ${limit}`);
   }
   return true;
-};
-
+}
 
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});

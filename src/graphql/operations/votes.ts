@@ -4,10 +4,6 @@ import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote }
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
 
-const FIRST_LIMIT = 1000;
-const SKIP_LIMIT = 5000;
-const SKIP_LIMIT_WITH_FILTERS = 100000;
-
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {}, first = 20, skip = 0 } = args;
