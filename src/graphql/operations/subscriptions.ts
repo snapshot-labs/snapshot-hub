@@ -1,18 +1,12 @@
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatSubscription } from '../helpers';
+import { buildWhereQuery, checkLimits, formatSubscription } from '../helpers';
 import log from '../../helpers/log';
-
-const FIRST_LIMIT = 1000;
-const SKIP_LIMIT = 5000;
 
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  if (first > FIRST_LIMIT)
-    return Promise.reject(`The \`first\` argument must not be greater than ${FIRST_LIMIT}`);
-  if (skip > SKIP_LIMIT)
-    return Promise.reject(`The \`skip\` argument must not be greater than ${SKIP_LIMIT}`);
-
+  await checkLimits(args, 'subscriptions');
+  
   const fields = {
     id: 'string',
     ipfs: 'string',

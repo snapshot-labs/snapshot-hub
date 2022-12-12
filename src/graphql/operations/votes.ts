@@ -1,6 +1,6 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, formatSpace, formatVote } from '../helpers';
+import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
 
@@ -12,19 +12,7 @@ async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {}, first = 20, skip = 0 } = args;
 
-  if (first > FIRST_LIMIT)
-    return Promise.reject(`The \`first\` argument must not be greater than ${FIRST_LIMIT}`);
-  if (where.proposal || where.proposal_in?.length || where.voter || where.voter_in?.length) {
-    if (skip > SKIP_LIMIT_WITH_FILTERS)
-      return Promise.reject(
-        `The \`skip\` argument must not be greater than ${SKIP_LIMIT_WITH_FILTERS}`
-      );
-  } else {
-    if (skip > SKIP_LIMIT)
-      return Promise.reject(
-        `The \`skip\` argument must not be greater than ${SKIP_LIMIT}, try passing proposal or voter filters to get more \`skip\` limit`
-      );
-  }
+  await checkLimits(args, 'votes');
 
   const fields = {
     id: 'string',
