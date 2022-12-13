@@ -8,7 +8,7 @@ async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {}, first = 20, skip = 0 } = args;
 
-  await checkLimits(args, 'votes');
+  checkLimits(args, 'votes');
 
   const fields = {
     id: 'string',

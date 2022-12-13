@@ -2,7 +2,7 @@ import { checkLimits, fetchSpaces, handleRelatedSpaces, PublicError } from '../h
 import log from '../../helpers/log';
 
 export default async function (_parent, args, _context, info) {
-  await checkLimits(args, 'spaces');
+  checkLimits(args, 'spaces');
   try {
     let spaces = await fetchSpaces(args);
     spaces = await handleRelatedSpaces(info, spaces);

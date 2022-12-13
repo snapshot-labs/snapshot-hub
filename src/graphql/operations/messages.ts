@@ -5,7 +5,7 @@ import log from '../../helpers/log';
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  await checkLimits(args, 'messages');
+  checkLimits(args, 'messages');
 
   const fields = {
     id: 'string',
