@@ -13,7 +13,7 @@ const ARG_LIMITS = {
     skip: 5000
   },
   proposals: {
-    space_in: 20
+    space_in: 10000
   },
   spaces: {
     skip: 15000
