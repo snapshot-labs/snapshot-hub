@@ -7,7 +7,7 @@ const network = process.env.NETWORK || 'testnet';
 
 export class PublicError extends Error {}
 
-const ARGS_LIMITS = {
+const ARG_LIMITS = {
   default: {
     first: 1000,
     skip: 5000
@@ -22,7 +22,7 @@ const ARGS_LIMITS = {
 
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
-  const typeLimits = { ...ARGS_LIMITS.default, ...(ARGS_LIMITS[type] || {}) };
+  const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
 
   for (const key in typeLimits) {
     const limit = typeLimits[key];
