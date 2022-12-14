@@ -1,11 +1,11 @@
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal } from '../helpers';
+import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
 
 export default async function (parent, args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
-  if (where.space_in && where.space_in.length > 20) return [];
+  checkLimits(args, 'proposals');
 
   const fields = {
     id: 'string',
@@ -59,17 +59,13 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20, skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  if (skip > 5000) skip = 5000;
-  params.push(skip, first);
-
   const query = `
     SELECT p.*, spaces.settings FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;
+  params.push(skip, first);
   try {
     const proposals = await db.queryAsync(query, params);
     return proposals.map(proposal => formatProposal(proposal));

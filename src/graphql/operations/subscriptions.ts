@@ -1,9 +1,11 @@
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatSubscription } from '../helpers';
+import { buildWhereQuery, checkLimits, formatSubscription } from '../helpers';
 import log from '../../helpers/log';
 
 export default async function (parent, args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
+
+  checkLimits(args, 'subscriptions');
 
   const fields = {
     id: 'string',
@@ -23,11 +25,6 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   let subscriptions: any[] = [];
 
   const query = `
@@ -36,6 +33,8 @@ export default async function (parent, args) {
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+  params.push(skip, first);
+
   try {
     subscriptions = await db.queryAsync(query, params);
     return subscriptions.map(subscription => formatSubscription(subscription));

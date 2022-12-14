@@ -1,14 +1,14 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, formatSpace, formatVote } from '../helpers';
+import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
 
-const LIMIT = 1000;
-
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
-  const { where = {} } = args;
+  const { where = {}, first = 20, skip = 0 } = args;
+
+  checkLimits(args, 'votes');
 
   const fields = {
     id: 'string',
@@ -31,11 +31,6 @@ async function query(parent, args, context?, info?) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20, skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  if (skip > 5000) skip = 5000;
-  params.push(skip, first);
-
   let votes: any[] = [];
 
   const query = `
@@ -43,6 +38,7 @@ async function query(parent, args, context?, info?) {
     WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection}, v.id ASC LIMIT ?, ?
   `;
+  params.push(skip, first);
   try {
     votes = await db.queryAsync(query, params);
     // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?

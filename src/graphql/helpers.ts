@@ -7,6 +7,34 @@ const network = process.env.NETWORK || 'testnet';
 
 export class PublicError extends Error {}
 
+const ARG_LIMITS = {
+  default: {
+    first: 1000,
+    skip: 5000
+  },
+  proposals: {
+    space_in: 10000
+  },
+  spaces: {
+    skip: 15000
+  }
+};
+
+export function checkLimits(args: any = {}, type) {
+  const { where = {} } = args;
+  const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
+
+  for (const key in typeLimits) {
+    const limit = typeLimits[key];
+    const firstLimitReached = key === 'first' && args[key] > limit;
+    const skipLimitReached = key === 'skip' && args[key] > limit;
+    const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
+    if (firstLimitReached || skipLimitReached || whereLimitReached)
+      throw new Error(`The \`${key}\` argument must not be greater than ${limit}`);
+  }
+  return true;
+}
+
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
@@ -88,7 +116,7 @@ export function buildWhereQuery(fields, alias, where) {
 }
 
 export async function fetchSpaces(args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
   const fields = { id: 'string' };
   const whereQuery = buildWhereQuery(fields, 's', where);
@@ -101,17 +129,13 @@ export async function fetchSpaces(args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   const query = `
     SELECT s.* FROM spaces s
     WHERE 1 = 1 ${queryStr}
     GROUP BY s.id
     ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+  params.push(skip, first);
 
   const spaces = await db.queryAsync(query, params);
   return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
