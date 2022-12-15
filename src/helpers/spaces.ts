@@ -9,8 +9,6 @@ export const spaceProposals = {};
 export const spaceVotes = {};
 export const spaceFollowers = {};
 
-let metricsLoaded = false;
-
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     spacesMetadata[id] = {
@@ -71,16 +69,12 @@ async function getFollowers() {
 }
 
 async function loadSpacesMetrics() {
-  if (metricsLoaded) return;
-
   const followersMetrics = await getFollowers();
   followersMetrics.forEach(followers => {
     if (spaces[followers.space]) spaceFollowers[followers.space] = followers;
   });
   log.info('[spaces] Followers metrics loaded');
   mapSpaces();
-
-  metricsLoaded = true;
 
   const proposalsMetrics = await getProposals();
   proposalsMetrics.forEach(proposals => {
@@ -106,7 +100,7 @@ async function run() {
   } catch (e) {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(180e3);
+  await snapshot.utils.sleep(360e3);
   await run();
 }
 
