@@ -25,11 +25,6 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/scores/:proposalId', async (req, res) => {
-  const { proposalId } = req.params;
-  res.redirect(307, `${SEQUENCER_URL}/scores/${proposalId}`);
-});
-
 router.get('/explore', (req, res) => {
   return res.json({ spaces: spacesMetadata });
 });
@@ -42,6 +37,11 @@ router.get('/spaces/:key', (req, res) => {
 router.get('/spaces/:key/poke', async (req, res) => {
   const { key } = req.params;
   res.redirect(307, `${SEQUENCER_URL}/spaces/${key}/poke`);
+});
+
+router.get('/scores/:proposalId', async (req, res) => {
+  const { proposalId } = req.params;
+  res.redirect(307, `${SEQUENCER_URL}/scores/${proposalId}`);
 });
 
 export default router;
