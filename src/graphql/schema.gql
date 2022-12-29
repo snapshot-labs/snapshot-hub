@@ -301,6 +301,8 @@ type Space {
   proposalsCount: Int
   parent: Space
   children: [Space]
+  guidelines: String
+  template: String
 }
 
 type SpaceFilters {
