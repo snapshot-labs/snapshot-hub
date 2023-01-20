@@ -1,6 +1,6 @@
 import { spaces } from '../../helpers/spaces';
 
-export default function() {
+export default function () {
   const validations = {};
   Object.values(spaces).forEach((space: any) => {
     if (space.validation)

@@ -1,12 +1,15 @@
 import rateLimit from 'express-rate-limit';
-import { sendError } from './utils';
+import { getIp, sendError } from './utils';
+import log from './log';
 
 export default rateLimit({
-  windowMs: 16 * 1e3,
-  max: 80,
+  windowMs: 20 * 1e3,
+  max: 60,
+  keyGenerator: req => getIp(req),
+  standardHeaders: true,
   handler: (req, res) => {
-    // const id = sha256(req.ip);
-    // console.log('Too many requests', id.slice(0, 7));
+    // const id = sha256(getIp(req));
+    log.info(`too many requests ${getIp(req).slice(0, 7)}`);
     sendError(res, 'too many requests', 429);
   }
 });

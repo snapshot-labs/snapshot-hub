@@ -1,5 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
+import log from './log';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
@@ -7,13 +8,10 @@ export let strategiesObj: any = {};
 const uri = 'https://score.snapshot.org/api/strategies';
 
 async function loadStrategies() {
-  console.log('[strategies] Load strategies');
   const res = await snapshot.utils.getJSON(uri);
 
   Object.values(spaces).forEach((space: any) => {
-    const ids = new Set<string>(
-      space.strategies.map(strategy => strategy.name)
-    );
+    const ids = new Set<string>(space.strategies.map(strategy => strategy.name));
     ids.forEach(id => {
       if (res[id]) {
         res[id].spacesCount = res[id].spacesCount || 0;
@@ -30,16 +28,14 @@ async function loadStrategies() {
     })
     .sort((a, b): any => b.spacesCount - a.spacesCount);
 
-  strategiesObj = Object.fromEntries(
-    strategies.map(strategy => [strategy.id, strategy])
-  );
+  strategiesObj = Object.fromEntries(strategies.map(strategy => [strategy.id, strategy]));
 }
 
 async function run() {
   try {
     await loadStrategies();
   } catch (e) {
-    console.log('[strategies] Failed to load', e);
+    log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(60e3);
   run();

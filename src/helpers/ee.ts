@@ -8,9 +8,7 @@ export default async function serve(id, action, args) {
   const key = sha256(id);
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
-    eventEmitter.once(key, data =>
-      data.error ? reject(data.e) : resolve(data)
-    );
+    eventEmitter.once(key, data => (data.error ? reject(data.e) : resolve(data)));
     if (eventEmitter.listenerCount(key) === 1) {
       try {
         eventEmitter.emit(key, await action(...args));

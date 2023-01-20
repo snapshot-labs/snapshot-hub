@@ -1,13 +1,14 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
 import { formatProposal, formatVote } from '../helpers';
+import log from '../../helpers/log';
 
-export default async function(parent, { id }, context, info) {
+export default async function (parent, { id }, context, info) {
   const requestedFields = info ? graphqlFields(info) : {};
   const query = `
     SELECT v.*, spaces.settings FROM votes v
     INNER JOIN spaces ON spaces.id = v.space
-    WHERE v.id = ? AND v.cb = 0 AND spaces.settings IS NOT NULL
+    WHERE v.id = ? AND spaces.settings IS NOT NULL
     LIMIT 1
   `;
   try {
@@ -24,13 +25,13 @@ export default async function(parent, { id }, context, info) {
         const proposals = await db.queryAsync(query, [proposalId]);
         result.proposal = formatProposal(proposals[0]);
       } catch (e) {
-        console.log('[graphql]', e);
+        log.error(`[graphql] vote, ${JSON.stringify(e)}`);
         return Promise.reject('request failed');
       }
     }
     return result;
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] vote, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

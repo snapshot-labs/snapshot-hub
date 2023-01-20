@@ -7,6 +7,34 @@ const network = process.env.NETWORK || 'testnet';
 
 export class PublicError extends Error {}
 
+const ARG_LIMITS = {
+  default: {
+    first: 1000,
+    skip: 5000
+  },
+  proposals: {
+    space_in: 10000
+  },
+  spaces: {
+    skip: 15000
+  }
+};
+
+export function checkLimits(args: any = {}, type) {
+  const { where = {} } = args;
+  const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
+
+  for (const key in typeLimits) {
+    const limit = typeLimits[key];
+    const firstLimitReached = key === 'first' && args[key] > limit;
+    const skipLimitReached = key === 'skip' && args[key] > limit;
+    const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
+    if (firstLimitReached || skipLimitReached || whereLimitReached)
+      throw new Error(`The \`${key}\` argument must not be greater than ${limit}`);
+  }
+  return true;
+}
+
 export function formatSpace(id, settings) {
   const space = jsonParse(settings, {});
   space.id = id;
@@ -27,9 +55,11 @@ export function formatSpace(id, settings) {
   space.voting.quorum = space.voting.quorum || null;
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
+  space.voting.aliased = space.voting.aliased || false;
   space.followersCount = spaceFollowers[id]?.count || 0;
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
+  space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.validation = space.validation || { name: 'basic', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
@@ -86,7 +116,7 @@ export function buildWhereQuery(fields, alias, where) {
 }
 
 export async function fetchSpaces(args) {
-  const { where = {} } = args;
+  const { first = 20, skip = 0, where = {} } = args;
 
   const fields = { id: 'string' };
   const whereQuery = buildWhereQuery(fields, 's', where);
@@ -95,15 +125,9 @@ export async function fetchSpaces(args) {
 
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created_at', 'updated_at', 'id'].includes(orderBy))
-    orderBy = 'created_at';
+  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
-
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
 
   const query = `
     SELECT s.* FROM spaces s
@@ -111,11 +135,10 @@ export async function fetchSpaces(args) {
     GROUP BY s.id
     ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+  params.push(skip, first);
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space =>
-    Object.assign(space, formatSpace(space.id, space.settings))
-  );
+  return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
@@ -144,14 +167,8 @@ function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   if (
-    !(
-      requestedFields.parent &&
-      Object.keys(requestedFields.parent).some(key => key !== 'id')
-    ) &&
-    !(
-      requestedFields.children &&
-      Object.keys(requestedFields.children).some(key => key !== 'id')
-    )
+    !(requestedFields.parent && Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
+    !(requestedFields.children && Object.keys(requestedFields.children).some(key => key !== 'id'))
   ) {
     return false;
   }
@@ -169,8 +186,7 @@ function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent =
-        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
@@ -189,7 +205,7 @@ async function fetchRelatedSpaces(spaces) {
   });
 }
 
-export async function handleRelatedSpaces(info: any, spaces: [any]) {
+export async function handleRelatedSpaces(info: any, spaces: any[]) {
   const requestedFields = info ? graphqlFields(info) : {};
   if (needsRelatedSpacesData(requestedFields)) {
     checkRelatedSpacesNesting(requestedFields);
@@ -211,6 +227,10 @@ export function formatUser(user) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
+  proposal.validation = jsonParse(proposal.validation, { name: 'any', params: {} }) || {
+    name: 'any',
+    params: {}
+  };
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
@@ -233,7 +253,7 @@ export function formatProposal(proposal) {
 
 export function formatVote(vote) {
   vote.choice = jsonParse(vote.choice);
-  vote.metadata = {};
+  vote.metadata = jsonParse(vote.metadata, {});
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
   vote.space = formatSpace(vote.space, vote.settings);
   return vote;

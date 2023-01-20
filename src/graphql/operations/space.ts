@@ -1,4 +1,5 @@
 import { fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function(_parent, { id, domain }, _context, info) {
   let where;
@@ -18,7 +19,7 @@ export default async function(_parent, { id, domain }, _context, info) {
 
     return spaces[0];
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] space, ${JSON.stringify(e)}`);
     if (e instanceof PublicError) return e;
     return new Error('Unexpected error');
   }

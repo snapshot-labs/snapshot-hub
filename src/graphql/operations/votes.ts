@@ -1,18 +1,14 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
-import {
-  buildWhereQuery,
-  formatProposal,
-  formatSpace,
-  formatVote
-} from '../helpers';
+import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
-
-const LIMIT = 20000;
+import log from '../../helpers/log';
 
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
-  const { where = {} } = args;
+  const { where = {}, first = 20, skip = 0 } = args;
+
+  checkLimits(args, 'votes');
 
   const fields = {
     id: 'string',
@@ -35,11 +31,6 @@ async function query(parent, args, context?, info?) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > LIMIT) first = LIMIT;
-  params.push(skip, first);
-
   let votes: any[] = [];
 
   const query = `
@@ -47,19 +38,18 @@ async function query(parent, args, context?, info?) {
     WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection}, v.id ASC LIMIT ?, ?
   `;
+  params.push(skip, first);
   try {
     votes = await db.queryAsync(query, params);
     // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
     votes = votes.map(vote => formatVote(vote));
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] votes, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 
   if (requestedFields.space && votes.length > 0) {
-    const spaceIds = votes
-      .map(vote => vote.space.id)
-      .filter((v, i, a) => a.indexOf(v) === i);
+    const spaceIds = votes.map(vote => vote.space.id).filter((v, i, a) => a.indexOf(v) === i);
     const query = `
       SELECT id, settings FROM spaces
       WHERE id IN (?) AND settings IS NOT NULL
@@ -71,12 +61,11 @@ async function query(parent, args, context?, info?) {
         spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
       );
       votes = votes.map(vote => {
-        if (spaces[vote.space.id])
-          return { ...vote, space: spaces[vote.space.id] };
+        if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
         return vote;
       });
     } catch (e) {
-      console.log('[graphql]', e);
+      log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
   }
@@ -98,7 +87,7 @@ async function query(parent, args, context?, info?) {
         return vote;
       });
     } catch (e) {
-      console.log('[graphql]', e);
+      log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
   }
@@ -106,7 +95,7 @@ async function query(parent, args, context?, info?) {
   return votes;
 }
 
-export default async function(parent, args, context?, info?) {
+export default async function (parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
   return await serve(JSON.stringify({ args, requestedFields }), query, [
     parent,

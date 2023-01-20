@@ -1,8 +1,11 @@
 import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal } from '../helpers';
+import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
+import log from '../../helpers/log';
 
-export default async function(parent, args) {
-  const { where = {} } = args;
+export default async function (parent, args) {
+  const { first = 20, skip = 0, where = {} } = args;
+
+  checkLimits(args, 'proposals');
 
   const fields = {
     id: 'string',
@@ -39,6 +42,16 @@ export default async function(parent, args) {
     params.push(`%${where.title_contains}%`);
   }
 
+  if (where.strategies_contains) {
+    searchSql += ' AND p.strategies LIKE ?';
+    params.push(`%${where.strategies_contains}%`);
+  }
+
+  if (where.validation) {
+    searchSql += ' AND p.validation LIKE ?';
+    params.push(`%"name": "${where.validation}"%`);
+  }
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
@@ -46,22 +59,18 @@ export default async function(parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   const query = `
     SELECT p.*, spaces.settings FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;
+  params.push(skip, first);
   try {
     const proposals = await db.queryAsync(query, params);
     return proposals.map(proposal => formatProposal(proposal));
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] proposals, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

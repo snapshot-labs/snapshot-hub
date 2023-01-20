@@ -1,8 +1,11 @@
 import db from '../../helpers/mysql';
-import { buildWhereQuery } from '../helpers';
+import { buildWhereQuery, checkLimits } from '../helpers';
+import log from '../../helpers/log';
 
-export default async function(parent, args) {
-  const { where = {} } = args;
+export default async function (parent, args) {
+  const { first = 20, skip = 0, where = {} } = args;
+
+  checkLimits(args, 'aliases');
 
   const fields = {
     id: 'string',
@@ -22,20 +25,17 @@ export default async function(parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let { first = 20 } = args;
-  const { skip = 0 } = args;
-  if (first > 1000) first = 1000;
-  params.push(skip, first);
-
   const query = `
     SELECT a.* FROM aliases a
     WHERE id IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
+  params.push(skip, first);
+
   try {
     return await db.queryAsync(query, params);
   } catch (e) {
-    console.log('[graphql]', e);
+    log.error(`[graphql] aliases, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
 }

@@ -81,14 +81,56 @@ type Query {
 
   vp(
     voter: String!
-    space: String,
+    space: String!
     proposal: String
   ): Vp
+
+  messages(
+    first: Int
+    skip: Int
+    where: MessageWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Message]
 }
 
 input SpaceWhere {
   id: String
   id_in: [String]
+}
+
+input MessageWhere {
+  id: String
+  id_in: [String]
+  mci: Int
+  mci_in: [Int]
+  mci_gt: Int
+  mci_gte: Int
+  mci_lt: Int
+  mci_lte: Int
+  timestamp: Int
+  timestamp_in: [Int]
+  timestamp_gt: Int
+  timestamp_gte: Int
+  timestamp_lt: Int
+  timestamp_lte: Int
+  space: String
+  space_in: [String]
+  type: String
+  type_in: [String]
+}
+
+type Message {
+  mci: Int
+  id: String
+  ipfs: String
+  address: String
+  version: String
+  timestamp: Int
+  space: String
+  type: String
+  sig: String
+  receipt: String
 }
 
 input ProposalWhere {
@@ -103,6 +145,8 @@ input ProposalWhere {
   network: String
   network_in: [String]
   title_contains: String
+  strategies_contains: String
+  validation: String
   type: String
   type_in: [String]
   created: Int
@@ -237,6 +281,7 @@ type Space {
   website: String
   twitter: String
   github: String
+  coingecko: String
   email: String
   network: String
   symbol: String
@@ -249,12 +294,15 @@ type Space {
   plugins: Any
   voting: SpaceVoting
   categories: [String]
-  validation: Strategy
+  validation: Validation
+  voteValidation: Validation
   treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
   parent: Space
   children: [Space]
+  guidelines: String
+  template: String
 }
 
 type SpaceFilters {
@@ -270,6 +318,7 @@ type SpaceVoting {
   blind: Boolean
   hideAbstain: Boolean
   privacy: String
+  aliased: Boolean
 }
 
 type Proposal {
@@ -282,6 +331,7 @@ type Proposal {
   symbol: String!
   type: String
   strategies: [Strategy]!
+  validation: Validation
   plugins: Any!
   title: String!
   body: String
@@ -294,6 +344,7 @@ type Proposal {
   snapshot: String
   state: String
   link: String
+  app: String
   scores: [Float]
   scores_by_strategy: Any
   scores_state: String
@@ -308,6 +359,11 @@ type Strategy {
   params: Any
 }
 
+type Validation {
+  name: String!
+  params: Any
+}
+
 type Vote {
   id: String!
   ipfs: String
@@ -317,6 +373,8 @@ type Vote {
   proposal: Proposal
   choice: Any!
   metadata: Any
+  reason: String
+  app: String
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String

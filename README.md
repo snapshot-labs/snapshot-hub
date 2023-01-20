@@ -2,7 +2,7 @@
     <img src="https://raw.githubusercontent.com/snapshot-labs/snapshot/develop/public/icon.svg" height="70" alt="Snapshot Logo">
     <h1>Snapshot hub</h1>
     <strong>
-      This is a hub for Snapshot network that stores the database and forwards new messages to peers. The hub hold a private keys to sign valid messages.
+      This is a hub for Snapshot network that stores the database and forwards new messages to peers. The hub holds a private key to sign valid messages.
     </strong>
 </div>
 <br>
@@ -34,7 +34,6 @@ yarn
 
 - `DATABASE_URL`: The database connection string. You will need to run your own MySQL database or use a Cloud service like [JawsDB](https://jawsdb.com).
 - `RELAYER_PK`: This is the private key of the hub. The hub counter-sign every accepted message with this key.
-- `FLEEK_API_KEY`, `FLEEK_API_SECRET` and `FLEEK_BUCKET` are required keys from [Fleek](https://fleek.co) for pinning on IPNS.
 
 3. Create the database schema
 
