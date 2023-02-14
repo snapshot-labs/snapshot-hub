@@ -17,6 +17,7 @@ query Spaces {
       params
     }
     admins
+    moderators
     members
     filters {
       minScore
