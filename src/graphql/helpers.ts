@@ -43,6 +43,7 @@ export function formatSpace(id, settings) {
   space.about = space.about || '';
   space.categories = space.categories || [];
   space.admins = space.admins || [];
+  space.moderators = space.moderators || [];
   space.members = space.members || [];
   space.plugins = space.plugins || {};
   space.filters = space.filters || {};

@@ -291,6 +291,7 @@ type Space {
   strategies: [Strategy]
   admins: [String]
   members: [String]
+  moderators: [String]
   filters: SpaceFilters
   plugins: Any
   voting: SpaceVoting
