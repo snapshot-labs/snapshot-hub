@@ -83,14 +83,12 @@ async function loadSpacesMetrics() {
   log.info('[spaces] Proposals metrics loaded');
   mapSpaces();
 
-  /*
   const votesMetrics = await getVotes();
   votesMetrics.forEach(votes => {
     if (spaces[votes.space]) spaceVotes[votes.space] = votes;
   });
   log.info('[spaces] Votes metrics loaded');
   mapSpaces();
-  */
 }
 
 async function run() {
