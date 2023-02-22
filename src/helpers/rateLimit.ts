@@ -9,7 +9,7 @@ export default rateLimit({
   keyGenerator: req => getIp(req),
   standardHeaders: true,
   skip: (req, res) => {
-    if (keycard.configured && req.headers['x-snapshot-keycard']) return true;
+    if (keycard.configured && req.headers['x-api-key']) return true;
 
     res.locals.ignoreKeycardCheck = true;
     return false;
