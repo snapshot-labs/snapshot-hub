@@ -81,15 +81,29 @@ export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];
   Object.entries(fields).forEach(([field, type]) => {
-    if (where[field]) {
+    if (where[field] !== undefined) {
       query += `AND ${alias}.${field} = ? `;
       params.push(where[field]);
     }
+
+    const fieldNot = where[`${field}_not`];
+    if (fieldNot !== undefined) {
+      query += `AND ${alias}.${field} != ? `;
+      params.push(fieldNot);
+    }
+
     const fieldIn = where[`${field}_in`] || [];
     if (fieldIn.length > 0) {
       query += `AND ${alias}.${field} IN (?) `;
       params.push(fieldIn);
     }
+
+    const fieldNotIn = where[`${field}_not_in`] || [];
+    if (fieldNotIn.length > 0) {
+      query += `AND ${alias}.${field} NOT IN (?) `;
+      params.push(fieldNotIn);
+    }
+
     if (type === 'number') {
       const fieldGt = where[`${field}_gt`];
       const fieldGte = where[`${field}_gte`];
@@ -167,14 +181,10 @@ function checkRelatedSpacesNesting(requestedFields): void {
 function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
-  if (
+  return !(
     !(requestedFields.parent && Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
     !(requestedFields.children && Object.keys(requestedFields.children).some(key => key !== 'id'))
-  ) {
-    return false;
-  }
-
-  return true;
+  );
 }
 
 function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {

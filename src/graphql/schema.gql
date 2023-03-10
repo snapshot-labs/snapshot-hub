@@ -150,6 +150,10 @@ input ProposalWhere {
   validation: String
   type: String
   type_in: [String]
+  app: String
+  app_not: String
+  app_in: [String]
+  app_not_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -184,6 +188,14 @@ input VoteWhere {
   voter_in: [String]
   proposal: String
   proposal_in: [String]
+  reason: String
+  reason_not: String
+  reason_in: [String]
+  reason_not_in: [String]
+  app: String
+  app_not: String
+  app_in: [String]
+  app_not_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
