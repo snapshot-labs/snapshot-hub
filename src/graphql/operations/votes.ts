@@ -16,6 +16,8 @@ async function query(parent, args, context?, info?) {
     space: 'string',
     voter: 'string',
     proposal: 'string',
+    reason: 'string',
+    app: 'string',
     created: 'number',
     vp: 'number',
     vp_state: 'string'
