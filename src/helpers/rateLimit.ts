@@ -1,17 +1,16 @@
 import rateLimit from 'express-rate-limit';
 import { getIp, sendError } from './utils';
 import log from './log';
-import keycard from './keycard';
+import { keycard } from './keycard';
 
 export default rateLimit({
   windowMs: 20 * 1e3,
   max: 60,
   keyGenerator: req => getIp(req),
   standardHeaders: true,
-  skip: (req, res) => {
-    if (keycard.configured && req.headers['x-api-key']) return true;
-
-    res.locals.ignoreKeycardCheck = true;
+  skip: req => {
+    const key = req.headers['x-api-key'] || req.query.apiKey;
+    if (key && keycard.configured) return true;
     return false;
   },
   handler: (req, res) => {
