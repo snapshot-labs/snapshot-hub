@@ -7,7 +7,7 @@ const keycard = new Keycard({
   URL: process.env.KEYCARD_URL || 'http://localhost:3002'
 });
 
-const checkKeyCard = async (req, res, next) => {
+const verifyKeyCard = async (req, res, next) => {
   const key = req.headers['x-api-key'] || req.query.apiKey;
   if (key && keycard.configured) {
     const { valid, rateLimited } = keycard.logReq(key);
@@ -18,4 +18,4 @@ const checkKeyCard = async (req, res, next) => {
   return next();
 };
 
-export { keycard, checkKeyCard };
+export { keycard, verifyKeyCard };
