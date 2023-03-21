@@ -146,7 +146,7 @@ export async function fetchSpaces(args) {
 
   const query = `
     SELECT s.* FROM spaces s
-    WHERE 1 = 1 ${queryStr} AND s.deleted = 0
+    WHERE s.deleted = 0 ${queryStr}
     GROUP BY s.id
     ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
