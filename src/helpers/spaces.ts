@@ -31,7 +31,7 @@ function mapSpaces() {
 }
 
 async function loadSpaces() {
-  const query = 'SELECT id, settings FROM spaces ORDER BY id ASC';
+  const query = 'SELECT id, settings FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
   const totalSpaces = Object.keys(spaces).length;

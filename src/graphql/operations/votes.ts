@@ -54,7 +54,7 @@ async function query(parent, args, context?, info?) {
     const spaceIds = votes.map(vote => vote.space.id).filter((v, i, a) => a.indexOf(v) === i);
     const query = `
       SELECT id, settings FROM spaces
-      WHERE id IN (?) AND settings IS NOT NULL
+      WHERE id IN (?) AND settings IS NOT NULL AND deleted = 0
     `;
     try {
       let spaces = await db.queryAsync(query, [spaceIds]);

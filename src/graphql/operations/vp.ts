@@ -15,7 +15,7 @@ export default async function (_parent, { voter, space, proposal }) {
       p.delegation === 1
     );
   } else if (space) {
-    const query = `SELECT settings FROM spaces WHERE id = ? LIMIT 1`;
+    const query = `SELECT settings FROM spaces WHERE id = ? AND deleted = 0 LIMIT 1`;
     let [s] = await db.queryAsync(query, [space]);
     s = JSON.parse(s.settings);
 
