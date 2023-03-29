@@ -66,13 +66,13 @@ export function formatSpace(id, settings) {
     // By default return space network if strategy network is not defined
     network: strategy.network || space.network
   }));
-  space.validation = space.validation || { name: 'any', params: {} };
-  if (space.validation.name === 'any' && space.filters.minScore) {
+  if (!space.validation && space.filters.minScore) {
     space.validation = {
       name: 'basic',
       params: { minScore: space.filters.minScore, strategies: space.strategies }
     };
   }
+  space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
 
   // always return parent and children in child node format
