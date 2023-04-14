@@ -1,7 +1,8 @@
 import { checkLimits, fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-export default async function (_parent, args, _context, info) {
+export default async function (parent: any, args: QueryArgs, context: any, info: any) {
   checkLimits(args, 'spaces');
   try {
     let spaces = await fetchSpaces(args);

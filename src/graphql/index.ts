@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { graphqlHTTP } from 'express-graphql';
 import { makeExecutableSchema } from 'graphql-tools';
+// @ts-ignore
 import queryCountLimit from 'graphql-query-count-limit';
 import depthLimit from 'graphql-depth-limit';
 import Query from './operations';

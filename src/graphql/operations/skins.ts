@@ -1,7 +1,7 @@
 import { spaces } from '../../helpers/spaces';
 
 export default function () {
-  const skins = {};
+  const skins: { [key: string]: number } = {};
   Object.values(spaces).forEach((space: any) => {
     if (space.skin) skins[space.skin] = skins[space.skin] ? skins[space.skin] + 1 : 1;
   });

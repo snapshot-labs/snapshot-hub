@@ -3,8 +3,9 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-async function query(parent, args, context?, info?) {
+async function query(parent: any, args: QueryArgs, context?: any, info?: any) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {}, first = 20, skip = 0 } = args;
 
@@ -60,7 +61,7 @@ async function query(parent, args, context?, info?) {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
       spaces = Object.fromEntries(
-        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+        spaces.map((space: any) => [space.id, formatSpace(space.id, space.settings)])
       );
       votes = votes.map(vote => {
         if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
@@ -82,7 +83,7 @@ async function query(parent, args, context?, info?) {
     try {
       let proposals = await db.queryAsync(query, [proposalIds]);
       proposals = Object.fromEntries(
-        proposals.map(proposal => [proposal.id, formatProposal(proposal)])
+        proposals.map((proposal: any) => [proposal.id, formatProposal(proposal)])
       );
       votes = votes.map(vote => {
         vote.proposal = proposals[vote.proposal];
@@ -97,7 +98,7 @@ async function query(parent, args, context?, info?) {
   return votes;
 }
 
-export default async function (parent, args, context?, info?) {
+export default async function (parent: any, args: QueryArgs, context?: any, info?: any) {
   const requestedFields = info ? graphqlFields(info) : {};
   return await serve(JSON.stringify({ args, requestedFields }), query, [
     parent,

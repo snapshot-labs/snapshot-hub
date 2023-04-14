@@ -1,8 +1,8 @@
 import { spaces } from '../../helpers/spaces';
 
 export default function () {
-  const networks = {};
-  Object.values(spaces).forEach((space: any) => {
+  const networks: { [key: string]: number } = {};
+  Object.values(spaces).forEach(space => {
     networks[space.network] = networks[space.network] ? networks[space.network] + 1 : 1;
   });
   return Object.entries(networks).map(network => ({

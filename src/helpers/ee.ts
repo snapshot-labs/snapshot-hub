@@ -4,7 +4,7 @@ import { sha256 } from './utils';
 const eventEmitter = new events.EventEmitter();
 eventEmitter.setMaxListeners(1000); // https://stackoverflow.com/a/26176922
 
-export default async function serve(id, action, args) {
+export default async function serve(id: string, action: any, args: any) {
   const key = sha256(id);
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {

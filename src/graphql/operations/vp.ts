@@ -1,7 +1,10 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from '../../helpers/mysql';
 
-export default async function (_parent, { voter, space, proposal }) {
+export default async function (
+  parent: any,
+  { voter, space, proposal }: { voter: any; space: string; proposal: string }
+) {
   if (proposal) {
     const query = `SELECT * FROM proposals WHERE id = ?`;
     const [p] = await db.queryAsync(query, [proposal]);

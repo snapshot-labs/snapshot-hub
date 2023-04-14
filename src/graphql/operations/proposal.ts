@@ -2,7 +2,7 @@ import db from '../../helpers/mysql';
 import { formatProposal } from '../helpers';
 import log from '../../helpers/log';
 
-export default async function (parent, { id }) {
+export default async function (parent: any, { id }: { id: string }) {
   const query = `
     SELECT p.*, spaces.settings FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
@@ -11,7 +11,7 @@ export default async function (parent, { id }) {
   `;
   try {
     const proposals = await db.queryAsync(query, [id]);
-    return proposals.map(proposal => formatProposal(proposal))[0] || null;
+    return proposals.map((proposal: any) => formatProposal(proposal))[0] || null;
   } catch (e) {
     log.error(`[graphql] proposal, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');

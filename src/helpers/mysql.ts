@@ -1,9 +1,15 @@
 import mysql from 'mysql';
+// @ts-ignore
 import Pool from 'mysql/lib/Pool';
+// @ts-ignore
 import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 import log from './log';
+
+interface PromisedPool {
+  queryAsync: (query: string, args?: any) => Promise<any>;
+}
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
 log.info(`[mysql] connection limit ${connectionLimit}`);
@@ -20,6 +26,6 @@ config.acquireTimeout = 60e3;
 config.timeout = 60e3;
 config.charset = 'utf8mb4';
 bluebird.promisifyAll([Pool, Connection]);
-const db = mysql.createPool(config);
+const db: PromisedPool = mysql.createPool(config) as mysql.Pool & PromisedPool;
 
 export default db;

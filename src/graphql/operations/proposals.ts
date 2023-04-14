@@ -1,8 +1,9 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-export default async function (parent, args) {
+export default async function (parent: any, args: QueryArgs) {
   const { first = 20, skip = 0, where = {} } = args;
 
   checkLimits(args, 'proposals');
@@ -74,7 +75,7 @@ export default async function (parent, args) {
   params.push(skip, first);
   try {
     const proposals = await db.queryAsync(query, params);
-    return proposals.map(proposal => formatProposal(proposal));
+    return proposals.map((proposal: any) => formatProposal(proposal));
   } catch (e) {
     log.error(`[graphql] proposals, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');

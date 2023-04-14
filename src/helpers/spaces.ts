@@ -2,15 +2,29 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
+import type { Space, SpaceMetadata, SpaceSetting } from '../types';
 
-export let spaces = {};
-export const spacesMetadata = {};
-export const spaceProposals = {};
-export const spaceVotes = {};
-export const spaceFollowers = {};
+type SpaceVotes = { space: Space['id']; count: number; count_7d: number };
+type ProposalsMetrics = {
+  space: Space['id'];
+  count: number;
+  active: 0 | 1;
+  count_7d: number | null;
+};
+type FollowersMetrics = {
+  space: Space['id'];
+  count: number;
+  count_7d: number;
+};
+
+export let spaces: { [key: Space['id']]: SpaceSetting } = {};
+export const spacesMetadata: { [key: Space['id']]: SpaceMetadata } = {};
+export const spaceProposals: { [key: Space['id']]: ProposalsMetrics } = {};
+export const spaceVotes: { [key: Space['id']]: SpaceVotes } = {};
+export const spaceFollowers: { [key: Space['id']]: FollowersMetrics } = {};
 
 function mapSpaces() {
-  Object.entries(spaces).forEach(([id, space]: any) => {
+  Object.entries(spaces).forEach(([id, space]) => {
     spacesMetadata[id] = {
       name: space.name,
       private: space.private || undefined,
@@ -32,14 +46,14 @@ function mapSpaces() {
 
 async function loadSpaces() {
   const query = 'SELECT id, settings FROM spaces WHERE deleted = 0 ORDER BY id ASC';
-  const s = await db.queryAsync(query);
+  const s: { id: Space['id']; settings: string }[] = await db.queryAsync(query);
   spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
   const totalSpaces = Object.keys(spaces).length;
   log.info(`[spaces] total spaces ${totalSpaces}`);
   mapSpaces();
 }
 
-async function getProposals() {
+async function getProposals(): Promise<ProposalsMetrics[]> {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
     SELECT space, COUNT(id) AS count,
@@ -50,7 +64,7 @@ async function getProposals() {
   return await db.queryAsync(query, [ts, ts]);
 }
 
-async function getVotes() {
+async function getVotes(): Promise<SpaceVotes[]> {
   const query = `
     SELECT space, COUNT(id) as count,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
@@ -59,7 +73,7 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
-async function getFollowers() {
+async function getFollowers(): Promise<FollowersMetrics[]> {
   const query = `
     SELECT space, COUNT(id) as count,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d

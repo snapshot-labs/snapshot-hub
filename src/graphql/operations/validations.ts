@@ -1,7 +1,7 @@
 import { spaces } from '../../helpers/spaces';
 
 export default function () {
-  const validations = {};
+  const validations: { [key: string]: number } = {};
   Object.values(spaces).forEach((space: any) => {
     if (space.validation)
       validations[space.validation.name] = validations[space.validation.name]
