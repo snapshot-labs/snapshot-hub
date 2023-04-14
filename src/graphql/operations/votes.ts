@@ -20,7 +20,8 @@ async function query(parent, args, context?, info?) {
     app: 'string',
     created: 'number',
     vp: 'number',
-    vp_state: 'string'
+    vp_state: 'string',
+    choice: 'any'
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;
