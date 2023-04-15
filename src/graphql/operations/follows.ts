@@ -17,7 +17,7 @@ export default async function (parent: any, args: QueryArgs) {
   };
   const whereQuery = buildWhereQuery(fields, 'f', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -34,9 +34,8 @@ export default async function (parent: any, args: QueryArgs) {
   `;
   params.push(skip, first);
 
-  let follows: any[] = [];
   try {
-    follows = await db.queryAsync(query, params);
+    const follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));
   } catch (e) {
     log.error(`[graphql] follows, ${JSON.stringify(e)}`);

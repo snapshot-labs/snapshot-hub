@@ -25,7 +25,7 @@ async function query(parent: any, args: QueryArgs, context?: any, info?: any) {
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -61,7 +61,7 @@ async function query(parent: any, args: QueryArgs, context?: any, info?: any) {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
       spaces = Object.fromEntries(
-        spaces.map((space: any) => [space.id, formatSpace(space.id, space.settings)])
+        spaces.map(space => [space.id, formatSpace(space.id as string, space.settings as string)])
       );
       votes = votes.map(vote => {
         if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
@@ -74,7 +74,7 @@ async function query(parent: any, args: QueryArgs, context?: any, info?: any) {
   }
 
   if (requestedFields.proposal && votes.length > 0) {
-    const proposalIds = votes.map(vote => vote.proposal);
+    const proposalIds = votes.map(vote => vote.proposal as string);
     const query = `
       SELECT p.*, spaces.settings FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
@@ -83,7 +83,7 @@ async function query(parent: any, args: QueryArgs, context?: any, info?: any) {
     try {
       let proposals = await db.queryAsync(query, [proposalIds]);
       proposals = Object.fromEntries(
-        proposals.map((proposal: any) => [proposal.id, formatProposal(proposal)])
+        proposals.map(proposal => [proposal.id, formatProposal(proposal)])
       );
       votes = votes.map(vote => {
         vote.proposal = proposals[vote.proposal];

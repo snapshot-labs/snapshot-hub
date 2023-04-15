@@ -23,7 +23,7 @@ export default async function (parent: any, args: QueryArgs) {
   };
   const whereQuery = buildWhereQuery(fields, 'p', where);
   let queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const state = where.state || null;
@@ -75,7 +75,7 @@ export default async function (parent: any, args: QueryArgs) {
   params.push(skip, first);
   try {
     const proposals = await db.queryAsync(query, params);
-    return proposals.map((proposal: any) => formatProposal(proposal));
+    return proposals.map(proposal => formatProposal(proposal));
   } catch (e) {
     log.error(`[graphql] proposals, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');

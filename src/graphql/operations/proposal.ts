@@ -11,7 +11,7 @@ export default async function (parent: any, { id }: { id: string }) {
   `;
   try {
     const proposals = await db.queryAsync(query, [id]);
-    return proposals.map((proposal: any) => formatProposal(proposal))[0] || null;
+    return proposals.map(proposal => formatProposal(proposal))[0] || null;
   } catch (e) {
     log.error(`[graphql] proposal, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');

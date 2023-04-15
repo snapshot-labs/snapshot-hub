@@ -17,7 +17,7 @@ export default async function (parent: any, args: QueryArgs) {
   };
   const whereQuery = buildWhereQuery(fields, 'a', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';

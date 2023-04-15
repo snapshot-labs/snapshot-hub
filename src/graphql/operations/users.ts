@@ -15,7 +15,7 @@ export default async function (parent: any, args: QueryArgs) {
   };
   const whereQuery = buildWhereQuery(fields, 'u', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -24,8 +24,6 @@ export default async function (parent: any, args: QueryArgs) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let users: any[] = [];
-
   const query = `
     SELECT u.* FROM users u
     WHERE 1=1 ${queryStr}
@@ -33,7 +31,7 @@ export default async function (parent: any, args: QueryArgs) {
   `;
   params.push(skip, first);
   try {
-    users = await db.queryAsync(query, params);
+    const users = await db.queryAsync(query, params);
     return users.map(user => formatUser(user));
   } catch (e) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);

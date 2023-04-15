@@ -17,7 +17,7 @@ export default async function (parent: any, args: QueryArgs) {
   };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -25,8 +25,6 @@ export default async function (parent: any, args: QueryArgs) {
   orderBy = `s.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
-
-  let subscriptions: any[] = [];
 
   const query = `
     SELECT s.*, spaces.settings FROM subscriptions s
@@ -37,7 +35,7 @@ export default async function (parent: any, args: QueryArgs) {
   params.push(skip, first);
 
   try {
-    subscriptions = await db.queryAsync(query, params);
+    const subscriptions = await db.queryAsync(query, params);
     return subscriptions.map(subscription => formatSubscription(subscription));
   } catch (e) {
     log.error(`[graphql] subscriptions, ${JSON.stringify(e)}`);

@@ -2,22 +2,21 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
-import type { Space, SpaceMetadata, SpaceSetting } from '../types';
+import type { Space, SpaceMetadata, SqlRow } from '../types';
 
-type SpaceVotes = { space: Space['id']; count: number; count_7d: number };
+type SpaceVotes = MetricLike & SqlRow;
+
+type MetricLike = {
+  count?: number;
+  count_7d?: number;
+};
 type ProposalsMetrics = {
-  space: Space['id'];
-  count: number;
-  active: 0 | 1;
-  count_7d: number | null;
-};
-type FollowersMetrics = {
-  space: Space['id'];
-  count: number;
-  count_7d: number;
-};
+  active?: 0 | 1;
+} & MetricLike &
+  SqlRow;
+type FollowersMetrics = MetricLike & SqlRow;
 
-export let spaces: { [key: Space['id']]: SpaceSetting } = {};
+export let spaces: { [key: Space['id']]: Space } = {};
 export const spacesMetadata: { [key: Space['id']]: SpaceMetadata } = {};
 export const spaceProposals: { [key: Space['id']]: ProposalsMetrics } = {};
 export const spaceVotes: { [key: Space['id']]: SpaceVotes } = {};
@@ -30,7 +29,9 @@ function mapSpaces() {
       private: space.private || undefined,
       terms: space.terms || undefined,
       network: space.network || undefined,
-      networks: uniq((space.strategies || []).map(strategy => strategy.network || space.network)),
+      networks: uniq(
+        (space.strategies || []).map(strategy => (strategy.network || space.network) as string)
+      ),
       categories: space.categories || undefined,
       activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined,
       proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
@@ -46,14 +47,16 @@ function mapSpaces() {
 
 async function loadSpaces() {
   const query = 'SELECT id, settings FROM spaces WHERE deleted = 0 ORDER BY id ASC';
-  const s: { id: Space['id']; settings: string }[] = await db.queryAsync(query);
-  spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
+  const s = await db.queryAsync(query);
+  spaces = Object.fromEntries(
+    s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings as string)])
+  );
   const totalSpaces = Object.keys(spaces).length;
   log.info(`[spaces] total spaces ${totalSpaces}`);
   mapSpaces();
 }
 
-async function getProposals(): Promise<ProposalsMetrics[]> {
+async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
     SELECT space, COUNT(id) AS count,
@@ -64,7 +67,7 @@ async function getProposals(): Promise<ProposalsMetrics[]> {
   return await db.queryAsync(query, [ts, ts]);
 }
 
-async function getVotes(): Promise<SpaceVotes[]> {
+async function getVotes() {
   const query = `
     SELECT space, COUNT(id) as count,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
@@ -73,7 +76,7 @@ async function getVotes(): Promise<SpaceVotes[]> {
   return await db.queryAsync(query);
 }
 
-async function getFollowers(): Promise<FollowersMetrics[]> {
+async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
@@ -85,21 +88,21 @@ async function getFollowers(): Promise<FollowersMetrics[]> {
 async function loadSpacesMetrics() {
   const followersMetrics = await getFollowers();
   followersMetrics.forEach(followers => {
-    if (spaces[followers.space]) spaceFollowers[followers.space] = followers;
+    if (followers.space && spaces[followers.space]) spaceFollowers[followers.space] = followers;
   });
   log.info('[spaces] Followers metrics loaded');
   mapSpaces();
 
   const proposalsMetrics = await getProposals();
   proposalsMetrics.forEach(proposals => {
-    if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
+    if (proposals.space && spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
   });
   log.info('[spaces] Proposals metrics loaded');
   mapSpaces();
 
   const votesMetrics = await getVotes();
   votesMetrics.forEach(votes => {
-    if (spaces[votes.space]) spaceVotes[votes.space] = votes;
+    if (votes.space && spaces[votes.space]) spaceVotes[votes.space] = votes;
   });
   log.info('[spaces] Votes metrics loaded');
   mapSpaces();

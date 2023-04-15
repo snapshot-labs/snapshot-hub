@@ -6,9 +6,11 @@ import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 import log from './log';
+import { SqlRow } from '../types';
 
+type SqlQueryArgs = string | number | boolean | (string | number | boolean)[];
 interface PromisedPool {
-  queryAsync: (query: string, args?: any) => Promise<any>;
+  queryAsync: (query: string, args?: SqlQueryArgs | SqlQueryArgs[]) => Promise<SqlRow[]>;
 }
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');

@@ -1,10 +1,10 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
 import log from './log';
-import type { Strategy } from '../types';
+import type { StrategyItem } from '../types';
 
-export let strategies: Strategy[] = [];
-export let strategiesObj: { [id: Strategy['id']]: Strategy } = {};
+export let strategies: StrategyItem[] = [];
+export let strategiesObj: { [id: StrategyItem['id']]: StrategyItem } = {};
 
 const uri = 'https://score.snapshot.org/api/strategies';
 
