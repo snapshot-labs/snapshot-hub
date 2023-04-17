@@ -29,10 +29,10 @@ async function query(parent, args, context?, info?) {
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created', 'vp'].includes(orderBy)) orderBy = 'created';
+  if (!['created', 'vp', 'choice'].includes(orderBy)) orderBy = 'created';
   orderBy = `v.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
-  if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+  if (!['asc', 'desc'].includes(orderDirection)) orderDirection = 'desc';
 
   let votes: any[] = [];
 
