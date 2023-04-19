@@ -1236,7 +1236,7 @@
   resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.7.tgz#c8e07e7e9baabee245020a72ac05835b65139823"
   integrity sha512-k/FUf4VWhwLFUmKuWs2mNvmPe691hqhvCJuujD4TfbIivWysmL1TqthwfdQUrQEAQUqVQ2ZKEiGkbufp5J27eQ==
 
-"@snapshot-labs/snapshot.js@^0.4.76":
+"@snapshot-labs/snapshot.js@^0.4.77":
   version "0.4.77"
   resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.4.77.tgz#a0042d63a4f262f6e0f425914c8ac1f23bd504c0"
   integrity sha512-HJdPEWF0xtRhU3Q1u2IuaQww2PzRGzb1khdfBiwwaTyWkEaP/ytLta2EezLH8btLAn2HD3I8rQIw1+TqA9hccg==
