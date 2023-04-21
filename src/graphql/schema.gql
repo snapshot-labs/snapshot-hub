@@ -210,8 +210,9 @@ input VoteWhere {
   vp_lte: Float
   vp_state: String
   vp_state_in: [String]
-  choice: Any
-  choice_in: [Any]
+  choice: String
+  choice_in: [String]
+  choice_in_json_keys: [String]
 }
 
 input AliasWhere {

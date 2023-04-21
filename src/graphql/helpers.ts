@@ -110,6 +110,16 @@ export function buildWhereQuery(fields, alias, where) {
       params.push(fieldNotIn);
     }
 
+    const fieldInJsonKeys = where[`${field}_in_json_keys`] || [];
+    if (fieldInJsonKeys.length > 0) {
+      const keys: string = fieldInJsonKeys.reduce((acc: string, val: string, i: number) => {
+        const isLast = i === fieldInJsonKeys.length - 1;
+        acc += `'$."${val}"'${isLast ? '' : ', '}`;
+        return acc;
+      }, '');
+      query += `AND JSON_CONTAINS_PATH(choice, 'all', ${keys}) `;
+    }
+
     if (type === 'number') {
       const fieldGt = where[`${field}_gt`];
       const fieldGte = where[`${field}_gte`];

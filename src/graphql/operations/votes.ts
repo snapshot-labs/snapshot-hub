@@ -21,7 +21,7 @@ async function query(parent, args, context?, info?) {
     created: 'number',
     vp: 'number',
     vp_state: 'string',
-    choice: 'any'
+    choice: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;
