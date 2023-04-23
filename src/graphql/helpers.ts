@@ -297,6 +297,7 @@ export function formatProposal(proposal: SqlRow) {
 export function formatVote(vote: SqlRow) {
   return {
     ...vote,
+    choice: jsonParse(vote.choice as string, {}),
     metadata: jsonParse(vote.metadata as string, {}),
     vp_by_strategy: jsonParse(vote.vp_by_strategy as string, []),
     space: formatSpace(vote.space as string, vote.settings as string)
