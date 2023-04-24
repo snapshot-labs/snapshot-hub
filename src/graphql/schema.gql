@@ -97,6 +97,7 @@ type Query {
 input SpaceWhere {
   id: String
   id_in: [String]
+  id_contains: String
 }
 
 input MessageWhere {
@@ -317,6 +318,8 @@ type Space {
   children: [Space]
   guidelines: String
   template: String
+  verified: Int
+  rank: Float
 }
 
 type SpaceFilters {

@@ -1,6 +1,6 @@
 import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
-import { spaceProposals, spaceFollowers } from '../helpers/spaces';
+import { spaceProposals, spaceFollowers, spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
@@ -74,6 +74,8 @@ export function formatSpace(id, settings) {
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
+  space.verified = spacesMetadata[id]?.verified || false;
+  space.rank = spacesMetadata[id]?.rank || 0;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
@@ -141,12 +143,40 @@ export async function fetchSpaces(args) {
 
   const fields = { id: 'string' };
   const whereQuery = buildWhereQuery(fields, 's', where);
-  const queryStr = whereQuery.query;
+  let queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
+  if (!['created_at', 'updated_at', 'id', 'rank'].includes(orderBy)) orderBy = 'created_at';
+  const orderByParams: any[] = [];
+  if (orderBy === 'rank' && Object.keys(spacesMetadata).length) {
+    const rankSortedSpaces = Object.values(spacesMetadata)
+      .filter((space: any) => !space.private)
+      .filter((space: any) => space.id.indexOf(where.id_contains || '') > -1)
+      .sort((a: any, b: any) => (orderDirection === 'desc' ? b.rank - a.rank : a.rank - b.rank))
+      .slice(skip, skip + first)
+      .map((space: any) => space.id);
+    if (!rankSortedSpaces.length) return [];
+
+    const rankSortedSpaceIds =
+      orderDirection === 'desc' ? [...rankSortedSpaces].reverse() : rankSortedSpaces;
+
+    orderBy = 'FIELD(s.id, ?)';
+    orderByParams.push(rankSortedSpaceIds);
+
+    queryStr += 'AND s.id IN (?) ';
+    params.push(rankSortedSpaceIds);
+  } else {
+    if (orderBy === 'rank') orderBy = 'created_at';
+    orderBy = `s.${orderBy}`;
+  }
+
+  if (where.id_contains) {
+    queryStr += ' AND s.id LIKE ?';
+    params.push(`%${where.id_contains}%`);
+  }
+
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
@@ -154,9 +184,9 @@ export async function fetchSpaces(args) {
     SELECT s.* FROM spaces s
     WHERE s.deleted = 0 ${queryStr}
     GROUP BY s.id
-    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
+    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
-  params.push(skip, first);
+  params.push(...orderByParams, skip, first);
 
   const spaces = await db.queryAsync(query, params);
   return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));

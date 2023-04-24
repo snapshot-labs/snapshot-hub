@@ -1,5 +1,5 @@
 import express from 'express';
-import { spaces, spacesMetadata } from './helpers/spaces';
+import { spaces, exploreEndpointData } from './helpers/spaces';
 import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
 
@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/explore', (req, res) => {
-  return res.json({ spaces: spacesMetadata });
+  return res.json({ spaces: exploreEndpointData });
 });
 
 router.get('/spaces/:key', (req, res) => {

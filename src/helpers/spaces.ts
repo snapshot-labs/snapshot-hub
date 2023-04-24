@@ -2,16 +2,34 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
+import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
 
 export let spaces = {};
+export const exploreEndpointData = {};
 export const spacesMetadata = {};
 export const spaceProposals = {};
 export const spaceVotes = {};
 export const spaceFollowers = {};
 
+function getRank(id: string, verified: number): number {
+  let ranking =
+    (spaceVotes[id]?.count || 0) / 50 +
+    (spaceVotes[id]?.count_7d || 0) +
+    (spaceProposals[id]?.count_7d || 0) * 50 +
+    (spaceFollowers[id]?.count_7d || 0);
+
+  if (verified) {
+    ranking = ranking * 5;
+    ranking += 100;
+  }
+
+  return ranking;
+}
+
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    spacesMetadata[id] = {
+    /* This will be deprecated soon */
+    exploreEndpointData[id] = {
       name: space.name,
       private: space.private || undefined,
       terms: space.terms || undefined,
@@ -26,6 +44,14 @@ function mapSpaces() {
       votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
       followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
       followers_7d: (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
+    };
+    /* This will be deprecated soon */
+
+    spacesMetadata[id] = {
+      id,
+      verified: verifiedSpaces[id] || 0,
+      rank: getRank(id, verifiedSpaces[id]),
+      private: space.private || undefined
     };
   });
 }
