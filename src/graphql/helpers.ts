@@ -152,8 +152,7 @@ export async function fetchSpaces(args) {
   const orderByParams: any[] = [];
   if (orderBy === 'rank' && Object.keys(spacesMetadata).length) {
     const rankSortedSpaces = Object.values(spacesMetadata)
-      .filter((space: any) => !space.private)
-      .filter((space: any) => space.id.indexOf(where.id_contains || '') > -1)
+      .filter((space: any) => !space.private && space.id.indexOf(where.id_contains || '') > -1)
       .sort((a: any, b: any) => (orderDirection === 'desc' ? b.rank - a.rank : a.rank - b.rank))
       .slice(skip, skip + first)
       .map((space: any) => space.id);
