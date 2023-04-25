@@ -51,7 +51,9 @@ function mapSpaces() {
       id,
       verified: verifiedSpaces[id] || 0,
       rank: getRank(id, verifiedSpaces[id]),
-      private: space.private || undefined
+      private: space.private ?? false,
+      categories: space.categories ?? [],
+      network: space.network ?? undefined
     };
   });
 }

@@ -98,6 +98,9 @@ input SpaceWhere {
   id: String
   id_in: [String]
   id_contains: String
+  private: Boolean
+  category: String
+  network: String
 }
 
 input MessageWhere {

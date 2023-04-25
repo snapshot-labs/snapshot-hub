@@ -152,7 +152,17 @@ export async function fetchSpaces(args) {
   const orderByParams: any[] = [];
   if (orderBy === 'rank' && Object.keys(spacesMetadata).length) {
     const rankSortedSpaces = Object.values(spacesMetadata)
-      .filter((space: any) => !space.private && space.id.indexOf(where.id_contains || '') > -1)
+      .filter(
+        (space: any) =>
+          // filter by id_contains if where.id_contains is defined
+          space.id.indexOf(where.id_contains || '') > -1 &&
+          // filter by private if where.private is defined
+          (where.private !== undefined ? space.private === where.private : true) &&
+          // filter by network if where.network is defined
+          (where.network !== undefined ? space.network === where.network : true) &&
+          // filter by category if where.category is defined
+          (where.category !== undefined ? space.categories.includes(where.category) : true)
+      )
       .sort((a: any, b: any) => (orderDirection === 'desc' ? b.rank - a.rank : a.rank - b.rank))
       .slice(skip, skip + first)
       .map((space: any) => space.id);
@@ -174,6 +184,21 @@ export async function fetchSpaces(args) {
   if (where.id_contains) {
     queryStr += ' AND s.id LIKE ?';
     params.push(`%${where.id_contains}%`);
+  }
+
+  if (where.private !== undefined) {
+    queryStr += " AND JSON_EXTRACT(s.settings, '$.private') in (?)";
+    params.push(where.private ? [true] : [false, null]);
+  }
+
+  if (where.network) {
+    queryStr += " AND JSON_EXTRACT(s.settings, '$.network') = ?";
+    params.push(where.network);
+  }
+
+  if (where.category) {
+    queryStr += " AND JSON_EXTRACT(s.settings, '$.categories') LIKE ?";
+    params.push(`%${where.category}%`);
   }
 
   orderDirection = orderDirection.toUpperCase();
