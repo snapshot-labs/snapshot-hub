@@ -53,7 +53,11 @@ function mapSpaces() {
       rank: getRank(id, verifiedSpaces[id]),
       private: space.private ?? false,
       categories: space.categories ?? [],
-      network: space.network ?? undefined
+      networks: uniq(
+        (space.strategies || [])
+          .map(strategy => strategy?.network || space.network)
+          .concat(space.network ?? undefined)
+      )
     };
   });
 }

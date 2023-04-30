@@ -159,7 +159,7 @@ export async function fetchSpaces(args) {
           // filter by private if where.private is defined
           (where.private !== undefined ? space.private === where.private : true) &&
           // filter by network if where.network is defined
-          (where.network !== undefined ? space.network === where.network : true) &&
+          (where.network !== undefined ? space.networks.includes(where.network) : true) &&
           // filter by category if where.category is defined
           (where.category !== undefined ? space.categories.includes(where.category) : true)
       )
@@ -192,8 +192,9 @@ export async function fetchSpaces(args) {
   }
 
   if (where.network) {
-    queryStr += " AND JSON_EXTRACT(s.settings, '$.network') = ?";
-    params.push(where.network);
+    queryStr +=
+      " AND (JSON_EXTRACT(s.settings, '$.network') = ? OR JSON_EXTRACT(s.settings, '$.strategies') LIKE ?)";
+    params.push(where.network, `%"network": "${where.network}"%`);
   }
 
   if (where.category) {
