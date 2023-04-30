@@ -57,8 +57,9 @@ export function formatSpace(id, settings) {
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
   space.voting.aliased = space.voting.aliased || false;
-  space.followersCount = spaceFollowers[id]?.count || 0;
-  space.proposalsCount = spaceProposals[id]?.count || 0;
+  space.followersCount = spaceFollowers[id]?.count || null;
+  space.proposalsCount = spaceProposals[id]?.count || null;
+  space.activeProposals = spaceProposals[id]?.active || null;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
