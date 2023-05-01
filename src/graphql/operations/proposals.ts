@@ -1,8 +1,9 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-export default async function (parent, args) {
+export default async function (parent: any, args: QueryArgs) {
   const { first = 20, skip = 0, where = {} } = args;
 
   checkLimits(args, 'proposals');
@@ -22,7 +23,7 @@ export default async function (parent, args) {
   };
   const whereQuery = buildWhereQuery(fields, 'p', where);
   let queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const state = where.state || null;

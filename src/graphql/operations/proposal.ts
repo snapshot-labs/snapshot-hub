@@ -2,7 +2,7 @@ import db from '../../helpers/mysql';
 import { formatProposal } from '../helpers';
 import log from '../../helpers/log';
 
-export default async function (parent, { id }) {
+export default async function (parent: any, { id }: { id: string }) {
   const query = `
     SELECT p.*, spaces.settings FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space

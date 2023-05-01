@@ -3,11 +3,26 @@ import { jsonParse } from '../helpers/utils';
 import { spaceProposals, spaceFollowers } from '../helpers/spaces';
 import db from '../helpers/mysql';
 
+import type {
+  Strategy,
+  QueryArgs,
+  Countable,
+  SqlRow,
+  User,
+  Subscription,
+  Follow,
+  Vote,
+  Proposal,
+  Space
+} from '../types';
+
+type QueryFields = { [key: string]: string };
+
 const network = process.env.NETWORK || 'testnet';
 
 export class PublicError extends Error {}
 
-const ARG_LIMITS = {
+const ARG_LIMITS: { [key: string]: Countable } = {
   default: {
     first: 1000,
     skip: 5000
@@ -20,7 +35,7 @@ const ARG_LIMITS = {
   }
 };
 
-export function checkLimits(args: any = {}, type) {
+export function checkLimits(args: QueryArgs, type: string) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
 
@@ -35,7 +50,7 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
-export function formatSpace(id, settings) {
+export function formatSpace(id: string, settings: string) {
   const space = jsonParse(settings, {});
   space.id = id;
   space.private = space.private || false;
@@ -61,7 +76,7 @@ export function formatSpace(id, settings) {
   space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
-  space.strategies = space.strategies?.map(strategy => ({
+  space.strategies = space.strategies?.map((strategy: Strategy) => ({
     ...strategy,
     // By default return space network if strategy network is not defined
     network: strategy.network || space.network
@@ -78,13 +93,13 @@ export function formatSpace(id, settings) {
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
   space.parent = space.parent ? { id: space.parent } : null;
-  space.children = space.children?.map(child => ({ id: child })) || [];
+  space.children = space.children?.map((child: string) => ({ id: child })) || [];
 
-  return space;
+  return space as Space;
 }
 
-export function buildWhereQuery(fields, alias, where) {
-  let query: any = '';
+export function buildWhereQuery(fields: QueryFields, alias: string, where: QueryArgs['where']) {
+  let query = '';
   const params: any[] = [];
   Object.entries(fields).forEach(([field, type]) => {
     if (where[field] !== undefined) {
@@ -136,13 +151,13 @@ export function buildWhereQuery(fields, alias, where) {
   return { query, params };
 }
 
-export async function fetchSpaces(args) {
+export async function fetchSpaces(args: QueryArgs): Promise<Space[]> {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string' };
+  const fields: QueryFields = { id: 'string' };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
@@ -159,10 +174,12 @@ export async function fetchSpaces(args) {
   params.push(skip, first);
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
+  return spaces.map(space =>
+    Object.assign(space, formatSpace(space.id as string, space.settings as string))
+  );
 }
 
-function checkRelatedSpacesNesting(requestedFields): void {
+function checkRelatedSpacesNesting(requestedFields: any): void {
   // for a children's parent or a parent's children, you can ONLY query id
   // (for the purpose of easier cross-checking of relations in frontend)
   // other than that, deeper nesting is not supported
@@ -184,7 +201,7 @@ function checkRelatedSpacesNesting(requestedFields): void {
   }
 }
 
-function needsRelatedSpacesData(requestedFields): boolean {
+function needsRelatedSpacesData(requestedFields: any): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   return !(
@@ -193,7 +210,7 @@ function needsRelatedSpacesData(requestedFields): boolean {
   );
 }
 
-function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
+function mapRelatedSpacesToSpaces(spaces: Space[], relatedSpaces: Space[]) {
   if (!relatedSpaces.length) return spaces;
 
   return spaces.map(space => {
@@ -203,26 +220,29 @@ function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent =
+        relatedSpaces.find(s => space.parent && s.id === space.parent.id) || space.parent;
     }
     return space;
   });
 }
 
-async function fetchRelatedSpaces(spaces) {
+async function fetchRelatedSpaces(spaces: Space[]) {
   // collect all parent and child ids of all spaces
-  const relatedSpaceIDs = spaces.reduce((ids, space) => {
+  const relatedSpaceIDs = spaces.reduce((ids: string[], space: Space) => {
     if (space.children) ids.push(...space.children.map(c => c.id));
     if (space.parent) ids.push(space.parent.id);
     return ids;
   }, []);
 
   return await fetchSpaces({
-    where: { id_in: relatedSpaceIDs }
+    where: { id_in: relatedSpaceIDs },
+    first: 20,
+    skip: 0
   });
 }
 
-export async function handleRelatedSpaces(info: any, spaces: any[]) {
+export async function handleRelatedSpaces(info: any, spaces: Space[]) {
   const requestedFields = info ? graphqlFields(info) : {};
   if (needsRelatedSpacesData(requestedFields)) {
     checkRelatedSpacesNesting(requestedFields);
@@ -232,56 +252,68 @@ export async function handleRelatedSpaces(info: any, spaces: any[]) {
   return spaces;
 }
 
-export function formatUser(user) {
-  const profile = jsonParse(user.profile, {});
+export function formatUser(user: SqlRow) {
+  const profile = jsonParse(user.profile as string, {});
   delete user.profile;
+
   return {
     ...user,
     ...profile
-  };
+  } as User;
 }
 
-export function formatProposal(proposal) {
-  proposal.choices = jsonParse(proposal.choices, []);
-  proposal.strategies = jsonParse(proposal.strategies, []);
-  proposal.validation = jsonParse(proposal.validation, { name: 'any', params: {} }) || {
-    name: 'any',
-    params: {}
-  };
-  proposal.plugins = jsonParse(proposal.plugins, {});
-  proposal.scores = jsonParse(proposal.scores, []);
-  proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
+export function formatProposal(proposal: SqlRow) {
+  const networkStr = network === 'testnet' ? 'demo.' : '';
   let proposalState = 'pending';
   const ts = parseInt((Date.now() / 1e3).toFixed());
-  if (ts > proposal.start) proposalState = 'active';
-  if (ts > proposal.end) proposalState = 'closed';
-  proposal.state = proposalState;
-  proposal.space = formatSpace(proposal.space, proposal.settings);
-  const networkStr = network === 'testnet' ? 'demo.' : '';
-  proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
-  proposal.strategies = proposal.strategies.map(strategy => ({
-    ...strategy,
-    // By default return proposal network if strategy network is not defined
-    network: strategy.network || proposal.network
-  }));
-  proposal.privacy = proposal.privacy || '';
-  return proposal;
+  if (ts > (proposal.start as number)) proposalState = 'active';
+  if (ts > (proposal.end as number)) proposalState = 'closed';
+  const space = formatSpace(proposal.space as string, proposal.settings as string);
+
+  return {
+    ...proposal,
+    choices: jsonParse(proposal.choices as string, []),
+    validation: jsonParse(proposal.validation as string, { name: 'any', params: {} }) || {
+      name: 'any',
+      params: {}
+    },
+    plugins: jsonParse(proposal.plugins as string, {}),
+    scores: jsonParse(proposal.scores as string, []),
+    scores_by_strategy: jsonParse(proposal.scores_by_strategy as string, []),
+    state: proposalState,
+    space,
+    link: `https://${networkStr}snapshot.org/#/${space.id}/proposal/${proposal.id}`,
+    strategies: (jsonParse(proposal.strategies as string, []) as Strategy[]).map(
+      (strategy: Strategy) => ({
+        ...strategy,
+        // By default return proposal network if strategy network is not defined
+        network: strategy.network || proposal.network
+      })
+    ),
+    privacy: proposal.privacy || ''
+  } as Proposal;
 }
 
-export function formatVote(vote) {
-  vote.choice = jsonParse(vote.choice);
-  vote.metadata = jsonParse(vote.metadata, {});
-  vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
-  vote.space = formatSpace(vote.space, vote.settings);
-  return vote;
+export function formatVote(vote: SqlRow) {
+  return {
+    ...vote,
+    choice: jsonParse(vote.choice as string, {}),
+    metadata: jsonParse(vote.metadata as string, {}),
+    vp_by_strategy: jsonParse(vote.vp_by_strategy as string, []),
+    space: formatSpace(vote.space as string, vote.settings as string)
+  } as Vote;
 }
 
-export function formatFollow(follow) {
-  follow.space = formatSpace(follow.space, follow.settings);
-  return follow;
+export function formatFollow(follow: SqlRow) {
+  return {
+    ...follow,
+    space: formatSpace(follow.space as string, follow.settings as string)
+  } as Follow;
 }
 
-export function formatSubscription(subscription) {
-  subscription.space = formatSpace(subscription.space, subscription.settings);
-  return subscription;
+export function formatSubscription(subscription: SqlRow) {
+  return {
+    ...subscription,
+    space: formatSpace(subscription.space as string, subscription.settings as string)
+  } as Subscription;
 }

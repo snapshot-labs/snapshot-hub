@@ -1,8 +1,9 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatFollow } from '../helpers';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-export default async function (parent, args) {
+export default async function (parent: any, args: QueryArgs) {
   const { first = 20, skip = 0, where = {} } = args;
 
   checkLimits(args, 'follows');
@@ -16,7 +17,7 @@ export default async function (parent, args) {
   };
   const whereQuery = buildWhereQuery(fields, 'f', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -33,9 +34,8 @@ export default async function (parent, args) {
   `;
   params.push(skip, first);
 
-  let follows: any[] = [];
   try {
-    follows = await db.queryAsync(query, params);
+    const follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));
   } catch (e) {
     log.error(`[graphql] follows, ${JSON.stringify(e)}`);

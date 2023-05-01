@@ -1,8 +1,9 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatUser } from '../helpers';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-export default async function (parent, args) {
+export default async function (parent: any, args: QueryArgs) {
   const { first = 20, skip = 0, where = {} } = args;
 
   checkLimits(args, 'users');
@@ -14,7 +15,7 @@ export default async function (parent, args) {
   };
   const whereQuery = buildWhereQuery(fields, 'u', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -23,8 +24,6 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let users: any[] = [];
-
   const query = `
     SELECT u.* FROM users u
     WHERE 1=1 ${queryStr}
@@ -32,7 +31,7 @@ export default async function (parent, args) {
   `;
   params.push(skip, first);
   try {
-    users = await db.queryAsync(query, params);
+    const users = await db.queryAsync(query, params);
     return users.map(user => formatUser(user));
   } catch (e) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);

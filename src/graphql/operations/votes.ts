@@ -3,8 +3,9 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-async function query(parent, args, context?, info?) {
+async function query(parent: any, args: QueryArgs, context?: any, info?: any) {
   const requestedFields = info ? graphqlFields(info) : {};
   const { where = {}, first = 20, skip = 0 } = args;
 
@@ -24,7 +25,7 @@ async function query(parent, args, context?, info?) {
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -60,7 +61,7 @@ async function query(parent, args, context?, info?) {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
       spaces = Object.fromEntries(
-        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
+        spaces.map(space => [space.id, formatSpace(space.id as string, space.settings as string)])
       );
       votes = votes.map(vote => {
         if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
@@ -73,7 +74,7 @@ async function query(parent, args, context?, info?) {
   }
 
   if (requestedFields.proposal && votes.length > 0) {
-    const proposalIds = votes.map(vote => vote.proposal);
+    const proposalIds = votes.map(vote => vote.proposal as string);
     const query = `
       SELECT p.*, spaces.settings FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
@@ -97,7 +98,7 @@ async function query(parent, args, context?, info?) {
   return votes;
 }
 
-export default async function (parent, args, context?, info?) {
+export default async function (parent: any, args: QueryArgs, context?: any, info?: any) {
   const requestedFields = info ? graphqlFields(info) : {};
   return await serve(JSON.stringify({ args, requestedFields }), query, [
     parent,

@@ -1,17 +1,18 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
 import log from './log';
+import type { StrategyItem } from '../types';
 
-export let strategies: any[] = [];
-export let strategiesObj: any = {};
+export let strategies: StrategyItem[] = [];
+export let strategiesObj: { [id: StrategyItem['id']]: StrategyItem } = {};
 
 const uri = 'https://score.snapshot.org/api/strategies';
 
 async function loadStrategies() {
   const res = await snapshot.utils.getJSON(uri);
 
-  Object.values(spaces).forEach((space: any) => {
-    const ids = new Set<string>(space.strategies.map(strategy => strategy.name));
+  Object.values(spaces).forEach(space => {
+    const ids = new Set<string>((space.strategies || []).map(strategy => strategy.name));
     ids.forEach(id => {
       if (res[id]) {
         res[id].spacesCount = res[id].spacesCount || 0;

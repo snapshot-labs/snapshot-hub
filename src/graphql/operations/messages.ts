@@ -1,8 +1,9 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
 import log from '../../helpers/log';
+import type { QueryArgs } from '../../types';
 
-export default async function (parent, args) {
+export default async function (parent: any, args: QueryArgs) {
   const { first = 20, skip = 0, where = {} } = args;
 
   checkLimits(args, 'messages');
@@ -16,7 +17,7 @@ export default async function (parent, args) {
   };
   const whereQuery = buildWhereQuery(fields, 'm', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params;
 
   let orderBy = args.orderBy || 'timestamp';
   let orderDirection = args.orderDirection || 'desc';

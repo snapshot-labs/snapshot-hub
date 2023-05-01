@@ -2,8 +2,7 @@ import db from '../../helpers/mysql';
 import { formatUser } from '../helpers';
 import log from '../../helpers/log';
 
-export default async function (parent, args) {
-  const id = args.id;
+export default async function (parent: any, { id }: { id: string }) {
   const query = `SELECT u.* FROM users u WHERE id = ? LIMIT 1`;
   try {
     const users = await db.queryAsync(query, id);
