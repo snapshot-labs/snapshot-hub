@@ -100,29 +100,29 @@ export function buildWhereQuery(fields, alias, where) {
 
     const fieldIn = where[`${field}_in`] || [];
     if (fieldIn.length > 0) {
-      // Handle choice_in json keys search
-      if (alias === 'v' && field === 'choice') {
-        params.push(fieldIn);
-        const keys: string = fieldIn.reduce((acc: string, val: string, i: number) => {
-          const isLast = i === fieldIn.length - 1;
-
-          const param = `'$."${val}"'`;
-          params.push(param);
-
-          acc += `?${isLast ? '' : ', '}`;
-          return acc;
-        }, '');
-        query += `AND (${alias}.${field} IN (?) OR JSON_CONTAINS_PATH(${alias}.${field}, 'all', ${keys})) `;
-      } else {
-        query += `AND ${alias}.${field} IN (?) `;
-        params.push(fieldIn);
-      }
+      query += `AND ${alias}.${field} IN (?) `;
+      params.push(fieldIn);
     }
 
     const fieldNotIn = where[`${field}_not_in`] || [];
     if (fieldNotIn.length > 0) {
       query += `AND ${alias}.${field} NOT IN (?) `;
       params.push(fieldNotIn);
+    }
+
+    const fieldChoiceMatch = where[`${field}_match`] || [];
+    if (alias === 'v' && fieldChoiceMatch.length > 0) {
+      params.push(fieldChoiceMatch);
+      const keys: string = fieldChoiceMatch.reduce((acc: string, val: string, i: number) => {
+        const isLast = i === fieldChoiceMatch.length - 1;
+
+        const param = `'$."${val}"'`;
+        params.push(param);
+
+        acc += `?${isLast ? '' : ', '}`;
+        return acc;
+      }, '');
+      query += `AND (${alias}.${field} IN (?) OR JSON_CONTAINS_PATH(${alias}.${field}, 'all', ${keys})) `;
     }
 
     if (type === 'number') {
