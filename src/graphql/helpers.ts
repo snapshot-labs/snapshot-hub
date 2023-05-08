@@ -1,6 +1,6 @@
 import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
-import { spaceProposals, spaceFollowers, spacesMetadata } from '../helpers/spaces';
+import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
@@ -57,9 +57,9 @@ export function formatSpace(id, settings) {
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
   space.voting.aliased = space.voting.aliased || false;
-  space.followersCount = spaceFollowers[id]?.count || null;
-  space.proposalsCount = spaceProposals[id]?.count || null;
-  space.activeProposals = spaceProposals[id]?.active || null;
+  space.followersCount = spacesMetadata[id]?.followersCount ?? null;
+  space.proposalsCount = spacesMetadata[id]?.proposalsCount ?? null;
+  space.activeProposals = spacesMetadata[id]?.activeProposals ?? null;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
@@ -75,8 +75,8 @@ export function formatSpace(id, settings) {
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
-  space.verified = spacesMetadata[id]?.verified || false;
-  space.rank = spacesMetadata[id]?.rank || 0;
+  space.verified = spacesMetadata[id]?.verified ?? null;
+  space.rank = spacesMetadata[id]?.rank ?? null;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
@@ -150,46 +150,53 @@ export async function fetchSpaces(args) {
   let orderBy = args.orderBy || 'created_at';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created_at', 'updated_at', 'id', 'rank'].includes(orderBy)) orderBy = 'created_at';
-  const orderByParams: any[] = [];
-  if (orderBy === 'rank' && Object.keys(spacesMetadata).length) {
-    const rankSortedSpaces = Object.values(spacesMetadata)
-      .filter(
-        (space: any) =>
-          // filter by id_contains if where.id_contains is defined
-          space.id.indexOf(where.id_contains || '') > -1 &&
-          // filter by private if where.private is defined
-          (where.private !== undefined ? space.private === where.private : true) &&
-          // filter by network if where.network is defined
-          (where.network !== undefined ? space.networks.includes(where.network) : true) &&
-          // filter by category if where.category is defined
-          (where.category !== undefined ? space.categories.includes(where.category) : true)
-      )
-      .sort((a: any, b: any) => (orderDirection === 'desc' ? b.rank - a.rank : a.rank - b.rank))
-      .slice(skip, skip + first)
-      .map((space: any) => space.id);
-    if (!rankSortedSpaces.length) return [];
 
+  const orderByParams: any[] = [];
+  let totalCount: null | number = null;
+  const searchStr = where.search?.toLowerCase() || '';
+  let rankSortedSpaces = Object.values(spacesMetadata)
+    .filter(
+      (space: any) =>
+        // filter by search if where.search is defined
+        (space.id.includes(searchStr) || space.name?.includes(searchStr)) &&
+        // filter by id if where.id is defined
+        (where.id !== undefined ? space.id === where.id : true) &&
+        // filter by id if where.id_in is defined
+        (where.id_in !== undefined ? where.id_in.includes(space.id) : true) &&
+        // filter by private if where.private is defined
+        (where.private !== undefined ? space.private === where.private : true) &&
+        // filter by network if where.network is defined
+        (where.network !== undefined ? space.networks.includes(where.network) : true) &&
+        // filter by category if where.category is defined
+        (where.category !== undefined ? space.categories.includes(where.category) : true)
+    )
+    .sort((a: any, b: any) => (orderDirection === 'desc' ? b.rank - a.rank : a.rank - b.rank));
+
+  totalCount = rankSortedSpaces.length;
+
+  rankSortedSpaces = rankSortedSpaces.slice(skip, skip + first).map((space: any) => space.id);
+  if (!rankSortedSpaces.length) return { spaces: [], total: 0 };
+
+  if (orderBy === 'rank') {
     const rankSortedSpaceIds =
       orderDirection === 'desc' ? [...rankSortedSpaces].reverse() : rankSortedSpaces;
-
     orderBy = 'FIELD(s.id, ?)';
     orderByParams.push(rankSortedSpaceIds);
 
     queryStr += 'AND s.id IN (?) ';
     params.push(rankSortedSpaceIds);
   } else {
-    if (orderBy === 'rank') orderBy = 'created_at';
     orderBy = `s.${orderBy}`;
   }
 
-  if (where.id_contains) {
-    queryStr += ' AND s.id LIKE ?';
-    params.push(`%${where.id_contains}%`);
+  if (searchStr) {
+    queryStr += ' AND (LOWER(s.id) LIKE ? OR LOWER(s.name) LIKE ?)';
+    params.push(`%${searchStr}%`, `%${searchStr}%`);
   }
 
   if (where.private !== undefined) {
-    queryStr += " AND JSON_EXTRACT(s.settings, '$.private') in (?)";
-    params.push(where.private ? [true] : [false, null]);
+    queryStr += " AND COALESCE(JSON_EXTRACT(s.settings, '$.private'), 'false') = ?";
+    params.push(where.private ? 'true' : 'false');
   }
 
   if (where.network) {
@@ -207,15 +214,19 @@ export async function fetchSpaces(args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT s.* FROM spaces s
-    WHERE s.deleted = 0 ${queryStr}
+    SELECT s.* FROM spaces s WHERE s.deleted = 0
+    ${queryStr}
     GROUP BY s.id
-    ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
+    ORDER BY ${orderBy} ${orderDirection}
   `;
-  params.push(...orderByParams, skip, first);
+  params.push(...orderByParams);
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
+  const result = {
+    spaces: spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings))),
+    total: totalCount
+  };
+  return result;
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
@@ -282,7 +293,7 @@ export async function handleRelatedSpaces(info: any, spaces: any[]) {
   const requestedFields = info ? graphqlFields(info) : {};
   if (needsRelatedSpacesData(requestedFields)) {
     checkRelatedSpacesNesting(requestedFields);
-    const relatedSpaces = await fetchRelatedSpaces(spaces);
+    const { spaces: relatedSpaces } = await fetchRelatedSpaces(spaces);
     spaces = mapRelatedSpacesToSpaces(spaces, relatedSpaces);
   }
   return spaces;

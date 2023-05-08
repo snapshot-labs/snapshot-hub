@@ -17,7 +17,7 @@ router.post('/msg', async (req, res) => {
 
 router.get('/', (req, res) => {
   const commit = process.env.COMMIT_HASH || '';
-  const v = commit ? `${version}#${commit.substr(0, 7)}` : version;
+  const v = commit ? `${version}#${commit.substring(0, 7)}` : version;
   return res.json({
     name,
     network,

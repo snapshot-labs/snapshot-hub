@@ -57,7 +57,10 @@ function mapSpaces() {
         (space.strategies || [])
           .map(strategy => strategy?.network || space.network)
           .concat(space.network ?? undefined)
-      )
+      ),
+      proposalsCount: spaceProposals[id]?.count || 0,
+      followersCount: spaceFollowers[id]?.count || 0,
+      activeProposals: spaceProposals[id]?.active || 0
     };
   });
 }
@@ -131,7 +134,7 @@ async function run() {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(360e3);
-  await run();
+  run();
 }
 
-setTimeout(() => run(), 3e3);
+run();

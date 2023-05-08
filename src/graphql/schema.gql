@@ -11,7 +11,7 @@ type Query {
     where: SpaceWhere
     orderBy: String
     orderDirection: OrderDirection
-  ): [Space]
+  ): SpaceObject
 
   proposal(id: String): Proposal
 
@@ -97,7 +97,7 @@ type Query {
 input SpaceWhere {
   id: String
   id_in: [String]
-  id_contains: String
+  search: String
   private: Boolean
   category: String
   network: String
@@ -324,6 +324,11 @@ type Space {
   template: String
   verified: Int
   rank: Float
+}
+
+type SpaceObject {
+  total: Int
+  spaces: [Space]
 }
 
 type SpaceFilters {
