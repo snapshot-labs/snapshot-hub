@@ -7,23 +7,24 @@ import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
 export let spaces = {};
 export const exploreEndpointData = {};
 export const spacesMetadata = {};
+export let popularSpaces: any = [];
 export const spaceProposals = {};
 export const spaceVotes = {};
 export const spaceFollowers = {};
 
-function getRank(id: string, verified: number): number {
-  let ranking =
+function getPopularity(id: string, verified: number): number {
+  let popularity =
     (spaceVotes[id]?.count || 0) / 50 +
     (spaceVotes[id]?.count_7d || 0) +
     (spaceProposals[id]?.count_7d || 0) * 50 +
     (spaceFollowers[id]?.count_7d || 0);
 
   if (verified) {
-    ranking = ranking * 5;
-    ranking += 100;
+    popularity = popularity * 5;
+    popularity += 100;
   }
 
-  return ranking;
+  return popularity;
 }
 
 function mapSpaces() {
@@ -50,7 +51,7 @@ function mapSpaces() {
     spacesMetadata[id] = {
       id,
       verified: verifiedSpaces[id] || 0,
-      rank: getRank(id, verifiedSpaces[id]),
+      popularity: getPopularity(id, verifiedSpaces[id]),
       private: space.private ?? false,
       categories: space.categories ?? [],
       networks: uniq(
@@ -58,11 +59,14 @@ function mapSpaces() {
           .map(strategy => strategy?.network || space.network)
           .concat(space.network ?? undefined)
       ),
-      proposalsCount: spaceProposals[id]?.count || 0,
-      followersCount: spaceFollowers[id]?.count || 0,
-      activeProposals: spaceProposals[id]?.active || 0
+      proposalsCount: (spaceProposals[id] && spaceProposals[id].count) || undefined,
+      followersCount: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
+      activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined
     };
   });
+  popularSpaces = Object.values(spacesMetadata).sort(
+    (a: any, b: any) => b.popularity - a.popularity
+  );
 }
 
 async function loadSpaces() {

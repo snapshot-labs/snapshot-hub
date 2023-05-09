@@ -9,8 +9,6 @@ type Query {
     first: Int
     skip: Int
     where: SpaceWhere
-    orderBy: String
-    orderDirection: OrderDirection
   ): SpaceObject
 
   proposal(id: String): Proposal
@@ -323,12 +321,12 @@ type Space {
   guidelines: String
   template: String
   verified: Int
-  rank: Float
+  popularity: Float
 }
 
 type SpaceObject {
   total: Int
-  spaces: [Space]
+  items: [Space]
 }
 
 type SpaceFilters {
