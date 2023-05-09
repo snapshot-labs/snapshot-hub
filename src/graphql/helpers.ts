@@ -145,20 +145,18 @@ export async function fetchSpaces(args) {
 
   let total = 0;
 
-  const { search = '', category = '', id = '' } = where;
-  let { id_in = [] } = where;
+  const { search = '', category = '', id = '', id_in = [] } = where;
   const searchStr = search.toLowerCase();
   let searchCategory = category.toLowerCase();
   if (searchCategory === 'all') searchCategory = '';
-  id_in.push(id);
-  id_in = id_in.filter(id => id);
+  const includedIds = [id, ...id_in].filter(id => id);
 
   let sortedSpaces = popularSpaces.filter(
     (space: any) =>
       // filter by search
       (space.id.includes(searchStr) || space.name?.includes(searchStr)) &&
       // filter by id
-      (id_in.length > 0 ? id_in.includes(space.id) : true) &&
+      (includedIds.length > 0 ? includedIds.includes(space.id) : true) &&
       // filter by private if where.private is defined
       (where.private !== undefined ? space.private === where.private : true) &&
       // filter by network if where.network is defined
@@ -167,8 +165,7 @@ export async function fetchSpaces(args) {
       (searchCategory ? space.categories.includes(searchCategory) : true)
   );
   total = sortedSpaces.length;
-
-  sortedSpaces = sortedSpaces.slice(skip, skip + first).map((space: any) => space.id);
+  sortedSpaces = Array.from(sortedSpaces.slice(skip, skip + first), (space: any) => space.id);
   if (!sortedSpaces.length) return { spaces: [], total };
 
   const query = `
