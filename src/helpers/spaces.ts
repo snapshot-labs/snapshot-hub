@@ -8,9 +8,9 @@ export let spaces = {};
 export const exploreEndpointData = {};
 export const spacesMetadata = {};
 export let popularSpaces: any = [];
-export const spaceProposals = {};
-export const spaceVotes = {};
-export const spaceFollowers = {};
+const spaceProposals = {};
+const spaceVotes = {};
+const spaceFollowers = {};
 
 function getPopularity(id: string, verified: number): number {
   let popularity =
