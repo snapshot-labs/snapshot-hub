@@ -37,7 +37,9 @@ export function checkLimits(args: any = {}, type) {
 }
 
 export function formatSpace(id, settings) {
-  const space = jsonParse(settings, {});
+  const spaceMetadata = spacesMetadata[id] || {};
+  const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
+
   space.id = id;
   space.private = space.private || false;
   space.avatar = space.avatar || '';
@@ -58,9 +60,6 @@ export function formatSpace(id, settings) {
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
   space.voting.aliased = space.voting.aliased || false;
-  space.followersCount = spacesMetadata[id]?.followersCount || 0;
-  space.proposalsCount = spacesMetadata[id]?.proposalsCount || 0;
-  space.activeProposals = spacesMetadata[id]?.activeProposals || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
@@ -76,8 +75,8 @@ export function formatSpace(id, settings) {
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
-  space.verified = spacesMetadata[id]?.verified ?? null;
-  space.popularity = spacesMetadata[id]?.popularity ?? null;
+  space.verified = spaceMetadata?.verified ?? null;
+  space.popularity = spaceMetadata?.popularity ?? null;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested

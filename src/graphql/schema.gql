@@ -313,9 +313,13 @@ type Space {
   validation: Validation
   voteValidation: Validation
   treasuries: [Treasury]
-  followersCount: Int
-  proposalsCount: Int
   activeProposals: Int
+  proposalsCount: Int
+  proposalsCount7d: Int
+  followersCount: Int
+  followersCount7d: Int
+  votesCount: Int
+  votesCount7d: Int
   parent: Space
   children: [Space]
   guidelines: String

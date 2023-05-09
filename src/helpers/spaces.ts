@@ -5,7 +5,7 @@ import log from './log';
 import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
 
 export let spaces = {};
-export const exploreEndpointData = {};
+export const exploreEndpointData = {}; // This will be deprecated soon
 export const spacesMetadata = {};
 export let popularSpaces: any = [];
 const spaceProposals = {};
@@ -59,9 +59,15 @@ function mapSpaces() {
           .map(strategy => strategy?.network || space.network)
           .concat(space.network ?? undefined)
       ),
-      proposalsCount: (spaceProposals[id] && spaceProposals[id].count) || undefined,
-      followersCount: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
-      activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined
+      counts: {
+        activeProposals: spaceProposals[id]?.active || 0,
+        proposalsCount: spaceFollowers[id]?.count || 0,
+        proposalsCount7d: spaceProposals[id]?.count_7d || 0,
+        followersCount: spaceProposals[id]?.count || 0,
+        followersCount7d: spaceFollowers[id]?.count_7d || 0,
+        votesCount: spaceVotes[id]?.count || 0,
+        votesCount7d: spaceVotes[id]?.count_7d || 0
+      }
     };
   });
   popularSpaces = Object.values(spacesMetadata).sort(
