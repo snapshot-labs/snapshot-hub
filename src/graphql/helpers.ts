@@ -16,6 +16,7 @@ const ARG_LIMITS = {
     space_in: 10000
   },
   spaces: {
+    first: 1000,
     skip: 15000
   }
 };
@@ -185,10 +186,10 @@ export async function fetchSpaces(args) {
 }
 
 export async function fetchSpace(id) {
-  const query = 'SELECT id, settings FROM spaces WHERE id = ? AND deleted = 0';
+  const query = 'SELECT id, settings FROM spaces WHERE id = ? AND deleted = 0 LIMIT 1';
   const spaces = await db.queryAsync(query, [id]);
   if (!spaces.length) return null;
-  return { [id]: formatSpace(id, spaces[0].settings) };
+  return formatSpace(id, spaces[0].settings);
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
