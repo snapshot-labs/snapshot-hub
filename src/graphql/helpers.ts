@@ -74,13 +74,13 @@ export function formatSpace(id, settings) {
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
-  space.nft = space.nft || {};
-  space.nft.maxSupply = space.nft.maxSupply || null;
-  space.nft.mintPrice = space.nft.mintPrice || null;
-  space.nft.proposerCut = space.nft.proposerCut || null;
-  space.nft.address = space.nft.address || null;
-  space.nft.network = space.nft.network || null;
-  space.nft.enabled = space.nft.enabled || false;
+  space.nftClaimer = space.nftClaimer || {};
+  space.nftClaimer.maxSupply = space.nftClaimer.maxSupply || null;
+  space.nftClaimer.mintPrice = space.nftClaimer.mintPrice || null;
+  space.nftClaimer.proposerCut = space.nftClaimer.proposerCut || null;
+  space.nftClaimer.address = space.nftClaimer.address || null;
+  space.nftClaimer.network = space.nftClaimer.network || null;
+  space.nftClaimer.enabled = space.nftClaimer.enabled || false;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
