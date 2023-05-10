@@ -90,6 +90,8 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Message]
+
+  metrics: Metrics
 }
 
 input SpaceWhere {
@@ -466,4 +468,11 @@ type Vp {
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
+}
+
+type Metrics {
+  categories: Any
+  strategies: Any
+  plugins: Any
+  networks: Any
 }

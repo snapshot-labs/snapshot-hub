@@ -17,6 +17,7 @@ import users from './users';
 import user from './user';
 import vp from './vp';
 import messages from './messages';
+import metrics from './metrics';
 
 export default {
   space,
@@ -37,5 +38,6 @@ export default {
   users,
   user,
   vp,
-  messages
+  messages,
+  metrics
 };

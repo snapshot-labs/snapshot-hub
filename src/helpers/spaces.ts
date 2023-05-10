@@ -5,7 +5,7 @@ import log from './log';
 import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
 
 export let spaces = {};
-export const exploreEndpointData = {}; // This will be deprecated soon
+export let metricsData = { categories: { all: 0 }, networks: {}, strategies: {}, plugins: {} };
 export const spacesMetadata = {};
 export let popularSpaces: any = [];
 const spaceProposals = {};
@@ -28,26 +28,8 @@ function getPopularity(id: string, verified: number): number {
 }
 
 function mapSpaces() {
+  metricsData = { categories: { all: 0 }, networks: {}, strategies: {}, plugins: {} };
   Object.entries(spaces).forEach(([id, space]: any) => {
-    /* This will be deprecated soon */
-    exploreEndpointData[id] = {
-      name: space.name,
-      private: space.private || undefined,
-      terms: space.terms || undefined,
-      network: space.network || undefined,
-      networks: uniq((space.strategies || []).map(strategy => strategy.network || space.network)),
-      categories: space.categories || undefined,
-      activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined,
-      proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
-      proposals_active: (spaceProposals[id] && spaceProposals[id].active) || undefined,
-      proposals_7d: (spaceProposals[id] && spaceProposals[id].count_7d) || undefined,
-      votes: (spaceVotes[id] && spaceVotes[id].count) || undefined,
-      votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
-      followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
-      followers_7d: (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
-    };
-    /* This will be deprecated soon */
-
     spacesMetadata[id] = {
       id,
       verified: verifiedSpaces[id] || 0,
@@ -57,7 +39,7 @@ function mapSpaces() {
       networks: uniq(
         (space.strategies || [])
           .map(strategy => strategy?.network || space.network)
-          .concat(space.network ?? undefined)
+          .concat(space.network)
       ),
       counts: {
         activeProposals: spaceProposals[id]?.active || 0,
@@ -69,7 +51,28 @@ function mapSpaces() {
         votesCount7d: spaceVotes[id]?.count_7d || 0
       }
     };
+
+    // Data for metrics query
+    if (!space.private) {
+      metricsData.categories.all += 1;
+      spacesMetadata[id].categories.forEach(category => {
+        metricsData.categories[category] = (metricsData.categories[category] || 0) + 1;
+      });
+      spacesMetadata[id].networks.forEach(network => {
+        metricsData.networks[network] = (metricsData.networks[network] || 0) + 1;
+      });
+
+      space.strategies.forEach((strategy: any) => {
+        const strategyName = strategy.name;
+        metricsData.strategies[strategyName] = (metricsData.strategies[strategyName] || 0) + 1;
+      });
+
+      Object.keys(space.plugins || {}).forEach(pluginName => {
+        metricsData.plugins[pluginName] = (metricsData.plugins[pluginName] || 0) + 1;
+      });
+    }
   });
+
   popularSpaces = Object.values(spacesMetadata).sort(
     (a: any, b: any) => b.popularity - a.popularity
   );
