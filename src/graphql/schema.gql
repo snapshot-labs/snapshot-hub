@@ -340,6 +340,7 @@ type SpaceNft {
   maxSupply: Int
   mintPrice: Int
   proposerCut: Int
+  address: String
   network: String
   enabled: Boolean
 }

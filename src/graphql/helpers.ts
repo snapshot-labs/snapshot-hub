@@ -78,6 +78,7 @@ export function formatSpace(id, settings) {
   space.nft.maxSupply = space.nft.maxSupply || null;
   space.nft.mintPrice = space.nft.mintPrice || null;
   space.nft.proposerCut = space.nft.proposerCut || null;
+  space.nft.address = space.nft.address || null;
   space.nft.network = space.nft.network || null;
   space.nft.enabled = space.nft.enabled || false;
 
