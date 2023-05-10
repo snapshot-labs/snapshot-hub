@@ -313,6 +313,7 @@ type Space {
   treasuries: [Treasury]
   followersCount: Int
   proposalsCount: Int
+  nft: SpaceNft
   parent: Space
   children: [Space]
   guidelines: String
@@ -333,6 +334,14 @@ type SpaceVoting {
   hideAbstain: Boolean
   privacy: String
   aliased: Boolean
+}
+
+type SpaceNft {
+  maxSupply: Int
+  mintPrice: Int
+  proposerCut: Int
+  network: String
+  enabled: Boolean
 }
 
 type Proposal {
