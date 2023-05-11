@@ -6,7 +6,7 @@ import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
 
 export let spaces = {};
 export const spacesMetadata = {};
-export let popularSpaces: any = [];
+export let rankedSpaces: any = [];
 const spaceProposals = {};
 const spaceVotes = {};
 const spaceFollowers = {};
@@ -33,6 +33,7 @@ function mapSpaces() {
       name: space.name,
       verified: verifiedSpaces[id] || 0,
       popularity: getPopularity(id, verifiedSpaces[id]),
+      private: space.private ?? false,
       categories: space.categories ?? [],
       networks: uniq(
         (space.strategies || [])
@@ -51,9 +52,13 @@ function mapSpaces() {
     };
   });
 
-  popularSpaces = Object.values(spacesMetadata).sort(
-    (a: any, b: any) => b.popularity - a.popularity
-  );
+  rankedSpaces = Object.values(spacesMetadata)
+    .sort((a: any, b: any) => b.popularity - a.popularity)
+    .filter((space: any) => !space.private);
+
+  rankedSpaces.forEach((space: any, i: number) => {
+    spacesMetadata[space.id].rank = i + 1;
+  });
 }
 
 async function loadSpaces() {

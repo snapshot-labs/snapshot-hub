@@ -1,6 +1,6 @@
 import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
-import { popularSpaces, spacesMetadata } from '../helpers/spaces';
+import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
@@ -19,7 +19,7 @@ const ARG_LIMITS = {
     first: 1000,
     skip: 15000
   },
-  activeSpaces: {
+  ranking: {
     first: 20,
     skip: 15000
   }
@@ -81,7 +81,7 @@ export function formatSpace(id, settings) {
   space.treasuries = space.treasuries || [];
 
   space.verified = spaceMetadata?.verified ?? null;
-  space.popularity = spaceMetadata?.popularity ?? null;
+  space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
@@ -168,53 +168,6 @@ export async function fetchSpaces(args) {
 
   const spaces = await db.queryAsync(query, params);
   return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
-}
-
-export async function fetchActiveSpaces(args) {
-  const { first = 20, skip = 0, where = {} } = args;
-
-  const metrics: { total: number; categories: any } = {
-    total: 0,
-    categories: {}
-  };
-
-  const { search = '', category = '', network = '' } = where;
-  const searchStr = search.toLowerCase();
-  let searchCategory = category.toLowerCase();
-  if (searchCategory === 'all') searchCategory = '';
-
-  let filteredSpaces = popularSpaces.filter(
-    (space: any) =>
-      !space.private &&
-      // filter by search
-      (space.id.includes(searchStr) || space.name?.toLowerCase().includes(searchStr)) &&
-      // filter by network if network is defined
-      (network ? space.networks.includes(network) : true) &&
-      // filter by category if where.category is defined
-      (searchCategory ? space.categories.includes(searchCategory) : true)
-  );
-
-  metrics.total = filteredSpaces.length;
-  filteredSpaces.forEach((space: any) => {
-    space.categories.forEach(category => {
-      metrics.categories[category] = (metrics.categories[category] || 0) + 1;
-    });
-  });
-  filteredSpaces = Array.from(filteredSpaces.slice(skip, skip + first), (space: any) => space.id);
-  if (!filteredSpaces.length) return { spaces: [], metrics };
-
-  const query = `
-    SELECT s.* FROM spaces s WHERE s.deleted = 0
-    AND s.id IN (?)
-    GROUP BY s.id
-    ORDER BY FIELD(s.id, ?) ASC
-  `;
-  const spaces = await db.queryAsync(query, [filteredSpaces, filteredSpaces]);
-  const result = {
-    spaces: spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings))),
-    metrics
-  };
-  return result;
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {

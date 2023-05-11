@@ -13,11 +13,11 @@ type Query {
     orderDirection: OrderDirection
   ): [Space]
 
-  activeSpaces(
+  ranking(
     first: Int
     skip: Int
-    where: ActiveSpaceWhere
-  ): SpaceObject
+    where: RankingWhere
+  ): RankingObject
 
   proposal(id: String): Proposal
 
@@ -105,7 +105,7 @@ input SpaceWhere {
   id_in: [String]
 }
 
-input ActiveSpaceWhere {
+input RankingWhere {
   id: String
   id_in: [String]
   search: String
@@ -337,10 +337,10 @@ type Space {
   guidelines: String
   template: String
   verified: Int
-  popularity: Float
+  rank: Float
 }
 
-type SpaceObject {
+type RankingObject {
   items: [Space]
   metrics: Metrics
 }
