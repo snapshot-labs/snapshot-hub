@@ -345,6 +345,11 @@ type SpaceObject {
   metrics: Metrics
 }
 
+type Metrics {
+  total: Int
+  categories: Any
+}
+
 type SpaceFilters {
   minScore: Float
   onlyMembers: Boolean
@@ -478,9 +483,4 @@ type Vp {
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
-}
-
-type Metrics {
-  total: Int
-  categories: Any
 }
