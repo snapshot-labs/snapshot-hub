@@ -18,6 +18,10 @@ const ARG_LIMITS = {
   spaces: {
     first: 1000,
     skip: 15000
+  },
+  activeSpaces: {
+    first: 20,
+    skip: 15000
   }
 };
 
@@ -75,6 +79,7 @@ export function formatSpace(id, settings) {
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
+
   space.verified = spaceMetadata?.verified ?? null;
   space.popularity = spaceMetadata?.popularity ?? null;
 
@@ -142,30 +147,61 @@ export function buildWhereQuery(fields, alias, where) {
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  let total = 0;
+  const fields = { id: 'string' };
+  const whereQuery = buildWhereQuery(fields, 's', where);
+  const queryStr = whereQuery.query;
+  const params: any[] = whereQuery.params;
 
-  const { search = '', category = '', id = '', id_in = [] } = where;
+  let orderBy = args.orderBy || 'created_at';
+  let orderDirection = args.orderDirection || 'desc';
+  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
+  orderDirection = orderDirection.toUpperCase();
+  if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
+  const query = `
+    SELECT s.* FROM spaces s
+    WHERE s.deleted = 0 ${queryStr}
+    GROUP BY s.id
+    ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
+  `;
+  params.push(skip, first);
+
+  const spaces = await db.queryAsync(query, params);
+  return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
+}
+
+export async function fetchActiveSpaces(args) {
+  const { first = 20, skip = 0, where = {} } = args;
+
+  const metrics: { total: number; categories: any } = {
+    total: 0,
+    categories: {}
+  };
+
+  const { search = '', category = '', network = '' } = where;
   const searchStr = search.toLowerCase();
   let searchCategory = category.toLowerCase();
   if (searchCategory === 'all') searchCategory = '';
-  const includedIds = [id, ...id_in].filter(id => id);
 
-  let sortedSpaces = popularSpaces.filter(
+  let filteredSpaces = popularSpaces.filter(
     (space: any) =>
+      !space.private &&
       // filter by search
-      (space.id.includes(searchStr) || space.name?.includes(searchStr)) &&
-      // filter by id
-      (includedIds.length > 0 ? includedIds.includes(space.id) : true) &&
-      // filter by private if where.private is defined
-      (where.private !== undefined ? space.private === where.private : true) &&
-      // filter by network if where.network is defined
-      (where.network !== undefined ? space.networks.includes(where.network) : true) &&
+      (space.id.includes(searchStr) || space.name?.toLowerCase().includes(searchStr)) &&
+      // filter by network if network is defined
+      (network ? space.networks.includes(network) : true) &&
       // filter by category if where.category is defined
       (searchCategory ? space.categories.includes(searchCategory) : true)
   );
-  total = sortedSpaces.length;
-  sortedSpaces = Array.from(sortedSpaces.slice(skip, skip + first), (space: any) => space.id);
-  if (!sortedSpaces.length) return { spaces: [], total };
+
+  metrics.total = filteredSpaces.length;
+  filteredSpaces.forEach((space: any) => {
+    space.categories.forEach(category => {
+      metrics.categories[category] = (metrics.categories[category] || 0) + 1;
+    });
+  });
+  filteredSpaces = Array.from(filteredSpaces.slice(skip, skip + first), (space: any) => space.id);
+  if (!filteredSpaces.length) return { spaces: [], metrics };
 
   const query = `
     SELECT s.* FROM spaces s WHERE s.deleted = 0
@@ -173,19 +209,12 @@ export async function fetchSpaces(args) {
     GROUP BY s.id
     ORDER BY FIELD(s.id, ?) ASC
   `;
-  const spaces = await db.queryAsync(query, [sortedSpaces, sortedSpaces]);
+  const spaces = await db.queryAsync(query, [filteredSpaces, filteredSpaces]);
   const result = {
     spaces: spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings))),
-    total
+    metrics
   };
   return result;
-}
-
-export async function fetchSpace(id) {
-  const query = 'SELECT id, settings FROM spaces WHERE id = ? AND deleted = 0 LIMIT 1';
-  const spaces = await db.queryAsync(query, [id]);
-  if (!spaces.length) return null;
-  return formatSpace(id, spaces[0].settings);
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {

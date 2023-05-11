@@ -9,6 +9,14 @@ type Query {
     first: Int
     skip: Int
     where: SpaceWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Space]
+
+  activeSpaces(
+    first: Int
+    skip: Int
+    where: ActiveSpaceWhere
   ): SpaceObject
 
   proposal(id: String): Proposal
@@ -90,15 +98,17 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Message]
-
-  metrics: Metrics
 }
 
 input SpaceWhere {
   id: String
   id_in: [String]
+}
+
+input ActiveSpaceWhere {
+  id: String
+  id_in: [String]
   search: String
-  private: Boolean
   category: String
   network: String
 }
@@ -331,8 +341,8 @@ type Space {
 }
 
 type SpaceObject {
-  total: Int
   items: [Space]
+  metrics: Metrics
 }
 
 type SpaceFilters {
@@ -471,8 +481,6 @@ type Vp {
 }
 
 type Metrics {
+  total: Int
   categories: Any
-  strategies: Any
-  plugins: Any
-  networks: Any
 }

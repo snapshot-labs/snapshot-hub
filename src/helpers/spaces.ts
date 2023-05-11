@@ -20,7 +20,7 @@ function getPopularity(id: string, verified: number): number {
     (spaceFollowers[id]?.count_7d || 0);
 
   if (verified) {
-    popularity = popularity * 5;
+    popularity *= 5;
     popularity += 100;
   }
 
@@ -32,6 +32,7 @@ function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     spacesMetadata[id] = {
       id,
+      name: space.name,
       verified: verifiedSpaces[id] || 0,
       popularity: getPopularity(id, verifiedSpaces[id]),
       private: space.private ?? false,
@@ -51,26 +52,6 @@ function mapSpaces() {
         votesCount7d: spaceVotes[id]?.count_7d || 0
       }
     };
-
-    // Data for metrics query
-    if (!space.private) {
-      metricsData.categories.all += 1;
-      spacesMetadata[id].categories.forEach(category => {
-        metricsData.categories[category] = (metricsData.categories[category] || 0) + 1;
-      });
-      spacesMetadata[id].networks.forEach(network => {
-        metricsData.networks[network] = (metricsData.networks[network] || 0) + 1;
-      });
-
-      space.strategies.forEach((strategy: any) => {
-        const strategyName = strategy.name;
-        metricsData.strategies[strategyName] = (metricsData.strategies[strategyName] || 0) + 1;
-      });
-
-      Object.keys(space.plugins || {}).forEach(pluginName => {
-        metricsData.plugins[pluginName] = (metricsData.plugins[pluginName] || 0) + 1;
-      });
-    }
   });
 
   popularSpaces = Object.values(spacesMetadata).sort(

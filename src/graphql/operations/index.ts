@@ -17,11 +17,12 @@ import users from './users';
 import user from './user';
 import vp from './vp';
 import messages from './messages';
-import metrics from './metrics';
+import activeSpaces from './activeSpaces';
 
 export default {
   space,
   spaces,
+  activeSpaces,
   proposal,
   proposals,
   vote,
@@ -38,6 +39,5 @@ export default {
   users,
   user,
   vp,
-  messages,
-  metrics
+  messages
 };
