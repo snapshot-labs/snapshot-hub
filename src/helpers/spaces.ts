@@ -5,7 +5,6 @@ import log from './log';
 import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
 
 export let spaces = {};
-export let metricsData = { categories: { all: 0 }, networks: {}, strategies: {}, plugins: {} };
 export const spacesMetadata = {};
 export let popularSpaces: any = [];
 const spaceProposals = {};
@@ -28,14 +27,12 @@ function getPopularity(id: string, verified: number): number {
 }
 
 function mapSpaces() {
-  metricsData = { categories: { all: 0 }, networks: {}, strategies: {}, plugins: {} };
   Object.entries(spaces).forEach(([id, space]: any) => {
     spacesMetadata[id] = {
       id,
       name: space.name,
       verified: verifiedSpaces[id] || 0,
       popularity: getPopularity(id, verifiedSpaces[id]),
-      private: space.private ?? false,
       categories: space.categories ?? [],
       networks: uniq(
         (space.strategies || [])

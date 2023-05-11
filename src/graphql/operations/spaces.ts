@@ -1,5 +1,6 @@
 import { checkLimits, fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 import log from '../../helpers/log';
+
 export default async function (_parent, args, _context, info) {
   checkLimits(args, 'spaces');
   try {
