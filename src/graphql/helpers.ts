@@ -234,7 +234,7 @@ export async function handleRelatedSpaces(info: any, spaces: any[]) {
   const requestedFields = info ? graphqlFields(info) : {};
   if (needsRelatedSpacesData(requestedFields)) {
     checkRelatedSpacesNesting(requestedFields);
-    const { spaces: relatedSpaces } = await fetchRelatedSpaces(spaces);
+    const relatedSpaces = await fetchRelatedSpaces(spaces);
     spaces = mapRelatedSpacesToSpaces(spaces, relatedSpaces);
   }
   return spaces;

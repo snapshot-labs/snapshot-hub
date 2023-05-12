@@ -18,23 +18,23 @@ export default async function (_parent, args, _context, info) {
     let searchCategory = category.toLowerCase();
     if (searchCategory === 'all') searchCategory = '';
 
-    let filteredSpaces = rankedSpaces.filter(
-      (space: any) =>
-        !space.private &&
-        // filter by search
-        (space.id.includes(searchStr) || space.name?.toLowerCase().includes(searchStr)) &&
-        // filter by network if network is defined
-        (network ? space.networks.includes(network) : true) &&
-        // filter by category if where.category is defined
-        (searchCategory ? space.categories.includes(searchCategory) : true)
-    );
+    let filteredSpaces = rankedSpaces.filter((space: any) => {
+      const filteredBySearch =
+        space.id.includes(searchStr) || space.name?.toLowerCase().includes(searchStr);
+      const filteredByNetwork = network ? space.networks.includes(network) : true;
+      if (filteredBySearch && filteredByNetwork) {
+        // count categories, should not consider searchCategory for counting
+        space.categories.forEach(category => {
+          metrics.categories[category] = (metrics.categories[category] || 0) + 1;
+        });
+      }
+
+      // filter by category if where.category is defined
+      const filteredByCategory = searchCategory ? space.categories.includes(searchCategory) : true;
+      return filteredBySearch && filteredByCategory && filteredByNetwork;
+    });
 
     metrics.total = filteredSpaces.length;
-    filteredSpaces.forEach((space: any) => {
-      space.categories.forEach(category => {
-        metrics.categories[category] = (metrics.categories[category] || 0) + 1;
-      });
-    });
     filteredSpaces = Array.from(filteredSpaces.slice(skip, skip + first), (space: any) => space.id);
     if (!filteredSpaces.length) return { spaces: [], metrics };
 
