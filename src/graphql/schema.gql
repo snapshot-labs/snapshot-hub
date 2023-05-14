@@ -397,6 +397,7 @@ type Proposal {
   scores_total: Float
   scores_updated: Int
   votes: Int
+  flagged: Boolean
 }
 
 type Strategy {

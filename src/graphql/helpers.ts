@@ -2,6 +2,7 @@ import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
 import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
+import { flaggedLinks, flaggedProposals } from '../helpers/moderation';
 
 const network = process.env.NETWORK || 'testnet';
 
@@ -250,6 +251,13 @@ export function formatUser(user) {
   };
 }
 
+function isFlaggedProposal(proposal) {
+  const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
+  if (flaggedProposals?.includes(proposal.id)) return true;
+  if (flaggedLinksRegex.test(proposal.body)) return true;
+  return false;
+}
+
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
@@ -274,6 +282,7 @@ export function formatProposal(proposal) {
     network: strategy.network || proposal.network
   }));
   proposal.privacy = proposal.privacy || '';
+  proposal.flagged = isFlaggedProposal(proposal);
   return proposal;
 }
 
