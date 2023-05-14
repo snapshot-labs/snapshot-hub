@@ -6,9 +6,7 @@
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
     "dev": "nodemon src/index.ts",
-    "start": "ts-node src/index.ts",
-    "preinstall": "yarn run init-submodules",
-    "init-submodules": "git submodule update --init"
+    "start": "ts-node src/index.ts"
   },
   "eslintConfig": {
     "extends": "@snapshot-labs"
