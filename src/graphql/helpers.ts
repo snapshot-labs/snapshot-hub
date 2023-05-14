@@ -253,9 +253,7 @@ export function formatUser(user) {
 
 function isFlaggedProposal(proposal) {
   const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
-  if (flaggedProposals?.includes(proposal.id)) return true;
-  if (flaggedLinksRegex.test(proposal.body)) return true;
-  return false;
+  return flaggedProposals?.includes(proposal.id) || flaggedLinksRegex.test(proposal.body);
 }
 
 export function formatProposal(proposal) {

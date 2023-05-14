@@ -189,6 +189,7 @@ input ProposalWhere {
   scores_state: String
   scores_state_in: [String]
   state: String
+  space_verified: Boolean
 }
 
 input VoteWhere {
