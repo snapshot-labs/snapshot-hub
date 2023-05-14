@@ -2,7 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
-import verifiedSpaces from '../../snapshot-spaces/spaces/verified.json';
+import { flaggedSpaces, verifiedSpaces } from './moderation';
 
 export let spaces = {};
 export const spacesMetadata = {};
@@ -11,7 +11,7 @@ const spaceProposals = {};
 const spaceVotes = {};
 const spaceFollowers = {};
 
-function getPopularity(id: string, verified: number): number {
+function getPopularity(id: string, verified: boolean): number {
   let popularity =
     (spaceVotes[id]?.count || 0) / 50 +
     (spaceVotes[id]?.count_7d || 0) +
@@ -28,11 +28,16 @@ function getPopularity(id: string, verified: number): number {
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
+    const verified = verifiedSpaces?.includes(id) || false;
+    const flagged = flaggedSpaces?.includes(id) || false;
+    const popularity = getPopularity(id, verified);
+
     spacesMetadata[id] = {
       id,
       name: space.name,
-      verified: verifiedSpaces[id] || 0,
-      popularity: getPopularity(id, verifiedSpaces[id]),
+      verified,
+      flagged,
+      popularity,
       private: space.private ?? false,
       categories: space.categories ?? [],
       networks: uniq(

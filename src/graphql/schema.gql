@@ -336,7 +336,8 @@ type Space {
   children: [Space]
   guidelines: String
   template: String
-  verified: Int
+  verified: Boolean
+  flagged: Boolean
   rank: Float
 }
 

@@ -81,6 +81,7 @@ export function formatSpace(id, settings) {
   space.treasuries = space.treasuries || [];
 
   space.verified = spaceMetadata?.verified ?? null;
+  space.flagged = spaceMetadata?.flagged ?? null;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
