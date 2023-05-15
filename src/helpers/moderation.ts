@@ -4,7 +4,10 @@ import log from './log';
 const moderationURL =
   'https://sh5.co/api/moderationList?fields=flaggedLinks,flaggedProposals,flaggedSpaces,verifiedSpaces';
 
-export let flaggedLinks, flaggedProposals, flaggedSpaces, verifiedSpaces;
+export let flaggedLinks: Array<string> = [];
+export let flaggedProposals: Array<string> = [];
+export let flaggedSpaces: Array<string> = [];
+export let verifiedSpaces: Array<string> = [];
 
 async function loadModerationData() {
   const res = await snapshot.utils.getJSON(moderationURL);
