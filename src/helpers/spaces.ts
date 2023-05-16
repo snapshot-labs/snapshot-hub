@@ -67,9 +67,9 @@ function mapSpaces() {
       ),
       counts: {
         activeProposals: spaceProposals[id]?.active || 0,
-        proposalsCount: spaceFollowers[id]?.count || 0,
+        proposalsCount: spaceProposals[id]?.count || 0,
         proposalsCount7d: spaceProposals[id]?.count_7d || 0,
-        followersCount: spaceProposals[id]?.count || 0,
+        followersCount: spaceFollowers[id]?.count || 0,
         followersCount7d: spaceFollowers[id]?.count_7d || 0,
         votesCount: spaceVotes[id]?.count || 0,
         votesCount7d: spaceVotes[id]?.count_7d || 0
