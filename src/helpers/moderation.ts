@@ -2,7 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import log from './log';
 
 const moderationURL =
-  'https://sh5.co/api/moderationList?fields=flaggedLinks,flaggedProposals,flaggedSpaces,verifiedSpaces';
+  'https://sh5.co/api/moderation?fields=flaggedLinks,flaggedProposals,flaggedSpaces,verifiedSpaces';
 
 export let flaggedLinks: Array<string> = [];
 export let flaggedProposals: Array<string> = [];
