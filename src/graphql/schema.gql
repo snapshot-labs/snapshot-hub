@@ -13,6 +13,12 @@ type Query {
     orderDirection: OrderDirection
   ): [Space]
 
+  ranking(
+    first: Int
+    skip: Int
+    where: RankingWhere
+  ): RankingObject
+
   proposal(id: String): Proposal
 
   proposals(
@@ -99,6 +105,14 @@ input SpaceWhere {
   id_in: [String]
 }
 
+input RankingWhere {
+  id: String
+  id_in: [String]
+  search: String
+  category: String
+  network: String
+}
+
 input MessageWhere {
   id: String
   id_in: [String]
@@ -175,6 +189,7 @@ input ProposalWhere {
   scores_state: String
   scores_state_in: [String]
   state: String
+  space_verified: Boolean
 }
 
 input VoteWhere {
@@ -311,12 +326,30 @@ type Space {
   validation: Validation
   voteValidation: Validation
   treasuries: [Treasury]
-  followersCount: Int
+  activeProposals: Int
   proposalsCount: Int
+  proposalsCount7d: Int
+  followersCount: Int
+  followersCount7d: Int
+  votesCount: Int
+  votesCount7d: Int
   parent: Space
   children: [Space]
   guidelines: String
   template: String
+  verified: Boolean
+  flagged: Boolean
+  rank: Float
+}
+
+type RankingObject {
+  items: [Space]
+  metrics: Metrics
+}
+
+type Metrics {
+  total: Int
+  categories: Any
 }
 
 type SpaceFilters {
@@ -365,6 +398,7 @@ type Proposal {
   scores_total: Float
   scores_updated: Int
   votes: Int
+  flagged: Boolean
 }
 
 type Strategy {

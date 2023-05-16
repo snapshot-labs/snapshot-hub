@@ -1,6 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
+import { verifiedSpaces } from '../../helpers/moderation';
 
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
@@ -56,6 +57,11 @@ export default async function (parent, args) {
   if (where.validation) {
     searchSql += ' AND p.validation LIKE ?';
     params.push(`%"name": "${where.validation}"%`);
+  }
+
+  if (where.space_verified) {
+    searchSql += ' AND spaces.id in (?)';
+    params.push(verifiedSpaces);
   }
 
   let orderBy = args.orderBy || 'created';

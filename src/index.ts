@@ -6,6 +6,7 @@ import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import log from './helpers/log';
 import './helpers/strategies';
+import './helpers/moderation';
 
 const app = express();
 app.use(express.json({ limit: '20mb' }));

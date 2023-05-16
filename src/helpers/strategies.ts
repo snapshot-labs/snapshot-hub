@@ -14,8 +14,7 @@ async function loadStrategies() {
     const ids = new Set<string>(space.strategies.map(strategy => strategy.name));
     ids.forEach(id => {
       if (res[id]) {
-        res[id].spacesCount = res[id].spacesCount || 0;
-        res[id].spacesCount++;
+        res[id].spacesCount = (res[id].spacesCount || 0) + 1;
       }
     });
   });

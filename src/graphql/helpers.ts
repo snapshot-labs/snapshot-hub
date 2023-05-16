@@ -1,7 +1,8 @@
 import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
-import { spaceProposals, spaceFollowers } from '../helpers/spaces';
+import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
+import { flaggedLinks, flaggedProposals } from '../helpers/moderation';
 
 const network = process.env.NETWORK || 'testnet';
 
@@ -16,6 +17,11 @@ const ARG_LIMITS = {
     space_in: 10000
   },
   spaces: {
+    first: 1000,
+    skip: 15000
+  },
+  ranking: {
+    first: 20,
     skip: 15000
   }
 };
@@ -36,7 +42,9 @@ export function checkLimits(args: any = {}, type) {
 }
 
 export function formatSpace(id, settings) {
-  const space = jsonParse(settings, {});
+  const spaceMetadata = spacesMetadata[id] || {};
+  const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
+
   space.id = id;
   space.private = space.private || false;
   space.avatar = space.avatar || '';
@@ -57,8 +65,6 @@ export function formatSpace(id, settings) {
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
   space.voting.aliased = space.voting.aliased || false;
-  space.followersCount = spaceFollowers[id]?.count || 0;
-  space.proposalsCount = spaceProposals[id]?.count || 0;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.strategies = space.strategies?.map(strategy => ({
@@ -74,6 +80,10 @@ export function formatSpace(id, settings) {
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
+
+  space.verified = spaceMetadata?.verified ?? null;
+  space.flagged = spaceMetadata?.flagged ?? null;
+  space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
@@ -217,7 +227,7 @@ async function fetchRelatedSpaces(spaces) {
     return ids;
   }, []);
 
-  return await fetchSpaces({
+  return fetchSpaces({
     where: { id_in: relatedSpaceIDs }
   });
 }
@@ -239,6 +249,11 @@ export function formatUser(user) {
     ...user,
     ...profile
   };
+}
+
+function isFlaggedProposal(proposal) {
+  const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
+  return flaggedProposals?.includes(proposal.id) || flaggedLinksRegex.test(proposal.body);
 }
 
 export function formatProposal(proposal) {
@@ -265,6 +280,7 @@ export function formatProposal(proposal) {
     network: strategy.network || proposal.network
   }));
   proposal.privacy = proposal.privacy || '';
+  proposal.flagged = isFlaggedProposal(proposal);
   return proposal;
 }
 
