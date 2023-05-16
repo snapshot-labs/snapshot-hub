@@ -5,6 +5,7 @@ import log from './log';
 import { flaggedSpaces, verifiedSpaces } from './moderation';
 
 export let spaces = {};
+export const exploreEndpointData = {};
 export const spacesMetadata = {};
 export let rankedSpaces: any = [];
 const spaceProposals = {};
@@ -28,6 +29,25 @@ function getPopularity(id: string, verified: boolean): number {
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
+    // exploreEndpointData will be deprecated in the future
+    exploreEndpointData[id] = {
+      name: space.name,
+      private: space.private || undefined,
+      terms: space.terms || undefined,
+      network: space.network || undefined,
+      networks: uniq((space.strategies || []).map(strategy => strategy.network || space.network)),
+      categories: space.categories || undefined,
+      activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined,
+      proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
+      proposals_active: (spaceProposals[id] && spaceProposals[id].active) || undefined,
+      proposals_7d: (spaceProposals[id] && spaceProposals[id].count_7d) || undefined,
+      votes: (spaceVotes[id] && spaceVotes[id].count) || undefined,
+      votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
+      followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
+      followers_7d: (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
+    };
+    // exploreEndpointData will be deprecated in the future
+
     const verified = verifiedSpaces?.includes(id) || false;
     const flagged = flaggedSpaces?.includes(id) || false;
     const popularity = getPopularity(id, verified);

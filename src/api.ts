@@ -1,5 +1,5 @@
 import express from 'express';
-import { spaces } from './helpers/spaces';
+import { exploreEndpointData, spaces } from './helpers/spaces';
 import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
 
@@ -23,6 +23,10 @@ router.get('/', (req, res) => {
     network,
     version: v
   });
+});
+
+router.get('/explore', (req, res) => {
+  return res.json({ spaces: exploreEndpointData });
 });
 
 router.get('/spaces/:key', (req, res) => {
