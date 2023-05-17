@@ -1,8 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import log from './log';
 
-const moderationURL =
-  'https://sh5.co/api/moderation?fields=flaggedLinks,flaggedProposals,flaggedSpaces,verifiedSpaces';
+const moderationURL = 'https://sh5.co/api/moderation';
 
 export let flaggedLinks: Array<string> = [];
 export let flaggedProposals: Array<string> = [];
@@ -23,7 +22,7 @@ async function run() {
   } catch (e) {
     log.error(`[moderation] failed to load ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(60e3);
+  await snapshot.utils.sleep(20e3);
   run();
 }
 
