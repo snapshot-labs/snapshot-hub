@@ -4,7 +4,7 @@ import log from './log';
 
 export default rateLimit({
   windowMs: 20 * 1e3,
-  max: 60,
+  max: 120,
   keyGenerator: req => getIp(req),
   standardHeaders: true,
   handler: (req, res) => {
