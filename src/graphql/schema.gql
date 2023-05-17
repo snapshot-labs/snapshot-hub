@@ -210,8 +210,6 @@ input VoteWhere {
   vp_lte: Float
   vp_state: String
   vp_state_in: [String]
-  choice: Any
-  choice_in: [Any]
   choice_match: [String]
 }
 
