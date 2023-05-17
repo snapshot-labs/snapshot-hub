@@ -1,4 +1,5 @@
 import snapshot from '@snapshot-labs/snapshot.js';
+import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
@@ -12,17 +13,28 @@ const spaceProposals = {};
 const spaceVotes = {};
 const spaceFollowers = {};
 
-function getPopularity(id: string, verified: boolean): number {
+const testnetNetworks = Object.values(networks)
+  .filter((network: any) => network.testnet)
+  .map((network: any) => network.key);
+const testStrategies = ['ticket'];
+
+function getPopularity(
+  id: string,
+  params: {
+    verified: boolean;
+    networks: string[];
+    strategies: any[];
+  }
+): number {
   let popularity =
     (spaceVotes[id]?.count || 0) / 50 +
     (spaceVotes[id]?.count_7d || 0) +
     (spaceProposals[id]?.count_7d || 0) * 50 +
     (spaceFollowers[id]?.count_7d || 0);
 
-  if (verified) {
-    popularity *= 5;
-    popularity += 100;
-  }
+  if (params.networks.some(network => testnetNetworks.includes(network))) popularity *= 3;
+  if (params.strategies.some(strategy => testStrategies.includes(strategy))) popularity *= 3;
+  if (params.verified) popularity *= 5;
 
   return popularity;
 }
@@ -50,7 +62,17 @@ function mapSpaces() {
 
     const verified = verifiedSpaces?.includes(id) || false;
     const flagged = flaggedSpaces?.includes(id) || false;
-    const popularity = getPopularity(id, verified);
+    const networks = uniq(
+      (space.strategies || [])
+        .map(strategy => strategy?.network || space.network)
+        .concat(space.network)
+    );
+    const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
+    const popularity = getPopularity(id, {
+      verified,
+      networks,
+      strategies
+    });
 
     spacesMetadata[id] = {
       id,
@@ -60,11 +82,7 @@ function mapSpaces() {
       popularity,
       private: space.private ?? false,
       categories: space.categories ?? [],
-      networks: uniq(
-        (space.strategies || [])
-          .map(strategy => strategy?.network || space.network)
-          .concat(space.network)
-      ),
+      networks,
       counts: {
         activeProposals: spaceProposals[id]?.active || 0,
         proposalsCount: spaceProposals[id]?.count || 0,
@@ -78,8 +96,8 @@ function mapSpaces() {
   });
 
   rankedSpaces = Object.values(spacesMetadata)
-    .sort((a: any, b: any) => b.popularity - a.popularity)
-    .filter((space: any) => !space.private);
+    .filter((space: any) => !space.private && !space.flagged)
+    .sort((a: any, b: any) => b.popularity - a.popularity);
 
   rankedSpaces.forEach((space: any, i: number) => {
     spacesMetadata[space.id].rank = i + 1;
