@@ -32,8 +32,8 @@ function getPopularity(
     (spaceProposals[id]?.count_7d || 0) * 50 +
     (spaceFollowers[id]?.count_7d || 0);
 
-  if (params.networks.some(network => testnets.includes(network))) popularity *= 3;
-  if (params.strategies.some(strategy => testStrategies.includes(strategy))) popularity *= 3;
+  if (!params.networks.some(network => testnets.includes(network))) popularity *= 3;
+  if (!params.strategies.some(strategy => testStrategies.includes(strategy))) popularity *= 3;
   if (params.verified) popularity *= 5;
 
   return popularity;
