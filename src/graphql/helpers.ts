@@ -111,7 +111,7 @@ export function buildWhereQuery(fields, alias, where) {
     }
 
     const fieldChoiceMatch = where[`${field}_match`] || [];
-    if (alias === 'v' && fieldChoiceMatch.length > 0) {
+    if (fieldChoiceMatch.length > 0 && alias === 'v') {
       params.push(fieldChoiceMatch);
       const keys: string = fieldChoiceMatch.reduce((acc: string, val: string, i: number) => {
         const isLast = i === fieldChoiceMatch.length - 1;
