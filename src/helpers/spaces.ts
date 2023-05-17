@@ -28,15 +28,15 @@ function getPopularity(
 ): number {
   let popularity =
     (spaceVotes[id]?.count || 0) / 50 +
-    (spaceVotes[id]?.count_7d || 0) * 5 +
+    (spaceVotes[id]?.count_7d || 0) / 50 +
     (spaceProposals[id]?.count || 0) / 50 +
-    (spaceProposals[id]?.count_7d || 0) * 5 +
+    (spaceProposals[id]?.count_7d || 0) / 50 +
     (spaceFollowers[id]?.count || 0) / 50 +
-    (spaceFollowers[id]?.count_7d || 0) * 5;
+    (spaceFollowers[id]?.count_7d || 0) / 50;
 
-  if (!params.networks.some(network => testnets.includes(network))) popularity *= 5;
-  if (!params.strategies.some(strategy => testStrategies.includes(strategy))) popularity *= 5;
-  if (params.verified) popularity *= 100;
+  if (!params.networks.some(network => testnets.includes(network))) popularity = 1;
+  if (!params.strategies.some(strategy => testStrategies.includes(strategy))) popularity = 1;
+  if (params.verified) popularity *= 1000;
 
   return popularity;
 }
