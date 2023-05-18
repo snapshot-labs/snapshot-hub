@@ -10,8 +10,7 @@ export default rateLimit({
   standardHeaders: true,
   skip: req => {
     const key = req.headers['x-api-key'] || req.query.apiKey;
-    if (key && keycard.configured) return true;
-    return false;
+    return key && keycard.configured;
   },
   handler: (req, res) => {
     // const id = sha256(getIp(req));
