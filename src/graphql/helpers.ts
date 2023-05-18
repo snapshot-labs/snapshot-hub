@@ -78,7 +78,6 @@ export function formatSpace(id, settings) {
   space.nftClaimer.maxSupply = space.nftClaimer.maxSupply || null;
   space.nftClaimer.mintPrice = space.nftClaimer.mintPrice || null;
   space.nftClaimer.proposerCut = space.nftClaimer.proposerCut || null;
-  space.nftClaimer.address = space.nftClaimer.address || null;
   space.nftClaimer.network = space.nftClaimer.network || null;
   space.nftClaimer.enabled = space.nftClaimer.enabled || false;
 
