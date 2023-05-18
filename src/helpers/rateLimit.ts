@@ -13,7 +13,6 @@ export default rateLimit({
     return key && keycard.configured;
   },
   handler: (req, res) => {
-    // const id = sha256(getIp(req));
     log.info(`too many requests ${getIp(req).slice(0, 7)}`);
     sendError(
       res,
