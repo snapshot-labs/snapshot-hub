@@ -4,7 +4,7 @@ export default function () {
   const plugins = {};
   Object.values(spaces).forEach((space: any) => {
     Object.keys(space.plugins || {}).forEach(plugin => {
-      plugins[plugin] = plugins[plugin] ? plugins[plugin] + 1 : 1;
+      plugins[plugin] = (plugins[plugin] || 0) + 1;
     });
   });
   return Object.entries(plugins).map(network => ({

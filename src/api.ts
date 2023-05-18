@@ -1,5 +1,5 @@
 import express from 'express';
-import { spaces, spacesMetadata } from './helpers/spaces';
+import { exploreEndpointData, spaces } from './helpers/spaces';
 import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
 
@@ -17,7 +17,7 @@ router.post('/msg', async (req, res) => {
 
 router.get('/', (req, res) => {
   const commit = process.env.COMMIT_HASH || '';
-  const v = commit ? `${version}#${commit.substr(0, 7)}` : version;
+  const v = commit ? `${version}#${commit.substring(0, 7)}` : version;
   return res.json({
     name,
     network,
@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/explore', (req, res) => {
-  return res.json({ spaces: spacesMetadata });
+  return res.json({ spaces: exploreEndpointData });
 });
 
 router.get('/spaces/:key', (req, res) => {
