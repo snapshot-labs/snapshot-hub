@@ -4,7 +4,7 @@ import { sendError } from './utils';
 const keycard = new Keycard({
   app: 'snapshot-hub',
   secret: process.env.KEYCARD_SECRET || '',
-  URL: process.env.KEYCARD_URL || 'http://localhost:3002'
+  URL: process.env.KEYCARD_URL || 'http://localhost:3007'
 });
 
 const verifyKeyCard = async (req, res, next) => {
