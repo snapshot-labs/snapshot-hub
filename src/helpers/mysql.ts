@@ -8,8 +8,9 @@ import log from './log';
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
 log.info(`[mysql] connection limit ${connectionLimit}`);
 
+const mysqlUrl = `${process.env.DATABASE_URL}/${process.env.MYSQL_DATABASE_NAME}`;
 // @ts-ignore
-const config = parse(process.env.DATABASE_URL);
+const config = parse(mysqlUrl);
 config.connectionLimit = connectionLimit;
 config.multipleStatements = true;
 config.database = config.path[0];
