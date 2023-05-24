@@ -6,6 +6,7 @@ import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import log from './helpers/log';
 import './helpers/strategies';
+import { verifyKeyCard } from './helpers/keycard';
 import './helpers/moderation';
 
 const app = express();
@@ -15,7 +16,7 @@ app.use(cors({ maxAge: 86400 }));
 app.set('trust proxy', 1);
 app.use(rateLimit);
 app.use('/api', api);
-app.use('/graphql', graphql);
+app.use('/graphql', verifyKeyCard, graphql);
 app.get('/*', (req, res) => res.redirect('/api'));
 
 const PORT = process.env.PORT || 3000;

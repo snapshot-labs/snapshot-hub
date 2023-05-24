@@ -15,6 +15,6 @@ const schema = makeExecutableSchema({ typeDefs, resolvers: rootValue });
 export default graphqlHTTP({
   schema,
   rootValue,
-  graphiql: { defaultQuery },
+  graphiql: { defaultQuery, headerEditorEnabled: true },
   validationRules: [queryCountLimit(5, 5), depthLimit(5)]
 });
