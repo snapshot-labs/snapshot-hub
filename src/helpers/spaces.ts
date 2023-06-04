@@ -1,32 +1,89 @@
 import snapshot from '@snapshot-labs/snapshot.js';
+import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
+import { flaggedSpaces, verifiedSpaces } from './moderation';
 
 export let spaces = {};
 export const spacesMetadata = {};
-export const spaceProposals = {};
-export const spaceVotes = {};
-export const spaceFollowers = {};
+export let rankedSpaces: any = [];
+const spaceProposals = {};
+const spaceVotes = {};
+const spaceFollowers = {};
+
+const testnets = Object.values(networks)
+  .filter((network: any) => network.testnet)
+  .map((network: any) => network.key);
+const testStrategies = ['ticket'];
+
+function getPopularity(
+  id: string,
+  params: {
+    verified: boolean;
+    networks: string[];
+    strategies: any[];
+  }
+): number {
+  let popularity =
+    (spaceVotes[id]?.count || 0) / 50 +
+    (spaceVotes[id]?.count_7d || 0) +
+    (spaceProposals[id]?.count || 0) / 50 +
+    (spaceProposals[id]?.count_7d || 0) +
+    (spaceFollowers[id]?.count || 0) / 50 +
+    (spaceFollowers[id]?.count_7d || 0);
+
+  if (params.networks.some(network => testnets.includes(network))) popularity = 1;
+  if (params.strategies.some(strategy => testStrategies.includes(strategy))) popularity = 1;
+
+  if (params.verified) popularity *= 100000;
+
+  return popularity;
+}
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
+    const verified = verifiedSpaces?.includes(id) || false;
+    const flagged = flaggedSpaces?.includes(id) || false;
+    const networks = uniq(
+      (space.strategies || [])
+        .map(strategy => strategy?.network || space.network)
+        .concat(space.network)
+    );
+    const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
+    const popularity = getPopularity(id, {
+      verified,
+      networks,
+      strategies
+    });
+
     spacesMetadata[id] = {
+      id,
       name: space.name,
-      private: space.private || undefined,
-      terms: space.terms || undefined,
-      network: space.network || undefined,
-      networks: uniq((space.strategies || []).map(strategy => strategy.network || space.network)),
-      categories: space.categories || undefined,
-      activeProposals: (spaceProposals[id] && spaceProposals[id].active) || undefined,
-      proposals: (spaceProposals[id] && spaceProposals[id].count) || undefined,
-      proposals_active: (spaceProposals[id] && spaceProposals[id].active) || undefined,
-      proposals_7d: (spaceProposals[id] && spaceProposals[id].count_7d) || undefined,
-      votes: (spaceVotes[id] && spaceVotes[id].count) || undefined,
-      votes_7d: (spaceVotes[id] && spaceVotes[id].count_7d) || undefined,
-      followers: (spaceFollowers[id] && spaceFollowers[id].count) || undefined,
-      followers_7d: (spaceFollowers[id] && spaceFollowers[id].count_7d) || undefined
+      verified,
+      flagged,
+      popularity,
+      private: space.private ?? false,
+      categories: space.categories ?? [],
+      networks,
+      counts: {
+        activeProposals: spaceProposals[id]?.active || 0,
+        proposalsCount: spaceProposals[id]?.count || 0,
+        proposalsCount7d: spaceProposals[id]?.count_7d || 0,
+        followersCount: spaceFollowers[id]?.count || 0,
+        followersCount7d: spaceFollowers[id]?.count_7d || 0,
+        votesCount: spaceVotes[id]?.count || 0,
+        votesCount7d: spaceVotes[id]?.count_7d || 0
+      }
     };
+  });
+
+  rankedSpaces = Object.values(spacesMetadata)
+    .filter((space: any) => !space.private && !space.flagged)
+    .sort((a: any, b: any) => b.popularity - a.popularity);
+
+  rankedSpaces.forEach((space: any, i: number) => {
+    spacesMetadata[space.id].rank = i + 1;
   });
 }
 
@@ -99,7 +156,7 @@ async function run() {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(360e3);
-  await run();
+  run();
 }
 
-setTimeout(() => run(), 3e3);
+run();

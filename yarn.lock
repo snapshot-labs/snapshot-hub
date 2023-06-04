@@ -1224,6 +1224,13 @@
   dependencies:
     "@snapshot-labs/eslint-config-base" "^0.1.0-beta.7"
 
+"@snapshot-labs/keycard@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/keycard/-/keycard-0.1.0.tgz#4904a43a61b48f7b0d0db02246f8a104d1daa536"
+  integrity sha512-CSbioDWmR5nqxYpEAJBzEbLXn8ucsg3arCLI2tgdhDIskH8n19Pzo21jELjql+/zUM8sPMQKnhmv1xTAIq9I4w==
+  dependencies:
+    cross-fetch "^3.1.5"
+
 "@snapshot-labs/pineapple@^0.1.0-beta.1":
   version "0.1.0-beta.1"
   resolved "https://registry.yarnpkg.com/@snapshot-labs/pineapple/-/pineapple-0.1.0-beta.1.tgz#4b136b778bff741c85df474ebfa202e8b1c9969a"
@@ -1236,10 +1243,10 @@
   resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.7.tgz#c8e07e7e9baabee245020a72ac05835b65139823"
   integrity sha512-k/FUf4VWhwLFUmKuWs2mNvmPe691hqhvCJuujD4TfbIivWysmL1TqthwfdQUrQEAQUqVQ2ZKEiGkbufp5J27eQ==
 
-"@snapshot-labs/snapshot.js@^0.4.82":
-  version "0.4.82"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.4.82.tgz#5e37e7075fbacba9e4bed0fcc67461bf9f9d5751"
-  integrity sha512-JQPemFSPST+z4TPkpUTpzGzXJPJemp/xuDd2VY8btw7/SWtBZ+LupuLfzrNQzssELr0I5GkJJwUX5yyphnWuDg==
+"@snapshot-labs/snapshot.js@^0.4.91":
+  version "0.4.91"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.4.91.tgz#6537cbcb8175dbe0e6f3e418b03f83bb35ebbe58"
+  integrity sha512-jaRl7t0T7csiWj1c1ao/B+W4arHLOeNvI+hVbfaItiCgVuL+/NIbGDMQam1xpDs+bJ82nQ3wbXRGnHVqGS7sYg==
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.6.4"
@@ -1251,7 +1258,7 @@
     "@ethersproject/wallet" "^5.6.2"
     ajv "^8.11.0"
     ajv-formats "^2.1.1"
-    cross-fetch "^3.1.5"
+    cross-fetch "^3.1.6"
     json-to-graphql-query "^2.2.4"
     lodash.set "^4.3.2"
 
@@ -1949,6 +1956,13 @@ cross-fetch@^3.0.4, cross-fetch@^3.1.5:
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
   dependencies:
     node-fetch "2.6.7"
+
+cross-fetch@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.6.tgz#bae05aa31a4da760969756318feeee6e70f15d6c"
+  integrity sha512-riRvo06crlE8HiqOwIpQhxwdOk4fOeR7FVM/wXoxchFEqMNUjvbs3bfo4OTgMEMHzppd4DxFBDbyySj8Cv781g==
+  dependencies:
+    node-fetch "^2.6.11"
 
 cross-spawn@^7.0.2:
   version "7.0.3"
@@ -3153,6 +3167,13 @@ node-fetch@2.6.7, node-fetch@^2.6.1:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
+  dependencies:
+    whatwg-url "^5.0.0"
+
+node-fetch@^2.6.11:
+  version "2.6.11"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.11.tgz#cde7fc71deef3131ef80a738919f999e6edfff25"
+  integrity sha512-4I6pdBY1EthSqDmJkiNk3JIT8cswwR9nfeW/cPdUagJYEQG7R95WRH74wpz7ma8Gh/9dI9FP+OU+0E4FvtA55w==
   dependencies:
     whatwg-url "^5.0.0"
 
