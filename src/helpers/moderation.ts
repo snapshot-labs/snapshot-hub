@@ -22,7 +22,7 @@ async function run() {
   } catch (e) {
     log.error(`[moderation] failed to load ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(20e3);
+  await snapshot.utils.sleep(5e3);
   run();
 }
 
