@@ -325,6 +325,7 @@ type Space {
   categories: [String]
   validation: Validation
   voteValidation: Validation
+  delegationPortal: DelegationPortal
   treasuries: [Treasury]
   activeProposals: Int
   proposalsCount: Int
@@ -410,6 +411,12 @@ type Strategy {
 type Validation {
   name: String!
   params: Any
+}
+
+type DelegationPortal {
+  delegationType: String!
+  delegationContract: String!
+  delegationApi: String!
 }
 
 type Vote {
