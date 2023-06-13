@@ -15,6 +15,8 @@ import strategies from './strategies';
 import strategy from './strategy';
 import users from './users';
 import user from './user';
+import statements from './statements';
+import statement from './statement';
 import vp from './vp';
 import messages from './messages';
 import ranking from './ranking';
@@ -38,6 +40,8 @@ export default {
   strategy,
   users,
   user,
+  statements,
+  statement,
   vp,
   messages
 };

@@ -127,3 +127,18 @@ CREATE TABLE users (
   INDEX ipfs (ipfs),
   INDEX created (created)
 );
+
+CREATE TABLE statements (
+  id VARCHAR(64) NOT NULL,
+  ipfs VARCHAR(64) NOT NULL,
+  delegate VARCHAR(64) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  about TEXT,
+  statement TEXT,
+  created INT(11) NOT NULL,
+  updated INT(11) NOT NULL,
+  PRIMARY KEY (delegate, space),
+  INDEX ipfs (ipfs),
+  INDEX created (created),
+  INDEX updated (updated)
+);

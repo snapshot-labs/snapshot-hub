@@ -71,7 +71,17 @@ type Query {
     orderDirection: OrderDirection
   ): [User]
 
+  statements(
+    first: Int
+    skip: Int
+    where: StatementsWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Statement]
+
   user(id: String): User
+
+  statement(id: String): Statement
 
   skins: [Item]
 
@@ -291,6 +301,21 @@ input UsersWhere {
   created_lte: Int
 }
 
+input StatementsWhere {
+  id: String
+  id_in: [String]
+  ipfs: String
+  ipfs_in: [String]
+  space: String
+  space_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
+}
+
 enum OrderDirection {
   asc
   desc
@@ -466,6 +491,16 @@ type User {
   about: String
   avatar: String
   created: Int!
+}
+
+type Statement {
+  id: String!
+  ipfs: String!
+  space: String!
+  about: String
+  statement: String
+  created: Int!
+  updated: Int!
 }
 
 type Item {
