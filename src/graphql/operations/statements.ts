@@ -1,5 +1,5 @@
 import db from '../../helpers/mysql';
-import { buildWhereQuery, checkLimits, formatUser } from '../helpers';
+import { buildWhereQuery, checkLimits } from '../helpers';
 import log from '../../helpers/log';
 
 export default async function (parent, args) {
