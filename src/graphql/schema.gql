@@ -308,6 +308,8 @@ input StatementsWhere {
   ipfs_in: [String]
   space: String
   space_in: [String]
+  delegate: String
+  delegate_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -498,6 +500,7 @@ type Statement {
   ipfs: String!
   space: String!
   about: String
+  delegate: String
   statement: String
   created: Int!
   updated: Int!
