@@ -11,7 +11,8 @@ export default async function (parent, args) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
-    created: 'number'
+    created: 'number',
+    delegate: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
