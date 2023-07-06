@@ -26,11 +26,11 @@ function getPopularity(
   }
 ): number {
   let popularity =
-    (spaceVotes[id]?.count || 0) / 50 +
+    (spaceVotes[id]?.count || 0) / 20 +
     (spaceVotes[id]?.count_7d || 0) +
-    (spaceProposals[id]?.count || 0) / 50 +
+    (spaceProposals[id]?.count || 0) / 20 +
     (spaceProposals[id]?.count_7d || 0) +
-    (spaceFollowers[id]?.count || 0) / 50 +
+    (spaceFollowers[id]?.count || 0) / 20 +
     (spaceFollowers[id]?.count_7d || 0);
 
   if (params.networks.some(network => testnets.includes(network))) popularity = 1;
