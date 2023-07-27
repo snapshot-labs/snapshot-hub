@@ -19,7 +19,7 @@ jobs:
           mysql -uroot -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
           mysql -uroot -proot -e "FLUSH PRIVILEGES;"
       - run: yarn
-      - run: yarn build
+      - run: yarn run tsc
       - run: yarn test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
