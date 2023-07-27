@@ -4,7 +4,9 @@
   "repository": "snapshot-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint . --ext .ts --fix",
+    "lint": "yarn lint:nofix --fix",
+    "lint:nofix": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit",
     "dev": "nodemon src/index.ts",
     "start": "ts-node src/index.ts"
   },
