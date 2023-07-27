@@ -8,11 +8,7 @@
     "lint:nofix": "eslint . --ext .ts",
     "typecheck": "tsc --noEmit",
     "dev": "nodemon src/index.ts",
-    "start": "ts-node src/index.ts",
-    "start:test": "dotenv -e test/.env.test yarn dev",
-    "test": "PORT=3030 start-server-and-test 'yarn start:test' 3030 'dotenv -e test/.env.test jest --runInBand'",
-    "test:unit": "dotenv -e test/.env.test jest test/unit/",
-    "test:e2e": "PORT=3030 start-server-and-test 'yarn start:test' 3030 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
+    "start": "ts-node src/index.ts"
   },
   "eslintConfig": {
     "extends": "@snapshot-labs"
@@ -49,16 +45,9 @@
   "devDependencies": {
     "@snapshot-labs/eslint-config": "^0.1.0-beta.7",
     "@snapshot-labs/prettier-config": "^0.1.0-beta.7",
-    "@types/jest": "^29.5.3",
     "@types/node": "^14.0.13",
-    "dotenv-cli": "^7.2.1",
     "eslint": "^8.28.0",
-    "jest": "^29.6.1",
-    "jest-environment-node-single-context": "^29.1.0",
     "nodemon": "^2.0.19",
-    "prettier": "^2.8.0",
-    "start-server-and-test": "^2.0.0",
-    "supertest": "^6.3.3",
-    "ts-jest": "^29.1.1"
+    "prettier": "^2.8.0"
   }
 }
