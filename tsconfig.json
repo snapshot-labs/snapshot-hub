@@ -8,6 +8,10 @@
     "esModuleInterop": true,
     "strict": true,
     "noImplicitAny": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/"
   }
 }
