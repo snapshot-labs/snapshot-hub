@@ -2,6 +2,7 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
 import { verifiedSpaces } from '../../helpers/moderation';
+import { capture } from '../../helpers/sentry';
 
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
@@ -81,8 +82,9 @@ export default async function (parent, args) {
   try {
     const proposals = await db.queryAsync(query, params);
     return proposals.map(proposal => formatProposal(proposal));
-  } catch (e) {
+  } catch (e: any) {
     log.error(`[graphql] proposals, ${JSON.stringify(e)}`);
+    capture(e);
     return Promise.reject('request failed');
   }
 }

@@ -3,6 +3,7 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
+import { capture } from '../../helpers/sentry';
 
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
@@ -45,7 +46,8 @@ async function query(parent, args, context?, info?) {
     votes = await db.queryAsync(query, params);
     // TODO: we need settings in the vote as its being passed to formatSpace inside formatVote, Maybe we dont need to do this?
     votes = votes.map(vote => formatVote(vote));
-  } catch (e) {
+  } catch (e: any) {
+    capture(e);
     log.error(`[graphql] votes, ${JSON.stringify(e)}`);
     return Promise.reject('request failed');
   }
@@ -66,7 +68,8 @@ async function query(parent, args, context?, info?) {
         if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
         return vote;
       });
-    } catch (e) {
+    } catch (e: any) {
+      capture(e);
       log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }
@@ -88,7 +91,8 @@ async function query(parent, args, context?, info?) {
         vote.proposal = proposals[vote.proposal];
         return vote;
       });
-    } catch (e) {
+    } catch (e: any) {
+      capture(e);
       log.error(`[graphql] votes, ${JSON.stringify(e)}`);
       return Promise.reject('request failed');
     }

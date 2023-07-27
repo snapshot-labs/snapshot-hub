@@ -1,5 +1,6 @@
 import { fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 import log from '../../helpers/log';
+import { capture } from '../../helpers/sentry';
 
 export default async function (_parent, { id }, _context, info) {
   if (!id) return new PublicError('Missing id');
@@ -10,9 +11,10 @@ export default async function (_parent, { id }, _context, info) {
     spaces = await handleRelatedSpaces(info, spaces);
 
     return spaces[0];
-  } catch (e) {
+  } catch (e: any) {
     log.error(`[graphql] space, ${JSON.stringify(e)}`);
     if (e instanceof PublicError) return e;
+    capture(e, { context: { id } });
     return new Error('Unexpected error');
   }
 }
