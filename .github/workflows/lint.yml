@@ -12,4 +12,4 @@ jobs:
           cache: 'yarn'
       - run: yarn
       - run: yarn lint:nofix
-      - run: yarn typescript
+      - run: yarn typecheck
