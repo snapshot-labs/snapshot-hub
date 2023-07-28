@@ -4,6 +4,7 @@ import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
 import { flaggedSpaces, verifiedSpaces } from './moderation';
+import { capture } from './sentry';
 
 export let spaces = {};
 export const spacesMetadata = {};
@@ -152,7 +153,8 @@ async function run() {
   try {
     await loadSpaces();
     await loadSpacesMetrics();
-  } catch (e) {
+  } catch (e: any) {
+    capture(e);
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(360e3);

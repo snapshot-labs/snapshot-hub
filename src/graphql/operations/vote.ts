@@ -2,6 +2,7 @@ import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
 import { formatProposal, formatVote } from '../helpers';
 import log from '../../helpers/log';
+import { capture } from '../../helpers/sentry';
 
 export default async function (parent, { id }, context, info) {
   const requestedFields = info ? graphqlFields(info) : {};
@@ -24,14 +25,16 @@ export default async function (parent, { id }, context, info) {
       try {
         const proposals = await db.queryAsync(query, [proposalId]);
         result.proposal = formatProposal(proposals[0]);
-      } catch (e) {
+      } catch (e: any) {
         log.error(`[graphql] vote, ${JSON.stringify(e)}`);
+        capture(e, { context: { id } });
         return Promise.reject('request failed');
       }
     }
     return result;
-  } catch (e) {
+  } catch (e: any) {
     log.error(`[graphql] vote, ${JSON.stringify(e)}`);
+    capture(e, { context: { id } });
     return Promise.reject('request failed');
   }
 }
