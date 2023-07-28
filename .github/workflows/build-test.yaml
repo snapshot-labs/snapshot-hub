@@ -1,0 +1,27 @@
+name: Build and run tests
+on: [push]
+jobs:
+  build-test:
+    runs-on: ubuntu-20.04
+    env:
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/hub_test'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE hub_test;' -uroot -proot
+          mysql -uroot -proot hub_test < src/helpers/schema.sql
+          mysql -uroot -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
+          mysql -uroot -proot -e "FLUSH PRIVILEGES;"
+      - run: yarn
+      - run: yarn run tsc
+      - run: yarn test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
