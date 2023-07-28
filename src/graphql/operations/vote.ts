@@ -2,7 +2,7 @@ import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
 import { formatProposal, formatVote } from '../helpers';
 import log from '../../helpers/log';
-import { capture } from '../../helpers/sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, { id }, context, info) {
   const requestedFields = info ? graphqlFields(info) : {};

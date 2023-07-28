@@ -8,7 +8,7 @@ import log from './helpers/log';
 import './helpers/strategies';
 import { verifyKeyCard } from './helpers/keycard';
 import './helpers/moderation';
-import { initLogger, fallbackLogger } from './helpers/sentry';
+import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
