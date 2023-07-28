@@ -1,6 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
 import log from '../../helpers/log';
+import { capture } from '../../helpers/sentry';
 
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
@@ -34,8 +35,9 @@ export default async function (parent, args) {
 
   try {
     return await db.queryAsync(query, params);
-  } catch (e) {
+  } catch (e: any) {
     log.error(`[graphql] aliases, ${JSON.stringify(e)}`);
+    capture(e);
     return Promise.reject('request failed');
   }
 }

@@ -1,6 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatSubscription } from '../helpers';
 import log from '../../helpers/log';
+import { capture } from '../../helpers/sentry';
 
 export default async function (parent, args) {
   const { first = 20, skip = 0, where = {} } = args;
@@ -38,8 +39,9 @@ export default async function (parent, args) {
   try {
     subscriptions = await db.queryAsync(query, params);
     return subscriptions.map(subscription => formatSubscription(subscription));
-  } catch (e) {
+  } catch (e: any) {
     log.error(`[graphql] subscriptions, ${JSON.stringify(e)}`);
+    capture(e);
     return Promise.reject('request failed');
   }
 }
