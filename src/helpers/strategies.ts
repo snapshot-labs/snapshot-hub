@@ -1,6 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
 import log from './log';
+import { capture } from './sentry';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
@@ -33,7 +34,8 @@ async function loadStrategies() {
 async function run() {
   try {
     await loadStrategies();
-  } catch (e) {
+  } catch (e: any) {
+    capture(e);
     log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(60e3);

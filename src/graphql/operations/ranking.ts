@@ -2,6 +2,7 @@ import { checkLimits, formatSpace, handleRelatedSpaces, PublicError } from '../h
 import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { rankedSpaces } from '../../helpers/spaces';
+import { capture } from '../../helpers/sentry';
 
 export default async function (_parent, args, _context, info) {
   checkLimits(args, 'ranking');
@@ -50,10 +51,10 @@ export default async function (_parent, args, _context, info) {
     const items = await handleRelatedSpaces(info, spaces);
 
     return { items, metrics };
-  } catch (e) {
-    console.log(e);
+  } catch (e: any) {
     log.error(`[graphql] spaces, ${JSON.stringify(e)}`);
     if (e instanceof PublicError) return e;
+    capture(e);
     return new Error('Unexpected error');
   }
 }
