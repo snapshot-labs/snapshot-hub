@@ -66,7 +66,7 @@ export default async function (parent, args) {
   }
 
   if (where.flagged === true) {
-    searchSql += ' AND p.id in (?)';
+    searchSql += ' AND p.id IN (?)';
     params.push(flaggedProposals);
   }
 
