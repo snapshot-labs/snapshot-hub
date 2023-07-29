@@ -1,6 +1,6 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import log from './log';
-import { capture } from './sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 const moderationURL = 'https://sh5.co/api/moderation';
 

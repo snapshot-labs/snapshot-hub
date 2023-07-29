@@ -3,7 +3,7 @@ import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
 import serve from '../../helpers/ee';
 import log from '../../helpers/log';
-import { capture } from '../../helpers/sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};

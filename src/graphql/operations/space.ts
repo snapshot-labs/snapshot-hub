@@ -1,6 +1,6 @@
 import { fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
 import log from '../../helpers/log';
-import { capture } from '../../helpers/sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (_parent, { id }, _context, info) {
   if (!id) return new PublicError('Missing id');

@@ -1,6 +1,6 @@
 import db from '../../helpers/mysql';
 import log from '../../helpers/log';
-import { capture } from '../../helpers/sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
   const id = args.id;

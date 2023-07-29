@@ -2,7 +2,7 @@ import { checkLimits, formatSpace, handleRelatedSpaces, PublicError } from '../h
 import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { rankedSpaces } from '../../helpers/spaces';
-import { capture } from '../../helpers/sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (_parent, args, _context, info) {
   checkLimits(args, 'ranking');

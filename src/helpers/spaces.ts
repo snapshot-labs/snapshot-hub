@@ -4,7 +4,7 @@ import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
 import { flaggedSpaces, verifiedSpaces } from './moderation';
-import { capture } from './sentry';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export let spaces = {};
 export const spacesMetadata = {};
