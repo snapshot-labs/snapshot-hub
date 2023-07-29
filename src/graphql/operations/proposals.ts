@@ -71,7 +71,7 @@ export default async function (parent, args) {
   }
 
   if (where.flagged === false) {
-    searchSql += ' AND p.id not in (?)';
+    searchSql += ' AND p.id NOT IN (?)';
     params.push(flaggedProposals);
   }
 
