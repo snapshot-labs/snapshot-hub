@@ -4,8 +4,8 @@
   "repository": "snapshot-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
-    "lint": "yarn lint:nofix --fix",
-    "lint:nofix": "eslint . --ext .ts",
+    "lint": "eslint src/ test/ --ext .ts",
+    "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "dev": "nodemon src/index.ts",
     "build": "tsc && copyfiles src/graphql/*.gql dist/",
