@@ -1,7 +1,7 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
-import { verifiedSpaces } from '../../helpers/moderation';
+import { flaggedProposals, verifiedSpaces } from '../../helpers/moderation';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
@@ -63,6 +63,16 @@ export default async function (parent, args) {
   if (where.space_verified) {
     searchSql += ' AND spaces.id in (?)';
     params.push(verifiedSpaces);
+  }
+
+  if (where.flagged === true) {
+    searchSql += ' AND p.id IN (?)';
+    params.push(flaggedProposals);
+  }
+
+  if (where.flagged === false) {
+    searchSql += ' AND p.id NOT IN (?)';
+    params.push(flaggedProposals);
   }
 
   let orderBy = args.orderBy || 'created';
