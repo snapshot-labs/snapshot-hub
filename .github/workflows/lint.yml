@@ -1,15 +1,8 @@
 name: Lint
+
 on: [push]
 
 jobs:
   lint:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'yarn'
-      - run: yarn
-      - run: yarn lint:nofix
-      - run: yarn typecheck
+    uses: snapshot-labs/actions/.github/workflows/lint.yml@main
+    secrets: inherit
