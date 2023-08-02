@@ -2,7 +2,7 @@ name: Create a Sentry release
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
 jobs:
   create-sentry-release:
     uses: snapshot-labs/actions/.github/workflows/create-sentry-release.yml@main
