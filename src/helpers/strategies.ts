@@ -7,6 +7,7 @@ export let strategies: any[] = [];
 export let strategiesObj: any = {};
 
 const uri = 'https://score.snapshot.org/api/strategies';
+let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
   const res = await snapshot.utils.getJSON(uri);
@@ -34,8 +35,13 @@ async function loadStrategies() {
 async function run() {
   try {
     await loadStrategies();
+    consecutiveFailsCount = 0;
   } catch (e: any) {
-    capture(e);
+    consecutiveFailsCount++;
+
+    if (consecutiveFailsCount >= 3) {
+      capture(e);
+    }
     log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(60e3);
