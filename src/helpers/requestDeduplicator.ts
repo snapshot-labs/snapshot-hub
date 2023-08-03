@@ -11,9 +11,8 @@ export default async function serve(id, action, args) {
         return result;
       })
       .catch(e => {
-        console.log('EventEmitter Error', e);
         ongoingRequests.delete(key);
-        throw { error: true, e };
+        throw e;
       });
     ongoingRequests.set(key, requestPromise);
   }
