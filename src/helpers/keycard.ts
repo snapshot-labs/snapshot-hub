@@ -7,15 +7,18 @@ const keycard = new Keycard({
   URL: process.env.KEYCARD_URL || 'https://keycard.snapshot.org'
 });
 
-const verifyKeyCard = async (req, res, next) => {
-  const key = req.headers['x-api-key'] || req.query.apiKey;
-  if (key && keycard.configured) {
-    const { valid, rateLimited } = keycard.logReq(key);
+const checkKeycard = async (req, res, next) => {
+  const apiKey = req.headers['x-api-key'] || req.query.apiKey;
+  if (apiKey && keycard.configured) {
+    const keycardData = keycard.logReq(apiKey);
+    if (!keycardData.valid) return sendError(res, 'invalid api key', 401);
 
-    if (!valid) return sendError(res, 'invalid api key', 401);
-    if (rateLimited) return sendError(res, 'too many requests', 429);
+    res.locals.keycardData = keycardData;
+    res.set('X-Api-Key-Limit', keycardData.limit);
+    res.set('X-Api-Key-Remaining', keycardData.remaining);
+    res.set('X-Api-Key-Reset', keycardData.reset);
   }
   return next();
 };
 
-export { keycard, verifyKeyCard };
+export { keycard, checkKeycard };
