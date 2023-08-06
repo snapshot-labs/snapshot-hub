@@ -1288,7 +1288,7 @@
 
 "@snapshot-labs/keycard@https://github.com/snapshot-labs/keycard.js#update-log-request":
   version "0.2.0"
-  resolved "https://github.com/snapshot-labs/keycard.js#2b91cf1eec0ab0bd2272c89d53a895a4c974c033"
+  resolved "https://github.com/snapshot-labs/keycard.js#7e576b15374573d20179f161e7685e67163917ae"
   dependencies:
     cross-fetch "^3.1.5"
 
