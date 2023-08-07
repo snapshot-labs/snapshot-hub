@@ -1286,9 +1286,10 @@
   dependencies:
     "@snapshot-labs/eslint-config-base" "^0.1.0-beta.7"
 
-"@snapshot-labs/keycard@https://github.com/snapshot-labs/keycard.js#update-log-request":
+"@snapshot-labs/keycard@^0.2.0":
   version "0.2.0"
-  resolved "https://github.com/snapshot-labs/keycard.js#7e576b15374573d20179f161e7685e67163917ae"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/keycard/-/keycard-0.2.0.tgz#7a9e4dd2224089fd291fe63ada738a70a5407d46"
+  integrity sha512-cfA2/fNy9MhChl0MR/rF0AY+Dzj9sQPd/jcZbIxsx7p4Dd8ZmSo6ufHz60H7pHBM5r4KgozHTlscN7sQVShZYg==
   dependencies:
     cross-fetch "^3.1.5"
 
