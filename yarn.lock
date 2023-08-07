@@ -1286,10 +1286,10 @@
   dependencies:
     "@snapshot-labs/eslint-config-base" "^0.1.0-beta.7"
 
-"@snapshot-labs/keycard@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/keycard/-/keycard-0.1.0.tgz#4904a43a61b48f7b0d0db02246f8a104d1daa536"
-  integrity sha512-CSbioDWmR5nqxYpEAJBzEbLXn8ucsg3arCLI2tgdhDIskH8n19Pzo21jELjql+/zUM8sPMQKnhmv1xTAIq9I4w==
+"@snapshot-labs/keycard@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/keycard/-/keycard-0.2.0.tgz#7a9e4dd2224089fd291fe63ada738a70a5407d46"
+  integrity sha512-cfA2/fNy9MhChl0MR/rF0AY+Dzj9sQPd/jcZbIxsx7p4Dd8ZmSo6ufHz60H7pHBM5r4KgozHTlscN7sQVShZYg==
   dependencies:
     cross-fetch "^3.1.5"
 

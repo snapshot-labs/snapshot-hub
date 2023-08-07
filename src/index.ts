@@ -6,7 +6,7 @@ import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import log from './helpers/log';
 import './helpers/strategies';
-import { verifyKeyCard } from './helpers/keycard';
+import { checkKeycard } from './helpers/keycard';
 import './helpers/moderation';
 import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 
@@ -19,9 +19,9 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: false }));
 app.use(cors({ maxAge: 86400 }));
 app.set('trust proxy', 1);
-app.use(rateLimit);
+app.use(checkKeycard, rateLimit);
 app.use('/api', api);
-app.use('/graphql', verifyKeyCard, graphql);
+app.use('/graphql', graphql);
 
 fallbackLogger(app);
 app.get('/*', (req, res) => res.redirect('/api'));
