@@ -2,7 +2,8 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import log from './log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
-const moderationURL = 'https://sh5.co/api/moderation';
+const sidekickURL = process.env.SIDEKICK_URL || 'https://sh5.co';
+const moderationURL = `${sidekickURL}/api/moderation`;
 let consecutiveFailsCount = 0;
 
 export let flaggedLinks: Array<string> = [];

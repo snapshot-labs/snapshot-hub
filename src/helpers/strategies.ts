@@ -6,7 +6,8 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
 
-const uri = 'https://score.snapshot.org/api/strategies';
+const scoreApiEndpoint = process.env.SCORE_API_URL || 'https://score.snapshot.org';
+const uri = `${scoreApiEndpoint}/api/strategies`;
 let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
