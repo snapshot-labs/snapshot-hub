@@ -6,7 +6,6 @@ export default rateLimit({
   windowMs: 20 * 1e3,
   max: 60,
   keyGenerator: req => getIp(req),
-  standardHeaders: true,
   skip: (req, res) => {
     const keycardData = res.locals.keycardData;
     if (keycardData?.valid && !keycardData.rateLimited) {
