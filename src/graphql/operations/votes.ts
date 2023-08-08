@@ -1,7 +1,7 @@
 import graphqlFields from 'graphql-fields';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatProposal, formatSpace, formatVote } from '../helpers';
-import serve from '../../helpers/ee';
+import serve from '../../helpers/requestDeduplicator';
 import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
