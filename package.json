@@ -22,7 +22,7 @@
   "dependencies": {
     "@snapshot-labs/keycard": "^0.2.0",
     "@snapshot-labs/snapshot-sentry": "^1.1.0",
-    "@snapshot-labs/snapshot.js": "^0.4.110",
+    "@snapshot-labs/snapshot.js": "^0.5.3",
     "bluebird": "^3.7.2",
     "connection-string": "^1.0.1",
     "cors": "^2.8.5",
