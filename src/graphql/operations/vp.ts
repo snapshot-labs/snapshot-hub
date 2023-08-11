@@ -1,6 +1,8 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import db from '../../helpers/mysql';
 
+const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
+
 export default async function (_parent, { voter, space, proposal }) {
   if (proposal) {
     const query = `SELECT * FROM proposals WHERE id = ?`;
@@ -12,7 +14,8 @@ export default async function (_parent, { voter, space, proposal }) {
       JSON.parse(p.strategies),
       p.snapshot,
       space,
-      p.delegation === 1
+      p.delegation === 1,
+      { url: scoreAPIUrl }
     );
   } else if (space) {
     const query = `SELECT settings FROM spaces WHERE id = ? AND deleted = 0 LIMIT 1`;
@@ -25,7 +28,8 @@ export default async function (_parent, { voter, space, proposal }) {
       s.strategies,
       'latest',
       space,
-      s.delegation === 1
+      s.delegation === 1,
+      { url: scoreAPIUrl }
     );
   }
 
