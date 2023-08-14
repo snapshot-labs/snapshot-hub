@@ -21,6 +21,7 @@
   "prettier": "@snapshot-labs/prettier-config",
   "dependencies": {
     "@snapshot-labs/keycard": "^0.2.0",
+    "@snapshot-labs/snapshot-metrics": "^1.0.0",
     "@snapshot-labs/snapshot-sentry": "^1.1.0",
     "@snapshot-labs/snapshot.js": "^0.5.3",
     "bluebird": "^3.7.2",
