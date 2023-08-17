@@ -2,19 +2,22 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
 import log from './log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import { URL } from 'url';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
 
-const scoreApiURL = process.env.SCORE_API_URL || 'https://score.snapshot.org';
-const uri = `${scoreApiURL}/api/strategies`;
+let scoreApiURL: URL | string = new URL(process.env.SCORE_API_URL ?? 'https://score.snapshot.org');
+scoreApiURL.pathname = '/api/strategies';
+scoreApiURL = scoreApiURL.toString();
+
 let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
-  const res = await snapshot.utils.getJSON(uri);
+  const res = await snapshot.utils.getJSON(scoreApiURL);
 
   if (res.hasOwnProperty('error')) {
-    capture(new Error('Failed to load strategies'), { context: { uri, res } });
+    capture(new Error('Failed to load strategies'), { context: { scoreApiURL, res } });
     return true;
   }
 
