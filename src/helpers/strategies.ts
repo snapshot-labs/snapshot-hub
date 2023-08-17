@@ -13,6 +13,10 @@ let consecutiveFailsCount = 0;
 async function loadStrategies() {
   const res = await snapshot.utils.getJSON(uri);
 
+  if (res.hasOwnProperty('error')) {
+    throw new Error(JSON.stringify(res));
+  }
+
   Object.values(spaces).forEach((space: any) => {
     const ids = new Set<string>(space.strategies.map(strategy => strategy.name));
     ids.forEach(id => {
