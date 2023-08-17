@@ -37,6 +37,10 @@ export function checkLimits(args: any = {}, type) {
     const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
     if (firstLimitReached || skipLimitReached || whereLimitReached)
       throw new Error(`The \`${key}\` argument must not be greater than ${limit}`);
+
+    if (['first', 'skip'].includes(key) && args[key] < 0) {
+      throw new Error(`The \`${key}\` argument must be positive`);
+    }
   }
   return true;
 }
