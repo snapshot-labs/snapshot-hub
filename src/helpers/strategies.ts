@@ -7,17 +7,17 @@ import { URL } from 'url';
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
 
-let scoreApiURL: URL | string = new URL(process.env.SCORE_API_URL ?? 'https://score.snapshot.org');
+const scoreApiURL: URL = new URL(process.env.SCORE_API_URL ?? 'https://score.snapshot.org');
 scoreApiURL.pathname = '/api/strategies';
-scoreApiURL = scoreApiURL.toString();
+const uri = scoreApiURL.toString();
 
 let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
-  const res = await snapshot.utils.getJSON(scoreApiURL);
+  const res = await snapshot.utils.getJSON(uri);
 
   if (res.hasOwnProperty('error')) {
-    capture(new Error('Failed to load strategies'), { context: { scoreApiURL, res } });
+    capture(new Error('Failed to load strategies'), { context: { uri, res } });
     return true;
   }
 
