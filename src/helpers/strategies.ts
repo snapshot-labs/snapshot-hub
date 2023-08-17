@@ -2,12 +2,15 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { spaces } from './spaces';
 import log from './log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import { URL } from 'url';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
 
-const scoreApiURL = process.env.SCORE_API_URL || 'https://score.snapshot.org';
-const uri = `${scoreApiURL}/api/strategies`;
+const scoreApiURL: URL = new URL(process.env.SCORE_API_URL ?? 'https://score.snapshot.org');
+scoreApiURL.pathname = '/api/strategies';
+const uri = scoreApiURL.toString();
+
 let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
