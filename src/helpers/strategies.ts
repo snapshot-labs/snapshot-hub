@@ -13,7 +13,7 @@ let consecutiveFailsCount = 0;
 async function loadStrategies() {
   const res = await snapshot.utils.getJSON(uri);
 
-  if (res.hasownProperty('error')) {
+  if (res.hasOwnProperty('error')) {
     capture(new Error('Failed to load strategies'), { context: { uri, res } });
     return true;
   }
