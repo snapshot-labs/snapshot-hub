@@ -27,14 +27,14 @@ export default async function (parent, { id }, context, info) {
         result.proposal = formatProposal(proposals[0]);
       } catch (e: any) {
         log.error(`[graphql] vote, ${JSON.stringify(e)}`);
-        capture(e, { context: { id } });
+        capture(e, { contexts: { input: { id, context, info } } });
         return Promise.reject('request failed');
       }
     }
     return result;
   } catch (e: any) {
     log.error(`[graphql] vote, ${JSON.stringify(e)}`);
-    capture(e, { context: { id } });
+    capture(e, { contexts: { input: { id, context, info } } });
     return Promise.reject('request failed');
   }
 }
