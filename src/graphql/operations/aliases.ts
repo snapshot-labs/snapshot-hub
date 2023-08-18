@@ -37,7 +37,7 @@ export default async function (parent, args) {
     return await db.queryAsync(query, params);
   } catch (e: any) {
     log.error(`[graphql] aliases, ${JSON.stringify(e)}`);
-    capture(e);
+    capture(e, { contexts: { input: { args } } });
     return Promise.reject('request failed');
   }
 }

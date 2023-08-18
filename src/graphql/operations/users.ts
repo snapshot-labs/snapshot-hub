@@ -37,7 +37,7 @@ export default async function (parent, args) {
     return users.map(user => formatUser(user));
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);
-    capture(e);
+    capture(e, { contexts: { input: { args } } });
     return Promise.reject('request failed');
   }
 }
