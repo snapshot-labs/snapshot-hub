@@ -12,12 +12,34 @@ async function main() {
   console.log(proposalsCountRes);
 
   console.log('Inserting/Updating votes_count');
-  const votesCountRes = await db.queryAsync(
-    `INSERT INTO user_space (votes_count, user_id, space_id)
-    (select * from (select count(id) as votes_count, voter, space from votes group by voter, space) as t)
-    ON DUPLICATE KEY UPDATE votes_count = t.votes_count`
-  );
-  console.log(votesCountRes);
+  let page = 0;
+  const batchSize = 1000;
+  const results: any[] = [];
+
+  while (true) {
+    const result = await db.queryAsync('SELECT id from spaces ORDER BY RAND () LIMIT ? OFFSET ?', [
+      batchSize,
+      page * batchSize
+    ]);
+
+    if (result.length === 0) {
+      break;
+    }
+
+    page += 1;
+    results.push(result);
+  }
+
+  for (const index in results) {
+    console.log(`Processing batch ${index + 1}/${results.length}`);
+    const votesCountRes = await db.queryAsync(
+      `INSERT INTO user_space (votes_count, user_id, space_id)
+    (select * from (select count(id) as votes_count, voter, space from votes where space IN (?) group by voter, space) as t)
+    ON DUPLICATE KEY UPDATE votes_count = t.votes_count`,
+      [results[index].map(d => d.id)]
+    );
+    console.log(votesCountRes);
+  }
 }
 
 (async () => {
