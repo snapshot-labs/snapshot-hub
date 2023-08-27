@@ -44,7 +44,7 @@ export default rateLimit({
   store: client
     ? new RedisStore({
         sendCommand: (...args: string[]) => client.sendCommand(args),
-        prefix: 'hub:'
+        prefix: 'snapshot-hub:'
       })
     : undefined
 });
