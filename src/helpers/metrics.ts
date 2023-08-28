@@ -4,20 +4,40 @@ import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
 import db from './mysql';
 
+const whitelistedPath = [
+  /^\/$/,
+  /^\/api$/,
+  /^\/api\/(msg|message)$/,
+  /^\/api\/spaces\/.+$/,
+  /^\/graphql/
+];
+
+const rateLimitedRequestsCount = new client.Counter({
+  name: 'http_requests_by_rate_limit_count',
+  help: 'Total number of requests, by rate limit status',
+  labelNames: ['rate_limited']
+});
+
+function instrumentRateLimitedRequests(req, res, next) {
+  res.on('finish', () => {
+    if (whitelistedPath.some(path => path.test(req.path))) {
+      rateLimitedRequestsCount.inc({ rate_limited: res.statusCode === 429 ? 1 : 0 });
+    }
+  });
+
+  next();
+}
+
 export default function initMetrics(app: Express) {
   init(app, {
     normalizedPath: [
       ['^/api/scores/.+', '/api/scores/#id'],
       ['^/api/spaces/([^/]+)(/poke)?$', '/api/spaces/#key$2']
     ],
-    whitelistedPath: [
-      /^\/$/,
-      /^\/api$/,
-      /^\/api\/(msg|message)$/,
-      /^\/api\/spaces\/.+$/,
-      /^\/graphql/
-    ]
+    whitelistedPath
   });
+
+  app.use(instrumentRateLimitedRequests);
 }
 
 new client.Gauge({
