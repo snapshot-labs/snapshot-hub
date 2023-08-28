@@ -36,7 +36,7 @@ export default rateLimit({
     return false;
   },
   handler: (req, res) => {
-    log.info(`too many requests ${hashedIp(req).slice(0, 7)}`);
+    log.info(`too many requests ${hashedIp(req)}`);
     sendError(
       res,
       'too many requests, Refer: https://twitter.com/SnapshotLabs/status/1605567222713196544',
