@@ -109,3 +109,8 @@ new client.Gauge({
     });
   }
 });
+
+export const requestDeduplicatorSize = new client.Gauge({
+  name: 'request_deduplicator_size',
+  help: 'Total number of items in the deduplicator queue'
+});
