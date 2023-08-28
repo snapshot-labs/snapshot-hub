@@ -20,5 +20,13 @@ export function sha256(str) {
 }
 
 export function getIp(req) {
-  return req.headers['cf-connecting-ip'] || req.ip;
+  const ips = (
+    req.headers['cf-connecting-ip'] ||
+    req.headers['x-real-ip'] ||
+    req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    ''
+  ).split(',');
+
+  return ips[0].trim();
 }
