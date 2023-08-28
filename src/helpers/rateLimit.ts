@@ -19,7 +19,7 @@ let client;
   await client.connect();
 })();
 
-const hashedIp = (ip: string): string => sha256(getIp(ip)).slice(0, 7);
+const hashedIp = (req): string => sha256(getIp(req)).slice(0, 7);
 
 export default rateLimit({
   windowMs: 20 * 1e3,
