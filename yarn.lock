@@ -1306,10 +1306,10 @@
     express-prom-bundle "^6.6.0"
     prom-client "^14.2.0"
 
-"@snapshot-labs/snapshot-sentry@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-sentry/-/snapshot-sentry-1.1.0.tgz#b357d4789ffd287f90fb70e7f0b207b47627cf24"
-  integrity sha512-Z31Y/5RJkTudrUwPasRxfABEQG2eQ2Ka5+vpi5zEwspt5gwTEfVM8M1NlYMFikWYqXHvVk51EU3UmJTqgL6pIg==
+"@snapshot-labs/snapshot-sentry@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-sentry/-/snapshot-sentry-1.2.0.tgz#f5f6e30bb3d78b491df232017e924bd5d89425c5"
+  integrity sha512-kFt6uwZLww/KytDS1ey4AAkt+1GOfnm5ZMZo3pK9pD/hV8b0v/kyFfMChQmVLLnnso0Nr6dPrLRYU46MWBl7cw==
   dependencies:
     "@sentry/node" "^7.60.1"
 
