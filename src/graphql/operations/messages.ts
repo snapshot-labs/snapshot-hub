@@ -36,7 +36,7 @@ export default async function (parent, args) {
     return await db.queryAsync(query, params);
   } catch (e: any) {
     log.error(`[graphql] messages, ${JSON.stringify(e)}`);
-    capture(e, { contexts: { input: { args } } });
+    capture(e, { args });
     return Promise.reject('request failed');
   }
 }

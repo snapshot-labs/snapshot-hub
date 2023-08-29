@@ -15,7 +15,7 @@ export default async function (parent, { id }) {
     return proposals.map(proposal => formatProposal(proposal))[0] || null;
   } catch (e: any) {
     log.error(`[graphql] proposal, ${JSON.stringify(e)}`);
-    capture(e, { contexts: { input: { id } } });
+    capture(e, { id });
     return Promise.reject('request failed');
   }
 }

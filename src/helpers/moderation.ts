@@ -27,7 +27,7 @@ async function run() {
     consecutiveFailsCount++;
 
     if (consecutiveFailsCount >= 5) {
-      capture(e, { contexts: { input: { url: moderationURL } } });
+      capture(e, { url: moderationURL });
     }
     log.error(`[moderation] failed to load ${JSON.stringify(e)}`);
   }

@@ -40,7 +40,7 @@ export default async function (parent, args) {
     return follows.map(follow => formatFollow(follow));
   } catch (e: any) {
     log.error(`[graphql] follows, ${JSON.stringify(e)}`);
-    capture(e, { contexts: { input: { args } } });
+    capture(e, { args });
     return Promise.reject('request failed');
   }
 }

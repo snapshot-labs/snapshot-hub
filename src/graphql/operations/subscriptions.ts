@@ -41,7 +41,7 @@ export default async function (parent, args) {
     return subscriptions.map(subscription => formatSubscription(subscription));
   } catch (e: any) {
     log.error(`[graphql] subscriptions, ${JSON.stringify(e)}`);
-    capture(e, { contexts: { input: { args } } });
+    capture(e, { args });
     return Promise.reject('request failed');
   }
 }
