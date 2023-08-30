@@ -11,6 +11,7 @@ const whitelistedPath = [
   /^\/api\/spaces\/.+$/,
   /^\/graphql/
 ];
+let server;
 
 const rateLimitedRequestsCount = new client.Counter({
   name: 'http_requests_by_rate_limit_count',
@@ -38,6 +39,13 @@ export default function initMetrics(app: Express) {
   });
 
   app.use(instrumentRateLimitedRequests);
+  app.use((req, res, next) => {
+    if (!server) {
+      // @ts-ignore
+      server = req.socket.server;
+    }
+    next();
+  });
 }
 
 new client.Gauge({
@@ -127,6 +135,16 @@ new client.Gauge({
     strategies.forEach((s: any) => {
       this.set({ name: s.id }, s.spacesCount);
     });
+  }
+});
+
+new client.Gauge({
+  name: 'express_open_connections_size',
+  help: 'Number of open connections on the express server',
+  async collect() {
+    if (server) {
+      this.set(server._connections);
+    }
   }
 });
 
