@@ -2,7 +2,7 @@ import { checkLimits, fetchSpaces, handleRelatedSpaces, PublicError } from '../h
 import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
-export default async function (_parent, args, _context, info) {
+export default async function (_parent, args, context, info) {
   checkLimits(args, 'spaces');
   try {
     let spaces = await fetchSpaces(args);
@@ -12,7 +12,7 @@ export default async function (_parent, args, _context, info) {
   } catch (e: any) {
     log.error(`[graphql] spaces, ${JSON.stringify(e)}`);
     if (e instanceof PublicError) return e;
-    capture(e);
+    capture(e, { args, context, info });
     return new Error('Unexpected error');
   }
 }

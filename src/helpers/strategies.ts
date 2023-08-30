@@ -17,7 +17,7 @@ async function loadStrategies() {
   const res = await snapshot.utils.getJSON(uri);
 
   if (res.hasOwnProperty('error')) {
-    capture(new Error('Failed to load strategies'), { context: { uri, res } });
+    capture(new Error('Failed to load strategies'), { contexts: { input: { uri }, res } });
     return true;
   }
 

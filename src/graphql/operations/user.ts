@@ -12,7 +12,7 @@ export default async function (parent, args) {
     return null;
   } catch (e: any) {
     log.error(`[graphql] user, ${JSON.stringify(e)}`);
-    capture(e, { context: { id } });
+    capture(e, { args });
     return Promise.reject('request failed');
   }
 }
