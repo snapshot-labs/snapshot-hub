@@ -60,7 +60,7 @@ export default async function (parent, args) {
     params.push(`%"name": "${where.validation}"%`);
   }
 
-  if (where.space_verified === true && verifiedSpaces.length > 0) {
+  if (where.space_verified && verifiedSpaces.length > 0) {
     searchSql += ' AND spaces.id in (?)';
     params.push(verifiedSpaces);
   }
