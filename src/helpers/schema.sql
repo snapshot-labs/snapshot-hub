@@ -19,6 +19,7 @@ CREATE TABLE proposals (
   ipfs VARCHAR(64) NOT NULL,
   author VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
+  updated INT(11) DEFAULT NULL,
   space VARCHAR(64) NOT NULL,
   network VARCHAR(12) NOT NULL,
   symbol VARCHAR(16) NOT NULL,
