@@ -16,6 +16,7 @@ export default async function (parent, args) {
     author: 'string',
     network: 'string',
     created: 'number',
+    updated: 'number',
     app: 'string',
     start: 'number',
     end: 'number',

@@ -184,6 +184,12 @@ input ProposalWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  updated: Int
+  updated_in: [Int]
+  updated_gt: Int
+  updated_gte: Int
+  updated_lt: Int
+  updated_lte: Int
   start: Int
   start_in: [Int]
   start_gt: Int
@@ -402,6 +408,7 @@ type Proposal {
   ipfs: String
   author: String!
   created: Int!
+  updated: Int
   space: Space
   network: String!
   symbol: String!
