@@ -48,6 +48,7 @@ CREATE TABLE proposals (
   INDEX ipfs (ipfs),
   INDEX author (author),
   INDEX created (created),
+  INDEX updated (updated),
   INDEX network (network),
   INDEX space (space),
   INDEX start (start),
