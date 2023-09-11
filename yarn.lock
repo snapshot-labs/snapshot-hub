@@ -1333,18 +1333,18 @@
   resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.7.tgz#c8e07e7e9baabee245020a72ac05835b65139823"
   integrity sha512-k/FUf4VWhwLFUmKuWs2mNvmPe691hqhvCJuujD4TfbIivWysmL1TqthwfdQUrQEAQUqVQ2ZKEiGkbufp5J27eQ==
 
-"@snapshot-labs/snapshot-metrics@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-metrics/-/snapshot-metrics-1.0.0.tgz#1f88a6aacc81f639f7059c153b53c550934cd3b3"
-  integrity sha512-6T8a2NX6Qo6zVAoNIWV8eSJCukCynI/HCLp37VZTzX8jwU/ahGsiDTQC3I/MDus+LDB+8pI5nju33NwM8Q7n2g==
+"@snapshot-labs/snapshot-metrics@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-metrics/-/snapshot-metrics-1.1.0.tgz#0b700ed50a28400cae7bfa47de9f5a1cc018719a"
+  integrity sha512-KajdSDd7cjQ9pRRYLDMqSd6yTcQ7Ln2/1zrRY5w23vGTSAH/NF0/7XojPYiW+IIdVAa5fV5nrcjFXT1X62XSYA==
   dependencies:
     express-prom-bundle "^6.6.0"
     prom-client "^14.2.0"
 
-"@snapshot-labs/snapshot-sentry@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-sentry/-/snapshot-sentry-1.3.0.tgz#9822d62b9a8918c70a09167da7b36ff43b9edba0"
-  integrity sha512-Qy+uLwsLhlRjx8MSbVU46tYVbiA5fIp6i1bgyab5pHwqsBaP93sjQIBetfGzeWxmmUXI8cS4lUOCc/x0HXEEGg==
+"@snapshot-labs/snapshot-sentry@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-sentry/-/snapshot-sentry-1.4.0.tgz#77933c2d8a32bb1b8daa05fec78ea73f8b78258d"
+  integrity sha512-261ZJGQ1rsSnAqsPrED1Hn2CoRFLtGla2WfnhqddcfYfYgEx2hsxUGs0jpSBCSfY/AsfK1+MgsoIXOFWXu74qQ==
   dependencies:
     "@sentry/node" "^7.60.1"
 
