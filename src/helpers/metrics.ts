@@ -1,4 +1,5 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express } from 'express';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
@@ -11,7 +12,6 @@ const whitelistedPath = [
   /^\/api\/spaces\/.+$/,
   /^\/graphql/
 ];
-let server;
 
 const rateLimitedRequestsCount = new client.Counter({
   name: 'http_requests_by_rate_limit_count',
@@ -35,17 +35,11 @@ export default function initMetrics(app: Express) {
       ['^/api/scores/.+', '/api/scores/#id'],
       ['^/api/spaces/([^/]+)(/poke)?$', '/api/spaces/#key$2']
     ],
-    whitelistedPath
+    whitelistedPath,
+    errorHandler: (e: any) => capture(e)
   });
 
   app.use(instrumentRateLimitedRequests);
-  app.use((req, res, next) => {
-    if (!server) {
-      // @ts-ignore
-      server = req.socket.server;
-    }
-    next();
-  });
 }
 
 new client.Gauge({
@@ -135,16 +129,6 @@ new client.Gauge({
     strategies.forEach((s: any) => {
       this.set({ name: s.id }, s.spacesCount);
     });
-  }
-});
-
-new client.Gauge({
-  name: 'express_open_connections_size',
-  help: 'Number of open connections on the express server',
-  async collect() {
-    if (server) {
-      this.set(server._connections);
-    }
   }
 });
 
