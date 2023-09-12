@@ -22,8 +22,8 @@ let client;
 const hashedIp = (req): string => sha256(getIp(req)).slice(0, 7);
 
 export default rateLimit({
-  windowMs: 20 * 1e3,
-  max: 60,
+  windowMs: 60 * 1e3,
+  max: 100,
   keyGenerator: req => hashedIp(req),
   standardHeaders: true,
   legacyHeaders: false,
@@ -39,7 +39,7 @@ export default rateLimit({
     log.info(`too many requests ${hashedIp(req)}`);
     sendError(
       res,
-      'too many requests, Refer: https://twitter.com/SnapshotLabs/status/1605567222713196544',
+      'too many requests, Refer to https://docs.snapshot.org/tools/api/api-keys#limits',
       429
     );
   },
