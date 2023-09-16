@@ -33,7 +33,8 @@ export default function initMetrics(app: Express) {
   init(app, {
     normalizedPath: [
       ['^/api/scores/.+', '/api/scores/#id'],
-      ['^/api/spaces/([^/]+)(/poke)?$', '/api/spaces/#key$2']
+      ['^/api/spaces/([^/]+)(/poke)?$', '/api/spaces/#key$2'],
+      ['^/graphql/?$', '/graphql']
     ],
     whitelistedPath,
     errorHandler: (e: any) => capture(e)
