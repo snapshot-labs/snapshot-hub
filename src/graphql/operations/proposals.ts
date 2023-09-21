@@ -66,13 +66,15 @@ export default async function (parent, args) {
     params.push(verifiedSpaces);
   }
 
+  // TODO: remove part `p.id IN (?)` when flagged proposals are moved from laser DB to snapshot-sequencer DB
   if (where.flagged === true && flaggedProposals.length > 0) {
-    searchSql += ' AND p.id IN (?)';
+    searchSql += ' AND (p.id IN (?) OR p.flagged = 1)';
     params.push(flaggedProposals);
   }
 
+  // TODO: remove part `p.id NOT IN (?)` when flagged proposals are moved from laser DB to snapshot-sequencer DB
   if (where.flagged === false && flaggedProposals.length > 0) {
-    searchSql += ' AND p.id NOT IN (?)';
+    searchSql += ' AND (p.id NOT IN (?) AND p.flagged = 0)';
     params.push(flaggedProposals);
   }
 
