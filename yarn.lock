@@ -1348,7 +1348,7 @@
   dependencies:
     "@sentry/node" "^7.60.1"
 
-"@snapshot-labs/snapshot.js@^0.6.1":
+"@snapshot-labs/snapshot.js@^0.6.2":
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.6.2.tgz#0f9ddf591ec50912aeed545c807b5295365d4e2f"
   integrity sha512-hQjZ0I9uLu2sUpuR05maYCq9KLi6yNJnCCkjIutDQjFFEzmeMqJ0Lru1tOdcRMsPW3g5ktdo5xi265ESEBDPdA==
