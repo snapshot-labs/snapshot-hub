@@ -58,7 +58,7 @@ CREATE TABLE proposals (
   INDEX app (app),
   INDEX scores_state (scores_state),
   INDEX scores_updated (scores_updated),
-  INDEX votes (votes)
+  INDEX votes (votes),
   INDEX flagged (flagged)
 );
 
