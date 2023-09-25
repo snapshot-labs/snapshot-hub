@@ -44,7 +44,6 @@ function getPopularity(
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    console.log('====', id, space, Boolean(space.verified), Boolean(space.flagged));
     // TODO: remove `verifiedSpaces?.includes(id)` after data migration from laser DB to snapshot-hub DB
     const verified = verifiedSpaces?.includes(id) || space.verified || false;
     // TODO: remove `flaggedSpaces?.includes(id)` after data migration from laser DB to snapshot-hub DB
