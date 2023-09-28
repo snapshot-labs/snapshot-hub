@@ -4,7 +4,7 @@ CREATE TABLE spaces (
   settings JSON,
   verified INT NOT NULL DEFAULT '0',
   deleted INT NOT NULL DEFAULT '0',
-  flagged TINYINT NOT NULL DEFAULT '0',
+  flagged INT NOT NULL DEFAULT '0',
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
   PRIMARY KEY (id),
