@@ -44,6 +44,7 @@ CREATE TABLE proposals (
   scores_total DECIMAL(64,30) NOT NULL,
   scores_updated INT(11) NOT NULL,
   votes INT(12) NOT NULL,
+  flagged INT NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX author (author),
@@ -57,7 +58,8 @@ CREATE TABLE proposals (
   INDEX app (app),
   INDEX scores_state (scores_state),
   INDEX scores_updated (scores_updated),
-  INDEX votes (votes)
+  INDEX votes (votes),
+  INDEX flagged (flagged)
 );
 
 CREATE TABLE votes (
