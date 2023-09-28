@@ -44,8 +44,10 @@ function getPopularity(
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    const verified = verifiedSpaces?.includes(id) || false;
-    const flagged = flaggedSpaces?.includes(id) || false;
+    // TODO: remove `verifiedSpaces?.includes(id)` after data migration from laser DB to snapshot-hub DB
+    const verified = verifiedSpaces?.includes(id) || space.verified || false;
+    // TODO: remove `flaggedSpaces?.includes(id)` after data migration from laser DB to snapshot-hub DB
+    const flagged = flaggedSpaces?.includes(id) || space.flagged || false;
     const networks = uniq(
       (space.strategies || [])
         .map(strategy => strategy?.network || space.network)
@@ -89,9 +91,19 @@ function mapSpaces() {
 }
 
 async function loadSpaces() {
-  const query = 'SELECT id, settings FROM spaces WHERE deleted = 0 ORDER BY id ASC';
+  const query =
+    'SELECT id, settings, flagged, verified FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);
-  spaces = Object.fromEntries(s.map(ensSpace => [ensSpace.id, JSON.parse(ensSpace.settings)]));
+  spaces = Object.fromEntries(
+    s.map(ensSpace => [
+      ensSpace.id,
+      {
+        ...JSON.parse(ensSpace.settings),
+        flagged: ensSpace.flagged === 1,
+        verified: ensSpace.verified === 1
+      }
+    ])
+  );
   const totalSpaces = Object.keys(spaces).length;
   log.info(`[spaces] total spaces ${totalSpaces}`);
   mapSpaces();
