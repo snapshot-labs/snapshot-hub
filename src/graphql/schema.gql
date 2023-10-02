@@ -47,6 +47,10 @@ type Query {
     orderDirection: OrderDirection
   ): [Alias]
 
+  roles(
+    where: RolesWhere
+  ): [Role]
+
   follows(
     first: Int
     skip: Int
@@ -259,6 +263,10 @@ input AliasWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+}
+
+input RolesWhere {
+  address: String
 }
 
 input FollowWhere {
@@ -476,6 +484,11 @@ type Alias {
   address: String!
   alias: String!
   created: Int!
+}
+
+type Role {
+  space: String
+  permissions: [String]
 }
 
 type Follow {
