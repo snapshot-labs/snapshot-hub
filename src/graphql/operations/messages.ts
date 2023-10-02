@@ -11,6 +11,7 @@ export default async function (parent, args) {
   const fields = {
     id: 'string',
     mci: 'number',
+    address: 'string',
     timestamp: 'number',
     space: 'string',
     type: 'string'
