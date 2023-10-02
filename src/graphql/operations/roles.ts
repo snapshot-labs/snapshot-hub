@@ -2,11 +2,6 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import db from '../../helpers/mysql';
 import log from '../../helpers/log';
 
-interface Role {
-  space: string;
-  permissions: string[];
-}
-
 export default async function (parent, args) {
   const { where = {} } = args;
 
@@ -34,7 +29,7 @@ export default async function (parent, args) {
 
       if (admins.includes(address.toLowerCase())) permissions.push('admin');
       if (moderators.includes(address.toLowerCase())) permissions.push('moderator');
-      if (members.includes(address.toLowerCase())) permissions.push('member');
+      if (members.includes(address.toLowerCase())) permissions.push('author');
 
       return { space: space.id, permissions };
     });
