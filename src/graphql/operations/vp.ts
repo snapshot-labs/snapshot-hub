@@ -14,7 +14,7 @@ export default async function (_parent, { voter, space, proposal }) {
       JSON.parse(p.strategies),
       p.snapshot,
       space,
-      p.delegation === 1,
+      false,
       { url: scoreAPIUrl }
     );
   } else if (space) {
@@ -22,15 +22,9 @@ export default async function (_parent, { voter, space, proposal }) {
     let [s] = await db.queryAsync(query, [space]);
     s = JSON.parse(s.settings);
 
-    return await snapshot.utils.getVp(
-      voter,
-      s.network,
-      s.strategies,
-      'latest',
-      space,
-      s.delegation === 1,
-      { url: scoreAPIUrl }
-    );
+    return await snapshot.utils.getVp(voter, s.network, s.strategies, 'latest', space, false, {
+      url: scoreAPIUrl
+    });
   }
 
   return Promise.reject('missing argument');
