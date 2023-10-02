@@ -132,6 +132,8 @@ input MessageWhere {
   mci_gte: Int
   mci_lt: Int
   mci_lte: Int
+  address: String
+  address_in: [String]
   timestamp: Int
   timestamp_in: [Int]
   timestamp_gt: Int
