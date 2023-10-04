@@ -49,7 +49,7 @@ async function query(parent, args, context?, info?) {
   } catch (e: any) {
     capture(e, { args, context, info });
     log.error(`[graphql] votes, ${JSON.stringify(e)}`);
-    return Promise.reject('request failed');
+    return Promise.reject(new Error('request failed'));
   }
 
   if (requestedFields.space && votes.length > 0) {
@@ -71,7 +71,7 @@ async function query(parent, args, context?, info?) {
     } catch (e: any) {
       capture(e, { args, context, info });
       log.error(`[graphql] votes, ${JSON.stringify(e)}`);
-      return Promise.reject('request failed');
+      return Promise.reject(new Error('request failed'));
     }
   }
 
@@ -94,7 +94,7 @@ async function query(parent, args, context?, info?) {
     } catch (e: any) {
       capture(e, { args, context, info });
       log.error(`[graphql] votes, ${JSON.stringify(e)}`);
-      return Promise.reject('request failed');
+      return Promise.reject(new Error('request failed'));
     }
   }
 

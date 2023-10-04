@@ -27,5 +27,5 @@ export default async function (_parent, { voter, space, proposal }) {
     });
   }
 
-  return Promise.reject('missing argument');
+  return Promise.reject(new Error('missing argument'));
 }
