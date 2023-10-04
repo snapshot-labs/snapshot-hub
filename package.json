@@ -45,7 +45,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@snapshot-labs/eslint-config": "^0.1.0-beta.11",
+    "@snapshot-labs/eslint-config": "^0.1.0-beta.13",
     "@snapshot-labs/prettier-config": "^0.1.0-beta.11",
     "@types/jest": "^29.5.3",
     "@types/node": "^14.0.13",
