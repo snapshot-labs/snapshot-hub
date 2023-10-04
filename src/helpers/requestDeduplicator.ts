@@ -12,7 +12,8 @@ export default async function serve(id, action, args) {
       })
       .catch(e => {
         throw e;
-      }).finally(() => {
+      })
+      .finally(() => {
         ongoingRequests.delete(key);
       });
     ongoingRequests.set(key, requestPromise);
