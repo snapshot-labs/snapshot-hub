@@ -40,6 +40,6 @@ export default async function (parent, args) {
   } catch (e: any) {
     log.error(`[graphql] statements, ${JSON.stringify(e)}`);
     capture(e, { args });
-    return Promise.reject('request failed');
+    return Promise.reject(new Error('request failed'));
   }
 }

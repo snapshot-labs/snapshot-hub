@@ -16,6 +16,6 @@ export default async function (parent, { id }) {
   } catch (e: any) {
     log.error(`[graphql] proposal, ${JSON.stringify(e)}`);
     capture(e, { id });
-    return Promise.reject('request failed');
+    return Promise.reject(new Error('request failed'));
   }
 }

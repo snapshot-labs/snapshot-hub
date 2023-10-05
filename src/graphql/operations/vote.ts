@@ -28,13 +28,13 @@ export default async function (parent, { id }, context, info) {
       } catch (e: any) {
         log.error(`[graphql] vote, ${JSON.stringify(e)}`);
         capture(e, { id, context, info });
-        return Promise.reject('request failed');
+        return Promise.reject(new Error('request failed'));
       }
     }
     return result;
   } catch (e: any) {
     log.error(`[graphql] vote, ${JSON.stringify(e)}`);
     capture(e, { id, context, info });
-    return Promise.reject('request failed');
+    return Promise.reject(new Error('request failed'));
   }
 }
