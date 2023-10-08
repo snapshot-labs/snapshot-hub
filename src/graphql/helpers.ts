@@ -2,7 +2,7 @@ import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
 import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
-import { flaggedLinks, flaggedProposals } from '../helpers/moderation';
+import { flaggedLinks } from '../helpers/moderation';
 
 const network = process.env.NETWORK || 'testnet';
 
@@ -258,12 +258,7 @@ export function formatUser(user) {
 
 function isFlaggedProposal(proposal) {
   const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
-  return (
-    // TODO: remove this check once flagged proposals are migrated to hub db via script
-    flaggedProposals?.includes(proposal.id) ||
-    flaggedLinksRegex.test(proposal.body) ||
-    proposal.flagged
-  );
+  return flaggedLinksRegex.test(proposal.body) || proposal.flagged;
 }
 
 export function formatProposal(proposal) {
