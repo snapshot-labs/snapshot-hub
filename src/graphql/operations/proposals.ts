@@ -65,11 +65,11 @@ export default async function (parent, args) {
   }
 
   if (where.flagged === true) {
-    searchSql += ' AND p.flagged = 1)';
+    searchSql += ' AND p.flagged = 1';
   }
 
   if (where.flagged === false) {
-    searchSql += ' AND p.flagged = 0)';
+    searchSql += ' AND p.flagged = 0';
   }
 
   let orderBy = args.orderBy || 'created';
