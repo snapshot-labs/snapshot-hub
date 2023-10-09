@@ -42,7 +42,7 @@ export default async function (_parent, { voter, space, proposal }) {
       });
     }
   } catch (e: any) {
-    capture(e, { input: { voter, space, proposal } });
+    capture(e, { voter, space, proposal });
     return Promise.reject(new Error('request failed'));
   }
 
