@@ -37,5 +37,4 @@ const sequencerDB = mysql.createPool(sequencerConfig);
 
 bluebird.promisifyAll([Pool, Connection]);
 
-export default hubDB;
-export { hubDB, sequencerDB };
+export { hubDB as default, sequencerDB };
