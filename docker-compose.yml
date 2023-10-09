@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       HUB_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
+      SEQ_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
 
     depends_on:
       - snapshot-mysql
