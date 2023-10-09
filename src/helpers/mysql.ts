@@ -19,7 +19,7 @@ hubConfig.connectTimeout = 60e3;
 hubConfig.acquireTimeout = 60e3;
 hubConfig.timeout = 60e3;
 hubConfig.charset = 'utf8mb4';
-bluebird.promisifyAll([Pool, Connection]);
+
 const hubDB = mysql.createPool(hubConfig);
 
 // @ts-ignore
@@ -33,8 +33,9 @@ sequencerConfig.connectTimeout = 60e3;
 sequencerConfig.acquireTimeout = 60e3;
 sequencerConfig.timeout = 60e3;
 sequencerConfig.charset = 'utf8mb4';
-bluebird.promisifyAll([Pool, Connection]);
 const sequencerDB = mysql.createPool(sequencerConfig);
+
+bluebird.promisifyAll([Pool, Connection]);
 
 export default hubDB;
 export { hubDB, sequencerDB };
