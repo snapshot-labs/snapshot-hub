@@ -177,6 +177,8 @@ input ProposalWhere {
   title_contains: String
   strategies_contains: String
   plugins_contains: String
+  strategies_in: [String]
+  plugins_in: [String]
   validation: String
   type: String
   type_in: [String]

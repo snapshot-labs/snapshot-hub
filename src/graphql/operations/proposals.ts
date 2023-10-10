@@ -55,9 +55,19 @@ export default async function (parent, args) {
     params.push(`%${where.plugins_contains}%`);
   }
 
+  if (where.strategies_in) {
+    searchSql += " AND JSON_OVERLAPS(JSON_EXTRACT(p.strategies, '$[*].name'), JSON_ARRAY(?))";
+    params.push(where.strategies_in);
+  }
+
+  if (where.plugins_in) {
+    searchSql += ' AND JSON_OVERLAPS(JSON_KEYS(p.plugins) , JSON_ARRAY(?))';
+    params.push(where.plugins_in);
+  }
+
   if (where.validation) {
-    searchSql += ' AND p.validation LIKE ?';
-    params.push(`%"name": "${where.validation}"%`);
+    searchSql += " AND JSON_OVERLAPS(JSON_EXTRACT(p.validation, '$.name') , JSON_ARRAY(?))";
+    params.push(where.validation);
   }
 
   if (where.space_verified) {
