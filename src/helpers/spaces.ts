@@ -15,7 +15,7 @@ const spaceFollowers = {};
 const testnets = Object.values(networks)
   .filter((network: any) => network.testnet)
   .map((network: any) => network.key);
-const testStrategies = ['ticket'];
+const testStrategies = ['ticket', 'api', 'api-v2', 'api-post', 'api-v2-override'];
 
 function getPopularity(
   id: string,
