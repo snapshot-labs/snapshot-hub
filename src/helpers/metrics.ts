@@ -52,20 +52,22 @@ export default function initMetrics(app: Express) {
 
       res.on('finish', () => {
         try {
-          const query = parse((req.body || req.query)?.query);
+          const query = (req.body || req.query)?.query;
           const operationName = (req.body || req.query)?.operationName;
 
-          if (!query || !operationName) next();
+          if (query && operationName) {
+            const definition = parse(query).definitions.find(
+              // @ts-ignore
+              def => def.name.value === operationName
+            );
 
-          // @ts-ignore
-          const definition = query.definitions.find(def => def.name.value === operationName);
+            // @ts-ignore
+            const types = definition.selectionSet.selections.map(sel => sel.name.value);
 
-          // @ts-ignore
-          const types = definition.selectionSet.selections.map(sel => sel.name.value);
-
-          for (const type of types) {
-            if (GRAPHQL_TYPES.includes(type)) {
-              end({ type });
+            for (const type of types) {
+              if (GRAPHQL_TYPES.includes(type)) {
+                end({ type });
+              }
             }
           }
         } catch (e: any) {
