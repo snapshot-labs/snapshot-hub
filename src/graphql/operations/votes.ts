@@ -55,15 +55,13 @@ async function query(parent, args, context?, info?) {
   if (requestedFields.space && votes.length > 0) {
     const spaceIds = votes.map(vote => vote.space.id).filter((v, i, a) => a.indexOf(v) === i);
     const query = `
-      SELECT id, settings FROM spaces
+      SELECT * FROM spaces
       WHERE id IN (?) AND settings IS NOT NULL AND deleted = 0
     `;
     try {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
-      spaces = Object.fromEntries(
-        spaces.map(space => [space.id, formatSpace(space.id, space.settings)])
-      );
+      spaces = Object.fromEntries(spaces.map(space => [space.id, formatSpace(space)]));
       votes = votes.map(vote => {
         if (spaces[vote.space.id]) return { ...vote, space: spaces[vote.space.id] };
         return vote;

@@ -7,7 +7,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 export default async function (parent, { id }, context, info) {
   const requestedFields = info ? graphqlFields(info) : {};
   const query = `
-    SELECT v.*, spaces.settings FROM votes v
+    SELECT v.*, spaces.settings, spaces.flagged as spaceFlagged, spaces.verified as spaceVerified FROM votes v
     INNER JOIN spaces ON spaces.id = v.space
     WHERE v.id = ? AND spaces.settings IS NOT NULL
     LIMIT 1

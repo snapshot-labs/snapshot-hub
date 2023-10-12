@@ -46,7 +46,7 @@ export default async function (_parent, args, context, info) {
       ORDER BY FIELD(s.id, ?) ASC
     `;
     let spaces = await db.queryAsync(query, [filteredSpaces, filteredSpaces]);
-    spaces = spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
+    spaces = spaces.map(space => Object.assign(space, formatSpace(space)));
 
     const items = await handleRelatedSpaces(info, spaces);
 
