@@ -52,12 +52,9 @@ function mapSpaces() {
 
     spacesMetadata[id] = {
       id,
-      name: space.name,
       flagged: space.flagged,
       popularity,
       private: space.private ?? false,
-      categories: space.categories,
-      networks,
       counts: {
         activeProposals: spaceProposals[id]?.active || 0,
         proposalsCount: spaceProposals[id]?.count || 0,
@@ -75,7 +72,6 @@ function mapSpaces() {
     .sort((a: any, b: any) => b.popularity - a.popularity)
     .map((space: any, i: number) => {
       space.rank = i + 1;
-      delete space.flagged;
       return space.id;
     });
 }
