@@ -1,7 +1,7 @@
 import { checkLimits, formatSpace, handleRelatedSpaces, PublicError } from '../helpers';
 import log from '../../helpers/log';
 import db from '../../helpers/mysql';
-import { rankedSpaces } from '../../helpers/spaces';
+import { spaces as globalSpaces, rankedSpaceIds } from '../../helpers/spaces';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (_parent, args, context, info) {
@@ -18,22 +18,25 @@ export default async function (_parent, args, context, info) {
     const searchStr = search.toLowerCase();
     let searchCategory = category.toLowerCase();
     if (searchCategory === 'all') searchCategory = '';
+    let filteredSpaces = rankedSpaceIds
+      .map(id => globalSpaces[id])
+      .filter((space: any) => {
+        const filteredBySearch =
+          space.id.includes(searchStr) || space.name?.toLowerCase().includes(searchStr);
+        const filteredByNetwork = network ? space.networks.includes(network) : true;
+        if (filteredBySearch && filteredByNetwork) {
+          // count categories, should not consider searchCategory for counting
+          space.categories.forEach(category => {
+            metrics.categories[category] = (metrics.categories[category] || 0) + 1;
+          });
+        }
 
-    let filteredSpaces = rankedSpaces.filter((space: any) => {
-      const filteredBySearch =
-        space.id.includes(searchStr) || space.name?.toLowerCase().includes(searchStr);
-      const filteredByNetwork = network ? space.networks.includes(network) : true;
-      if (filteredBySearch && filteredByNetwork) {
-        // count categories, should not consider searchCategory for counting
-        space.categories.forEach(category => {
-          metrics.categories[category] = (metrics.categories[category] || 0) + 1;
-        });
-      }
-
-      // filter by category if where.category is defined
-      const filteredByCategory = searchCategory ? space.categories.includes(searchCategory) : true;
-      return filteredBySearch && filteredByCategory && filteredByNetwork;
-    });
+        // filter by category if where.category is defined
+        const filteredByCategory = searchCategory
+          ? space.categories.includes(searchCategory)
+          : true;
+        return filteredBySearch && filteredByCategory && filteredByNetwork;
+      });
 
     metrics.total = filteredSpaces.length;
     filteredSpaces = Array.from(filteredSpaces.slice(skip, skip + first), (space: any) => space.id);

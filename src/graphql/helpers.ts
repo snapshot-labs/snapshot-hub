@@ -46,8 +46,8 @@ export function checkLimits(args: any = {}, type) {
 }
 
 export function formatSpace({ id, settings, verified, flagged }) {
-  const spaceMetadata = spacesMetadata[id] || {};
-  const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
+  const { rank, counts } = spacesMetadata[id] || {};
+  const space = { ...jsonParse(settings, {}), ...counts };
 
   space.id = id;
   space.private = space.private || false;
@@ -88,7 +88,7 @@ export function formatSpace({ id, settings, verified, flagged }) {
 
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
-  space.rank = spaceMetadata?.rank ?? null;
+  space.rank = rank ?? null;
 
   // always return parent and children in child node format
   // will be overwritten if other fields than id are requested
