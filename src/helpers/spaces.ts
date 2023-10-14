@@ -44,6 +44,12 @@ function getPopularity(
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
+    space.categories = space.categories ?? [];
+    space.networks = uniq(
+      (space.strategies || [])
+        .map(strategy => strategy?.network || space.network)
+        .concat(space.network)
+    );
     const popularity = getPopularity(id, {
       verified: space.verified,
       networks: space.networks,
@@ -85,12 +91,6 @@ async function loadSpaces() {
       ensSpace.id,
       {
         id: ensSpace.id,
-        categories: ensSpace.categories ?? [],
-        networks: uniq(
-          (ensSpace.strategies || [])
-            .map(strategy => strategy?.network || ensSpace.network)
-            .concat(ensSpace.network)
-        ),
         ...JSON.parse(ensSpace.settings),
         flagged: ensSpace.flagged === 1,
         verified: ensSpace.verified === 1
