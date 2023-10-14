@@ -24,7 +24,7 @@ async function query(parent, args, context?, info?) {
     vp_state: 'string'
   };
   const whereQuery = buildWhereQuery(fields, 'v', where);
-  const queryStr = whereQuery.query;
+  let queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
@@ -35,6 +35,12 @@ async function query(parent, args, context?, info?) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   let votes: any[] = [];
+
+  if (where.choice_in) {
+    queryStr +=
+      ' AND JSON_OVERLAPS(JSON_KEYS(choice), JSON_ARRAY(?)) OR JSON_OVERLAPS(choice, JSON_ARRAY(?)) OR choice = ?';
+    params.push(where.choice_in, where.choice_in, where.choice_in);
+  }
 
   const query = `
     SELECT v.* FROM votes v
