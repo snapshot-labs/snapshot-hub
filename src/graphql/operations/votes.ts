@@ -38,7 +38,7 @@ async function query(parent, args, context?, info?) {
 
   if (where.choice_in) {
     queryStr +=
-      ' AND JSON_OVERLAPS(JSON_KEYS(choice), JSON_ARRAY(?)) OR JSON_OVERLAPS(choice, JSON_ARRAY(?)) OR choice = ?';
+      ' AND (JSON_OVERLAPS(JSON_KEYS(choice), JSON_ARRAY(?)) OR JSON_OVERLAPS(choice, JSON_ARRAY(?)) OR choice = ? )';
     params.push(where.choice_in, where.choice_in, where.choice_in);
   }
 
@@ -47,6 +47,7 @@ async function query(parent, args, context?, info?) {
     WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection}, v.id ASC LIMIT ?, ?
   `;
+  console.log(query);
   params.push(skip, first);
   try {
     votes = await db.queryAsync(query, params);
