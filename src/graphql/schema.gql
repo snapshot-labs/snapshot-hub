@@ -384,7 +384,7 @@ type Space {
   template: String
   verified: Boolean
   flagged: Boolean
-  hibernating: Boolean
+  hibernated: Boolean
   rank: Float
   created_at: Int
 }
