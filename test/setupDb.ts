@@ -5,6 +5,8 @@ import bluebird from 'bluebird';
 import parse from 'connection-string';
 import fs from 'fs';
 
+export const TEST_DATABASE_SUFFIX = '_test';
+
 // @ts-ignore
 const config = parse(process.env.HUB_DATABASE_URL);
 config.connectionLimit = 5;
@@ -14,8 +16,8 @@ bluebird.promisifyAll([Pool, Connection]);
 const db = mysql.createPool(config);
 const dbName = config.path[0];
 
-if (!dbName.endsWith('_test')) {
-  console.error('Invalid test database name. Must end with _test');
+if (!dbName.endsWith(TEST_DATABASE_SUFFIX)) {
+  console.error(`Invalid test database name. Must end with ${TEST_DATABASE_SUFFIX}`);
   process.exit(1);
 }
 
