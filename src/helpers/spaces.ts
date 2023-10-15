@@ -87,7 +87,7 @@ function mapSpaces() {
   });
 }
 
-async function loadSpaces() {
+export async function loadSpaces() {
   const query =
     'SELECT id, settings, flagged, verified FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);
@@ -158,7 +158,7 @@ async function loadSpacesMetrics() {
   mapSpaces();
 }
 
-async function run() {
+export default async function run() {
   try {
     await loadSpaces();
     await loadSpacesMetrics();
@@ -169,5 +169,3 @@ async function run() {
   await snapshot.utils.sleep(360e3);
   run();
 }
-
-run();
