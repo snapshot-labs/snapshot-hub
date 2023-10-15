@@ -4,8 +4,7 @@ import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 import fs from 'fs';
-
-export const TEST_DATABASE_SUFFIX = '_test';
+import { TEST_DATABASE_SUFFIX } from './setup';
 
 // @ts-ignore
 const config = parse(process.env.HUB_DATABASE_URL);

@@ -1,5 +1,6 @@
 import { default as db, sequencerDB } from '../src/helpers/mysql';
-import { TEST_DATABASE_SUFFIX } from './setupDb';
+
+export const TEST_DATABASE_SUFFIX = '_test';
 
 const setup = async () => {
   try {
