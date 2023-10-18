@@ -66,7 +66,7 @@ export default async function (parent, args) {
   }
 
   if (where.validation) {
-    searchSql += " AND JSON_OVERLAPS(JSON_EXTRACT(p.validation, '$.name') , JSON_ARRAY(?))";
+    searchSql += " AND JSON_EXTRACT(p.validation, '$.name') = ?";
     params.push(where.validation);
   }
 
