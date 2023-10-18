@@ -1,12 +1,20 @@
-import { spaces } from '../../helpers/spaces';
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import db from '../../helpers/mysql';
 
-export default function () {
-  const skins = {};
-  Object.values(spaces).forEach((space: any) => {
-    if (space.skin) skins[space.skin] = skins[space.skin] ? skins[space.skin] + 1 : 1;
-  });
-  return Object.entries(skins).map(skin => ({
-    id: skin[0],
-    spacesCount: skin[1]
-  }));
+export default async function () {
+  const query = `
+    SELECT
+      COALESCE(JSON_UNQUOTE(JSON_EXTRACT(settings, '$.skin')), '') AS skin,
+      COUNT(id) as spacesCount
+    FROM spaces
+    GROUP BY skin
+    ORDER BY spacesCount DESC
+  `;
+
+  try {
+    return (await db.queryAsync(query)).map(v => ({ ...v, id: v.skin }));
+  } catch (e: any) {
+    capture(e);
+    return Promise.reject(new Error('request failed'));
+  }
 }
