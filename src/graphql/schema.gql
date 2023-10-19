@@ -89,7 +89,7 @@ type Query {
 
   skins: [Item]
 
-  networks: [Item]
+  networks: [Network]
 
   validations: [Item]
 
@@ -554,4 +554,21 @@ type Vp {
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
+}
+
+type Network {
+  key: String
+  id: String
+  spacesCount: Int
+  name: String
+  chainId: String
+  network: String
+  explorer: NetworkExplorer
+  logo: String
+  testnet: Boolean
+}
+
+type NetworkExplorer {
+  url: String
+  apiUrl: String
 }
