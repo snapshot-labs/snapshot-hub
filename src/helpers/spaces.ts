@@ -158,6 +158,24 @@ async function loadSpacesMetrics() {
   mapSpaces();
 }
 
+export async function getSpace(id: string) {
+  const query = `
+    SELECT id, settings, flagged, verified
+    FROM spaces
+    WHERE deleted = 0 AND id = ?
+    LIMIT 1`;
+
+  const [space] = await db.queryAsync(query, [id]);
+
+  if (!space) return Promise.reject(new Error('NOT_FOUND'));
+
+  return {
+    ...JSON.parse(space.settings),
+    flagged: space.flagged === 1,
+    verified: space.verified === 1
+  };
+}
+
 async function run() {
   try {
     await loadSpaces();
