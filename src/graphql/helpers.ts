@@ -175,6 +175,11 @@ export async function fetchSpaces(args) {
     params.push(where.plugins_in);
   }
 
+  if (where.network) {
+    queryStr += " AND JSON_EXTRACT(settings, '$.network') = ?";
+    params.push(where.network);
+  }
+
   const query = `
     SELECT s.* FROM spaces s
     WHERE s.deleted = 0 ${queryStr}
