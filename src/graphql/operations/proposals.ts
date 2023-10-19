@@ -1,7 +1,6 @@
 import db from '../../helpers/mysql';
 import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
 import log from '../../helpers/log';
-import { flaggedProposals, verifiedSpaces } from '../../helpers/moderation';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
@@ -61,21 +60,16 @@ export default async function (parent, args) {
     params.push(`%"name": "${where.validation}"%`);
   }
 
-  if (where.space_verified && verifiedSpaces.length > 0) {
-    searchSql += ' AND spaces.id in (?)';
-    params.push(verifiedSpaces);
+  if (where.space_verified) {
+    searchSql += ' AND spaces.verified = 1';
   }
 
-  // TODO: remove part `p.id IN (?)` when flagged proposals are moved from laser DB to snapshot-sequencer DB
-  if (where.flagged === true && flaggedProposals.length > 0) {
-    searchSql += ' AND (p.id IN (?) OR p.flagged = 1)';
-    params.push(flaggedProposals);
+  if (where.flagged === true) {
+    searchSql += ' AND p.flagged = 1';
   }
 
-  // TODO: remove part `p.id NOT IN (?)` when flagged proposals are moved from laser DB to snapshot-sequencer DB
-  if (where.flagged === false && flaggedProposals.length > 0) {
-    searchSql += ' AND (p.id NOT IN (?) AND p.flagged = 0)';
-    params.push(flaggedProposals);
+  if (where.flagged === false) {
+    searchSql += ' AND p.flagged = 0';
   }
 
   let orderBy = args.orderBy || 'created';
@@ -86,7 +80,7 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT p.*, spaces.settings FROM proposals p
+    SELECT p.*, spaces.settings, spaces.flagged as spaceFlagged, spaces.verified as spaceVerified FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?

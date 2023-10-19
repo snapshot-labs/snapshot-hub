@@ -3,7 +3,6 @@ import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import db from './mysql';
 import log from './log';
-import { flaggedSpaces, verifiedSpaces } from './moderation';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export let spaces = {};
@@ -16,7 +15,7 @@ const spaceFollowers = {};
 const testnets = Object.values(networks)
   .filter((network: any) => network.testnet)
   .map((network: any) => network.key);
-const testStrategies = ['ticket'];
+const testStrategies = ['ticket', 'api', 'api-v2', 'api-post', 'api-v2-override'];
 
 function getPopularity(
   id: string,
@@ -44,10 +43,8 @@ function getPopularity(
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    // TODO: remove `verifiedSpaces?.includes(id)` after data migration from laser DB to snapshot-hub DB
-    const verified = verifiedSpaces?.includes(id) || space.verified || false;
-    // TODO: remove `flaggedSpaces?.includes(id)` after data migration from laser DB to snapshot-hub DB
-    const flagged = flaggedSpaces?.includes(id) || space.flagged || false;
+    const verified = space.verified || false;
+    const flagged = space.flagged || false;
     const networks = uniq(
       (space.strategies || [])
         .map(strategy => strategy?.network || space.network)
