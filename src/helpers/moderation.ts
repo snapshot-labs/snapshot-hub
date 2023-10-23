@@ -7,16 +7,10 @@ const moderationURL = `${sidekickURL}/api/moderation`;
 let consecutiveFailsCount = 0;
 
 export let flaggedLinks: Array<string> = [];
-export let flaggedProposals: Array<string> = [];
-export let flaggedSpaces: Array<string> = [];
-export let verifiedSpaces: Array<string> = [];
 
 async function loadModerationData() {
   const res = await snapshot.utils.getJSON(moderationURL);
   flaggedLinks = res?.flaggedLinks;
-  flaggedProposals = res?.flaggedProposals;
-  flaggedSpaces = res?.flaggedSpaces;
-  verifiedSpaces = res?.verifiedSpaces;
 }
 
 async function run() {

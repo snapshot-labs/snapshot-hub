@@ -2,7 +2,7 @@ import graphqlFields from 'graphql-fields';
 import { jsonParse } from '../helpers/utils';
 import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
-import { flaggedLinks, flaggedProposals } from '../helpers/moderation';
+import { flaggedLinks } from '../helpers/moderation';
 
 const network = process.env.NETWORK || 'testnet';
 
@@ -45,7 +45,7 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
-export function formatSpace(id, settings) {
+export function formatSpace({ id, settings, verified, flagged }) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
@@ -86,8 +86,8 @@ export function formatSpace(id, settings) {
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
 
-  space.verified = spaceMetadata?.verified ?? null;
-  space.flagged = spaceMetadata?.flagged ?? null;
+  space.verified = verified ?? null;
+  space.flagged = flagged ?? null;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -174,7 +174,7 @@ export async function fetchSpaces(args) {
   params.push(skip, first);
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space => Object.assign(space, formatSpace(space.id, space.settings)));
+  return spaces.map(space => Object.assign(space, formatSpace(space)));
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
@@ -258,12 +258,7 @@ export function formatUser(user) {
 
 function isFlaggedProposal(proposal) {
   const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
-  return (
-    // TODO: remove this check once flagged proposals are migrated to hub db via script
-    flaggedProposals?.includes(proposal.id) ||
-    flaggedLinksRegex.test(proposal.body) ||
-    proposal.flagged
-  );
+  return flaggedLinksRegex.test(proposal.body) || proposal.flagged;
 }
 
 export function formatProposal(proposal) {
@@ -281,7 +276,12 @@ export function formatProposal(proposal) {
   if (ts > proposal.start) proposalState = 'active';
   if (ts > proposal.end) proposalState = 'closed';
   proposal.state = proposalState;
-  proposal.space = formatSpace(proposal.space, proposal.settings);
+  proposal.space = formatSpace({
+    id: proposal.space,
+    settings: proposal.settings,
+    verified: proposal.spaceVerified,
+    flagged: proposal.spaceFlagged
+  });
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   proposal.strategies = proposal.strategies.map(strategy => ({
@@ -298,16 +298,31 @@ export function formatVote(vote) {
   vote.choice = jsonParse(vote.choice);
   vote.metadata = jsonParse(vote.metadata, {});
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
-  vote.space = formatSpace(vote.space, vote.settings);
+  vote.space = formatSpace({
+    id: vote.space,
+    settings: vote.settings,
+    verified: vote.spaceVerified,
+    flagged: vote.spaceFlagged
+  });
   return vote;
 }
 
 export function formatFollow(follow) {
-  follow.space = formatSpace(follow.space, follow.settings);
+  follow.space = formatSpace({
+    id: follow.space,
+    settings: follow.settings,
+    verified: follow.spaceVerified,
+    flagged: follow.spaceFlagged
+  });
   return follow;
 }
 
 export function formatSubscription(subscription) {
-  subscription.space = formatSpace(subscription.space, subscription.settings);
+  subscription.space = formatSpace({
+    id: subscription.space,
+    settings: subscription.settings,
+    verified: subscription.spaceVerified,
+    flagged: subscription.spaceFlagged
+  });
   return subscription;
 }
