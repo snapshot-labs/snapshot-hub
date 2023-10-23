@@ -27,6 +27,11 @@ router.get('/', (req, res) => {
 
 router.get('/spaces/:key', (req, res) => {
   const { key } = req.params;
+
+  if (!spaces[key]) {
+    return sendError(res, 'space not found', 404);
+  }
+
   return res.json(spaces[key]);
 });
 
