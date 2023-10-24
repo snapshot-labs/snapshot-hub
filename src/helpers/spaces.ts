@@ -160,7 +160,7 @@ async function loadSpacesMetrics() {
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT id, settings, flagged, verified
+    SELECT settings, flagged, verified
     FROM spaces
     WHERE deleted = 0 AND id = ?
     LIMIT 1`;
