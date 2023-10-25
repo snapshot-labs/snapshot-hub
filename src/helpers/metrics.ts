@@ -58,12 +58,8 @@ export default function initMetrics(app: Express) {
           if (query && operationName) {
             const definition = parse(query).definitions.find(
               // @ts-ignore
-              def => def.name?.value === operationName
+              def => def.name.value === operationName
             );
-
-            if (!definition) {
-              return;
-            }
 
             // @ts-ignore
             const types = definition.selectionSet.selections.map(sel => sel.name.value);
