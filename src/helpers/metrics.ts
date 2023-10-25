@@ -1,7 +1,7 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express, type Request, type Response } from 'express';
-import { parse } from 'graphql';
+import { GraphQLError, parse } from 'graphql';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
 import db from './mysql';
@@ -71,7 +71,9 @@ export default function initMetrics(app: Express) {
             }
           }
         } catch (e: any) {
-          capture(e);
+          if (!(e instanceof GraphQLError)) {
+            capture(e);
+          }
         }
       });
     }
