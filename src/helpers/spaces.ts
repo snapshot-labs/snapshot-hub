@@ -7,7 +7,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export let spaces = {};
 export const spacesMetadata = {};
-export let rankedSpaces: any = [];
+export let rankedSpaceIds: string[] = [];
 const spaceProposals = {};
 const spaceVotes = {};
 const spaceFollowers = {};
@@ -43,29 +43,24 @@ function getPopularity(
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    const verified = space.verified || false;
-    const flagged = space.flagged || false;
-    const networks = uniq(
+    const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
+    space.categories = space.categories ?? [];
+    space.networks = uniq(
       (space.strategies || [])
         .map(strategy => strategy?.network || space.network)
         .concat(space.network)
     );
-    const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
     const popularity = getPopularity(id, {
-      verified,
-      networks,
+      verified: space.verified,
+      networks: space.networks,
       strategies
     });
 
     spacesMetadata[id] = {
       id,
-      name: space.name,
-      verified,
-      flagged,
+      flagged: space.flagged,
       popularity,
       private: space.private ?? false,
-      categories: space.categories ?? [],
-      networks,
       counts: {
         activeProposals: spaceProposals[id]?.active || 0,
         proposalsCount: spaceProposals[id]?.count || 0,
@@ -78,13 +73,13 @@ function mapSpaces() {
     };
   });
 
-  rankedSpaces = Object.values(spacesMetadata)
+  rankedSpaceIds = Object.values(spacesMetadata)
     .filter((space: any) => !space.private && !space.flagged)
-    .sort((a: any, b: any) => b.popularity - a.popularity);
-
-  rankedSpaces.forEach((space: any, i: number) => {
-    spacesMetadata[space.id].rank = i + 1;
-  });
+    .sort((a: any, b: any) => b.popularity - a.popularity)
+    .map((space: any, i: number) => {
+      space.rank = i + 1;
+      return space.id;
+    });
 }
 
 async function loadSpaces() {
@@ -95,6 +90,7 @@ async function loadSpaces() {
     s.map(ensSpace => [
       ensSpace.id,
       {
+        id: ensSpace.id,
         ...JSON.parse(ensSpace.settings),
         flagged: ensSpace.flagged === 1,
         verified: ensSpace.verified === 1
