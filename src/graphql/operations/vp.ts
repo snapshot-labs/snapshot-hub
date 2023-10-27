@@ -4,6 +4,10 @@ import db from '../../helpers/mysql';
 const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
 
 export default async function (_parent, { voter, space, proposal }) {
+  if (voter === '0x0000000000000000000000000000000000000000' || voter === '') {
+    return Promise.reject(new Error('invalid address'));
+  }
+
   if (proposal) {
     const query = `SELECT * FROM proposals WHERE id = ?`;
     const [p] = await db.queryAsync(query, [proposal]);
