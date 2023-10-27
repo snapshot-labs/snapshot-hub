@@ -1315,10 +1315,10 @@
     node-fetch "^2.7.0"
     prom-client "^14.2.0"
 
-"@snapshot-labs/snapshot-sentry@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-sentry/-/snapshot-sentry-1.5.1.tgz#c4b5da87a97f760d9327743f7748783aaef14d9a"
-  integrity sha512-2xM72Xqypr73x6iWP5kr9fsNDeygmbiflTLhKeahT5yjjpFaSyS2razha+qxjo6w+0rIwNQXXYnlcrju24K2iA==
+"@snapshot-labs/snapshot-sentry@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-sentry/-/snapshot-sentry-1.5.2.tgz#a8c48e6602e0f236ba582a6728381e542501fe2a"
+  integrity sha512-xDZKiXigmfBWimDQGQwh/1WoqcD2n23nQczjWe+ukkLSvqk3AMwWz0F2tnd/MLiiklSyHezfcAzsSVMxlZPsPA==
   dependencies:
     "@sentry/node" "^7.60.1"
 
