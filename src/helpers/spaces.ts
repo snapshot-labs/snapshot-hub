@@ -176,7 +176,7 @@ export async function getSpace(id: string) {
   };
 }
 
-async function run() {
+export default async function run() {
   try {
     await loadSpaces();
     await loadSpacesMetrics();
@@ -187,5 +187,3 @@ async function run() {
   await snapshot.utils.sleep(360e3);
   run();
 }
-
-run();

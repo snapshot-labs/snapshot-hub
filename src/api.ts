@@ -1,12 +1,14 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { getSpace } from './helpers/spaces';
+import refreshSpacesCache, { getSpace } from './helpers/spaces';
 import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
 const SEQUENCER_URL = process.env.SEQUENCER_URL || '';
+
+refreshSpacesCache();
 
 router.post('/message', async (req, res) => {
   return sendError(res, 'personal sign is not supported anymore');
