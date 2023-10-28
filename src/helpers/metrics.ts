@@ -1,9 +1,11 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Express } from 'express';
+import { Express, type Request, type Response } from 'express';
+import { GraphQLError, parse } from 'graphql';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
 import db from './mysql';
+import operations from '../graphql/operations/';
 
 const whitelistedPath = [
   /^\/$/,
@@ -30,6 +32,8 @@ function instrumentRateLimitedRequests(req, res, next) {
 }
 
 export default function initMetrics(app: Express) {
+  const GRAPHQL_TYPES = Object.keys(operations);
+
   init(app, {
     normalizedPath: [
       ['^/api/scores/.+', '/api/scores/#id'],
@@ -41,6 +45,45 @@ export default function initMetrics(app: Express) {
   });
 
   app.use(instrumentRateLimitedRequests);
+
+  app.use((req: Request, res: Response, next) => {
+    if (req.originalUrl.startsWith('/graphql')) {
+      const end = graphqlRequest.startTimer();
+
+      res.on('finish', () => {
+        try {
+          const query = (req.body || req.query)?.query;
+          const operationName = (req.body || req.query)?.operationName;
+
+          if (query && operationName) {
+            const definition = parse(query).definitions.find(
+              // @ts-ignore
+              def => def.name?.value === operationName
+            );
+
+            if (!definition) {
+              return;
+            }
+
+            // @ts-ignore
+            const types = definition.selectionSet.selections.map(sel => sel.name.value);
+
+            for (const type of types) {
+              if (GRAPHQL_TYPES.includes(type)) {
+                end({ type });
+              }
+            }
+          }
+        } catch (e: any) {
+          if (!(e instanceof GraphQLError)) {
+            capture(e);
+          }
+        }
+      });
+    }
+
+    next();
+  });
 }
 
 new client.Gauge({
@@ -136,4 +179,11 @@ new client.Gauge({
 export const requestDeduplicatorSize = new client.Gauge({
   name: 'request_deduplicator_size',
   help: 'Total number of items in the deduplicator queue'
+});
+
+export const graphqlRequest = new client.Histogram({
+  name: 'graphql_requests_duration_seconds',
+  help: 'Duration in seconds of graphql requests',
+  labelNames: ['type'],
+  buckets: [0.5, 1, 2, 5, 10, 15]
 });

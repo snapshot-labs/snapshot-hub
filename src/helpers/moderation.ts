@@ -13,7 +13,7 @@ async function loadModerationData() {
   flaggedLinks = res?.flaggedLinks;
 }
 
-async function run() {
+export default async function run() {
   try {
     await loadModerationData();
     consecutiveFailsCount = 0;
@@ -28,5 +28,3 @@ async function run() {
   await snapshot.utils.sleep(5e3);
   run();
 }
-
-run();
