@@ -88,6 +88,10 @@ new client.Gauge({
     const verifiedCount = Object.values(spacesMetadata).filter((s: any) => s.verified).length;
     this.set({ status: 'verified' }, verifiedCount);
     this.set({ status: 'unverified' }, Object.keys(spacesMetadata).length - verifiedCount);
+    this.set(
+      { status: 'hibernated' },
+      Object.values(spacesMetadata).filter((s: any) => s.hibernated).length
+    );
   }
 });
 

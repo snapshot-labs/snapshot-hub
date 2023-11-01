@@ -45,7 +45,7 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
-export function formatSpace({ id, settings, verified, flagged }) {
+export function formatSpace({ id, settings, verified, flagged, hibernated }) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
@@ -88,6 +88,7 @@ export function formatSpace({ id, settings, verified, flagged }) {
 
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
+  space.hibernated = hibernated ?? null;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -280,7 +281,8 @@ export function formatProposal(proposal) {
     id: proposal.space,
     settings: proposal.settings,
     verified: proposal.spaceVerified,
-    flagged: proposal.spaceFlagged
+    flagged: proposal.spaceFlagged,
+    hibernated: proposal.spaceHibernated
   });
   const networkStr = network === 'testnet' ? 'demo.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
@@ -302,7 +304,8 @@ export function formatVote(vote) {
     id: vote.space,
     settings: vote.settings,
     verified: vote.spaceVerified,
-    flagged: vote.spaceFlagged
+    flagged: vote.spaceFlagged,
+    hibernated: vote.spaceHibernated
   });
   return vote;
 }
@@ -312,7 +315,8 @@ export function formatFollow(follow) {
     id: follow.space,
     settings: follow.settings,
     verified: follow.spaceVerified,
-    flagged: follow.spaceFlagged
+    flagged: follow.spaceFlagged,
+    hibernated: follow.spaceHibernated
   });
   return follow;
 }
@@ -322,7 +326,8 @@ export function formatSubscription(subscription) {
     id: subscription.space,
     settings: subscription.settings,
     verified: subscription.spaceVerified,
-    flagged: subscription.spaceFlagged
+    flagged: subscription.spaceFlagged,
+    hibernated: subscription.spaceHibernated
   });
   return subscription;
 }

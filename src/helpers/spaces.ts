@@ -45,6 +45,7 @@ function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     const verified = space.verified || false;
     const flagged = space.flagged || false;
+    const hibernated = space.hibernated || false;
     const networks = uniq(
       (space.strategies || [])
         .map(strategy => strategy?.network || space.network)
@@ -62,6 +63,7 @@ function mapSpaces() {
       name: space.name,
       verified,
       flagged,
+      hibernated,
       popularity,
       private: space.private ?? false,
       categories: space.categories ?? [],
