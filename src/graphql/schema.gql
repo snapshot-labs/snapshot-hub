@@ -386,7 +386,6 @@ type Space {
   flagged: Boolean
   hibernated: Boolean
   rank: Float
-  created_at: Int
 }
 
 type RankingObject {
