@@ -159,9 +159,9 @@ export async function fetchSpaces(args) {
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
-  let orderBy = args.orderBy || 'created_at';
+  let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
+  if (!['created', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
