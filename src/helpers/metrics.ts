@@ -91,9 +91,14 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    const verifiedCount = Object.values(spacesMetadata).filter((s: any) => s.verified).length;
-    this.set({ status: 'verified' }, verifiedCount);
-    this.set({ status: 'unverified' }, Object.keys(spacesMetadata).length - verifiedCount);
+    this.set(
+      { status: 'verified' },
+      Object.values(spacesMetadata).filter((s: any) => s.verified).length
+    );
+    this.set(
+      { status: 'flagged' },
+      (await db.queryAsync('SELECT COUNT(id) as count FROM spaces WHERE flagged = 1'))[0].count
+    );
   }
 });
 
