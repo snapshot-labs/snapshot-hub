@@ -161,7 +161,7 @@ export async function fetchSpaces(args) {
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created';
+  if (!['created', 'updated', 'id'].includes(orderBy)) orderBy = 'created';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 

@@ -6,14 +6,14 @@ CREATE TABLE spaces (
   deleted INT NOT NULL DEFAULT '0',
   flagged INT NOT NULL DEFAULT '0',
   created BIGINT NOT NULL,
-  updated_at BIGINT NOT NULL,
+  updated BIGINT NOT NULL,
   PRIMARY KEY (id),
   INDEX name (name),
   INDEX verified (verified),
   INDEX flagged (flagged),
   INDEX deleted (deleted),
   INDEX created (created),
-  INDEX updated_at (updated_at)
+  INDEX updated (updated)
 );
 
 CREATE TABLE proposals (
