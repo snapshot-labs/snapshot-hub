@@ -5,8 +5,8 @@ const fixtures: Record<string, any>[] = [
     flagged: false,
     verified: true,
     settings: { network: 1 },
-    created_at: Math.floor(Date.now() / 1e3),
-    updated_at: Math.floor(Date.now() / 1e3)
+    created: Math.floor(Date.now() / 1e3),
+    updated: Math.floor(Date.now() / 1e3)
   }
 ];
 
