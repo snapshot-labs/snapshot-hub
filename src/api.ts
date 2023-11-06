@@ -1,5 +1,6 @@
 import express from 'express';
-import { spaces } from './helpers/spaces';
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import { getSpace } from './helpers/spaces';
 import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
 
@@ -25,14 +26,18 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/spaces/:key', (req, res) => {
+router.get('/spaces/:key', async (req, res) => {
   const { key } = req.params;
 
-  if (!spaces[key]) {
-    return sendError(res, 'space not found', 404);
+  try {
+    return res.json(await getSpace(key));
+  } catch (e: any) {
+    if (e.message !== 'NOT_FOUND') {
+      capture(e);
+      return sendError(res, 'server_error', 500);
+    }
+    return sendError(res, 'not_found', 404);
   }
-
-  return res.json(spaces[key]);
 });
 
 router.get('/spaces/:key/poke', async (req, res) => {

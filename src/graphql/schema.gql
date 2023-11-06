@@ -117,6 +117,12 @@ type Query {
 input SpaceWhere {
   id: String
   id_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
 }
 
 input RankingWhere {
@@ -386,6 +392,7 @@ type Space {
   flagged: Boolean
   hibernated: Boolean
   rank: Float
+  created: Int!
 }
 
 type RankingObject {

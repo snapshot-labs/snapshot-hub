@@ -1,7 +1,7 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express, type Request, type Response } from 'express';
-import { parse } from 'graphql';
+import { GraphQLError, parse } from 'graphql';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
 import db from './mysql';
@@ -58,8 +58,12 @@ export default function initMetrics(app: Express) {
           if (query && operationName) {
             const definition = parse(query).definitions.find(
               // @ts-ignore
-              def => def.name.value === operationName
+              def => def.name?.value === operationName
             );
+
+            if (!definition) {
+              return;
+            }
 
             // @ts-ignore
             const types = definition.selectionSet.selections.map(sel => sel.name.value);
@@ -71,7 +75,9 @@ export default function initMetrics(app: Express) {
             }
           }
         } catch (e: any) {
-          capture(e);
+          if (!(e instanceof GraphQLError)) {
+            capture(e);
+          }
         }
       });
     }
@@ -85,12 +91,13 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    const verifiedCount = Object.values(spacesMetadata).filter((s: any) => s.verified).length;
-    this.set({ status: 'verified' }, verifiedCount);
-    this.set({ status: 'unverified' }, Object.keys(spacesMetadata).length - verifiedCount);
     this.set(
-      { status: 'hibernated' },
-      Object.values(spacesMetadata).filter((s: any) => s.hibernated).length
+      { status: 'verified' },
+      Object.values(spacesMetadata).filter((s: any) => s.verified).length
+    );
+    this.set(
+      { status: 'flagged' },
+      (await db.queryAsync('SELECT COUNT(id) as count FROM spaces WHERE flagged = 1'))[0].count
     );
   }
 });
