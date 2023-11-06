@@ -117,12 +117,12 @@ type Query {
 input SpaceWhere {
   id: String
   id_in: [String]
-  created_at: Int
-  created_at_in: [Int]
-  created_at_gt: Int
-  created_at_gte: Int
-  created_at_lt: Int
-  created_at_lte: Int
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
 }
 
 input RankingWhere {
@@ -391,7 +391,7 @@ type Space {
   verified: Boolean
   flagged: Boolean
   rank: Float
-  created_at: Int!
+  created: Int!
 }
 
 type RankingObject {
