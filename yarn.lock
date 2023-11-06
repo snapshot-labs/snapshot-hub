@@ -1294,10 +1294,10 @@
   dependencies:
     "@snapshot-labs/eslint-config-base" "^0.1.0-beta.13"
 
-"@snapshot-labs/keycard@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/keycard/-/keycard-0.4.0.tgz#7b97c59150c198552df36b02992fd6b6a5cc22e3"
-  integrity sha512-K+g5RUNewgnQPYxI6HeEZXeSaRiNF0j3+d7T02O4woq1YUPkz4vc/IE4Kyj4ABS4O2qlrlg9xwr03pCsyr9SRg==
+"@snapshot-labs/keycard@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/keycard/-/keycard-0.5.0.tgz#52bad89a9a47b097dcdb1170f6f09acf58fbc672"
+  integrity sha512-YR5PZ/YGb052VSwAqYWyNSL4xrZ9x25qAMHz1znUqRWGRXB/s/TjFxFrJI8nkXNHixkBC8CeG+0jmebnQsJs5Q==
   dependencies:
     node-fetch "^2.7.0"
 
