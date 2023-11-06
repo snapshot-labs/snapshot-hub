@@ -154,14 +154,14 @@ export function buildWhereQuery(fields, alias, where) {
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string' };
+  const fields = { id: 'string', created: 'number' };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
-  let orderBy = args.orderBy || 'created_at';
+  let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
+  if (!['created', 'updated', 'id'].includes(orderBy)) orderBy = 'created';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
