@@ -154,7 +154,7 @@ export function buildWhereQuery(fields, alias, where) {
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string' };
+  const fields = { id: 'string', created: 'number' };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
