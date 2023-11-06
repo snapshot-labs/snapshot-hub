@@ -171,6 +171,14 @@ new client.Gauge({
 });
 
 new client.Gauge({
+  name: 'spaces_total_count',
+  help: 'Total number of spaces',
+  async collect() {
+    this.set((await db.queryAsync('SELECT COUNT(id) as count FROM spaces'))[0].count);
+  }
+});
+
+new client.Gauge({
   name: 'strategies_per_space_count',
   help: 'Number of strategies per spaces',
   labelNames: ['name'],
