@@ -117,6 +117,9 @@ type Query {
 input SpaceWhere {
   id: String
   id_in: [String]
+  strategies_in: [String]
+  plugins_in: [String]
+  network: String
 }
 
 input RankingWhere {
