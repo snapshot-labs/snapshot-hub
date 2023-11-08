@@ -1,11 +1,10 @@
 import snapshot from '@snapshot-labs/snapshot.js';
-import { spaces } from './spaces';
-import log from './log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import { URL } from 'url';
+import db from '../helpers/mysql';
+import log from './log';
 
 export let strategies: any[] = [];
-export let strategiesObj: any = {};
 
 const scoreApiURL: URL = new URL(process.env.SCORE_API_URL ?? 'https://score.snapshot.org');
 scoreApiURL.pathname = '/api/strategies';
@@ -21,24 +20,31 @@ async function loadStrategies() {
     return true;
   }
 
-  Object.values(spaces).forEach((space: any) => {
-    const ids = new Set<string>(space.strategies.map(strategy => strategy.name));
-    ids.forEach(id => {
-      if (res[id]) {
-        res[id].spacesCount = (res[id].spacesCount || 0) + 1;
-      }
-    });
-  });
+  const results = new Map(
+    (
+      await db.queryAsync(`
+        SELECT
+          s.name as id,
+          COUNT(s.name) as count
+        FROM
+          spaces,
+          JSON_TABLE(
+            spaces.settings,
+            '$.strategies[*]' COLUMNS (name VARCHAR(40) PATH '$.name')
+          ) s
+        GROUP BY s.name
+        ORDER BY count DESC;
+      `)
+    ).map(r => [r.id, r.count])
+  );
 
   strategies = Object.values(res)
     .map((strategy: any) => {
       strategy.id = strategy.key;
-      strategy.spacesCount = strategy.spacesCount || 0;
+      strategy.spacesCount = results.get(strategy.id) || 0;
       return strategy;
     })
     .sort((a, b): any => b.spacesCount - a.spacesCount);
-
-  strategiesObj = Object.fromEntries(strategies.map(strategy => [strategy.id, strategy]));
 }
 
 async function run() {

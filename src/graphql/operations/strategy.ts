@@ -1,5 +1,5 @@
-import { strategiesObj } from '../../helpers/strategies';
+import { strategies } from '../../helpers/strategies';
 
-export default async function (parent, { id }) {
-  return strategiesObj[id];
+export default function (parent, { id }) {
+  return strategies.find(strategy => strategy.id === id);
 }
