@@ -91,14 +91,12 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    this.set(
-      { status: 'verified' },
-      Object.values(spacesMetadata).filter((s: any) => s.verified).length
-    );
-    this.set(
-      { status: 'flagged' },
-      (await db.queryAsync('SELECT COUNT(id) as count FROM spaces WHERE flagged = 1'))[0].count
-    );
+    ['verified', 'flagged', 'hibernated'].forEach(async status => {
+      this.set(
+        { status },
+        (await db.queryAsync(`SELECT COUNT(id) as count FROM spaces WHERE ${status} = 1`))[0].count
+      );
+    });
   }
 });
 

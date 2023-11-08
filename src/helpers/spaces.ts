@@ -45,6 +45,7 @@ function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     const verified = space.verified || false;
     const flagged = space.flagged || false;
+    const hibernated = space.hibernated || false;
     const networks = uniq(
       (space.strategies || [])
         .map(strategy => strategy?.network || space.network)
@@ -62,6 +63,7 @@ function mapSpaces() {
       name: space.name,
       verified,
       flagged,
+      hibernated,
       popularity,
       private: space.private ?? false,
       categories: space.categories ?? [],
@@ -89,7 +91,7 @@ function mapSpaces() {
 
 async function loadSpaces() {
   const query =
-    'SELECT id, settings, flagged, verified FROM spaces WHERE deleted = 0 ORDER BY id ASC';
+    'SELECT id, settings, flagged, verified, hibernated FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(
     s.map(ensSpace => [
@@ -97,7 +99,8 @@ async function loadSpaces() {
       {
         ...JSON.parse(ensSpace.settings),
         flagged: ensSpace.flagged === 1,
-        verified: ensSpace.verified === 1
+        verified: ensSpace.verified === 1,
+        hibernated: ensSpace.hibernated === 1
       }
     ])
   );
