@@ -1306,10 +1306,10 @@
   resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.11.tgz#d8caa8fc32252ac265fa4de5b8478ce3cac867b2"
   integrity sha512-/OiQgEkNpMJqDfTDYXggDDxLX6YYQ7n3GZfWRqnUJTlf6YNfkurBC2pVTkN1iHJOI/Vx1Aq/v3D8Ss907k+MMg==
 
-"@snapshot-labs/snapshot-metrics@^1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-metrics/-/snapshot-metrics-1.3.1.tgz#e282b443380434c454ff5800e7524c8a62d02acb"
-  integrity sha512-Dim9V/YgG/A4OJxpnyIBS2h43P/CBfFf5fvpDGwazJNb0DcyJPbRuw5kb48U/DCQ7aATM9XNG0s8Lj239VwTOw==
+"@snapshot-labs/snapshot-metrics@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot-metrics/-/snapshot-metrics-1.4.0.tgz#f0831f9a8100c6196e8422e1366a8e5440dd6b16"
+  integrity sha512-WujRGrTkmNkd8kysCriOTiTqs2z4xfSuX4gqudlGw7IGxIHxyyj7zyaY6H1Y75usG3rs3ECUf+hOUSOUxA83pQ==
   dependencies:
     express-prom-bundle "^6.6.0"
     node-fetch "^2.7.0"
