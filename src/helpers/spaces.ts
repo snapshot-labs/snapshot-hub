@@ -113,7 +113,7 @@ async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
     SELECT space, COUNT(id) AS count,
-    COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active,
+    COUNT(IF(start < ? AND end > ? AND flagged = 0, 1, NULL)) AS active,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM proposals GROUP BY space
   `;
