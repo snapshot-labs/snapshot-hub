@@ -89,7 +89,7 @@ function mapSpaces() {
   });
 }
 
-async function loadSpaces() {
+export async function loadSpaces() {
   const query =
     'SELECT id, settings, flagged, verified, hibernated FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);

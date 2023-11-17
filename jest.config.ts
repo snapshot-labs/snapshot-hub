@@ -20,5 +20,8 @@ export default {
   globalTeardown: '<rootDir>/test/teardown.ts',
   moduleFileExtensions: ['js', 'ts'],
   testPathIgnorePatterns: ['dist/'],
+  fakeTimers: {
+    enableGlobally: true
+  },
   verbose: true
 };
