@@ -102,6 +102,7 @@ export function formatSpace({ id, settings, verified, flagged, hibernated }) {
 export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];
+
   Object.entries(fields).forEach(([field, type]) => {
     if (where[field] !== undefined) {
       query += `AND ${alias}.${field} = ? `;
@@ -114,16 +115,24 @@ export function buildWhereQuery(fields, alias, where) {
       params.push(fieldNot);
     }
 
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      query += `AND ${alias}.${field} IN (?) `;
-      params.push(fieldIn);
+    const fieldIn = where[`${field}_in`];
+    if (Array.isArray(fieldIn)) {
+      if (fieldIn.length > 0) {
+        query += `AND ${alias}.${field} IN (?) `;
+        params.push(fieldIn);
+      } else {
+        throw new PublicError(`${field}_in must have at least one item`);
+      }
     }
 
-    const fieldNotIn = where[`${field}_not_in`] || [];
-    if (fieldNotIn.length > 0) {
-      query += `AND ${alias}.${field} NOT IN (?) `;
-      params.push(fieldNotIn);
+    const fieldNotIn = where[`${field}_not_in`];
+    if (Array.isArray(fieldNotIn)) {
+      if (fieldNotIn?.length > 0) {
+        query += `AND ${alias}.${field} NOT IN (?) `;
+        params.push(fieldNotIn);
+      } else {
+        throw new PublicError(`${field}_not_in must have at least one item`);
+      }
     }
 
     if (type === 'number') {
