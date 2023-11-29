@@ -43,12 +43,6 @@ export function checkLimits(args: any = {}, type) {
     }
   }
 
-  Object.keys(where).forEach(key => {
-    if (key.endsWith('_in') && where[key].length === 0) {
-      throw new PublicError(`${key} must have at least one item`);
-    }
-  });
-
   return true;
 }
 
@@ -121,16 +115,24 @@ export function buildWhereQuery(fields, alias, where) {
       params.push(fieldNot);
     }
 
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      query += `AND ${alias}.${field} IN (?) `;
-      params.push(fieldIn);
+    const fieldIn = where[`${field}_in`];
+    if (Array.isArray(fieldIn)) {
+      if (fieldIn.length > 0) {
+        query += `AND ${alias}.${field} IN (?) `;
+        params.push(fieldIn);
+      } else {
+        query += 'AND 1=0 ';
+      }
     }
 
-    const fieldNotIn = where[`${field}_not_in`] || [];
-    if (fieldNotIn.length > 0) {
-      query += `AND ${alias}.${field} NOT IN (?) `;
-      params.push(fieldNotIn);
+    const fieldNotIn = where[`${field}_not_in`];
+    if (Array.isArray(fieldNotIn)) {
+      if (fieldNotIn.length > 0) {
+        query += `AND ${alias}.${field} NOT IN (?) `;
+        params.push(fieldNotIn);
+      } else {
+        query += 'AND 1=0 ';
+      }
     }
 
     if (type === 'number') {
