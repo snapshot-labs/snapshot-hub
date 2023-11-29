@@ -42,6 +42,13 @@ export function checkLimits(args: any = {}, type) {
       throw new PublicError(`The \`${key}\` argument must be positive`);
     }
   }
+
+  Object.keys(where).forEach(key => {
+    if (key.endsWith('_in') && where[key].length === 0) {
+      throw new PublicError(`${key} must have at least one item`);
+    }
+  });
+
   return true;
 }
 
