@@ -36,19 +36,12 @@ export function checkLimits(args: any = {}, type) {
     const skipLimitReached = key === 'skip' && args[key] > limit;
     const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
     if (firstLimitReached || skipLimitReached || whereLimitReached)
-      throw new PublicError(`The \`${key}\` argument must not be greater than ${limit}`);
+      throw new Error(`The \`${key}\` argument must not be greater than ${limit}`);
 
     if (['first', 'skip'].includes(key) && args[key] < 0) {
-      throw new PublicError(`The \`${key}\` argument must be positive`);
+      throw new Error(`The \`${key}\` argument must be positive`);
     }
   }
-
-  Object.keys(where).forEach(key => {
-    if (key.endsWith('_in') && where[key].length === 0) {
-      throw new PublicError(`${key} must have at least one item`);
-    }
-  });
-
   return true;
 }
 
