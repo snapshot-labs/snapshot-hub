@@ -36,12 +36,13 @@ export function checkLimits(args: any = {}, type) {
     const skipLimitReached = key === 'skip' && args[key] > limit;
     const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
     if (firstLimitReached || skipLimitReached || whereLimitReached)
-      throw new Error(`The \`${key}\` argument must not be greater than ${limit}`);
+      throw new PublicError(`The \`${key}\` argument must not be greater than ${limit}`);
 
     if (['first', 'skip'].includes(key) && args[key] < 0) {
-      throw new Error(`The \`${key}\` argument must be positive`);
+      throw new PublicError(`The \`${key}\` argument must be positive`);
     }
   }
+
   return true;
 }
 
@@ -114,16 +115,24 @@ export function buildWhereQuery(fields, alias, where) {
       params.push(fieldNot);
     }
 
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      query += `AND ${alias}.${field} IN (?) `;
-      params.push(fieldIn);
+    const fieldIn = where[`${field}_in`];
+    if (Array.isArray(fieldIn)) {
+      if (fieldIn.length > 0) {
+        query += `AND ${alias}.${field} IN (?) `;
+        params.push(fieldIn);
+      } else {
+        query += 'AND 1=0 ';
+      }
     }
 
-    const fieldNotIn = where[`${field}_not_in`] || [];
-    if (fieldNotIn.length > 0) {
-      query += `AND ${alias}.${field} NOT IN (?) `;
-      params.push(fieldNotIn);
+    const fieldNotIn = where[`${field}_not_in`];
+    if (Array.isArray(fieldNotIn)) {
+      if (fieldNotIn.length > 0) {
+        query += `AND ${alias}.${field} NOT IN (?) `;
+        params.push(fieldNotIn);
+      } else {
+        query += 'AND 1=0 ';
+      }
     }
 
     if (type === 'number') {
