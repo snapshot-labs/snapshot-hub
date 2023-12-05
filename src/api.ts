@@ -9,7 +9,7 @@ const network = process.env.NETWORK || 'testnet';
 const SEQUENCER_URL = process.env.SEQUENCER_URL || '';
 
 router.post('/message', async (req, res) => {
-  return sendError(res, 'personal sign is not supported anymore');
+  return sendError(res, 'personal sign is not supported anymore', 410);
 });
 
 router.post('/msg', async (req, res) => {
