@@ -391,6 +391,7 @@ type Space {
   verified: Boolean
   flagged: Boolean
   hibernated: Boolean
+  turbo: Boolean
   rank: Float
   created: Int!
 }

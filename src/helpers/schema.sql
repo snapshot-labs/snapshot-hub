@@ -6,6 +6,7 @@ CREATE TABLE spaces (
   deleted INT NOT NULL DEFAULT '0',
   flagged INT NOT NULL DEFAULT '0',
   hibernated INT NOT NULL DEFAULT '0',
+  turbo INT NOT NULL DEFAULT '0',
   created BIGINT NOT NULL,
   updated BIGINT NOT NULL,
   PRIMARY KEY (id),
@@ -13,6 +14,7 @@ CREATE TABLE spaces (
   INDEX verified (verified),
   INDEX flagged (flagged),
   INDEX hibernated (hibernated),
+  INDEX turbo (turbo),
   INDEX deleted (deleted),
   INDEX created (created),
   INDEX updated (updated)
