@@ -293,7 +293,7 @@ export function formatProposal(proposal) {
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated
   });
-  const networkStr = network === 'testnet' ? 'demo.' : '';
+  const networkStr = network === 'testnet' ? 'testnet.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   proposal.strategies = proposal.strategies.map(strategy => ({
     ...strategy,
