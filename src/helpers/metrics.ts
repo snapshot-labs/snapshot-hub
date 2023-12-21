@@ -24,7 +24,9 @@ const rateLimitedRequestsCount = new client.Counter({
 function instrumentRateLimitedRequests(req, res, next) {
   res.on('finish', () => {
     if (whitelistedPath.some(path => path.test(req.path))) {
-      rateLimitedRequestsCount.inc({ rate_limited: res.statusCode === 429 ? 1 : 0 });
+      rateLimitedRequestsCount.inc({
+        rate_limited: res.statusCode === 429 ? 1 : 0
+      });
     }
   });
 
@@ -66,7 +68,9 @@ export default function initMetrics(app: Express) {
             }
 
             // @ts-ignore
-            const types = definition.selectionSet.selections.map(sel => sel.name.value);
+            const types = definition.selectionSet.selections.map(
+              sel => sel.name.value
+            );
 
             for (const type of types) {
               if (GRAPHQL_TYPES.includes(type)) {
@@ -94,7 +98,11 @@ new client.Gauge({
     ['verified', 'flagged', 'hibernated'].forEach(async status => {
       this.set(
         { status },
-        (await db.queryAsync(`SELECT COUNT(id) as count FROM spaces WHERE ${status} = 1`))[0].count
+        (
+          await db.queryAsync(
+            `SELECT COUNT(id) as count FROM spaces WHERE ${status} = 1`
+          )
+        )[0].count
       );
     });
   }
@@ -156,7 +164,9 @@ new client.Gauge({
   name: 'proposals_total_count',
   help: 'Total number of proposals',
   async collect() {
-    this.set((await db.queryAsync('SELECT COUNT(id) as count FROM proposals'))[0].count);
+    this.set(
+      (await db.queryAsync('SELECT COUNT(id) as count FROM proposals'))[0].count
+    );
   }
 });
 
@@ -164,7 +174,9 @@ new client.Gauge({
   name: 'users_total_count',
   help: 'Total number of users',
   async collect() {
-    this.set((await db.queryAsync('SELECT COUNT(id) as count FROM users'))[0].count);
+    this.set(
+      (await db.queryAsync('SELECT COUNT(id) as count FROM users'))[0].count
+    );
   }
 });
 
@@ -172,7 +184,9 @@ new client.Gauge({
   name: 'spaces_total_count',
   help: 'Total number of spaces',
   async collect() {
-    this.set((await db.queryAsync('SELECT COUNT(id) as count FROM spaces'))[0].count);
+    this.set(
+      (await db.queryAsync('SELECT COUNT(id) as count FROM spaces'))[0].count
+    );
   }
 });
 

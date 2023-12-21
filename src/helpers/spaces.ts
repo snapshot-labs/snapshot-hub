@@ -15,7 +15,13 @@ const spaceFollowers = {};
 const testnets = Object.values(networks)
   .filter((network: any) => network.testnet)
   .map((network: any) => network.key);
-const testStrategies = ['ticket', 'api', 'api-v2', 'api-post', 'api-v2-override'];
+const testStrategies = [
+  'ticket',
+  'api',
+  'api-v2',
+  'api-post',
+  'api-v2-override'
+];
 
 function getPopularity(
   id: string,
@@ -33,8 +39,10 @@ function getPopularity(
     (spaceFollowers[id]?.count || 0) / 50 +
     (spaceFollowers[id]?.count_7d || 0);
 
-  if (params.networks.some(network => testnets.includes(network))) popularity = 1;
-  if (params.strategies.some(strategy => testStrategies.includes(strategy))) popularity = 1;
+  if (params.networks.some(network => testnets.includes(network)))
+    popularity = 1;
+  if (params.strategies.some(strategy => testStrategies.includes(strategy)))
+    popularity = 1;
 
   if (params.verified) popularity *= 100000;
 
@@ -51,7 +59,9 @@ function mapSpaces() {
         .map(strategy => strategy?.network || space.network)
         .concat(space.network)
     );
-    const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
+    const strategies = uniq(
+      space.strategies?.map(strategy => strategy.name) || []
+    );
     const popularity = getPopularity(id, {
       verified,
       networks,

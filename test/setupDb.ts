@@ -16,7 +16,9 @@ const db = mysql.createPool(config);
 const dbName = config.path[0];
 
 if (!dbName.endsWith(TEST_DATABASE_SUFFIX)) {
-  console.error(`Invalid test database name. Must end with ${TEST_DATABASE_SUFFIX}`);
+  console.error(
+    `Invalid test database name. Must end with ${TEST_DATABASE_SUFFIX}`
+  );
   process.exit(1);
 }
 

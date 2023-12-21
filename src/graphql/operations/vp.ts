@@ -35,9 +35,17 @@ export default async function (_parent, { voter, space, proposal }) {
 
     s = JSON.parse(s.settings);
 
-    return await snapshot.utils.getVp(voter, s.network, s.strategies, 'latest', space, false, {
-      url: scoreAPIUrl
-    });
+    return await snapshot.utils.getVp(
+      voter,
+      s.network,
+      s.strategies,
+      'latest',
+      space,
+      false,
+      {
+        url: scoreAPIUrl
+      }
+    );
   }
 
   return Promise.reject(new Error('missing argument'));
