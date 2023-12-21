@@ -13,7 +13,9 @@ let client;
   client = createClient({ url: process.env.RATE_LIMIT_DATABASE_URL });
   client.on('connect', () => console.log('[redis-rl] Redis connect'));
   client.on('ready', () => console.log('[redis-rl] Redis ready'));
-  client.on('reconnecting', err => console.log('[redis-rl] Redis reconnecting', err));
+  client.on('reconnecting', err =>
+    console.log('[redis-rl] Redis reconnecting', err)
+  );
   client.on('error', err => console.log('[redis-rl] Redis error', err));
   client.on('end', err => console.log('[redis-rl] Redis end', err));
   await client.connect();
