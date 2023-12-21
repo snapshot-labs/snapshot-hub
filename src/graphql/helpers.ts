@@ -34,9 +34,13 @@ export function checkLimits(args: any = {}, type) {
     const limit = typeLimits[key];
     const firstLimitReached = key === 'first' && args[key] > limit;
     const skipLimitReached = key === 'skip' && args[key] > limit;
-    const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
+    const whereLimitReached = key.endsWith('_in')
+      ? where[key]?.length > limit
+      : where[key] > limit;
     if (firstLimitReached || skipLimitReached || whereLimitReached)
-      throw new PublicError(`The \`${key}\` argument must not be greater than ${limit}`);
+      throw new PublicError(
+        `The \`${key}\` argument must not be greater than ${limit}`
+      );
 
     if (['first', 'skip'].includes(key) && args[key] < 0) {
       throw new PublicError(`The \`${key}\` argument must be positive`);
@@ -213,8 +217,14 @@ function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   return !(
-    !(requestedFields.parent && Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
-    !(requestedFields.children && Object.keys(requestedFields.children).some(key => key !== 'id'))
+    !(
+      requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')
+    ) &&
+    !(
+      requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id')
+    )
   );
 }
 
@@ -228,7 +238,8 @@ function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent =
+        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
@@ -274,7 +285,10 @@ function isFlaggedProposal(proposal) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
-  proposal.validation = jsonParse(proposal.validation, { name: 'any', params: {} }) || {
+  proposal.validation = jsonParse(proposal.validation, {
+    name: 'any',
+    params: {}
+  }) || {
     name: 'any',
     params: {}
   };
