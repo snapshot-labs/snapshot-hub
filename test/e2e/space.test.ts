@@ -40,6 +40,8 @@ describe('GET /api/space/:key', () => {
       const expectedSpace = {
         flagged: space.flagged,
         verified: space.verified,
+        turbo: space.turbo,
+        hibernated: space.hibernated,
         ...space.settings
       };
 
