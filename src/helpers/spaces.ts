@@ -55,6 +55,7 @@ function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     const verified = space.verified || false;
     const flagged = space.flagged || false;
+    const turbo = space.turbo || false;
     const hibernated = space.hibernated || false;
     const networks = uniq(
       (space.strategies || [])
@@ -76,6 +77,7 @@ function mapSpaces() {
       name: space.name,
       verified,
       flagged,
+      turbo,
       hibernated,
       popularity,
       private: space.private ?? false,
@@ -113,6 +115,7 @@ async function loadSpaces() {
         ...JSON.parse(ensSpace.settings),
         flagged: ensSpace.flagged === 1,
         verified: ensSpace.verified === 1,
+        turbo: ensSpace.turbo === 1,
         hibernated: ensSpace.hibernated === 1
       }
     ])
