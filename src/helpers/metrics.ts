@@ -95,7 +95,7 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    ['verified', 'flagged', 'hibernated'].forEach(async status => {
+    ['verified', 'flagged', 'turbo', 'hibernated'].forEach(async status => {
       this.set(
         { status },
         (

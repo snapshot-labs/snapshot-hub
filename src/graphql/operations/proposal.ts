@@ -5,7 +5,13 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, { id }) {
   const query = `
-    SELECT p.*, spaces.settings, spaces.flagged as spaceFlagged, spaces.verified as spaceVerified, spaces.hibernated as spaceHibernated FROM proposals p
+    SELECT p.*,
+      spaces.settings,
+      spaces.flagged as spaceFlagged,
+      spaces.verified as spaceVerified,
+      spaces.turbo as spaceTurbo,
+      spaces.hibernated as spaceHibernated
+    FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     WHERE p.id = ? AND spaces.settings IS NOT NULL
     LIMIT 1

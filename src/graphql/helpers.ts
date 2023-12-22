@@ -50,7 +50,14 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
-export function formatSpace({ id, settings, verified, flagged, hibernated }) {
+export function formatSpace({
+  id,
+  settings,
+  verified,
+  turbo,
+  flagged,
+  hibernated
+}) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
@@ -94,6 +101,7 @@ export function formatSpace({ id, settings, verified, flagged, hibernated }) {
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
   space.hibernated = hibernated ?? null;
+  space.turbo = turbo ?? null;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -304,6 +312,7 @@ export function formatProposal(proposal) {
     id: proposal.space,
     settings: proposal.settings,
     verified: proposal.spaceVerified,
+    turbo: proposal.spaceTurbo,
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated
   });
@@ -327,6 +336,7 @@ export function formatVote(vote) {
     id: vote.space,
     settings: vote.settings,
     verified: vote.spaceVerified,
+    turbo: vote.spaceTurbo,
     flagged: vote.spaceFlagged,
     hibernated: vote.spaceHibernated
   });
@@ -338,6 +348,7 @@ export function formatFollow(follow) {
     id: follow.space,
     settings: follow.settings,
     verified: follow.spaceVerified,
+    turbo: follow.spaceTurbo,
     flagged: follow.spaceFlagged,
     hibernated: follow.spaceHibernated
   });
@@ -349,6 +360,7 @@ export function formatSubscription(subscription) {
     id: subscription.space,
     settings: subscription.settings,
     verified: subscription.spaceVerified,
+    turbo: subscription.spaceTurbo,
     flagged: subscription.spaceFlagged,
     hibernated: subscription.spaceHibernated
   });
