@@ -27,6 +27,7 @@ function getPopularity(
   id: string,
   params: {
     verified: boolean;
+    turbo: boolean;
     networks: string[];
     strategies: any[];
   }
@@ -45,6 +46,7 @@ function getPopularity(
     popularity = 1;
 
   if (params.verified) popularity *= 100000;
+  if (params.turbo) popularity *= 100000;
 
   return popularity;
 }
@@ -65,6 +67,7 @@ function mapSpaces() {
     );
     const popularity = getPopularity(id, {
       verified,
+      turbo,
       networks,
       strategies
     });
