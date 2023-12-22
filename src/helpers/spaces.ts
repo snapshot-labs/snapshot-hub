@@ -106,7 +106,7 @@ function mapSpaces() {
 
 async function loadSpaces() {
   const query =
-    'SELECT id, settings, flagged, verified, hibernated FROM spaces WHERE deleted = 0 ORDER BY id ASC';
+    'SELECT id, settings, flagged, verified, turbo, hibernated FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(
     s.map(ensSpace => [
@@ -179,7 +179,7 @@ async function loadSpacesMetrics() {
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT settings, flagged, verified
+    SELECT settings, flagged, verified, turbo, hibernated
     FROM spaces
     WHERE deleted = 0 AND id = ?
     LIMIT 1`;
@@ -191,7 +191,9 @@ export async function getSpace(id: string) {
   return {
     ...JSON.parse(space.settings),
     flagged: space.flagged === 1,
-    verified: space.verified === 1
+    verified: space.verified === 1,
+    turbo: space.turbo === 1,
+    hibernated: space.hibernated === 1
   };
 }
 
