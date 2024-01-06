@@ -1,4 +1,9 @@
-import { checkLimits, fetchSpaces, handleRelatedSpaces, PublicError } from '../helpers';
+import {
+  checkLimits,
+  fetchSpaces,
+  handleRelatedSpaces,
+  PublicError
+} from '../helpers';
 import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 

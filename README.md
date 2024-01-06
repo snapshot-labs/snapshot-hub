@@ -63,7 +63,7 @@ yarn start
 
 ### Load a space setting
 
-To load a space settings in the database you can go on this endpoint http://localhost:3000/api/spaces/yam.eth/poke (change yam.eth with the space you want to activate).
+To load a space settings in the database you can go on this endpoint <http://localhost:3000/api/spaces/yam.eth/poke> (change yam.eth with the space you want to activate).
 
 ## License
 

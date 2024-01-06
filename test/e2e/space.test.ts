@@ -30,7 +30,9 @@ describe('GET /api/space/:key', () => {
 
     it('returns the correct HTTP response', () => {
       expect(response.status);
-      expect(response.headers.get('content-type')).toContain('application/json');
+      expect(response.headers.get('content-type')).toContain(
+        'application/json'
+      );
     });
 
     it('returns the space data', async () => {
@@ -38,6 +40,8 @@ describe('GET /api/space/:key', () => {
       const expectedSpace = {
         flagged: space.flagged,
         verified: space.verified,
+        turbo: space.turbo,
+        hibernated: space.hibernated,
         ...space.settings
       };
 
@@ -50,7 +54,9 @@ describe('GET /api/space/:key', () => {
       const response = await fetch(`${HOST}/api/spaces/null.eth`);
 
       expect(response.status).toBe(404);
-      expect(response.headers.get('content-type')).toContain('application/json');
+      expect(response.headers.get('content-type')).toContain(
+        'application/json'
+      );
       expect(response.json()).resolves.toEqual({
         error: 'unauthorized',
         error_description: 'not_found'

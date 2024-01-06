@@ -34,9 +34,13 @@ export function checkLimits(args: any = {}, type) {
     const limit = typeLimits[key];
     const firstLimitReached = key === 'first' && args[key] > limit;
     const skipLimitReached = key === 'skip' && args[key] > limit;
-    const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
+    const whereLimitReached = key.endsWith('_in')
+      ? where[key]?.length > limit
+      : where[key] > limit;
     if (firstLimitReached || skipLimitReached || whereLimitReached)
-      throw new PublicError(`The \`${key}\` argument must not be greater than ${limit}`);
+      throw new PublicError(
+        `The \`${key}\` argument must not be greater than ${limit}`
+      );
 
     if (['first', 'skip'].includes(key) && args[key] < 0) {
       throw new PublicError(`The \`${key}\` argument must be positive`);
@@ -46,7 +50,14 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
-export function formatSpace({ id, settings, verified, flagged, hibernated }) {
+export function formatSpace({
+  id,
+  settings,
+  verified,
+  turbo,
+  flagged,
+  hibernated
+}) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
@@ -90,6 +101,7 @@ export function formatSpace({ id, settings, verified, flagged, hibernated }) {
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
   space.hibernated = hibernated ?? null;
+  space.turbo = turbo ?? null;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -213,8 +225,14 @@ function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   return !(
-    !(requestedFields.parent && Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
-    !(requestedFields.children && Object.keys(requestedFields.children).some(key => key !== 'id'))
+    !(
+      requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')
+    ) &&
+    !(
+      requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id')
+    )
   );
 }
 
@@ -228,7 +246,8 @@ function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent =
+        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
@@ -278,7 +297,10 @@ function isFlaggedProposal(proposal) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
-  proposal.validation = jsonParse(proposal.validation, { name: 'any', params: {} }) || {
+  proposal.validation = jsonParse(proposal.validation, {
+    name: 'any',
+    params: {}
+  }) || {
     name: 'any',
     params: {}
   };
@@ -294,10 +316,11 @@ export function formatProposal(proposal) {
     id: proposal.space,
     settings: proposal.settings,
     verified: proposal.spaceVerified,
+    turbo: proposal.spaceTurbo,
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated
   });
-  const networkStr = network === 'testnet' ? 'demo.' : '';
+  const networkStr = network === 'testnet' ? 'testnet.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   proposal.strategies = proposal.strategies.map(strategy => ({
     ...strategy,
@@ -317,6 +340,7 @@ export function formatVote(vote) {
     id: vote.space,
     settings: vote.settings,
     verified: vote.spaceVerified,
+    turbo: vote.spaceTurbo,
     flagged: vote.spaceFlagged,
     hibernated: vote.spaceHibernated
   });
@@ -328,6 +352,7 @@ export function formatFollow(follow) {
     id: follow.space,
     settings: follow.settings,
     verified: follow.spaceVerified,
+    turbo: follow.spaceTurbo,
     flagged: follow.spaceFlagged,
     hibernated: follow.spaceHibernated
   });
@@ -339,6 +364,7 @@ export function formatSubscription(subscription) {
     id: subscription.space,
     settings: subscription.settings,
     verified: subscription.spaceVerified,
+    turbo: subscription.spaceTurbo,
     flagged: subscription.spaceFlagged,
     hibernated: subscription.spaceHibernated
   });
