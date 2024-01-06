@@ -267,6 +267,10 @@ export function formatUser(user) {
 }
 
 function isFlaggedProposal(proposal) {
+  if (flaggedLinks.length === 0) {
+    return false;
+  }
+
   const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
   return flaggedLinksRegex.test(proposal.body) || proposal.flagged;
 }

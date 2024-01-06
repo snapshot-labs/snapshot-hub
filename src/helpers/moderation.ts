@@ -10,7 +10,7 @@ export let flaggedLinks: Array<string> = [];
 
 async function loadModerationData() {
   const res = await snapshot.utils.getJSON(moderationURL);
-  flaggedLinks = res?.flaggedLinks;
+  flaggedLinks = res?.flaggedLinks || [];
 }
 
 export default async function run() {
