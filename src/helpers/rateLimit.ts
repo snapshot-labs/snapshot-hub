@@ -2,7 +2,6 @@ import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import { createClient } from 'redis';
 import { getIp, sendError, sha256 } from './utils';
-import log from './log';
 
 let client;
 
