@@ -38,7 +38,7 @@ export default rateLimit({
     return false;
   },
   handler: (req, res) => {
-    log.info(`too many requests ${hashedIp(req)}`);
+    // log.info(`too many requests ${hashedIp(req)}`);
     sendError(
       res,
       'too many requests, refer to https://docs.snapshot.org/tools/api/api-keys#limits',
