@@ -2,7 +2,6 @@ import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import { createClient } from 'redis';
 import { getIp, sendError, sha256 } from './utils';
-import log from './log';
 
 let client;
 
@@ -38,7 +37,7 @@ export default rateLimit({
     return false;
   },
   handler: (req, res) => {
-    log.info(`too many requests ${hashedIp(req)}`);
+    // log.info(`too many requests ${hashedIp(req)}`);
     sendError(
       res,
       'too many requests, refer to https://docs.snapshot.org/tools/api/api-keys#limits',
