@@ -12,7 +12,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 export default async function (_parent, args, context, info) {
   checkLimits(args, 'ranking');
   try {
-    const { first = 20, skip = 0, where = {} } = args;
+    const { first, skip, where = {} } = args;
 
     const metrics: { total: number; categories: any } = {
       total: 0,
