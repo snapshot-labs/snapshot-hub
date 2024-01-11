@@ -10,14 +10,13 @@ export default async function (parent, args) {
 
   const query = `
     SELECT * FROM spaces
-    WHERE JSON_CONTAINS(LOWER(settings->'$.admins'), LOWER(?))
-      OR JSON_CONTAINS(LOWER(settings->'$.members'), LOWER(?))
-      OR JSON_CONTAINS(LOWER(settings->'$.moderators'), LOWER(?));
+    WHERE JSON_CONTAINS(LOWER(settings->'$.admins'), LOWER(JSON_QUOTE(?)))
+      OR JSON_CONTAINS(LOWER(settings->'$.members'), LOWER(JSON_QUOTE(?)))
+      OR JSON_CONTAINS(LOWER(settings->'$.moderators'), LOWER(JSON_QUOTE(?)));
   `;
-  const params: string[] = [`"${address}"`, `"${address}"`, `"${address}"`];
 
   try {
-    const data = await db.queryAsync(query, params);
+    const data = await db.queryAsync(query, [address, address, address]);
     return data.map((space: any) => {
       const settings = JSON.parse(space.settings);
       const permissions: string[] = [];
