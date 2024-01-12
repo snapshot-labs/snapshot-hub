@@ -113,6 +113,7 @@ input SpaceWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  turbo: Boolean
 }
 
 input RankingWhere {
