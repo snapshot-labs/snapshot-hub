@@ -12,7 +12,7 @@
     "start": "node dist/src/index.js",
     "start:test": "dotenv -e test/.env.test yarn dev",
     "test:setup": "dotenv -e test/.env.test yarn ts-node ./test/setupDb.ts",
-    "test": "PORT=3030 start-server-and-test 'yarn start:test' 3030 'dotenv -e test/.env.test jest --runInBand'",
+    "test": "yarn test:setup; PORT=3030 start-server-and-test 'yarn start:test' 3030 'dotenv -e test/.env.test jest --runInBand'",
     "test:unit": "dotenv -e test/.env.test jest test/unit/",
     "test:e2e": "PORT=3030 start-server-and-test 'yarn start:test' 3030 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
   },
