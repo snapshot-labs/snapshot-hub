@@ -201,6 +201,20 @@ new client.Gauge({
   }
 });
 
+new client.Gauge({
+  name: 'proposals_pending_scores_count',
+  help: 'Total number of closed proposals with a pending scores',
+  async collect() {
+    this.set(
+      (
+        await db.queryAsync(
+          "SELECT COUNT(id) FROM proposals WHERE scores_state = 'pending' AND end < UNIX_TIMESTAMP()"
+        )
+      )[0].count
+    );
+  }
+});
+
 export const requestDeduplicatorSize = new client.Gauge({
   name: 'request_deduplicator_size',
   help: 'Total number of items in the deduplicator queue'
