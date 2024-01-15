@@ -208,7 +208,7 @@ new client.Gauge({
     this.set(
       (
         await db.queryAsync(
-          "SELECT COUNT(id) FROM proposals WHERE scores_state = 'pending' AND end < UNIX_TIMESTAMP()"
+          "SELECT COUNT(id) as count FROM proposals WHERE scores_state = 'pending' AND end < UNIX_TIMESTAMP()"
         )
       )[0].count
     );
