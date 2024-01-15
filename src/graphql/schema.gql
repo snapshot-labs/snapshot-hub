@@ -6,24 +6,20 @@ type Query {
   space(id: String): Space
 
   spaces(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: SpaceWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Space]
 
-  ranking(
-    first: Int
-    skip: Int
-    where: RankingWhere
-  ): RankingObject
+  ranking(first: Int! = 20, skip: Int! = 0, where: RankingWhere): RankingObject
 
   proposal(id: String): Proposal
 
   proposals(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: ProposalWhere
     orderBy: String
     orderDirection: OrderDirection
@@ -32,52 +28,50 @@ type Query {
   vote(id: String): Vote
 
   votes(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: VoteWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Vote]
 
   aliases(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: AliasWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Alias]
 
-  roles(
-    where: RolesWhere
-  ): [Role]
+  roles(where: RolesWhere): [Role]
 
   follows(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: FollowWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Follow]
 
   subscriptions(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: SubscriptionWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [Subscription]
 
   users(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: UsersWhere
     orderBy: String
     orderDirection: OrderDirection
   ): [User]
 
   statements(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: StatementsWhere
     orderBy: String
     orderDirection: OrderDirection
@@ -99,15 +93,11 @@ type Query {
 
   strategy(id: String): StrategyItem
 
-  vp(
-    voter: String!
-    space: String!
-    proposal: String
-  ): Vp
+  vp(voter: String!, space: String!, proposal: String): Vp
 
   messages(
-    first: Int
-    skip: Int
+    first: Int! = 20
+    skip: Int! = 0
     where: MessageWhere
     orderBy: String
     orderDirection: OrderDirection
@@ -117,6 +107,12 @@ type Query {
 input SpaceWhere {
   id: String
   id_in: [String]
+  created: Int
+  created_in: [Int]
+  created_gt: Int
+  created_gte: Int
+  created_lt: Int
+  created_lte: Int
 }
 
 input RankingWhere {
@@ -384,7 +380,10 @@ type Space {
   template: String
   verified: Boolean
   flagged: Boolean
+  hibernated: Boolean
+  turbo: Boolean
   rank: Float
+  created: Int!
 }
 
 type RankingObject {

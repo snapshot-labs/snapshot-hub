@@ -2,7 +2,6 @@ import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import { createClient } from 'redis';
 import { getIp, sendError, sha256 } from './utils';
-import log from './log';
 
 let client;
 
@@ -13,7 +12,9 @@ let client;
   client = createClient({ url: process.env.RATE_LIMIT_DATABASE_URL });
   client.on('connect', () => console.log('[redis-rl] Redis connect'));
   client.on('ready', () => console.log('[redis-rl] Redis ready'));
-  client.on('reconnecting', err => console.log('[redis-rl] Redis reconnecting', err));
+  client.on('reconnecting', err =>
+    console.log('[redis-rl] Redis reconnecting', err)
+  );
   client.on('error', err => console.log('[redis-rl] Redis error', err));
   client.on('end', err => console.log('[redis-rl] Redis end', err));
   await client.connect();
@@ -36,7 +37,7 @@ export default rateLimit({
     return false;
   },
   handler: (req, res) => {
-    log.info(`too many requests ${hashedIp(req)}`);
+    // log.info(`too many requests ${hashedIp(req)}`);
     sendError(
       res,
       'too many requests, refer to https://docs.snapshot.org/tools/api/api-keys#limits',

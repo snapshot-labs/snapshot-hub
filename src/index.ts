@@ -8,7 +8,8 @@ import rateLimit from './helpers/rateLimit';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
 import { checkKeycard } from './helpers/keycard';
-import './helpers/moderation';
+import refreshModerationData from './helpers/moderation';
+import refreshSpacesCache from './helpers/spaces';
 import './helpers/strategies';
 
 const app = express();
@@ -16,6 +17,8 @@ const PORT = process.env.PORT || 3000;
 
 initLogger(app);
 initMetrics(app);
+refreshModerationData();
+refreshSpacesCache();
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '20mb' }));

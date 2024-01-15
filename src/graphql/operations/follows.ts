@@ -4,7 +4,7 @@ import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
-  const { first = 20, skip = 0, where = {} } = args;
+  const { first, skip, where = {} } = args;
 
   checkLimits(args, 'follows');
 
@@ -27,7 +27,13 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT f.*, spaces.settings, spaces.flagged as spaceFlagged, spaces.verified as spaceVerified FROM follows f
+    SELECT f.*,
+      spaces.settings,
+      spaces.flagged as spaceFlagged,
+      spaces.verified as spaceVerified,
+      spaces.turbo as spaceTurbo,
+      spaces.hibernated as spaceHibernated
+    FROM follows f
     INNER JOIN spaces ON spaces.id = f.space
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?

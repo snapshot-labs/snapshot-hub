@@ -34,18 +34,30 @@ export function checkLimits(args: any = {}, type) {
     const limit = typeLimits[key];
     const firstLimitReached = key === 'first' && args[key] > limit;
     const skipLimitReached = key === 'skip' && args[key] > limit;
-    const whereLimitReached = key.endsWith('_in') ? where[key]?.length > limit : where[key] > limit;
+    const whereLimitReached = key.endsWith('_in')
+      ? where[key]?.length > limit
+      : where[key] > limit;
     if (firstLimitReached || skipLimitReached || whereLimitReached)
-      throw new Error(`The \`${key}\` argument must not be greater than ${limit}`);
+      throw new PublicError(
+        `The \`${key}\` argument must not be greater than ${limit}`
+      );
 
     if (['first', 'skip'].includes(key) && args[key] < 0) {
-      throw new Error(`The \`${key}\` argument must be positive`);
+      throw new PublicError(`The \`${key}\` argument must be positive`);
     }
   }
+
   return true;
 }
 
-export function formatSpace({ id, settings, verified, flagged }) {
+export function formatSpace({
+  id,
+  settings,
+  verified,
+  turbo,
+  flagged,
+  hibernated
+}) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
@@ -88,6 +100,8 @@ export function formatSpace({ id, settings, verified, flagged }) {
 
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
+  space.hibernated = hibernated ?? null;
+  space.turbo = turbo ?? null;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -113,16 +127,24 @@ export function buildWhereQuery(fields, alias, where) {
       params.push(fieldNot);
     }
 
-    const fieldIn = where[`${field}_in`] || [];
-    if (fieldIn.length > 0) {
-      query += `AND ${alias}.${field} IN (?) `;
-      params.push(fieldIn);
+    const fieldIn = where[`${field}_in`];
+    if (Array.isArray(fieldIn)) {
+      if (fieldIn.length > 0) {
+        query += `AND ${alias}.${field} IN (?) `;
+        params.push(fieldIn);
+      } else {
+        query += 'AND 1=0 ';
+      }
     }
 
-    const fieldNotIn = where[`${field}_not_in`] || [];
-    if (fieldNotIn.length > 0) {
-      query += `AND ${alias}.${field} NOT IN (?) `;
-      params.push(fieldNotIn);
+    const fieldNotIn = where[`${field}_not_in`];
+    if (Array.isArray(fieldNotIn)) {
+      if (fieldNotIn.length > 0) {
+        query += `AND ${alias}.${field} NOT IN (?) `;
+        params.push(fieldNotIn);
+      } else {
+        query += 'AND 1=0 ';
+      }
     }
 
     if (type === 'number') {
@@ -154,14 +176,14 @@ export function buildWhereQuery(fields, alias, where) {
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string' };
+  const fields = { id: 'string', created: 'number' };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
-  let orderBy = args.orderBy || 'created_at';
+  let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created_at', 'updated_at', 'id'].includes(orderBy)) orderBy = 'created_at';
+  if (!['created', 'updated', 'id'].includes(orderBy)) orderBy = 'created';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
@@ -203,8 +225,14 @@ function needsRelatedSpacesData(requestedFields): boolean {
   // id's of parent/children are already included in the result from fetchSpaces
   // an additional query is only needed if other fields are requested
   return !(
-    !(requestedFields.parent && Object.keys(requestedFields.parent).some(key => key !== 'id')) &&
-    !(requestedFields.children && Object.keys(requestedFields.children).some(key => key !== 'id'))
+    !(
+      requestedFields.parent &&
+      Object.keys(requestedFields.parent).some(key => key !== 'id')
+    ) &&
+    !(
+      requestedFields.children &&
+      Object.keys(requestedFields.children).some(key => key !== 'id')
+    )
   );
 }
 
@@ -218,7 +246,8 @@ function mapRelatedSpacesToSpaces(spaces, relatedSpaces) {
         .filter(s => s);
     }
     if (space.parent) {
-      space.parent = relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
+      space.parent =
+        relatedSpaces.find(s => s.id === space.parent.id) || space.parent;
     }
     return space;
   });
@@ -257,6 +286,10 @@ export function formatUser(user) {
 }
 
 function isFlaggedProposal(proposal) {
+  if (flaggedLinks.length === 0) {
+    return false;
+  }
+
   const flaggedLinksRegex = new RegExp(flaggedLinks.join('|'), 'i');
   return flaggedLinksRegex.test(proposal.body) || proposal.flagged;
 }
@@ -264,7 +297,10 @@ function isFlaggedProposal(proposal) {
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
   proposal.strategies = jsonParse(proposal.strategies, []);
-  proposal.validation = jsonParse(proposal.validation, { name: 'any', params: {} }) || {
+  proposal.validation = jsonParse(proposal.validation, {
+    name: 'any',
+    params: {}
+  }) || {
     name: 'any',
     params: {}
   };
@@ -280,9 +316,11 @@ export function formatProposal(proposal) {
     id: proposal.space,
     settings: proposal.settings,
     verified: proposal.spaceVerified,
-    flagged: proposal.spaceFlagged
+    turbo: proposal.spaceTurbo,
+    flagged: proposal.spaceFlagged,
+    hibernated: proposal.spaceHibernated
   });
-  const networkStr = network === 'testnet' ? 'demo.' : '';
+  const networkStr = network === 'testnet' ? 'testnet.' : '';
   proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
   proposal.strategies = proposal.strategies.map(strategy => ({
     ...strategy,
@@ -302,7 +340,9 @@ export function formatVote(vote) {
     id: vote.space,
     settings: vote.settings,
     verified: vote.spaceVerified,
-    flagged: vote.spaceFlagged
+    turbo: vote.spaceTurbo,
+    flagged: vote.spaceFlagged,
+    hibernated: vote.spaceHibernated
   });
   return vote;
 }
@@ -312,7 +352,9 @@ export function formatFollow(follow) {
     id: follow.space,
     settings: follow.settings,
     verified: follow.spaceVerified,
-    flagged: follow.spaceFlagged
+    turbo: follow.spaceTurbo,
+    flagged: follow.spaceFlagged,
+    hibernated: follow.spaceHibernated
   });
   return follow;
 }
@@ -322,7 +364,9 @@ export function formatSubscription(subscription) {
     id: subscription.space,
     settings: subscription.settings,
     verified: subscription.spaceVerified,
-    flagged: subscription.spaceFlagged
+    turbo: subscription.spaceTurbo,
+    flagged: subscription.spaceFlagged,
+    hibernated: subscription.spaceHibernated
   });
   return subscription;
 }

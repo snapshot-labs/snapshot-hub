@@ -15,12 +15,19 @@ const spaceFollowers = {};
 const testnets = Object.values(networks)
   .filter((network: any) => network.testnet)
   .map((network: any) => network.key);
-const testStrategies = ['ticket', 'api', 'api-v2', 'api-post', 'api-v2-override'];
+const testStrategies = [
+  'ticket',
+  'api',
+  'api-v2',
+  'api-post',
+  'api-v2-override'
+];
 
 function getPopularity(
   id: string,
   params: {
     verified: boolean;
+    turbo: boolean;
     networks: string[];
     strategies: any[];
   }
@@ -33,10 +40,13 @@ function getPopularity(
     (spaceFollowers[id]?.count || 0) / 50 +
     (spaceFollowers[id]?.count_7d || 0);
 
-  if (params.networks.some(network => testnets.includes(network))) popularity = 1;
-  if (params.strategies.some(strategy => testStrategies.includes(strategy))) popularity = 1;
+  if (params.networks.some(network => testnets.includes(network)))
+    popularity = 1;
+  if (params.strategies.some(strategy => testStrategies.includes(strategy)))
+    popularity = 1;
 
   if (params.verified) popularity *= 100000;
+  if (params.turbo) popularity *= 100000;
 
   return popularity;
 }
@@ -45,14 +55,19 @@ function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
     const verified = space.verified || false;
     const flagged = space.flagged || false;
+    const turbo = space.turbo || false;
+    const hibernated = space.hibernated || false;
     const networks = uniq(
       (space.strategies || [])
         .map(strategy => strategy?.network || space.network)
         .concat(space.network)
     );
-    const strategies = uniq(space.strategies?.map(strategy => strategy.name) || []);
+    const strategies = uniq(
+      space.strategies?.map(strategy => strategy.name) || []
+    );
     const popularity = getPopularity(id, {
       verified,
+      turbo,
       networks,
       strategies
     });
@@ -62,6 +77,8 @@ function mapSpaces() {
       name: space.name,
       verified,
       flagged,
+      turbo,
+      hibernated,
       popularity,
       private: space.private ?? false,
       categories: space.categories ?? [],
@@ -89,7 +106,7 @@ function mapSpaces() {
 
 async function loadSpaces() {
   const query =
-    'SELECT id, settings, flagged, verified FROM spaces WHERE deleted = 0 ORDER BY id ASC';
+    'SELECT id, settings, flagged, verified, turbo, hibernated FROM spaces WHERE deleted = 0 ORDER BY id ASC';
   const s = await db.queryAsync(query);
   spaces = Object.fromEntries(
     s.map(ensSpace => [
@@ -97,7 +114,9 @@ async function loadSpaces() {
       {
         ...JSON.parse(ensSpace.settings),
         flagged: ensSpace.flagged === 1,
-        verified: ensSpace.verified === 1
+        verified: ensSpace.verified === 1,
+        turbo: ensSpace.turbo === 1,
+        hibernated: ensSpace.hibernated === 1
       }
     ])
   );
@@ -110,7 +129,7 @@ async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
     SELECT space, COUNT(id) AS count,
-    COUNT(IF(start < ? AND end > ?, 1, NULL)) AS active,
+    COUNT(IF(start < ? AND end > ? AND flagged = 0, 1, NULL)) AS active,
     count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
     FROM proposals GROUP BY space
   `;
@@ -158,7 +177,27 @@ async function loadSpacesMetrics() {
   mapSpaces();
 }
 
-async function run() {
+export async function getSpace(id: string) {
+  const query = `
+    SELECT settings, flagged, verified, turbo, hibernated
+    FROM spaces
+    WHERE deleted = 0 AND id = ?
+    LIMIT 1`;
+
+  const [space] = await db.queryAsync(query, [id]);
+
+  if (!space) return Promise.reject(new Error('NOT_FOUND'));
+
+  return {
+    ...JSON.parse(space.settings),
+    flagged: space.flagged === 1,
+    verified: space.verified === 1,
+    turbo: space.turbo === 1,
+    hibernated: space.hibernated === 1
+  };
+}
+
+export default async function run() {
   try {
     await loadSpaces();
     await loadSpacesMetrics();
@@ -169,5 +208,3 @@ async function run() {
   await snapshot.utils.sleep(360e3);
   run();
 }
-
-run();

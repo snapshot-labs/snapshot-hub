@@ -10,10 +10,10 @@ export let flaggedLinks: Array<string> = [];
 
 async function loadModerationData() {
   const res = await snapshot.utils.getJSON(moderationURL);
-  flaggedLinks = res?.flaggedLinks;
+  flaggedLinks = res?.flaggedLinks || [];
 }
 
-async function run() {
+export default async function run() {
   try {
     await loadModerationData();
     consecutiveFailsCount = 0;
@@ -28,5 +28,3 @@ async function run() {
   await snapshot.utils.sleep(5e3);
   run();
 }
-
-run();
