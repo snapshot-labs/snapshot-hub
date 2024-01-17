@@ -21,7 +21,7 @@ router.get('/:space', async (req, res) => {
     '@context': 'http://www.daostar.org/schemas',
     type: 'DAO',
     name: space.name,
-    description: space.about,
+    description: space.about ?? '',
     membersURI: `${baseUrl}/members`,
     proposalsURI: `${baseUrl}/proposals`,
     activityLogURI: `${baseUrl}/activities`,
