@@ -6,7 +6,9 @@ const router = express.Router();
 
 router.get('/:space', async (req, res) => {
   let space: any = {};
-  const baseUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+  const protocol = req.get('X-Forwarded-Proto') || req.protocol;
+  const host = req.get('X-Forwarded-Host') || req.get('host');
+  const baseUrl = `${protocol}://${host}${req.originalUrl}`;
 
   try {
     space = await getSpace(req.params.space);
