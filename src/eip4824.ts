@@ -5,8 +5,17 @@ import db, { sequencerDB } from './helpers/mysql';
 const router = express.Router();
 
 router.get('/:space', async (req, res) => {
+  let space: any = {};
   const baseUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-  const space = await getSpace(req.params.space);
+
+  try {
+    space = await getSpace(req.params.space);
+
+    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ error: 'NOT_FOUND' });
+  }
 
   return res.json({
     '@context': 'http://www.daostar.org/schemas',
@@ -22,7 +31,15 @@ router.get('/:space', async (req, res) => {
 });
 
 router.get('/:space/members', async (req, res) => {
-  const space = await getSpace(req.params.space);
+  let space: any = {};
+
+  try {
+    space = await getSpace(req.params.space);
+
+    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+  } catch (e) {
+    return res.status(404).json({ error: 'NOT_FOUND' });
+  }
 
   const members = [...space.admins, ...space.moderators, ...space.members].map(
     member => ({
@@ -41,11 +58,21 @@ router.get('/:space/members', async (req, res) => {
 
 router.get('/:space/proposals', async (req, res) => {
   const id = req.params.space;
-  const space = await getSpace(id);
-  let proposals = await db.queryAsync(
-    'SELECT id, title, start, end FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
-    [id]
-  );
+  let space: any = {};
+  let proposals: any[] = [];
+
+  try {
+    space = await getSpace(id);
+
+    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+
+    proposals = await db.queryAsync(
+      'SELECT id, title, start, end FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
+      [id]
+    );
+  } catch (e) {
+    return res.status(404).json({ error: 'NOT_FOUND' });
+  }
 
   const ts = Math.floor(Date.now() / 1000);
   proposals = proposals.map(proposal => ({
@@ -67,11 +94,21 @@ router.get('/:space/proposals', async (req, res) => {
 
 router.get('/:space/activities', async (req, res) => {
   const id = req.params.space;
-  const space = await getSpace(req.params.space);
-  const messages = await sequencerDB.queryAsync(
-    'SELECT id, type, address FROM messages WHERE space = ? ORDER BY timestamp DESC LIMIT 20',
-    [id]
-  );
+  let space: any = {};
+  let messages: any[] = [];
+
+  try {
+    space = await getSpace(req.params.space);
+
+    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+
+    messages = await sequencerDB.queryAsync(
+      'SELECT id, type, address FROM messages WHERE space = ? ORDER BY timestamp DESC LIMIT 20',
+      [id]
+    );
+  } catch (e) {
+    return res.status(404).json({ error: 'NOT_FOUND' });
+  }
 
   const activities = messages.map(message => ({
     id: message.id,
@@ -91,7 +128,15 @@ router.get('/:space/activities', async (req, res) => {
 });
 
 router.get('/:space/contracts', async (req, res) => {
-  const space = await getSpace(req.params.space);
+  let space: any = {};
+
+  try {
+    space = await getSpace(req.params.space);
+
+    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+  } catch (e) {
+    return res.status(404).json({ error: 'NOT_FOUND' });
+  }
 
   const contracts = space.treasuries.map(treasury => ({
     type: 'EthereumAddress',
