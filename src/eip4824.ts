@@ -3,6 +3,7 @@ import { getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
 
 const router = express.Router();
+const context = '<http://www.daostar.org/schemas>';
 
 router.get('/:space', async (req, res) => {
   let space: any = {};
@@ -13,17 +14,17 @@ router.get('/:space', async (req, res) => {
   try {
     space = await getSpace(req.params.space);
 
-    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ error: 'NOT_FOUND' });
   }
 
   return res.json({
-    '@context': 'http://www.daostar.org/schemas',
+    '@context': context,
     type: 'DAO',
     name: space.name,
-    description: space.about ?? '',
+    description: space.about,
     membersURI: `${baseUrl}/members`,
     proposalsURI: `${baseUrl}/proposals`,
     activityLogURI: `${baseUrl}/activities`,
@@ -38,7 +39,7 @@ router.get('/:space/members', async (req, res) => {
   try {
     space = await getSpace(req.params.space);
 
-    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
   } catch (e) {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
@@ -51,7 +52,7 @@ router.get('/:space/members', async (req, res) => {
   );
 
   return res.json({
-    '@context': 'http://www.daostar.org/schemas',
+    '@context': context,
     type: 'DAO',
     name: space.name,
     members
@@ -66,7 +67,7 @@ router.get('/:space/proposals', async (req, res) => {
   try {
     space = await getSpace(id);
 
-    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
 
     proposals = await db.queryAsync(
       'SELECT id, title, start, end FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
@@ -87,7 +88,7 @@ router.get('/:space/proposals', async (req, res) => {
   }));
 
   return res.json({
-    '@context': 'http://www.daostar.org/schemas',
+    '@context': context,
     type: 'DAO',
     name: space.name,
     proposals
@@ -102,7 +103,7 @@ router.get('/:space/activities', async (req, res) => {
   try {
     space = await getSpace(req.params.space);
 
-    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
 
     messages = await sequencerDB.queryAsync(
       'SELECT id, type, address FROM messages WHERE space = ? ORDER BY timestamp DESC LIMIT 20',
@@ -122,7 +123,7 @@ router.get('/:space/activities', async (req, res) => {
   }));
 
   return res.json({
-    '@context': 'http://www.daostar.org/schemas',
+    '@context': context,
     type: 'DAO',
     name: space.name,
     activities
@@ -135,7 +136,7 @@ router.get('/:space/contracts', async (req, res) => {
   try {
     space = await getSpace(req.params.space);
 
-    if (!space.verified) return res.status(404).json({ error: 'INVALID' });
+    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
   } catch (e) {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
@@ -147,7 +148,7 @@ router.get('/:space/contracts', async (req, res) => {
   }));
 
   return res.json({
-    '@context': 'http://www.daostar.org/schemas',
+    '@context': context,
     type: 'DAO',
     name: space.name,
     contracts
