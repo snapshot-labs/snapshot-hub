@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 import api from './api';
+import eip4824 from './eip4824';
 import graphql from './graphql';
 import rateLimit from './helpers/rateLimit';
 import log from './helpers/log';
@@ -27,6 +28,7 @@ app.use(cors({ maxAge: 86400 }));
 app.set('trust proxy', 1);
 app.use(checkKeycard, rateLimit);
 app.use('/api', api);
+app.use('/api/eip4824', eip4824);
 app.use('/graphql', graphql);
 
 fallbackLogger(app);
