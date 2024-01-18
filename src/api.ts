@@ -1,6 +1,6 @@
 import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { getSpace } from './helpers/spaces';
+import { getSpace, getDeletedSpaces } from './helpers/spaces';
 import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
 
@@ -37,6 +37,24 @@ router.get('/spaces/:key', async (req, res) => {
       return sendError(res, 'server_error', 500);
     }
     return sendError(res, 'not_found', 404);
+  }
+});
+
+router.post('/deleted-spaces', async (req, res) => {
+  const { spaces } = req.body;
+  const id = (Array.isArray(spaces) ? spaces : [spaces])
+    .map(i => i?.toString())
+    .filter(a => a);
+
+  try {
+    return res.json(
+      id.length > 0
+        ? (await getDeletedSpaces(id)).map((s: { id: string }) => s.id)
+        : []
+    );
+  } catch (e: any) {
+    capture(e);
+    return sendError(res, 'server_error', 500);
   }
 });
 
