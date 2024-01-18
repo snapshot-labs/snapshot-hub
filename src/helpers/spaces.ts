@@ -197,14 +197,14 @@ export async function getSpace(id: string) {
   };
 }
 
-export async function getDeletedSpaces(id: string[]) {
+export async function getDeletedSpaces(ids: string[]) {
   const query = `
     SELECT id
     FROM spaces
     WHERE deleted = 1 AND id IN (?)
     `;
 
-  return await db.queryAsync(query, [id]);
+  return await db.queryAsync(query, [ids]);
 }
 
 export default async function run() {

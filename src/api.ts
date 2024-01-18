@@ -42,14 +42,14 @@ router.get('/spaces/:key', async (req, res) => {
 
 router.post('/deleted-spaces', async (req, res) => {
   const { spaces } = req.body;
-  const id = (Array.isArray(spaces) ? spaces : [spaces])
+  const ids = (Array.isArray(spaces) ? spaces : [spaces])
     .map(i => i?.toString())
-    .filter(a => a);
+    .filter(i => i);
 
   try {
     return res.json(
-      id.length > 0
-        ? (await getDeletedSpaces(id)).map((s: { id: string }) => s.id)
+      ids.length > 0
+        ? (await getDeletedSpaces(ids)).map((s: { id: string }) => s.id)
         : []
     );
   } catch (e: any) {
