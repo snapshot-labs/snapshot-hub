@@ -9,6 +9,18 @@ const fixtures: Record<string, any>[] = [
     settings: { network: 1 },
     created: Math.floor(Date.now() / 1e3),
     updated: Math.floor(Date.now() / 1e3)
+  },
+  {
+    id: 'snap.eth',
+    name: 'snap.eth',
+    flagged: false,
+    verified: true,
+    turbo: false,
+    hibernated: false,
+    deleted: true,
+    settings: { network: 1 },
+    created: Math.floor(Date.now() / 1e3),
+    updated: Math.floor(Date.now() / 1e3)
   }
 ];
 

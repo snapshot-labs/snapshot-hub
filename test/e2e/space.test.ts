@@ -67,19 +67,15 @@ describe('GET /api/space/:key', () => {
 
   describe('when the space is marked as deleted', () => {
     it('returns the space data with a deleted:true', async () => {
-      await db.queryAsync(
-        'UPDATE spaces SET deleted = 1 WHERE id = ?',
-        fixtures[0].id
-      );
-      const response = await fetch(`${HOST}/api/spaces/${fixtures[0].id}`);
+      const response = await fetch(`${HOST}/api/spaces/${fixtures[1].id}`);
 
-      const space = fixtures[0];
+      const space = fixtures[1];
       const expectedSpace = {
         flagged: space.flagged,
         verified: space.verified,
         turbo: space.turbo,
         hibernated: space.hibernated,
-        deleted: false,
+        deleted: true,
         ...space.settings
       };
 
