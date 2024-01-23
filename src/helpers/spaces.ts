@@ -181,7 +181,7 @@ export async function getSpace(id: string) {
   const query = `
     SELECT settings, flagged, verified, turbo, hibernated
     FROM spaces
-    WHERE deleted = 0 AND id = ?
+    WHERE id = ?
     LIMIT 1`;
 
   const [space] = await db.queryAsync(query, [id]);
@@ -193,18 +193,9 @@ export async function getSpace(id: string) {
     flagged: space.flagged === 1,
     verified: space.verified === 1,
     turbo: space.turbo === 1,
-    hibernated: space.hibernated === 1
+    hibernated: space.hibernated === 1,
+    deleted: space.deleted === 1
   };
-}
-
-export async function getDeletedSpaces(ids: string[]) {
-  const query = `
-    SELECT id
-    FROM spaces
-    WHERE deleted = 1 AND id IN (?)
-    `;
-
-  return await db.queryAsync(query, [ids]);
 }
 
 export default async function run() {
