@@ -179,9 +179,9 @@ async function loadSpacesMetrics() {
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT settings, flagged, verified, turbo, hibernated
+    SELECT settings, flagged, verified, turbo, hibernated, deleted
     FROM spaces
-    WHERE deleted = 0 AND id = ?
+    WHERE id = ?
     LIMIT 1`;
 
   const [space] = await db.queryAsync(query, [id]);
@@ -193,7 +193,8 @@ export async function getSpace(id: string) {
     flagged: space.flagged === 1,
     verified: space.verified === 1,
     turbo: space.turbo === 1,
-    hibernated: space.hibernated === 1
+    hibernated: space.hibernated === 1,
+    deleted: space.deleted === 1
   };
 }
 
