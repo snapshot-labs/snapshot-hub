@@ -9,7 +9,6 @@ import rateLimit from './helpers/rateLimit';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
 import { checkKeycard } from './helpers/keycard';
-import refreshModerationData from './helpers/moderation';
 import refreshSpacesCache from './helpers/spaces';
 import './helpers/strategies';
 
@@ -18,7 +17,6 @@ const PORT = process.env.PORT || 3000;
 
 initLogger(app);
 initMetrics(app);
-refreshModerationData();
 refreshSpacesCache();
 
 app.disable('x-powered-by');
