@@ -402,8 +402,8 @@ type SpaceFilters {
 }
 
 type SpaceVoting {
-  delay: Int
-  period: Int
+  delay: Float
+  period: Float
   type: String
   quorum: Float
   blind: Boolean
