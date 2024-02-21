@@ -29,9 +29,7 @@ export default rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req, res) => {
-    if (client && !client.isReady) {
-      return true;
-    }
+    if (!client?.isReady) return true;
 
     const keycardData = res.locals.keycardData;
     if (keycardData?.valid && !keycardData.rateLimited) {
