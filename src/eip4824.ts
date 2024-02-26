@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSpace } from './helpers/spaces';
+import { getSpace, getUniqueVotersForSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
 
 const router = express.Router();
@@ -35,21 +35,26 @@ router.get('/:space', async (req, res) => {
 
 router.get('/:space/members', async (req, res) => {
   let space: any = {};
+  let uniqueVoters: any = [];
 
   try {
     space = await getSpace(req.params.space);
+    uniqueVoters = await getUniqueVotersForSpace(req.params.space);
 
     if (!space.verified) return res.status(400).json({ error: 'INVALID' });
   } catch (e) {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
 
-  const members = [...space.admins, ...space.moderators, ...space.members].map(
-    member => ({
-      type: 'EthereumAddress',
-      id: member
-    })
-  );
+  const members = [
+    ...space.admins,
+    ...space.moderators,
+    ...space.members,
+    ...uniqueVoters
+  ].map(member => ({
+    type: member.type,
+    id: member.id
+  }));
 
   return res.json({
     '@context': context,

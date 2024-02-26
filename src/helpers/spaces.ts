@@ -145,6 +145,23 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
+export async function getUniqueVotersForSpace(spaceId) {
+  const query = `
+    SELECT space, GROUP_CONCAT(DISTINCT voter) AS unique_voters
+    FROM votes
+    WHERE space = ?
+    GROUP BY space
+  `;
+  const [result] = await db.queryAsync(query, [spaceId]);
+
+  if (!result) return Promise.reject(new Error('NOT_FOUND'));
+
+  const votersArray = result.unique_voters ? result.unique_voters.split(',') : [];
+
+  return votersArray;
+}
+
+
 async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count,
