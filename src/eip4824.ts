@@ -35,33 +35,54 @@ router.get('/:space', async (req, res) => {
 
 router.get('/:space/members', async (req, res) => {
   let space: any = {};
-  let uniqueVoters: any = [];
+  let uniqueVotersResult: any = {};
 
   try {
-    space = await getSpace(req.params.space);
-    uniqueVoters = await getUniqueVotersForSpace(req.params.space);
+    const spaceId = req.params.space;
+    const cursor = req.query.cursor || null;
+    // Default pageSize is set to 100, this is the query limit.
 
+    space = await getSpace(spaceId);
     if (!space.verified) return res.status(400).json({ error: 'INVALID' });
+
+    uniqueVotersResult = await getUniqueVotersForSpace(spaceId, cursor);
   } catch (e) {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
 
-  const members = [
-    ...space.admins,
-    ...space.moderators,
-    ...space.members,
-    ...uniqueVoters
-  ].map(member => ({
-    type: member.type,
-    id: member.id
-  }));
+  // Combine all members and map them to JSON strings for uniqueness check
+  const allMembersJSON = [
+    ...space.admins.map(admin =>
+      JSON.stringify({ type: 'EthereumAddress', id: admin })
+    ),
+    ...space.moderators.map(moderator =>
+      JSON.stringify({ type: 'EthereumAddress', id: moderator })
+    ),
+    ...space.members.map(member =>
+      JSON.stringify({ type: 'EthereumAddress', id: member })
+    ),
+    ...uniqueVotersResult.voters.map(voter =>
+      JSON.stringify({ type: 'EthereumAddress', id: voter })
+    )
+  ];
 
-  return res.json({
+  // Convert the array of JSON strings to a Set to remove duplicates, then back to an array
+  const uniqueMembersJSON = [...new Set(allMembersJSON)];
+
+  // Convert each JSON string back to an object
+  const members = uniqueMembersJSON.map(memberJSON => JSON.parse(memberJSON));
+
+  const responseObject = {
     '@context': context,
     type: 'DAO',
     name: space.name,
-    members
-  });
+    members: members,
+    nextCursor: uniqueVotersResult.nextCursor
+      ? uniqueVotersResult.nextCursor
+      : undefined
+  };
+
+  return res.json(responseObject);
 });
 
 router.get('/:space/proposals', async (req, res) => {
