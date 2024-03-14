@@ -383,6 +383,7 @@ type Space {
   hibernated: Boolean
   turbo: Boolean
   rank: Float
+  boost: BoostSettings
   created: Int!
 }
 
@@ -547,6 +548,11 @@ type Treasury {
   name: String
   address: String
   network: String
+}
+
+type BoostSettings {
+  disabled: Boolean
+  bribeEnabled: Boolean
 }
 
 type Vp {
