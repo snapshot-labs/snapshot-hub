@@ -551,7 +551,7 @@ type Treasury {
 }
 
 type BoostSettings {
-  disabled: Boolean
+  enabled: Boolean
   bribeEnabled: Boolean
 }
 
