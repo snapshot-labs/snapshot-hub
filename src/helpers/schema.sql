@@ -46,6 +46,7 @@ CREATE TABLE proposals (
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
   quorum DECIMAL(64,30) NOT NULL,
+  quorum_type VARCHAR(24) NOT NULL DEFAULT '',
   privacy VARCHAR(24) NOT NULL,
   snapshot INT(24) NOT NULL,
   app VARCHAR(24) NOT NULL,
