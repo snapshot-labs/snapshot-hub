@@ -77,6 +77,7 @@ export function formatSpace({
   space.voting.period = space.voting.period || null;
   space.voting.type = space.voting.type || null;
   space.voting.quorum = space.voting.quorum || null;
+  space.voting.quorumType = space.voting.quorumType || 'default';
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
   space.voting.aliased = space.voting.aliased || false;
@@ -319,6 +320,7 @@ export function formatProposal(proposal) {
     network: strategy.network || proposal.network
   }));
   proposal.privacy = proposal.privacy || '';
+  proposal.quorumType = proposal.quorum_type || 'default';
   return proposal;
 }
 
