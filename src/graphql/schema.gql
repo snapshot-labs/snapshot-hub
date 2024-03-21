@@ -407,7 +407,7 @@ type SpaceVoting {
   period: Int
   type: String
   quorum: Float
-  quorumType: String
+  quorumType: String!
   blind: Boolean
   hideAbstain: Boolean
   privacy: String
