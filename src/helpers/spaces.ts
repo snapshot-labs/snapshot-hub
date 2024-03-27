@@ -145,6 +145,50 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
+export async function getUniqueVotersForSpace(
+  spaceId,
+  cursor = null,
+  pageSize = 100
+) {
+  let query, params;
+
+  // Adjust the query based on whether a cursor is provided
+  if (cursor) {
+    // Query to use when there is a cursor value, fetching results after the cursor
+    query = `
+      SELECT DISTINCT voter
+      FROM votes
+      WHERE space = ? AND voter > ?
+      ORDER BY voter
+      LIMIT ?
+    `;
+    params = [spaceId, cursor, pageSize];
+  } else {
+    // Query to use for the first page, without a cursor
+    query = `
+      SELECT DISTINCT voter
+      FROM votes
+      WHERE space = ?
+      ORDER BY voter
+      LIMIT ?
+    `;
+    params = [spaceId, pageSize];
+  }
+
+  const results = await db.queryAsync(query, params);
+
+  if (!results || results.length === 0)
+    return Promise.reject(new Error('NOT_FOUND'));
+
+  // As the results are ordered, the last voter ID can serve as the next cursor,
+  const nextCursor =
+    results.length === pageSize ? results[results.length - 1].voter : null;
+  return {
+    voters: results.map(row => row.voter),
+    nextCursor: nextCursor
+  };
+}
+
 async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count,
