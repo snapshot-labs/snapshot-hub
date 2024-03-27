@@ -206,6 +206,6 @@ export default async function run() {
     capture(e);
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(360e3);
+  await snapshot.utils.sleep(120e3);
   run();
 }
