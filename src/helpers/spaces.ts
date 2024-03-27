@@ -45,10 +45,10 @@ function getPopularity(
   if (params.strategies.some(strategy => testStrategies.includes(strategy)))
     popularity = 1;
 
-  if (params.verified) popularity *= 1000000;
+  if (params.verified) popularity *= 100000000;
   if (params.turbo) {
     popularity += 1;
-    popularity *= 1000000;
+    popularity *= 100000000;
   }
 
   return popularity;
