@@ -17,11 +17,11 @@ const ARG_LIMITS = {
   },
   spaces: {
     first: 1000,
-    skip: 30000
+    skip: 100000
   },
   ranking: {
     first: 20,
-    skip: 30000
+    skip: 100000
   }
 };
 
