@@ -292,10 +292,13 @@ export function formatProposal(proposal) {
   proposal.validation = jsonParse(proposal.validation, {
     name: 'any',
     params: {}
-  }) || {
-    name: 'any',
-    params: {}
-  };
+  });
+  if (!proposal.validation || Object.keys(proposal.validation).length === 0) {
+    proposal.validation = {
+      name: 'any',
+      params: {}
+    };
+  }
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
