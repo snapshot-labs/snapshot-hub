@@ -43,7 +43,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Alias]
 
-  roles(where: RolesWhere): [Role]
+  roles(where: RolesWhere!): [Role]
 
   follows(
     first: Int! = 20
@@ -264,7 +264,7 @@ input AliasWhere {
 }
 
 input RolesWhere {
-  address: String
+  address: String!
 }
 
 input FollowWhere {

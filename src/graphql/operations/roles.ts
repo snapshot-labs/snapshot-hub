@@ -6,7 +6,7 @@ export default async function (parent, args) {
   const { where = {} } = args;
 
   const { address } = where;
-  if (!address) return Promise.reject(new Error('address is required'));
+  // if (!address) return Promise.reject(new Error('address is required'));
 
   const query = `
     SELECT * FROM spaces

@@ -4,7 +4,6 @@ import log from '../../helpers/log';
 import fetchVotes from './votes';
 
 export default async function (parent, { id }, context, info) {
-  if (!id) return new PublicError('Missing id');
   try {
     const votes = await fetchVotes(
       parent,
