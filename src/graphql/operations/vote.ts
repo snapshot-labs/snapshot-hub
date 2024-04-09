@@ -1,5 +1,4 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { PublicError } from '../helpers';
 import log from '../../helpers/log';
 import fetchVotes from './votes';
 
