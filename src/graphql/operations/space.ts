@@ -3,7 +3,6 @@ import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (_parent, { id }, context, info) {
-  if (!id) return new PublicError('Missing id');
   try {
     let spaces = await fetchSpaces({ first: 1, where: { id } });
     if (spaces.length !== 1) return null;

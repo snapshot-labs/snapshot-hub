@@ -3,7 +3,7 @@ scalar Any
 # Queries
 
 type Query {
-  space(id: String): Space
+  space(id: String!): Space
 
   spaces(
     first: Int! = 20
@@ -15,7 +15,7 @@ type Query {
 
   ranking(first: Int! = 20, skip: Int! = 0, where: RankingWhere): RankingObject
 
-  proposal(id: String): Proposal
+  proposal(id: String!): Proposal
 
   proposals(
     first: Int! = 20
@@ -25,7 +25,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Proposal]
 
-  vote(id: String): Vote
+  vote(id: String!): Vote
 
   votes(
     first: Int! = 20
@@ -43,7 +43,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Alias]
 
-  roles(where: RolesWhere): [Role]
+  roles(where: RolesWhere!): [Role]
 
   follows(
     first: Int! = 20
@@ -77,9 +77,9 @@ type Query {
     orderDirection: OrderDirection
   ): [Statement]
 
-  user(id: String): User
+  user(id: String!): User
 
-  statement(id: String): Statement
+  statement(id: String!): Statement
 
   skins: [Item]
 
@@ -91,7 +91,7 @@ type Query {
 
   strategies: [StrategyItem]
 
-  strategy(id: String): StrategyItem
+  strategy(id: String!): StrategyItem
 
   vp(voter: String!, space: String!, proposal: String): Vp
 
@@ -264,7 +264,7 @@ input AliasWhere {
 }
 
 input RolesWhere {
-  address: String
+  address: String!
 }
 
 input FollowWhere {
