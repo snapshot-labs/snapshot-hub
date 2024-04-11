@@ -7,8 +7,8 @@ export default function () {
       plugins[plugin] = (plugins[plugin] || 0) + 1;
     });
   });
-  return Object.entries(plugins).map(network => ({
-    id: network[0],
-    spacesCount: network[1]
+  return Object.entries(plugins).map(plugin => ({
+    id: plugin[0],
+    spacesCount: plugin[1]
   }));
 }

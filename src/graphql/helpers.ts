@@ -179,7 +179,7 @@ export async function fetchSpaces(args) {
 
   const fields = { id: 'string', created: 'number' };
   const whereQuery = buildWhereQuery(fields, 's', where);
-  const queryStr = whereQuery.query;
+  let queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
@@ -187,6 +187,16 @@ export async function fetchSpaces(args) {
   if (!['created', 'updated', 'id'].includes(orderBy)) orderBy = 'created';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
+  if (where.strategy) {
+    queryStr += ` AND JSON_CONTAINS(JSON_EXTRACT(s.settings, '$.strategies[*].name'), JSON_ARRAY(?))`;
+    params.push(where.strategy);
+  }
+
+  if (where.plugin) {
+    queryStr += ` AND JSON_CONTAINS(JSON_KEYS(s.settings->'$.plugins'), JSON_ARRAY(?))`;
+    params.push(where.plugin);
+  }
 
   const query = `
     SELECT s.* FROM spaces s
