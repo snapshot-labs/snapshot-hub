@@ -113,6 +113,8 @@ input SpaceWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  strategy: String
+  plugin: String
 }
 
 input RankingWhere {
@@ -121,6 +123,8 @@ input RankingWhere {
   search: String
   category: String
   network: String
+  strategy: String
+  plugin: String
 }
 
 input MessageWhere {

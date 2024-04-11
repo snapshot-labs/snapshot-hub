@@ -65,14 +65,15 @@ function mapSpaces() {
         .map(strategy => strategy?.network || space.network)
         .concat(space.network)
     );
-    const strategies = uniq(
-      space.strategies?.map(strategy => strategy.name) || []
+    const strategyNames = uniq(
+      (space.strategies || []).map(strategy => strategy.name) || []
     );
+    const pluginNames = uniq(Object.keys(space.plugins || {}) || []);
     const popularity = getPopularity(id, {
       verified,
       turbo,
       networks,
-      strategies
+      strategies: strategyNames
     });
 
     spacesMetadata[id] = {
@@ -94,7 +95,9 @@ function mapSpaces() {
         followersCount7d: spaceFollowers[id]?.count_7d || 0,
         votesCount: spaceVotes[id]?.count || 0,
         votesCount7d: spaceVotes[id]?.count_7d || 0
-      }
+      },
+      strategyNames,
+      pluginNames
     };
   });
 
