@@ -66,7 +66,7 @@ function mapSpaces() {
         .concat(space.network)
     );
     const strategyNames = uniq(
-      (space.strategies || []).map(strategy => strategy.name) || []
+      (space.strategies || []).map(strategy => strategy.name)
     );
     const pluginNames = uniq(Object.keys(space.plugins || {}) || []);
     const popularity = getPopularity(id, {
