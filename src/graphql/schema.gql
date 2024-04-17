@@ -557,6 +557,8 @@ type User {
   about: String
   avatar: String
   created: Int!
+  vote_count: Int
+  proposal_count: Int
 }
 
 type Statement {
