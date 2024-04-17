@@ -603,8 +603,8 @@ type Vp {
 }
 
 type Leaderboard {
-  space: String
-  user: String
+  space: Space
+  user: User
   proposal_count: Int
   vote_count: Int
 }
