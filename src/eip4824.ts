@@ -3,7 +3,7 @@ import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
 
 const router = express.Router();
-const context = 'http://www.daostar.org/schemas';
+const context = ["https://www.snapshot.org", "https://www.daostar.org/schemas"];
 
 router.get('/:space', async (req, res) => {
   let space: any = {};
