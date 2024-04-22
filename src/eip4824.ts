@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSpace, getUniqueVotersForSpace } from './helpers/spaces';
+import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
 
 const router = express.Router();
@@ -34,56 +34,48 @@ router.get('/:space', async (req, res) => {
 });
 
 router.get('/:space/members', async (req, res) => {
-  let space: any = {};
-  let uniqueVotersResult: any = {};
-
   try {
     const spaceId = req.params.space;
     const cursor = req.query.cursor || null;
-    // Default pageSize is set to 100, this is the query limit.
+    const pageSize = 500; // Default page size
 
-    space = await getSpace(spaceId);
-    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
+    const space = await getSpace(spaceId);
+    if (!space.verified) {
+      return res.status(400).json({ error: 'INVALID_SPACE', message: 'The specified space is not verified.' });
+    }
 
-    uniqueVotersResult = await getUniqueVotersForSpace(spaceId, cursor);
+    // Includes space.members, space.admins, space.moderators and voters
+    const combinedMembersResult = await getCombinedMembersAndVoters(spaceId, cursor, pageSize);
+
+    const members = combinedMembersResult.members.map(address => ({
+      type: 'EthereumAddress',
+      id: address
+    }));
+
+    const responseObject = {
+      '@context': context, 
+      type: 'DAO',
+      name: space.name,
+      members: members,
+      nextCursor: combinedMembersResult.nextCursor
+    };
+
+    return res.json(responseObject);
+
   } catch (e) {
-    return res.status(404).json({ error: 'NOT_FOUND' });
+    const error = e as Error; 
+    console.error(error); 
+
+    if (error.message.includes('database')) {
+      return res.status(500).json({ error: 'DATABASE_ERROR', message: 'Failed to retrieve data from the database.' });
+  } else if (error.message.includes('parameter')) {
+      return res.status(400).json({ error: 'INVALID_PARAMETER', message: 'Invalid or missing parameter.' });
+  } else {
+      return res.status(500).json({ error: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred.' });
   }
-
-  // Combine all members and map them to JSON strings for uniqueness check
-  const allMembersJSON = [
-    ...space.admins.map(admin =>
-      JSON.stringify({ type: 'EthereumAddress', id: admin })
-    ),
-    ...space.moderators.map(moderator =>
-      JSON.stringify({ type: 'EthereumAddress', id: moderator })
-    ),
-    ...space.members.map(member =>
-      JSON.stringify({ type: 'EthereumAddress', id: member })
-    ),
-    ...uniqueVotersResult.voters.map(voter =>
-      JSON.stringify({ type: 'EthereumAddress', id: voter })
-    )
-  ];
-
-  // Convert the array of JSON strings to a Set to remove duplicates, then back to an array
-  const uniqueMembersJSON = [...new Set(allMembersJSON)];
-
-  // Convert each JSON string back to an object
-  const members = uniqueMembersJSON.map(memberJSON => JSON.parse(memberJSON));
-
-  const responseObject = {
-    '@context': context,
-    type: 'DAO',
-    name: space.name,
-    members: members,
-    nextCursor: uniqueVotersResult.nextCursor
-      ? uniqueVotersResult.nextCursor
-      : undefined
-  };
-
-  return res.json(responseObject);
+  }
 });
+
 
 router.get('/:space/proposals', async (req, res) => {
   const id = req.params.space;

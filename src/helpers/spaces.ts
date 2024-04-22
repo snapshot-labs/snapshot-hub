@@ -145,49 +145,54 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
-export async function getUniqueVotersForSpace(
-  spaceId,
-  cursor = null,
-  pageSize = 100
-) {
-  let query, params;
+export async function getCombinedMembersAndVoters(spaceId, cursor = null, pageSize) {
+  let query;
+  const params = [spaceId, spaceId, spaceId, spaceId];
 
-  // Adjust the query based on whether a cursor is provided
+  query = `
+    SELECT address
+    FROM (
+      (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.admins[*]')) AS address 
+       FROM spaces 
+       WHERE id = ?)
+      UNION
+      (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.moderators[*]')) AS address 
+       FROM spaces 
+       WHERE id = ?)
+      UNION
+      (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.members[*]')) AS address 
+       FROM spaces 
+       WHERE id = ?)
+      UNION
+      (SELECT DISTINCT voter AS address
+       FROM votes
+       WHERE space = ?)
+    ) AS combined_addresses
+    WHERE (? IS NULL OR address > ?)
+    ORDER BY address
+    LIMIT ?
+  `;
+
   if (cursor) {
-    // Query to use when there is a cursor value, fetching results after the cursor
-    query = `
-      SELECT DISTINCT voter
-      FROM votes
-      WHERE space = ? AND voter > ?
-      ORDER BY voter
-      LIMIT ?
-    `;
-    params = [spaceId, cursor, pageSize];
+    params.push(cursor, cursor, pageSize); 
   } else {
-    // Query to use for the first page, without a cursor
-    query = `
-      SELECT DISTINCT voter
-      FROM votes
-      WHERE space = ?
-      ORDER BY voter
-      LIMIT ?
-    `;
-    params = [spaceId, pageSize];
+    params.push(null, null, pageSize);  
   }
 
   const results = await db.queryAsync(query, params);
 
-  if (!results || results.length === 0)
+  if (!results || results.length === 0) {
     return Promise.reject(new Error('NOT_FOUND'));
+  }
 
-  // As the results are ordered, the last voter ID can serve as the next cursor,
-  const nextCursor =
-    results.length === pageSize ? results[results.length - 1].voter : null;
+  const nextCursor = results.length === pageSize ? results[results.length - 1].address : null;
+
   return {
-    voters: results.map(row => row.voter),
+    members: results.map(row => row.address),
     nextCursor: nextCursor
   };
 }
+
 
 async function getFollowers() {
   const query = `
