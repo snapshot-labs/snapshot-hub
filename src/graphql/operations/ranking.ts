@@ -26,8 +26,8 @@ export default async function (_parent, args, context, info) {
       strategy = '',
       plugin = ''
     } = where;
-    const searchStr = search.toLowerCase();
-    let searchCategory = category.toLowerCase();
+    const searchStr = search?.toLowerCase() || '';
+    let searchCategory = category?.toLowerCase() || '';
     if (searchCategory === 'all') searchCategory = '';
 
     let filteredSpaces = rankedSpaces.filter((space: any) => {
