@@ -5,7 +5,16 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
   const id = args.id;
-  const query = `SELECT u.* FROM users u WHERE id = ? LIMIT 1`;
+  const query = `
+    SELECT
+      u.*,
+      SUM(l.vote_count) AS vote_count,
+      SUM(l.proposal_count) AS proposal_count
+    FROM users u
+    JOIN leaderboard l ON BINARY l.user = BINARY u.id
+    WHERE id = ?
+    GROUP BY l.user
+    LIMIT 1`;
   try {
     const users = await db.queryAsync(query, id);
     if (users.length === 1) return formatUser(users[0]);

@@ -316,6 +316,18 @@ input UsersWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  vote_count: Int
+  vote_count_in: [Int]
+  vote_count_gt: Int
+  vote_count_gte: Int
+  vote_count_lt: Int
+  vote_count_lte: Int
+  proposal_count: Int
+  proposal_count_in: [Int]
+  proposal_count_gt: Int
+  proposal_count_gte: Int
+  proposal_count_lt: Int
+  proposal_count_lte: Int
 }
 
 input StatementsWhere {
@@ -521,6 +533,8 @@ type User {
   name: String
   about: String
   avatar: String
+  vote_count: Int
+  proposal_count: Int
   created: Int!
 }
 
