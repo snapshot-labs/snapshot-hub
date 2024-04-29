@@ -8,8 +8,8 @@ export default async function (parent, args) {
   const query = `
     SELECT
       u.*,
-      SUM(leaderboard.vote_count) as vote_count,
-      SUM(leaderboard.proposal_count) as proposal_count
+      SUM(leaderboard.vote_count) as votesCount,
+      SUM(leaderboard.proposal_count) as proposalsCount
     FROM users u
     INNER JOIN leaderboard ON leaderboard.user = u.id
     WHERE id = ?

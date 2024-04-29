@@ -11,11 +11,11 @@ export default async function (parent, args) {
   const fields = {
     user: 'string',
     space: 'string',
-    vote_count: 'number',
-    proposal_count: 'number'
+    votesCount: 'number',
+    proposalsCount: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'l', where);
-  const defaultOrder = 'l.vote_count DESC, l.proposal_count DESC';
+  const defaultOrder = 'l.votesCount DESC, l.proposalsCount DESC';
 
   const orderBy = Object.keys(fields).includes(args.orderBy)
     ? args.orderBy
