@@ -27,12 +27,12 @@ export default async function (parent, args) {
   const query = `
     SELECT
       u.*,
-      SUM(leaderboard.vote_count) as votesCount,
-      SUM(leaderboard.proposal_count) as proposalsCount
+      SUM(l.vote_count) as votesCount,
+      SUM(l.proposal_count) as proposalsCount
     FROM users u
-    INNER JOIN leaderboard ON leaderboard.user = u.id
+    INNER JOIN leaderboard l ON BINARY l.user = BINARY u.id
     WHERE 1=1 ${queryStr}
-    GROUP BY leaderboard.user
+    GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);

@@ -15,7 +15,7 @@ export default async function (parent, args) {
     proposalsCount: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'l', where);
-  const defaultOrder = 'l.votesCount DESC, l.proposalsCount DESC';
+  const defaultOrder = 'votesCount DESC, proposalsCount DESC';
 
   const orderBy = Object.keys(fields).includes(args.orderBy)
     ? args.orderBy
@@ -32,10 +32,12 @@ export default async function (parent, args) {
       spaces.hibernated as spaceHibernated,
       users.profile as userProfile,
       users.ipfs as userIpfs,
-      users.created as userCreated
+      users.created as userCreated,
+      l.vote_count as votesCount,
+      l.proposal_count as proposalsCount
     FROM leaderboard l
-    INNER JOIN spaces ON spaces.id = l.space
-    INNER JOIN users ON users.id = l.user
+    INNER JOIN spaces ON BINARY spaces.id = BINARY l.space
+    INNER JOIN users ON BINARY users.id = BINARY l.user
     WHERE spaces.settings IS NOT NULL ${whereQuery.query}
     ORDER BY ${
       orderBy ? `l.${orderBy} ${orderDirection}` : defaultOrder
