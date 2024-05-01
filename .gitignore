@@ -8,5 +8,3 @@ coverage
 # Remove some common IDE working directories
 .idea
 .vscode
-
-pnpm-lock.yaml
