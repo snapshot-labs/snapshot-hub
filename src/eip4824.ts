@@ -3,7 +3,7 @@ import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
 
 const router = express.Router();
-const context = ["https://www.snapshot.org", "https://www.daostar.org/schemas"];
+const context = ['https://www.snapshot.org', 'https://www.daostar.org/schemas'];
 
 router.get('/:space', async (req, res) => {
   let space: any = {};
@@ -41,11 +41,18 @@ router.get('/:space/members', async (req, res) => {
 
     const space = await getSpace(spaceId);
     if (!space.verified) {
-      return res.status(400).json({ error: 'INVALID_SPACE', message: 'The specified space is not verified.' });
+      return res.status(400).json({
+        error: 'INVALID_SPACE',
+        message: 'The specified space is not verified.'
+      });
     }
 
     // Includes space.members, space.admins, space.moderators and voters
-    const combinedMembersResult = await getCombinedMembersAndVoters(spaceId, cursor, pageSize);
+    const combinedMembersResult = await getCombinedMembersAndVoters(
+      spaceId,
+      cursor,
+      pageSize
+    );
 
     const members = combinedMembersResult.members.map(address => ({
       type: 'EthereumAddress',
@@ -53,7 +60,7 @@ router.get('/:space/members', async (req, res) => {
     }));
 
     const responseObject = {
-      '@context': context, 
+      '@context': context,
       type: 'DAO',
       name: space.name,
       members: members,
@@ -61,21 +68,28 @@ router.get('/:space/members', async (req, res) => {
     };
 
     return res.json(responseObject);
-
   } catch (e) {
-    const error = e as Error; 
-    console.error(error); 
+    const error = e as Error;
+    console.error(error);
 
     if (error.message.includes('database')) {
-      return res.status(500).json({ error: 'DATABASE_ERROR', message: 'Failed to retrieve data from the database.' });
-  } else if (error.message.includes('parameter')) {
-      return res.status(400).json({ error: 'INVALID_PARAMETER', message: 'Invalid or missing parameter.' });
-  } else {
-      return res.status(500).json({ error: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred.' });
-  }
+      return res.status(500).json({
+        error: 'DATABASE_ERROR',
+        message: 'Failed to retrieve data from the database.'
+      });
+    } else if (error.message.includes('parameter')) {
+      return res.status(400).json({
+        error: 'INVALID_PARAMETER',
+        message: 'Invalid or missing parameter.'
+      });
+    } else {
+      return res.status(500).json({
+        error: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred.'
+      });
+    }
   }
 });
-
 
 router.get('/:space/proposals', async (req, res) => {
   const id = req.params.space;

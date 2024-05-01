@@ -145,11 +145,13 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
-export async function getCombinedMembersAndVoters(spaceId, cursor = null, pageSize) {
-  let query;
+export async function getCombinedMembersAndVoters(
+  spaceId,
+  cursor = null,
+  pageSize
+) {
   const params = [spaceId, spaceId, spaceId, spaceId];
-
-  query = `
+  const query = `
     SELECT address
     FROM (
       (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.admins[*]')) AS address 
@@ -174,9 +176,9 @@ export async function getCombinedMembersAndVoters(spaceId, cursor = null, pageSi
   `;
 
   if (cursor) {
-    params.push(cursor, cursor, pageSize); 
+    params.push(cursor, cursor, pageSize);
   } else {
-    params.push(null, null, pageSize);  
+    params.push(null, null, pageSize);
   }
 
   const results = await db.queryAsync(query, params);
@@ -185,14 +187,14 @@ export async function getCombinedMembersAndVoters(spaceId, cursor = null, pageSi
     return Promise.reject(new Error('NOT_FOUND'));
   }
 
-  const nextCursor = results.length === pageSize ? results[results.length - 1].address : null;
+  const nextCursor =
+    results.length === pageSize ? results[results.length - 1].address : null;
 
   return {
     members: results.map(row => row.address),
     nextCursor: nextCursor
   };
 }
-
 
 async function getFollowers() {
   const query = `
