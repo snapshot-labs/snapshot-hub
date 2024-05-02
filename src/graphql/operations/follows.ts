@@ -13,11 +13,12 @@ export default async function (parent, args) {
     ipfs: 'string',
     follower: 'string',
     space: 'string',
+    network: 'string',
     created: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'f', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params.concat(skip, first);
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -34,15 +35,13 @@ export default async function (parent, args) {
       spaces.turbo as spaceTurbo,
       spaces.hibernated as spaceHibernated
     FROM follows f
-    INNER JOIN spaces ON spaces.id = f.space
-    WHERE spaces.settings IS NOT NULL ${queryStr}
+    LEFT JOIN spaces ON spaces.id = f.space
+    WHERE 1=1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
-  params.push(skip, first);
 
-  let follows: any[] = [];
   try {
-    follows = await db.queryAsync(query, params);
+    const follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));
   } catch (e: any) {
     log.error(`[graphql] follows, ${JSON.stringify(e)}`);

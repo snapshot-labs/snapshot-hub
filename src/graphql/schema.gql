@@ -280,6 +280,8 @@ input FollowWhere {
   follower_in: [String]
   space: String
   space_in: [String]
+  network: String
+  network_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -504,6 +506,7 @@ type Follow {
   ipfs: String
   follower: String!
   space: Space!
+  network: String!
   created: Int!
 }
 
