@@ -352,22 +352,22 @@ input LeaderboardsWhere {
   user_in: [String]
   user_not: String
   user_not_in: [String]
-  proposalsCount: Int
-  proposalsCount_in: [Int]
-  proposalsCount_not: Int
-  proposalsCount_not_in: [Int]
-  proposalsCount_gt: [Int]
-  proposalsCount_gte: [Int]
-  proposalsCount_lt: [Int]
-  proposalsCount_lte: [Int]
-  votesCount: Int
-  votesCount_in: [Int]
-  votesCount_not: Int
-  votesCount_not_in: [Int]
-  votesCount_gt: [Int]
-  votesCount_gte: [Int]
-  votesCount_lt: [Int]
-  votesCount_lte: [Int]
+  proposal_count: Int
+  proposal_count_in: [Int]
+  proposal_count_not: Int
+  proposal_count_not_in: [Int]
+  proposal_count_gt: [Int]
+  proposal_count_gte: [Int]
+  proposal_count_lt: [Int]
+  proposal_count_lte: [Int]
+  vote_count: Int
+  vote_count_in: [Int]
+  vote_count_not: Int
+  vote_count_not_in: [Int]
+  vote_count_gt: [Int]
+  vote_count_gte: [Int]
+  vote_count_lt: [Int]
+  vote_count_lte: [Int]
 }
 
 enum OrderDirection {

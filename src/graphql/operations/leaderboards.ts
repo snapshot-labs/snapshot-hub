@@ -11,8 +11,8 @@ export default async function (parent, args) {
   const fields = {
     user: 'string',
     space: 'string',
-    votesCount: 'number',
-    proposalsCount: 'number'
+    vote_count: 'number',
+    proposal_count: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'l', where);
   const defaultOrder = 'votesCount DESC, proposalsCount DESC';
