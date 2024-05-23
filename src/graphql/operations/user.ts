@@ -9,7 +9,8 @@ export default async function (parent, args) {
     SELECT
       u.*,
       SUM(l.vote_count) AS vote_count,
-      SUM(l.proposal_count) AS proposal_count
+      SUM(l.proposal_count) AS proposal_count,
+      MAX(l.last_vote) AS last_vote
     FROM users u
     JOIN leaderboard l ON BINARY l.user = BINARY u.id
     WHERE id = ?

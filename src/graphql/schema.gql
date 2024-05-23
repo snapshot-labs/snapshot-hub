@@ -535,6 +535,7 @@ type User {
   avatar: String
   vote_count: Int
   proposal_count: Int
+  last_vote: Int
   created: Int!
 }
 
