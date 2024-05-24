@@ -1,6 +1,6 @@
 import db from '../../helpers/mysql';
 import log from '../../helpers/log';
-import { buildWhereQuery, checkLimits, formatLeaderboard } from '../helpers';
+import { buildWhereQuery, checkLimits } from '../helpers';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
@@ -25,33 +25,18 @@ export default async function (parent, args) {
 
   const query = `
     SELECT l.*,
-      spaces.settings,
-      spaces.flagged as spaceFlagged,
-      spaces.verified as spaceVerified,
-      spaces.turbo as spaceTurbo,
-      spaces.hibernated as spaceHibernated,
-      users.profile as userProfile,
-      users.ipfs as userIpfs,
-      users.created as userCreated,
       l.vote_count as votesCount,
-      l.proposal_count as proposalsCount
+      l.proposal_count as proposalsCount,
+      l.last_vote as lastVote
     FROM leaderboard l
-    INNER JOIN spaces ON BINARY spaces.id = BINARY l.space
-    INNER JOIN users ON BINARY users.id = BINARY l.user
-    WHERE spaces.settings IS NOT NULL ${whereQuery.query}
+    WHERE 1=1 ${whereQuery.query}
     ORDER BY ${
       orderBy ? `l.${orderBy} ${orderDirection}` : defaultOrder
     } LIMIT ?, ?
   `;
 
   try {
-    const result = await db.queryAsync(query, [
-      ...whereQuery.params,
-      skip,
-      first
-    ]);
-
-    return result.map(item => formatLeaderboard(item));
+    return db.queryAsync(query, [...whereQuery.params, skip, first]);
   } catch (e) {
     log.error(`[graphql] leaderboards, ${JSON.stringify(e)}`);
     capture(e, { args });

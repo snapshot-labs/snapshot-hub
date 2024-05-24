@@ -605,8 +605,9 @@ type Vp {
 }
 
 type Leaderboard {
-  space: Space
-  user: User
+  space: String
+  user: String
   proposalsCount: Int
   votesCount: Int
+  lastVote: Int
 }

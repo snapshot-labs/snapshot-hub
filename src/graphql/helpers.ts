@@ -375,22 +375,3 @@ export function formatSubscription(subscription) {
   });
   return subscription;
 }
-
-export function formatLeaderboard(leaderboard) {
-  leaderboard.space = formatSpace({
-    id: leaderboard.space,
-    settings: leaderboard.settings,
-    verified: leaderboard.spaceVerified,
-    turbo: leaderboard.spaceTurbo,
-    flagged: leaderboard.spaceFlagged,
-    hibernated: leaderboard.spaceHibernated
-  });
-  leaderboard.user = formatUser({
-    id: leaderboard.user,
-    profile: leaderboard.userProfile,
-    ipfs: leaderboard.userIpfs,
-    created: leaderboard.userCreated
-  });
-
-  return leaderboard;
-}
