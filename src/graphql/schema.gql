@@ -118,8 +118,6 @@ input SpaceWhere {
 }
 
 input RankingWhere {
-  id: String
-  id_in: [String]
   search: String
   category: String
   network: String
