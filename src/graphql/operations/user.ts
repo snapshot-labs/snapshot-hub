@@ -9,9 +9,10 @@ export default async function (parent, args) {
     SELECT
       u.*,
       SUM(l.vote_count) as votesCount,
-      SUM(l.proposal_count) as proposalsCount
+      SUM(l.proposal_count) as proposalsCount,
+      MAX(l.last_vote) as lastVote
     FROM users u
-    INNER JOIN leaderboard l  ON BINARY l.user = BINARY u.id
+    LEFT JOIN leaderboard l ON BINARY l.user = BINARY u.id
     WHERE id = ?
     LIMIT 1`;
   try {
