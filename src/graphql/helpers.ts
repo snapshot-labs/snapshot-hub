@@ -395,7 +395,7 @@ async function getControllerDomains(address: string): Promise<string[]> {
   };
 
   try {
-    const response = await fetch(process.env.STAMP_URL, {
+    const response = await fetch(process.env.STAMP_URL ?? 'https://stamp.fyi', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
