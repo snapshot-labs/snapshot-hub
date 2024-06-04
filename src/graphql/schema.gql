@@ -115,6 +115,7 @@ input SpaceWhere {
   created_lte: Int
   strategy: String
   plugin: String
+  controller: String
 }
 
 input RankingWhere {
