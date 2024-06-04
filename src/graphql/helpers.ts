@@ -180,7 +180,9 @@ export async function fetchSpaces(args) {
 
   const fields = { id: 'string', created: 'number' };
 
-  if (where.controller) {
+  if ('controller' in where) {
+    if (!where.controller) return [];
+
     where.id_in = await getControllerDomains(where.controller);
 
     delete where.controller;
