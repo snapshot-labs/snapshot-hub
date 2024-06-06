@@ -74,7 +74,7 @@ export default async function (_parent, args, context, info) {
       filteredSpaces.slice(skip, skip + first),
       (space: any) => space.id
     );
-    if (!filteredSpaces.length) return { spaces: [], metrics };
+    if (!filteredSpaces.length) return { items: [], metrics };
 
     const query = `
       SELECT s.* FROM spaces s WHERE s.deleted = 0
