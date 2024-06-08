@@ -525,6 +525,9 @@ type User {
   name: String
   about: String
   avatar: String
+  cover: String
+  github: String
+  twitter: String
   created: Int!
 }
 
