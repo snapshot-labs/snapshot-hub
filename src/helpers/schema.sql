@@ -160,3 +160,14 @@ CREATE TABLE statements (
   INDEX created (created),
   INDEX updated (updated)
 );
+
+CREATE TABLE user_space_activities (
+  user_id VARCHAR(64) NOT NULL,
+  space_id VARCHAR(64) NOT NULL,
+  votes_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  proposals_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  UNIQUE KEY user_id_space_id (user_id,space_id),
+  INDEX space_id (space_id),
+  INDEX votes_count (votes_count),
+  INDEX proposals_count (proposals_count)
+);
