@@ -1,3 +1,4 @@
+import { getAddress } from '@ethersproject/address';
 import graphqlFields from 'graphql-fields';
 import fetch from 'node-fetch';
 import { jsonParse } from '../helpers/utils';
@@ -117,7 +118,23 @@ export function formatSpace({
 export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];
+
   Object.entries(fields).forEach(([field, type]) => {
+    if (type === 'EVMAddress') {
+      const conditions = ['', '_not', '_in', '_not_in'];
+      try {
+        conditions.forEach(condition => {
+          const key = `${field}${condition}`;
+          if (where[key]) {
+            where[key] = condition.includes('in')
+              ? where[key].map(getAddress)
+              : getAddress(where[key]);
+          }
+        });
+      } catch (e) {
+        throw new PublicError(`Invalid ${field} address`);
+      }
+    }
     if (where[field] !== undefined) {
       query += `AND ${alias}.${field} = ? `;
       params.push(where[field]);
