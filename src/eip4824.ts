@@ -47,11 +47,15 @@ router.get('/:space/members', async (req, res) => {
       });
     }
 
-    // Includes space.members, space.admins, space.moderators and voters
+    const knownAdmins = space.admins || [];
+    const knownMembers = space.members || [];
+
     const combinedMembersResult = await getCombinedMembersAndVoters(
       spaceId,
       cursor,
-      pageSize
+      pageSize,
+      knownAdmins,
+      knownMembers
     );
 
     const members = combinedMembersResult.members.map(address => ({
@@ -90,6 +94,7 @@ router.get('/:space/members', async (req, res) => {
     }
   }
 });
+
 
 router.get('/:space/proposals', async (req, res) => {
   const id = req.params.space;

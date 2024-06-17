@@ -145,31 +145,47 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
-export async function getCombinedMembersAndVoters(
-  spaceId,
-  cursor = null,
-  pageSize
-) {
-  const params = [spaceId, spaceId, spaceId, spaceId];
+export async function getCombinedMembersAndVoters(spaceId: string, cursor: string | null, pageSize: number, knownAdmins: string[] = [], knownMembers: string[] = []) {
+  const params: (string | number | null)[] = [];
+  let subqueries: string[] = [];
+
+  const exclusionList = [...knownAdmins, ...knownMembers];
+  
+  if (knownAdmins.length === 0) {
+    subqueries.push(`
+      SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.admins[*]')) AS address 
+      FROM spaces 
+      WHERE id = ?
+    `);
+    params.push(spaceId);
+  }
+
+  if (knownMembers.length === 0) {
+    subqueries.push(`
+      SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.moderators[*]')) AS address 
+      FROM spaces 
+      WHERE id = ?
+    `);
+    params.push(spaceId);
+  }
+
+  subqueries.push(`
+    SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.members[*]')) AS address 
+    FROM spaces 
+    WHERE id = ? AND address NOT IN (${exclusionList.map(() => '?').join(', ')})
+  `);
+  params.push(spaceId, ...exclusionList);
+
+  subqueries.push(`
+    SELECT DISTINCT voter AS address
+    FROM votes
+    WHERE space = ? AND voter NOT IN (${exclusionList.map(() => '?').join(', ')})
+  `);
+  params.push(spaceId, ...exclusionList);
+
   const query = `
     SELECT address
-    FROM (
-      (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.admins[*]')) AS address 
-       FROM spaces 
-       WHERE id = ?)
-      UNION
-      (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.moderators[*]')) AS address 
-       FROM spaces 
-       WHERE id = ?)
-      UNION
-      (SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(settings, '$.members[*]')) AS address 
-       FROM spaces 
-       WHERE id = ?)
-      UNION
-      (SELECT DISTINCT voter AS address
-       FROM votes
-       WHERE space = ?)
-    ) AS combined_addresses
+    FROM (${subqueries.join(' UNION ')})
     WHERE (? IS NULL OR address > ?)
     ORDER BY address
     LIMIT ?
@@ -195,6 +211,7 @@ export async function getCombinedMembersAndVoters(
     nextCursor: nextCursor
   };
 }
+
 
 async function getFollowers() {
   const query = `
