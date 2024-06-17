@@ -147,7 +147,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE statements (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   delegate VARCHAR(64) NOT NULL,
   space VARCHAR(64) NOT NULL,
