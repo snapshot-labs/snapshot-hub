@@ -36,7 +36,7 @@ router.get('/:space', async (req, res) => {
 router.get('/:space/members', async (req, res) => {
   try {
     const spaceId = req.params.space;
-    const cursor = req.query.cursor || null;  // Handle cursor that can be null
+    const cursor = req.query.cursor || null;  
     const pageSize = 500; // Default page size
 
     const space = await getSpace(spaceId);
@@ -47,7 +47,6 @@ router.get('/:space/members', async (req, res) => {
       });
     }
 
-    // Fetch only the voters, as other data (admins, moderators, members) are assumed to be already fetched
     const combinedMembersResult = await getCombinedMembersAndVoters(
       spaceId,
       cursor,
