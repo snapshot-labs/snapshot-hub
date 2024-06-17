@@ -36,7 +36,7 @@ router.get('/:space', async (req, res) => {
 router.get('/:space/members', async (req, res) => {
   try {
     const spaceId = req.params.space;
-    const cursor = req.query.cursor || null;
+    const cursor = req.query.cursor || null;  // Handle cursor that can be null
     const pageSize = 500; // Default page size
 
     const space = await getSpace(spaceId);
@@ -47,21 +47,22 @@ router.get('/:space/members', async (req, res) => {
       });
     }
 
-    const knownAdmins = space.admins || [];
-    const knownMembers = space.members || [];
-
+    // Fetch only the voters, as other data (admins, moderators, members) are assumed to be already fetched
     const combinedMembersResult = await getCombinedMembersAndVoters(
       spaceId,
       cursor,
       pageSize,
-      knownAdmins,
-      knownMembers
+      space.admins || [],
+      space.moderators || [],
+      space.members || []
     );
 
-    const members = combinedMembersResult.members.map(address => ({
-      type: 'EthereumAddress',
-      id: address
-    }));
+    const members = [
+      ...space.admins.map(admin => ({ type: 'EthereumAddress', id: admin })),
+      ...space.moderators.map(moderator => ({ type: 'EthereumAddress', id: moderator })),
+      ...space.members.map(member => ({ type: 'EthereumAddress', id: member })),
+      ...combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }))
+    ];
 
     const responseObject = {
       '@context': context,
