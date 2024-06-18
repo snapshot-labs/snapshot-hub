@@ -535,9 +535,12 @@ type Statement {
   id: String!
   ipfs: String!
   space: String!
+  network: String
   about: String
   delegate: String
   statement: String
+  discourse: String
+  status: String
   created: Int!
   updated: Int!
 }

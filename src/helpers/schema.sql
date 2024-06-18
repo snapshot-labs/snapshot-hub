@@ -147,16 +147,22 @@ CREATE TABLE users (
 );
 
 CREATE TABLE statements (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  delegate VARCHAR(64) NOT NULL,
-  space VARCHAR(64) NOT NULL,
+  delegate VARCHAR(100) NOT NULL,
+  space VARCHAR(100) NOT NULL,
   about TEXT,
   statement TEXT,
+  network VARCHAR(24) NOT NULL DEFAULT 's',
+  discourse VARCHAR(64),
+  status VARCHAR(24) NOT NULL DEFAULT 'inactive',
   created INT(11) NOT NULL,
   updated INT(11) NOT NULL,
-  PRIMARY KEY (delegate, space),
+  PRIMARY KEY (delegate, space, network),
   INDEX ipfs (ipfs),
+  INDEX space (space),
+  INDEX network (network),
   INDEX created (created),
-  INDEX updated (updated)
+  INDEX updated (updated),
+  INDEX status (status)
 );
