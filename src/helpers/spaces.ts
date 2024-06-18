@@ -157,7 +157,7 @@ export async function getCombinedMembersAndVoters(spaceId: string, cursor: strin
   subqueries.push(`
     SELECT DISTINCT voter AS address
     FROM votes
-    WHERE space_id = ? AND voter NOT IN (${placeholders})
+    WHERE space = ? AND voter NOT IN (${placeholders})
   `);
   params.push(spaceId, ...exclusionList);
 
