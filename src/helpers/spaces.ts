@@ -164,7 +164,7 @@ export async function getCombinedMembersAndVoters(spaceId: string, cursor: strin
   const cursorClause = cursor ? ' AND address > ?' : '';
   const query = `
     SELECT address
-    FROM (${subqueries.join(' UNION ')})
+     FROM (${subqueries}) as subqueries
     WHERE 1=1 ${cursorClause}
     ORDER BY address
     LIMIT ?
