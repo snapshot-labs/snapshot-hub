@@ -528,6 +528,8 @@ type User {
   cover: String
   github: String
   twitter: String
+  lens: String;
+  farcaster: String;
   created: Int!
 }
 
