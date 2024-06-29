@@ -166,3 +166,16 @@ CREATE TABLE statements (
   INDEX updated (updated),
   INDEX status (status)
 );
+
+CREATE TABLE leaderboard (
+  user VARCHAR(100) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  vote_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  proposal_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  last_vote BIGINT,
+  PRIMARY KEY user_space (user,space),
+  INDEX space (space),
+  INDEX vote_count (vote_count),
+  INDEX proposal_count (proposal_count),
+  INDEX last_vote (last_vote)
+);
