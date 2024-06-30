@@ -78,7 +78,7 @@ CREATE TABLE votes (
   ipfs VARCHAR(64) NOT NULL,
   voter VARCHAR(100) NOT NULL,
   created INT(11) NOT NULL,
-  space VARCHAR(64) NOT NULL,
+  space VARCHAR(100) NOT NULL,
   proposal VARCHAR(66) NOT NULL,
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
