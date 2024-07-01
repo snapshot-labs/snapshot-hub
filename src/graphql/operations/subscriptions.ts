@@ -11,7 +11,7 @@ export default async function (parent, args) {
   const fields = {
     id: 'string',
     ipfs: 'string',
-    address: 'string',
+    address: 'EVMAddress',
     space: 'string',
     created: 'number'
   };
