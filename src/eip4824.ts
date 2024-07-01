@@ -47,28 +47,35 @@ router.get('/:space/members', async (req, res) => {
       });
     }
 
-    const combinedMembersResult = await getCombinedMembersAndVoters(
-      spaceId,
-      cursor,
-      pageSize,
-      space.admins || [],
-      space.moderators || [],
-      space.members || []
-    );
+    let members: { type: string, id: string }[] = []; 
+    let nextCursor: string | null = null; 
 
-    const members = [
-      ...space.admins.map(admin => ({ type: 'EthereumAddress', id: admin })),
-      ...space.moderators.map(moderator => ({ type: 'EthereumAddress', id: moderator })),
-      ...space.members.map(member => ({ type: 'EthereumAddress', id: member })),
-      ...combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }))
-    ];
+    if (cursor) {
+      const combinedMembersResult = await getCombinedMembersAndVoters(
+        spaceId,
+        cursor,
+        pageSize,
+        [], 
+        [], 
+        []  
+      );
+      members = combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }));
+      nextCursor = combinedMembersResult.nextCursor; 
+
+    } else {
+      members = [
+        ...space.admins.map(admin => ({ type: 'EthereumAddress', id: admin })),
+        ...space.moderators.map(moderator => ({ type: 'EthereumAddress', id: moderator })),
+        ...space.members.map(member => ({ type: 'EthereumAddress', id: member }))
+      ];
+    }
 
     const responseObject = {
       '@context': context,
       type: 'DAO',
       name: space.name,
       members: members,
-      nextCursor: combinedMembersResult.nextCursor
+      nextCursor: nextCursor 
     };
 
     return res.json(responseObject);
