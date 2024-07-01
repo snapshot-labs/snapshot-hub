@@ -19,9 +19,15 @@ export default async function (_parent, args, context, info) {
       categories: {}
     };
 
-    const { search = '', category = '', network = '' } = where;
-    const searchStr = search.toLowerCase();
-    let searchCategory = category.toLowerCase();
+    const {
+      search = '',
+      category = '',
+      network = '',
+      strategy = '',
+      plugin = ''
+    } = where;
+    const searchStr = search?.toLowerCase() || '';
+    let searchCategory = category?.toLowerCase() || '';
     if (searchCategory === 'all') searchCategory = '';
 
     let filteredSpaces = rankedSpaces.filter((space: any) => {
@@ -31,7 +37,18 @@ export default async function (_parent, args, context, info) {
       const filteredByNetwork = network
         ? space.networks.includes(network)
         : true;
-      if (filteredBySearch && filteredByNetwork) {
+      const filteredByStrategy = strategy
+        ? space.strategyNames.includes(strategy)
+        : true;
+      const filteredByPlugin = plugin
+        ? space.pluginNames.includes(plugin)
+        : true;
+      if (
+        filteredBySearch &&
+        filteredByNetwork &&
+        filteredByStrategy &&
+        filteredByPlugin
+      ) {
         // count categories, should not consider searchCategory for counting
         space.categories.forEach(category => {
           metrics.categories[category] =
@@ -43,7 +60,13 @@ export default async function (_parent, args, context, info) {
       const filteredByCategory = searchCategory
         ? space.categories.includes(searchCategory)
         : true;
-      return filteredBySearch && filteredByCategory && filteredByNetwork;
+      return (
+        filteredBySearch &&
+        filteredByCategory &&
+        filteredByNetwork &&
+        filteredByStrategy &&
+        filteredByPlugin
+      );
     });
 
     metrics.total = filteredSpaces.length;
@@ -51,7 +74,7 @@ export default async function (_parent, args, context, info) {
       filteredSpaces.slice(skip, skip + first),
       (space: any) => space.id
     );
-    if (!filteredSpaces.length) return { spaces: [], metrics };
+    if (!filteredSpaces.length) return { items: [], metrics };
 
     const query = `
       SELECT s.* FROM spaces s WHERE s.deleted = 0

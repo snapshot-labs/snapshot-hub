@@ -45,8 +45,11 @@ function getPopularity(
   if (params.strategies.some(strategy => testStrategies.includes(strategy)))
     popularity = 1;
 
-  if (params.verified) popularity *= 100000;
-  if (params.turbo) popularity *= 100000;
+  if (params.verified) popularity *= 100000000;
+  if (params.turbo) {
+    popularity += 1;
+    popularity *= 100000000;
+  }
 
   return popularity;
 }
@@ -62,14 +65,15 @@ function mapSpaces() {
         .map(strategy => strategy?.network || space.network)
         .concat(space.network)
     );
-    const strategies = uniq(
-      space.strategies?.map(strategy => strategy.name) || []
+    const strategyNames = uniq(
+      (space.strategies || []).map(strategy => strategy.name)
     );
+    const pluginNames = uniq(Object.keys(space.plugins || {}));
     const popularity = getPopularity(id, {
       verified,
       turbo,
       networks,
-      strategies
+      strategies: strategyNames
     });
 
     spacesMetadata[id] = {
@@ -91,7 +95,9 @@ function mapSpaces() {
         followersCount7d: spaceFollowers[id]?.count_7d || 0,
         votesCount: spaceVotes[id]?.count || 0,
         votesCount7d: spaceVotes[id]?.count_7d || 0
-      }
+      },
+      strategyNames,
+      pluginNames
     };
   });
 
@@ -251,6 +257,6 @@ export default async function run() {
     capture(e);
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(360e3);
+  await snapshot.utils.sleep(120e3);
   run();
 }

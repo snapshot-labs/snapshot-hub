@@ -1,4 +1,6 @@
+import { getAddress } from '@ethersproject/address';
 import graphqlFields from 'graphql-fields';
+import fetch from 'node-fetch';
 import { jsonParse } from '../helpers/utils';
 import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
@@ -17,11 +19,11 @@ const ARG_LIMITS = {
   },
   spaces: {
     first: 1000,
-    skip: 30000
+    skip: 100000
   },
   ranking: {
     first: 20,
-    skip: 30000
+    skip: 100000
   }
 };
 
@@ -77,12 +79,14 @@ export function formatSpace({
   space.voting.period = space.voting.period || null;
   space.voting.type = space.voting.type || null;
   space.voting.quorum = space.voting.quorum || null;
+  space.voting.quorumType = space.voting.quorumType || 'default';
   space.voting.blind = space.voting.blind || false;
   space.voting.privacy = space.voting.privacy || '';
   space.voting.aliased = space.voting.aliased || false;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
   space.delegationPortal = space.delegationPortal || null;
+  space.boost = space.boost || { enabled: true, bribeEnabled: false };
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
     // By default return space network if strategy network is not defined
@@ -114,7 +118,23 @@ export function formatSpace({
 export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];
+
   Object.entries(fields).forEach(([field, type]) => {
+    if (type === 'EVMAddress') {
+      const conditions = ['', '_not', '_in', '_not_in'];
+      try {
+        conditions.forEach(condition => {
+          const key = `${field}${condition}`;
+          if (where[key]) {
+            where[key] = condition.includes('in')
+              ? where[key].map(getAddress)
+              : getAddress(where[key]);
+          }
+        });
+      } catch (e) {
+        throw new PublicError(`Invalid ${field} address`);
+      }
+    }
     if (where[field] !== undefined) {
       query += `AND ${alias}.${field} = ? `;
       params.push(where[field]);
@@ -176,8 +196,17 @@ export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
   const fields = { id: 'string', created: 'number' };
+
+  if ('controller' in where) {
+    if (!where.controller) return [];
+
+    where.id_in = await getControllerDomains(where.controller);
+
+    delete where.controller;
+  }
+
   const whereQuery = buildWhereQuery(fields, 's', where);
-  const queryStr = whereQuery.query;
+  let queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
 
   let orderBy = args.orderBy || 'created';
@@ -185,6 +214,16 @@ export async function fetchSpaces(args) {
   if (!['created', 'updated', 'id'].includes(orderBy)) orderBy = 'created';
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+
+  if (where.strategy) {
+    queryStr += ` AND JSON_CONTAINS(JSON_EXTRACT(s.settings, '$.strategies[*].name'), JSON_ARRAY(?))`;
+    params.push(where.strategy);
+  }
+
+  if (where.plugin) {
+    queryStr += ` AND JSON_CONTAINS(JSON_KEYS(s.settings->'$.plugins'), JSON_ARRAY(?))`;
+    params.push(where.plugin);
+  }
 
   const query = `
     SELECT s.* FROM spaces s
@@ -290,10 +329,13 @@ export function formatProposal(proposal) {
   proposal.validation = jsonParse(proposal.validation, {
     name: 'any',
     params: {}
-  }) || {
-    name: 'any',
-    params: {}
-  };
+  });
+  if (!proposal.validation || Object.keys(proposal.validation).length === 0) {
+    proposal.validation = {
+      name: 'any',
+      params: {}
+    };
+  }
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
@@ -318,6 +360,7 @@ export function formatProposal(proposal) {
     network: strategy.network || proposal.network
   }));
   proposal.privacy = proposal.privacy || '';
+  proposal.quorumType = proposal.quorum_type || 'default';
   return proposal;
 }
 
@@ -358,4 +401,36 @@ export function formatSubscription(subscription) {
     hibernated: subscription.spaceHibernated
   });
   return subscription;
+}
+
+async function getControllerDomains(address: string): Promise<string[]> {
+  type JsonRpcResponse = {
+    result: string[];
+    error?: {
+      code: number;
+      message: string;
+      data: any;
+    };
+  };
+
+  try {
+    const response = await fetch(process.env.STAMP_URL ?? 'https://stamp.fyi', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        method: 'lookup_domains',
+        params: address
+      })
+    });
+    const { result, error } = (await response.json()) as JsonRpcResponse;
+
+    if (error) throw new PublicError("Failed to resolve controller's domains");
+
+    return result;
+  } catch (e) {
+    throw new PublicError("Failed to resolve controller's domains");
+  }
 }

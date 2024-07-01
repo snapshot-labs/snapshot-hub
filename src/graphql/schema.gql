@@ -3,7 +3,7 @@ scalar Any
 # Queries
 
 type Query {
-  space(id: String): Space
+  space(id: String!): Space
 
   spaces(
     first: Int! = 20
@@ -15,7 +15,7 @@ type Query {
 
   ranking(first: Int! = 20, skip: Int! = 0, where: RankingWhere): RankingObject
 
-  proposal(id: String): Proposal
+  proposal(id: String!): Proposal
 
   proposals(
     first: Int! = 20
@@ -25,7 +25,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Proposal]
 
-  vote(id: String): Vote
+  vote(id: String!): Vote
 
   votes(
     first: Int! = 20
@@ -43,7 +43,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Alias]
 
-  roles(where: RolesWhere): [Role]
+  roles(where: RolesWhere!): [Role]
 
   follows(
     first: Int! = 20
@@ -77,9 +77,9 @@ type Query {
     orderDirection: OrderDirection
   ): [Statement]
 
-  user(id: String): User
+  user(id: String!): User
 
-  statement(id: String): Statement
+  statement(id: String!): Statement
 
   skins: [Item]
 
@@ -91,7 +91,7 @@ type Query {
 
   strategies: [StrategyItem]
 
-  strategy(id: String): StrategyItem
+  strategy(id: String!): StrategyItem
 
   vp(voter: String!, space: String!, proposal: String): Vp
 
@@ -113,14 +113,17 @@ input SpaceWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  strategy: String
+  plugin: String
+  controller: String
 }
 
 input RankingWhere {
-  id: String
-  id_in: [String]
   search: String
   category: String
   network: String
+  strategy: String
+  plugin: String
 }
 
 input MessageWhere {
@@ -264,7 +267,7 @@ input AliasWhere {
 }
 
 input RolesWhere {
-  address: String
+  address: String!
 }
 
 input FollowWhere {
@@ -276,6 +279,8 @@ input FollowWhere {
   follower_in: [String]
   space: String
   space_in: [String]
+  network: String
+  network_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -383,6 +388,7 @@ type Space {
   hibernated: Boolean
   turbo: Boolean
   rank: Float
+  boost: BoostSettings
   created: Int!
 }
 
@@ -406,6 +412,7 @@ type SpaceVoting {
   period: Int
   type: String
   quorum: Float
+  quorumType: String!
   blind: Boolean
   hideAbstain: Boolean
   privacy: String
@@ -432,6 +439,7 @@ type Proposal {
   start: Int!
   end: Int!
   quorum: Float!
+  quorumType: String!
   privacy: String
   snapshot: String
   state: String
@@ -497,6 +505,7 @@ type Follow {
   ipfs: String
   follower: String!
   space: Space!
+  network: String!
   created: Int!
 }
 
@@ -514,6 +523,11 @@ type User {
   name: String
   about: String
   avatar: String
+  cover: String
+  github: String
+  twitter: String
+  lens: String
+  farcaster: String
   created: Int!
 }
 
@@ -521,9 +535,12 @@ type Statement {
   id: String!
   ipfs: String!
   space: String!
+  network: String
   about: String
   delegate: String
   statement: String
+  discourse: String
+  status: String
   created: Int!
   updated: Int!
 }
@@ -547,6 +564,11 @@ type Treasury {
   name: String
   address: String
   network: String
+}
+
+type BoostSettings {
+  enabled: Boolean
+  bribeEnabled: Boolean
 }
 
 type Vp {
