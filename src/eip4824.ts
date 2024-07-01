@@ -61,13 +61,22 @@ router.get('/:space/members', async (req, res) => {
       );
       members = combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }));
       nextCursor = combinedMembersResult.nextCursor; 
-
     } else {
+      const combinedMembersResult = await getCombinedMembersAndVoters(
+        spaceId,
+        cursor,
+        pageSize,
+        space.admins,
+        space.moderators,
+        space.members
+      );
       members = [
         ...space.admins.map(admin => ({ type: 'EthereumAddress', id: admin })),
         ...space.moderators.map(moderator => ({ type: 'EthereumAddress', id: moderator })),
-        ...space.members.map(member => ({ type: 'EthereumAddress', id: member }))
+        ...space.members.map(member => ({ type: 'EthereumAddress', id: member })),
+        ...combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }))
       ];
+      nextCursor = combinedMembersResult.nextCursor; 
     }
 
     const responseObject = {
