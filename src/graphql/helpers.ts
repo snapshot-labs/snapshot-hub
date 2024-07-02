@@ -27,6 +27,15 @@ const ARG_LIMITS = {
   }
 };
 
+export function formatAddress(address: string): string {
+  try {
+    return getAddress(address);
+  } catch (error) {
+    // return same address for now, but return error in the future, if address is not EVM or sn address
+    return address;
+  }
+}
+
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
@@ -127,8 +136,8 @@ export function buildWhereQuery(fields, alias, where) {
           const key = `${field}${condition}`;
           if (where[key]) {
             where[key] = condition.includes('in')
-              ? where[key].map(getAddress)
-              : getAddress(where[key]);
+              ? where[key].map(formatAddress)
+              : formatAddress(where[key]);
           }
         });
       } catch (e) {
