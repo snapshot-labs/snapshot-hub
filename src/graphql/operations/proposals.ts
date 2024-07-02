@@ -12,7 +12,7 @@ export default async function (parent, args) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
-    author: 'string',
+    author: 'EVMAddress',
     network: 'string',
     created: 'number',
     updated: 'number',

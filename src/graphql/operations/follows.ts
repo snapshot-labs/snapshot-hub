@@ -11,7 +11,7 @@ export default async function (parent, args) {
   const fields = {
     id: 'string',
     ipfs: 'string',
-    follower: 'string',
+    follower: 'EVMAddress',
     space: 'string',
     network: 'string',
     created: 'number'

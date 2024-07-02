@@ -2,9 +2,15 @@ import db from '../../helpers/mysql';
 import { formatUser } from '../helpers';
 import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import { getAddress } from '@ethersproject/address';
 
 export default async function (parent, args) {
-  const id = args.id;
+  let id = args.id;
+  try {
+    id = getAddress(id);
+  } catch (error) {
+    return Promise.reject(new Error('invalid id'));
+  }
   const query = `SELECT u.* FROM users u WHERE id = ? LIMIT 1`;
   try {
     const users = await db.queryAsync(query, id);
