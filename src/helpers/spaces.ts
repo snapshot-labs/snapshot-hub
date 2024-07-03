@@ -151,6 +151,51 @@ async function getVotes() {
   return await db.queryAsync(query);
 }
 
+export async function getCombinedMembersAndVoters(spaceId: string, cursor: string | null, pageSize: number, knownAdmins: string[] = [], knownModerators: string[] = [], knownMembers: string[] = []) {
+  const params: (string | number)[] = [];
+  let subqueries: string[] = [];
+
+  // Excluding known addresses fetched during the Space verification
+  const exclusionList = [...knownAdmins, ...knownModerators, ...knownMembers];
+  let placeholders = exclusionList.map(() => '?').join(', ');
+
+  // Other roles are already known and fetched at the app level while Space Verification
+  subqueries.push(`
+    SELECT DISTINCT voter AS address
+    FROM votes
+    WHERE space = ? AND voter NOT IN (${placeholders})
+  `);
+  params.push(spaceId, ...exclusionList);
+
+  const cursorClause = cursor ? ' AND address > ?' : '';
+  const query = `
+    SELECT address
+     FROM (${subqueries}) as subqueries
+    WHERE 1=1 ${cursorClause}
+    ORDER BY address
+    LIMIT ?
+  `;
+
+  if (cursor) {
+    params.push(cursor);
+  }
+  params.push(pageSize);  
+
+  const results = await db.queryAsync(query, params);
+  if (!results || results.length === 0) {
+    return Promise.reject(new Error('NOT_FOUND'));
+  }
+
+  const nextCursor = results.length === pageSize ? results[results.length - 1].address : null;
+  return {
+    members: results.map(row => row.address),
+    nextCursor: nextCursor
+  };
+}
+
+
+
+
 async function getFollowers() {
   const query = `
     SELECT space, COUNT(id) as count,
