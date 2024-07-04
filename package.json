@@ -21,7 +21,6 @@
   },
   "prettier": "@snapshot-labs/prettier-config",
   "dependencies": {
-    "@ethersproject/address": "^5.7.0",
     "@graphql-tools/schema": "^10.0.0",
     "@snapshot-labs/keycard": "^0.5.1",
     "@snapshot-labs/snapshot-metrics": "^1.4.1",
