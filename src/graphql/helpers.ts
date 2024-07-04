@@ -31,7 +31,15 @@ export function formatAddress(address: string): string {
   try {
     return getAddress(address);
   } catch (error) {
-    // return same address for now, but return error in the future, if address is not EVM or sn address
+    // Pad starknet address to 64 characters
+    if (/^0x[a-fA-F0-9]{43,64}$/.test(address)) {
+      const addr = address.split('0x').pop()!;
+      if (addr.length < 64) {
+        const padding = '0'.repeat(64 - addr.length);
+        return `0x${padding}${addr}`;
+      }
+    }
+
     return address;
   }
 }
