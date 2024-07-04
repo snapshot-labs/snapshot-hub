@@ -115,20 +115,31 @@ export function formatSpace({
   return space;
 }
 
-export function buildWhereQuery(fields, alias, where) {
+export function buildWhereQuery(
+  fields: Record<string, string | string[]>,
+  alias: string,
+  where
+) {
   let query: any = '';
   const params: any[] = [];
 
   Object.entries(fields).forEach(([field, type]) => {
-    if (type === 'EVMAddress') {
+    const addressFormatter: string[] = [];
+    if (Array.from(type).includes('evmAddress')) addressFormatter.push('evm');
+    if (Array.from(type).includes('starknetAddress'))
+      addressFormatter.push('starknet');
+
+    if (addressFormatter.length > 0) {
       const conditions = ['', '_not', '_in', '_not_in'];
       try {
         conditions.forEach(condition => {
           const key = `${field}${condition}`;
           if (where[key]) {
             where[key] = condition.includes('in')
-              ? where[key].map(utils.getFormattedAddress)
-              : utils.getFormattedAddress(where[key]);
+              ? where[key].map(address =>
+                  utils.getFormattedAddress(address, addressFormatter)
+                )
+              : utils.getFormattedAddress(where[key], addressFormatter);
           }
         });
       } catch (e) {
