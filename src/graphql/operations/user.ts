@@ -1,10 +1,11 @@
-import db from '../../helpers/mysql';
-import { formatAddress, formatUser } from '../helpers';
-import log from '../../helpers/log';
+import utils from '@snapshot-labs/snapshot.js/src/utils';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import db from '../../helpers/mysql';
+import { formatUser } from '../helpers';
+import log from '../../helpers/log';
 
 export default async function (parent, args) {
-  const id = formatAddress(args.id);
+  const id = utils.getFormattedAddress(args.id);
   const query = `SELECT u.* FROM users u WHERE id = ? LIMIT 1`;
   try {
     const users = await db.queryAsync(query, id);

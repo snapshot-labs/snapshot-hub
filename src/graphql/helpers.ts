@@ -1,4 +1,4 @@
-import { getAddress } from '@ethersproject/address';
+import utils from '@snapshot-labs/snapshot.js/src/utils';
 import graphqlFields from 'graphql-fields';
 import fetch from 'node-fetch';
 import { jsonParse } from '../helpers/utils';
@@ -26,23 +26,6 @@ const ARG_LIMITS = {
     skip: 100000
   }
 };
-
-export function formatAddress(address: string): string {
-  try {
-    return getAddress(address);
-  } catch (error) {
-    // Pad starknet address to 64 characters
-    if (/^0x[a-fA-F0-9]{43,64}$/.test(address)) {
-      const addr = address.split('0x').pop()!;
-      if (addr.length < 64) {
-        const padding = '0'.repeat(64 - addr.length);
-        return `0x${padding}${addr}`;
-      }
-    }
-
-    return address;
-  }
-}
 
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
@@ -144,8 +127,8 @@ export function buildWhereQuery(fields, alias, where) {
           const key = `${field}${condition}`;
           if (where[key]) {
             where[key] = condition.includes('in')
-              ? where[key].map(formatAddress)
-              : formatAddress(where[key]);
+              ? where[key].map(utils.getFormattedAddress)
+              : utils.getFormattedAddress(where[key]);
           }
         });
       } catch (e) {
