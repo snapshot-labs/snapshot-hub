@@ -1,6 +1,13 @@
-import utils from '@snapshot-labs/snapshot.js/src/utils';
+import {
+  getFormattedAddress,
+  isEvmAddress,
+  isStarknetAddress
+} from '@snapshot-labs/snapshot.js/src/utils';
 import graphqlFields from 'graphql-fields';
 import fetch from 'node-fetch';
+import castArray from 'lodash/castArray';
+import intersection from 'lodash/intersection';
+import uniq from 'lodash/uniq';
 import { jsonParse } from '../helpers/utils';
 import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
@@ -115,6 +122,29 @@ export function formatSpace({
   return space;
 }
 
+export function formatAddresses(
+  addresses: string[],
+  types: ('evmAddress' | 'starknetAddress')[]
+) {
+  return addresses
+    .map(address => {
+      const results: string[] = [];
+
+      if (types.includes('evmAddress') && isEvmAddress(address)) {
+        results.push(getFormattedAddress(address, 'evm'));
+      } else if (
+        types.includes('starknetAddress') &&
+        isStarknetAddress(address)
+      ) {
+        results.push(getFormattedAddress(address, 'starknet'));
+      }
+
+      return results;
+    })
+    .flat()
+    .filter(Boolean);
+}
+
 export function buildWhereQuery(
   fields: Record<string, string | string[]>,
   alias: string,
@@ -124,29 +154,29 @@ export function buildWhereQuery(
   const params: any[] = [];
 
   Object.entries(fields).forEach(([field, type]) => {
-    const addressFormatter: string[] = [];
-    if (Array.from(type).includes('evmAddress')) addressFormatter.push('evm');
-    if (Array.from(type).includes('starknetAddress'))
-      addressFormatter.push('starknet');
+    const arrayType = castArray(type);
 
-    if (addressFormatter.length > 0) {
+    if (intersection(['evmAddress', 'starknetAddress'], arrayType).length > 0) {
       const conditions = ['', '_not', '_in', '_not_in'];
-      try {
-        conditions.forEach(condition => {
-          const key = `${field}${condition}`;
-          if (where[key]) {
-            where[key] = condition.includes('in')
-              ? where[key].map(address =>
-                  utils.getFormattedAddress(address, addressFormatter)
-                )
-              : utils.getFormattedAddress(where[key], addressFormatter);
-          }
-        });
-      } catch (e) {
-        throw new PublicError(`Invalid ${field} address`);
-      }
+
+      conditions.forEach(condition => {
+        const key = `${field}${condition}`;
+
+        if (!where[key]) return;
+
+        const formattedAddresses = uniq(
+          formatAddresses(castArray(where[key]), arrayType)
+        );
+
+        if (!formattedAddresses.length)
+          throw new PublicError(`Invalid addresses in ${field}`);
+
+        where[key] = Array.isArray(where[key])
+          ? formattedAddresses
+          : formattedAddresses[0];
+      });
     }
-    if (where[field] !== undefined) {
+    if (where[field] !== undefined && !Array.isArray(where[field])) {
       query += `AND ${alias}.${field} = ? `;
       params.push(where[field]);
     }
