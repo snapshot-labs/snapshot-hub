@@ -432,7 +432,7 @@ async function getControllerDomains(address: string): Promise<string[]> {
       body: JSON.stringify({
         method: 'lookup_domains',
         params: address,
-        network: process.env.NETWORK === 'mainnet' ? '1' : '11155111'
+        network: network === 'testnet' ? '11155111' : '1'
       })
     });
     const { result, error } = (await response.json()) as JsonRpcResponse;
