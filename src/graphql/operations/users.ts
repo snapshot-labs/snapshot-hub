@@ -31,7 +31,7 @@ export default async function (parent, args) {
       SUM(l.proposal_count) as proposalsCount,
       MAX(l.last_vote) as lastVote
     FROM users u
-    INNER JOIN leaderboard l ON BINARY l.user = BINARY u.id
+    INNER JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
     GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?

@@ -12,7 +12,7 @@ export default async function (parent, args) {
       SUM(l.proposal_count) as proposalsCount,
       MAX(l.last_vote) as lastVote
     FROM users u
-    LEFT JOIN leaderboard l ON BINARY l.user = BINARY u.id
+    LEFT JOIN leaderboard l ON l.user = u.id
     WHERE id = ?
     LIMIT 1`;
   try {
