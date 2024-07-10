@@ -29,7 +29,7 @@ CREATE TABLE spaces (
 CREATE TABLE proposals (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  author VARCHAR(64) NOT NULL,
+  author VARCHAR(100) NOT NULL,
   created INT(11) NOT NULL,
   updated INT(11) DEFAULT NULL,
   space VARCHAR(64) NOT NULL,
@@ -76,9 +76,9 @@ CREATE TABLE proposals (
 CREATE TABLE votes (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  voter VARCHAR(64) NOT NULL,
+  voter VARCHAR(100) NOT NULL,
   created INT(11) NOT NULL,
-  space VARCHAR(64) NOT NULL,
+  space VARCHAR(100) NOT NULL,
   proposal VARCHAR(66) NOT NULL,
   choice JSON NOT NULL,
   metadata JSON NOT NULL,
@@ -104,19 +104,22 @@ CREATE TABLE votes (
 CREATE TABLE follows (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  follower VARCHAR(64) NOT NULL,
-  space VARCHAR(64) NOT NULL,
+  follower VARCHAR(100) NOT NULL,
+  space VARCHAR(100) NOT NULL,
+  network VARCHAR(24) NOT NULL DEFAULT 's',
   created INT(11) NOT NULL,
-  PRIMARY KEY (follower, space),
+  PRIMARY KEY (follower, space, network),
   INDEX ipfs (ipfs),
+  INDEX space (space),
+  INDEX network (network),
   INDEX created (created)
 );
 
 CREATE TABLE aliases (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  address VARCHAR(64) NOT NULL,
-  alias VARCHAR(64) NOT NULL,
+  address VARCHAR(100) NOT NULL,
+  alias VARCHAR(100) NOT NULL,
   created INT(11) NOT NULL,
   PRIMARY KEY (address, alias),
   INDEX ipfs (ipfs)
@@ -125,7 +128,7 @@ CREATE TABLE aliases (
 CREATE TABLE subscriptions (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  address VARCHAR(64) NOT NULL,
+  address VARCHAR(100) NOT NULL,
   space VARCHAR(64) NOT NULL,
   created INT(11) NOT NULL,
   PRIMARY KEY (address, space),
@@ -134,7 +137,7 @@ CREATE TABLE subscriptions (
 );
 
 CREATE TABLE users (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(100) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
   profile JSON,
   created INT(11) NOT NULL,
@@ -144,18 +147,37 @@ CREATE TABLE users (
 );
 
 CREATE TABLE statements (
-  id VARCHAR(64) NOT NULL,
+  id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
-  delegate VARCHAR(64) NOT NULL,
-  space VARCHAR(64) NOT NULL,
+  delegate VARCHAR(100) NOT NULL,
+  space VARCHAR(100) NOT NULL,
   about TEXT,
   statement TEXT,
+  network VARCHAR(24) NOT NULL DEFAULT 's',
+  discourse VARCHAR(64),
+  status VARCHAR(24) NOT NULL DEFAULT 'INACTIVE',
   created INT(11) NOT NULL,
   updated INT(11) NOT NULL,
-  PRIMARY KEY (delegate, space),
+  PRIMARY KEY (delegate, space, network),
   INDEX ipfs (ipfs),
+  INDEX space (space),
+  INDEX network (network),
   INDEX created (created),
-  INDEX updated (updated)
+  INDEX updated (updated),
+  INDEX status (status)
+);
+
+CREATE TABLE leaderboard (
+  user VARCHAR(100) NOT NULL,
+  space VARCHAR(64) NOT NULL,
+  vote_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  proposal_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  last_vote BIGINT,
+  PRIMARY KEY user_space (user,space),
+  INDEX space (space),
+  INDEX vote_count (vote_count),
+  INDEX proposal_count (proposal_count),
+  INDEX last_vote (last_vote)
 );
 
 CREATE TABLE leaderboard (

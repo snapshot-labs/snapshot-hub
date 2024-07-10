@@ -1,10 +1,10 @@
 import db from '../../helpers/mysql';
-import { formatUser } from '../helpers';
+import { formatAddress, formatUser } from '../helpers';
 import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
-  const id = args.id;
+  const id = formatAddress(args.id);
   const query = `
     SELECT
       u.*,

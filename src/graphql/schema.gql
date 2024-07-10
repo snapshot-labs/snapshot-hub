@@ -123,11 +123,10 @@ input SpaceWhere {
   created_lte: Int
   strategy: String
   plugin: String
+  controller: String
 }
 
 input RankingWhere {
-  id: String
-  id_in: [String]
   search: String
   category: String
   network: String
@@ -288,6 +287,8 @@ input FollowWhere {
   follower_in: [String]
   space: String
   space_in: [String]
+  network: String
+  network_in: [String]
   created: Int
   created_in: [Int]
   created_gt: Int
@@ -551,6 +552,7 @@ type Follow {
   ipfs: String
   follower: String!
   space: Space!
+  network: String!
   created: Int!
 }
 
@@ -568,6 +570,11 @@ type User {
   name: String
   about: String
   avatar: String
+  cover: String
+  github: String
+  twitter: String
+  lens: String
+  farcaster: String
   created: Int!
   votesCount: Int
   proposalsCount: Int
@@ -578,9 +585,12 @@ type Statement {
   id: String!
   ipfs: String!
   space: String!
+  network: String
   about: String
   delegate: String
   statement: String
+  discourse: String
+  status: String
   created: Int!
   updated: Int!
 }

@@ -9,7 +9,7 @@ export default async function (parent, args) {
   checkLimits(args, 'users');
 
   const fields = {
-    id: 'string',
+    id: 'EVMAddress',
     ipfs: 'string',
     created: 'number'
   };
