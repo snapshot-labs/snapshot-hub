@@ -4,10 +4,7 @@ import log from '../../helpers/log';
 import { formatUser, formatAddresses, PublicError } from '../helpers';
 
 export default async function (parent, args) {
-  const addresses = formatAddresses(
-    [args.id],
-    ['evmAddress', 'starknetAddress']
-  );
+  const addresses = formatAddresses([args.id]);
   if (!addresses.length) throw new PublicError('Invalid address');
 
   const query = `SELECT u.* FROM users u WHERE id = ? LIMIT 1`;

@@ -120,7 +120,10 @@ export function formatSpace({
 
 export function formatAddresses(
   addresses: string[],
-  types: ('evmAddress' | 'starknetAddress')[]
+  types: ('evmAddress' | 'starknetAddress')[] = [
+    'evmAddress',
+    'starknetAddress'
+  ]
 ) {
   return addresses
     .map(address => {
