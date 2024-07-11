@@ -1,8 +1,4 @@
-import {
-  getFormattedAddress,
-  isEvmAddress,
-  isStarknetAddress
-} from '@snapshot-labs/snapshot.js/src/utils';
+import snapshot from '@snapshot-labs/snapshot.js';
 import graphqlFields from 'graphql-fields';
 import fetch from 'node-fetch';
 import castArray from 'lodash/castArray';
@@ -130,13 +126,16 @@ export function formatAddresses(
     .map(address => {
       const results: string[] = [];
 
-      if (types.includes('evmAddress') && isEvmAddress(address)) {
-        results.push(getFormattedAddress(address, 'evm'));
+      if (
+        types.includes('evmAddress') &&
+        snapshot.utils.isEvmAddress(address)
+      ) {
+        results.push(snapshot.utils.getFormattedAddress(address, 'evm'));
       } else if (
         types.includes('starknetAddress') &&
-        isStarknetAddress(address)
+        snapshot.utils.isStarknetAddress(address)
       ) {
-        results.push(getFormattedAddress(address, 'starknet'));
+        results.push(snapshot.utils.getFormattedAddress(address, 'starknet'));
       }
 
       return results;
