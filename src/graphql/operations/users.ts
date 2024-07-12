@@ -24,16 +24,21 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let users: any[] = [];
-
   const query = `
-    SELECT u.* FROM users u
+    SELECT
+      u.*,
+      SUM(l.vote_count) as votesCount,
+      SUM(l.proposal_count) as proposalsCount,
+      MAX(l.last_vote) as lastVote
+    FROM users u
+    INNER JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
+    GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
   try {
-    users = await db.queryAsync(query, params);
+    const users = await db.queryAsync(query, params);
     return users.map(user => formatUser(user));
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);

@@ -21,6 +21,7 @@ import vp from './vp';
 import messages from './messages';
 import ranking from './ranking';
 import roles from './roles';
+import leaderboards from './leaderboards';
 
 export default {
   space,
@@ -45,5 +46,6 @@ export default {
   statement,
   vp,
   messages,
-  roles
+  roles,
+  leaderboards
 };

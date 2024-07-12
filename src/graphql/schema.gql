@@ -102,6 +102,14 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Message]
+
+  leaderboards(
+    first: Int! = 20
+    skip: Int! = 0
+    where: LeaderboardsWhere
+    orderBy: String
+    orderDirection: OrderDirection
+  ): [Leaderboard]
 }
 
 input SpaceWhere {
@@ -317,6 +325,18 @@ input UsersWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  vote_count: Int
+  vote_count_in: [Int]
+  vote_count_gt: Int
+  vote_count_gte: Int
+  vote_count_lt: Int
+  vote_count_lte: Int
+  proposal_count: Int
+  proposal_count_in: [Int]
+  proposal_count_gt: Int
+  proposal_count_gte: Int
+  proposal_count_lt: Int
+  proposal_count_lte: Int
 }
 
 input StatementsWhere {
@@ -334,6 +354,33 @@ input StatementsWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+}
+
+input LeaderboardsWhere {
+  space: String
+  space_in: [String]
+  space_not: String
+  space_not_in: [String]
+  user: String
+  user_in: [String]
+  user_not: String
+  user_not_in: [String]
+  proposal_count: Int
+  proposal_count_in: [Int]
+  proposal_count_not: Int
+  proposal_count_not_in: [Int]
+  proposal_count_gt: [Int]
+  proposal_count_gte: [Int]
+  proposal_count_lt: [Int]
+  proposal_count_lte: [Int]
+  vote_count: Int
+  vote_count_in: [Int]
+  vote_count_not: Int
+  vote_count_not_in: [Int]
+  vote_count_gt: [Int]
+  vote_count_gte: [Int]
+  vote_count_lt: [Int]
+  vote_count_lte: [Int]
 }
 
 enum OrderDirection {
@@ -529,6 +576,9 @@ type User {
   lens: String
   farcaster: String
   created: Int!
+  votesCount: Int
+  proposalsCount: Int
+  lastVote: Int
 }
 
 type Statement {
@@ -575,4 +625,12 @@ type Vp {
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
+}
+
+type Leaderboard {
+  space: String
+  user: String
+  proposalsCount: Int
+  votesCount: Int
+  lastVote: Int
 }
