@@ -9,18 +9,21 @@ export default async function (parent, args) {
 
   checkLimits(args, 'leaderboards');
 
-  const ORDER_FIELDS = ['vote_count', 'proposal_count', 'user'];
+  const ORDER_FIELDS = ['vote_count', 'proposal_count', 'last_vote', 'user'];
   const DEFAULT_ORDER_FIELD = 'vote_count';
 
   const fields = {
     user: 'EVMAddress',
     space: 'string',
+    last_vote: 'number',
     vote_count: 'number',
     proposal_count: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'l', where);
 
-  const orderBy = ORDER_FIELDS.includes(args.orderBy)
+  const orderBy = uniq([...Object.keys(fields), ...ORDER_FIELDS]).includes(
+    args.orderBy
+  )
     ? args.orderBy
     : DEFAULT_ORDER_FIELD;
   let orderDirection = (args.orderDirection || 'desc').toUpperCase();
