@@ -30,7 +30,7 @@ export default async function (parent, args) {
     WHERE t.userId = ?
     LIMIT 1`;
   try {
-    const users = await db.queryAsync(query, [id, id]);
+    const users = await db.queryAsync(query, id);
 
     if (!users.length) return null;
 
