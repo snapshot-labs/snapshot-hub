@@ -34,9 +34,6 @@ export default async function (parent, args) {
 
     if (!users.length) return null;
 
-    users[0].id = users[0].userId;
-    delete users[0].userId;
-
     return formatUser(users[0]);
   } catch (e: any) {
     log.error(`[graphql] user, ${JSON.stringify(e)}`);

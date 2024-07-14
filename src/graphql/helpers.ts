@@ -328,7 +328,8 @@ export function formatUser(user) {
   delete user.profile;
   return {
     ...user,
-    ...profile
+    ...profile,
+    id: user.userId || user.id
   };
 }
 
