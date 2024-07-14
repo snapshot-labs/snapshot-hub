@@ -326,6 +326,8 @@ export async function handleRelatedSpaces(info: any, spaces: any[]) {
 export function formatUser(user) {
   const profile = jsonParse(user.profile, {});
   delete user.profile;
+  delete user.userId;
+
   return {
     ...user,
     ...profile,
