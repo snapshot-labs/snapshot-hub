@@ -134,28 +134,40 @@ async function loadSpaces() {
 async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const query = `
-    SELECT space, COUNT(id) AS count,
-    COUNT(IF(start < ? AND end > ? AND flagged = 0, 1, NULL)) AS active,
-    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
-    FROM proposals GROUP BY space
+    SELECT
+      space,
+      spaces.proposal_count AS count,
+      COUNT(IF(start < ? AND end > ? AND flagged = 0, 1, NULL)) AS active,
+      COUNT(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d,
+    FROM proposals
+    JOIN spaces ON spaces.id = space
+    GROUP BY space
   `;
   return await db.queryAsync(query, [ts, ts]);
 }
 
 async function getVotes() {
   const query = `
-    SELECT space, COUNT(id) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
-    FROM votes GROUP BY space
+    SELECT
+      space,
+      spaces.vote_count as count,
+      COUNT(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d
+    FROM votes
+    JOIN spaces ON spaces.id = space
+    GROUP BY space
   `;
   return await db.queryAsync(query);
 }
 
 async function getFollowers() {
   const query = `
-    SELECT space, COUNT(id) as count,
-    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
-    FROM follows GROUP BY space
+    SELECT
+      space,
+      spaces.follower_count AS count,
+      COUNT(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d
+    FROM follows
+    JOIN spaces ON spaces.id = space
+    GROUP BY space
   `;
   return await db.queryAsync(query);
 }
