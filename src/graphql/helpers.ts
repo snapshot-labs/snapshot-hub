@@ -143,6 +143,8 @@ export function formatAddresses(
       ) {
         return snapshot.utils.getFormattedAddress(address, 'starknet');
       }
+
+      throw new PublicError('Invalid address');
     })
     .filter(Boolean) as string[];
 }
@@ -166,16 +168,17 @@ export function buildWhereQuery(
 
         if (!where[key]) return;
 
-        const formattedAddresses = uniq(
-          formatAddresses(castArray(where[key]), arrayType)
-        );
+        try {
+          const formattedAddresses = uniq(
+            formatAddresses(castArray(where[key]), arrayType)
+          );
 
-        if (!formattedAddresses.length)
+          where[key] = Array.isArray(where[key])
+            ? formattedAddresses
+            : formattedAddresses[0];
+        } catch (e: any) {
           throw new PublicError(`Invalid addresses in ${field}`);
-
-        where[key] = Array.isArray(where[key])
-          ? formattedAddresses
-          : formattedAddresses[0];
+        }
       });
     }
     if (where[field] !== undefined && !Array.isArray(where[field])) {
