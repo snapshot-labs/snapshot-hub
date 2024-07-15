@@ -10,6 +10,12 @@ import db from '../helpers/mysql';
 
 const network = process.env.NETWORK || 'testnet';
 
+type AddressFormat = 'evmAddress' | 'starknetAddress';
+const DEFAULT_ADDRESS_FORMAT: AddressFormat[] = [
+  'evmAddress',
+  'starknetAddress'
+];
+
 export class PublicError extends Error {}
 
 const ARG_LIMITS = {
@@ -120,31 +126,25 @@ export function formatSpace({
 
 export function formatAddresses(
   addresses: string[],
-  types: ('evmAddress' | 'starknetAddress')[] = [
-    'evmAddress',
-    'starknetAddress'
-  ]
-) {
+  types: AddressFormat[] = DEFAULT_ADDRESS_FORMAT
+): string[] {
   return addresses
     .map(address => {
-      const results: string[] = [];
-
       if (
         types.includes('evmAddress') &&
         snapshot.utils.isEvmAddress(address)
       ) {
-        results.push(snapshot.utils.getFormattedAddress(address, 'evm'));
-      } else if (
+        return snapshot.utils.getFormattedAddress(address, 'evm');
+      }
+
+      if (
         types.includes('starknetAddress') &&
         snapshot.utils.isStarknetAddress(address)
       ) {
-        results.push(snapshot.utils.getFormattedAddress(address, 'starknet'));
+        return snapshot.utils.getFormattedAddress(address, 'starknet');
       }
-
-      return results;
     })
-    .flat()
-    .filter(Boolean);
+    .filter(Boolean) as string[];
 }
 
 export function buildWhereQuery(
@@ -158,7 +158,7 @@ export function buildWhereQuery(
   Object.entries(fields).forEach(([field, type]) => {
     const arrayType = castArray(type);
 
-    if (intersection(['evmAddress', 'starknetAddress'], arrayType).length > 0) {
+    if (intersection(DEFAULT_ADDRESS_FORMAT, arrayType).length > 0) {
       const conditions = ['', '_not', '_in', '_not_in'];
 
       conditions.forEach(condition => {
