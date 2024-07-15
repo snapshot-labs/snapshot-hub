@@ -124,20 +124,11 @@ export function formatSpace({
   return space;
 }
 
-export function buildWhereQuery(
-  fields,
-  alias,
-  where,
-  options: { aliases?: Record<string, string> } = {}
-) {
+export function buildWhereQuery(fields, alias, where) {
   let query: any = '';
   const params: any[] = [];
 
   Object.entries(fields).forEach(([field, type]) => {
-    const aliasedFieldName = `${alias}.${
-      (options.aliases || {})[field] || field
-    }`;
-
     if (type === 'EVMAddress') {
       const conditions = ['', '_not', '_in', '_not_in'];
       try {
@@ -154,20 +145,20 @@ export function buildWhereQuery(
       }
     }
     if (where[field] !== undefined) {
-      query += `AND ${aliasedFieldName} = ? `;
+      query += `AND ${alias}.${field} = ? `;
       params.push(where[field]);
     }
 
     const fieldNot = where[`${field}_not`];
     if (fieldNot !== undefined) {
-      query += `AND ${aliasedFieldName} != ? `;
+      query += `AND ${alias}.${field} != ? `;
       params.push(fieldNot);
     }
 
     const fieldIn = where[`${field}_in`];
     if (Array.isArray(fieldIn)) {
       if (fieldIn.length > 0) {
-        query += `AND ${aliasedFieldName} IN (?) `;
+        query += `AND ${alias}.${field} IN (?) `;
         params.push(fieldIn);
       } else {
         query += 'AND 1=0 ';
@@ -177,7 +168,7 @@ export function buildWhereQuery(
     const fieldNotIn = where[`${field}_not_in`];
     if (Array.isArray(fieldNotIn)) {
       if (fieldNotIn.length > 0) {
-        query += `AND ${aliasedFieldName} NOT IN (?) `;
+        query += `AND ${alias}.${field} NOT IN (?) `;
         params.push(fieldNotIn);
       } else {
         query += 'AND 1=0 ';
@@ -190,19 +181,19 @@ export function buildWhereQuery(
       const fieldLt = where[`${field}_lt`];
       const fieldLte = where[`${field}_lte`];
       if (fieldGt) {
-        query += `AND ${aliasedFieldName} > ? `;
+        query += `AND ${alias}.${field} > ? `;
         params.push(fieldGt);
       }
       if (fieldGte) {
-        query += `AND ${aliasedFieldName} >= ? `;
+        query += `AND ${alias}.${field} >= ? `;
         params.push(fieldGte);
       }
       if (fieldLt) {
-        query += `AND ${aliasedFieldName} < ? `;
+        query += `AND ${alias}.${field} < ? `;
         params.push(fieldLt);
       }
       if (fieldLte) {
-        query += `AND ${aliasedFieldName} <= ? `;
+        query += `AND ${alias}.${field} <= ? `;
         params.push(fieldLte);
       }
     }
