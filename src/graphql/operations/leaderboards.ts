@@ -9,7 +9,7 @@ export default async function (parent, args) {
   checkLimits(args, 'leaderboards');
 
   const fields = {
-    user: 'EVMAddress',
+    user: ['evmAddress', 'starknetAddress'],
     space: 'string',
     vote_count: 'number',
     proposal_count: 'number'
