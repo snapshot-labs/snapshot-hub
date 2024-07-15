@@ -13,7 +13,7 @@ export default async function (parent, args) {
   const DEFAULT_ORDER_FIELD = 'vote_count';
 
   const fields = {
-    user: 'EVMAddress',
+    user: ['evmAddress', 'starknetAddress'],
     space: 'string',
     last_vote: 'number',
     vote_count: 'number',

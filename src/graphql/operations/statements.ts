@@ -13,7 +13,7 @@ export default async function (parent, args) {
     ipfs: 'string',
     space: 'string',
     created: 'number',
-    delegate: 'EVMAddress'
+    delegate: ['evmAddress', 'starknetAddress']
   };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;

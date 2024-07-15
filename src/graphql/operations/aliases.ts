@@ -11,8 +11,8 @@ export default async function (parent, args) {
   const fields = {
     id: 'string',
     ipfs: 'string',
-    address: 'EVMAddress',
-    alias: 'EVMAddress',
+    address: ['evmAddress', 'starknetAddress'],
+    alias: 'evmAddress',
     created: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'a', where);
