@@ -1,10 +1,11 @@
-import db from '../../helpers/mysql';
-import { formatAddress, formatUser } from '../helpers';
-import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import db from '../../helpers/mysql';
+import log from '../../helpers/log';
+import { formatUser, formatAddresses, PublicError } from '../helpers';
 
 export default async function (parent, args) {
-  const id = formatAddress(args.id);
+  const addresses = formatAddresses([args.id]);
+  if (!addresses.length) throw new PublicError('Invalid address');
   const query = `
     SELECT * FROM (
       SELECT
@@ -30,7 +31,7 @@ export default async function (parent, args) {
     WHERE t.userId = ?
     LIMIT 1`;
   try {
-    const users = await db.queryAsync(query, id);
+    const users = await db.queryAsync(query, addresses[0]);
 
     if (!users.length) return null;
 
