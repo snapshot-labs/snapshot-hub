@@ -22,7 +22,7 @@ export default async function (parent, args) {
   try {
     const users = await db.queryAsync(query, addresses[0]);
 
-    if (!users.length) return null;
+    if (!users.length || !users[0].id) return null;
 
     return formatUser(users[0]);
   } catch (e: any) {
