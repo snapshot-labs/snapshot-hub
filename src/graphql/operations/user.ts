@@ -16,15 +16,14 @@ export default async function (parent, args) {
     FROM users u
     LEFT JOIN leaderboard l ON l.user = u.id
     WHERE u.id = ?
+    GROUP BY u.id
     LIMIT 1
   `;
 
   try {
     const users = await db.queryAsync(query, addresses[0]);
 
-    if (!users.length || !users[0].id) return null;
-
-    return formatUser(users[0]);
+    return users.length ? formatUser(users[0]) : null;
   } catch (e: any) {
     log.error(`[graphql] user, ${JSON.stringify(e)}`);
     capture(e, { args });

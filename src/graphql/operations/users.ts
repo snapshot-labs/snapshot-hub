@@ -27,11 +27,11 @@ export default async function (parent, args) {
   const query = `
     SELECT
       u.*,
-      SUM(l.vote_count) as votesCount,
-      SUM(l.proposal_count) as proposalsCount,
+      COALESCE(SUM(l.vote_count), 0) as votesCount,
+      COALESCE(SUM(l.proposal_count), 0) as proposalsCount,
       MAX(l.last_vote) as lastVote
     FROM users u
-    INNER JOIN leaderboard l ON l.user = u.id
+    LEFT JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
     GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
@@ -39,7 +39,8 @@ export default async function (parent, args) {
   params.push(skip, first);
   try {
     const users = await db.queryAsync(query, params);
-    return users.map(user => formatUser(user));
+
+    return users.map(formatUser);
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);
     capture(e, { args });
