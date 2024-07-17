@@ -137,9 +137,9 @@ async function getProposals() {
     SELECT
       space,
       spaces.proposal_count AS count,
-      COUNT(IF(start < ? AND end > ? AND flagged = 0, 1, NULL)) AS active,
-      COUNT(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d,
-    FROM proposals
+      COUNT(IF(p.start < ? AND p.end > ? AND p.flagged = 0, 1, NULL)) AS active,
+      COUNT(IF(p.created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d,
+    FROM proposals p
     JOIN spaces ON spaces.id = space
     GROUP BY space
   `;
@@ -151,8 +151,8 @@ async function getVotes() {
     SELECT
       space,
       spaces.vote_count as count,
-      COUNT(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d
-    FROM votes
+      COUNT(IF(v.created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d
+    FROM votes v
     JOIN spaces ON spaces.id = space
     GROUP BY space
   `;
@@ -164,8 +164,8 @@ async function getFollowers() {
     SELECT
       space,
       spaces.follower_count AS count,
-      COUNT(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d
-    FROM follows
+      COUNT(IF(f.created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) AS count_7d
+    FROM follows f
     JOIN spaces ON spaces.id = space
     GROUP BY space
   `;
