@@ -133,131 +133,52 @@ async function loadSpaces() {
 
 async function getProposals() {
   const ts = parseInt((Date.now() / 1e3).toFixed());
-
-  const allActivitiesQuery = `
-    SELECT
-      id,
-      proposal_count AS count
-    FROM spaces
+  const query = `
+    SELECT space, COUNT(id) AS count,
+    COUNT(IF(start < ? AND end > ? AND flagged = 0, 1, NULL)) AS active,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
+    FROM proposals GROUP BY space
   `;
-
-  const results = Object.fromEntries(
-    (await db.queryAsync(allActivitiesQuery)).map(({ id, count }) => [
-      id,
-      { count, count_7d: 0, active: 0 }
-    ])
-  );
-
-  const recentActivityQuery = `
-    SELECT
-      space,
-      count(id) AS count
-    FROM proposals
-    WHERE created > (UNIX_TIMESTAMP() - 604800)
-    GROUP BY space
-  `;
-
-  (await db.queryAsync(recentActivityQuery)).forEach(({ space, count }) => {
-    if (results[space]) results[space].count_7d = count;
-  });
-
-  const activeQuery = `
-    SELECT
-      space,
-      count(id) AS count
-    FROM proposals
-    WHERE start < ? AND end > ? AND flagged = 0
-    GROUP BY space
-  `;
-
-  (await db.queryAsync(activeQuery, [ts, ts])).forEach(({ space, count }) => {
-    if (results[space]) results[space].active = count;
-  });
-
-  return results;
+  return await db.queryAsync(query, [ts, ts]);
 }
 
 async function getVotes() {
-  const allActivitiesQuery = `
-    SELECT
-      id,
-      vote_count AS count
-    FROM spaces
+  const query = `
+    SELECT space, COUNT(id) as count,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
+    FROM votes GROUP BY space
   `;
-
-  const results = Object.fromEntries(
-    (await db.queryAsync(allActivitiesQuery)).map(({ id, count }) => [
-      id,
-      { count, count_7d: 0 }
-    ])
-  );
-
-  const recentActivityQuery = `
-    SELECT
-      space,
-      count(id) AS count
-    FROM votes
-    WHERE created > (UNIX_TIMESTAMP() - 604800)
-    GROUP BY space
-  `;
-
-  (await db.queryAsync(recentActivityQuery)).forEach(({ space, count }) => {
-    if (results[space]) results[space].count_7d = count;
-  });
-
-  return results;
+  return await db.queryAsync(query);
 }
 
 async function getFollowers() {
-  const allActivitiesQuery = `
-    SELECT
-      id,
-      follower_count AS count
-    FROM spaces
+  const query = `
+    SELECT space, COUNT(id) as count,
+    count(IF(created > (UNIX_TIMESTAMP() - 604800), 1, NULL)) as count_7d
+    FROM follows GROUP BY space
   `;
-
-  const results = Object.fromEntries(
-    (await db.queryAsync(allActivitiesQuery)).map(({ id, count }) => [
-      id,
-      { count, count_7d: 0 }
-    ])
-  );
-
-  const recentActivityQuery = `
-    SELECT
-      space,
-      count(id) AS count
-    FROM follows
-    WHERE created > (UNIX_TIMESTAMP() - 604800)
-    GROUP BY space
-  `;
-
-  (await db.queryAsync(recentActivityQuery)).forEach(({ space, count }) => {
-    if (results[space]) results[space].count_7d = count;
-  });
-
-  return results;
+  return await db.queryAsync(query);
 }
 
 async function loadSpacesMetrics() {
   const followersMetrics = await getFollowers();
-  for (const [space, metrics] of Object.entries(followersMetrics)) {
-    if (spaces[space]) spaceFollowers[space] = metrics;
-  }
+  followersMetrics.forEach(followers => {
+    if (spaces[followers.space]) spaceFollowers[followers.space] = followers;
+  });
   log.info('[spaces] Followers metrics loaded');
   mapSpaces();
 
   const proposalsMetrics = await getProposals();
-  for (const [space, metrics] of Object.entries(proposalsMetrics)) {
-    if (spaces[space]) spaceProposals[space] = metrics;
-  }
+  proposalsMetrics.forEach(proposals => {
+    if (spaces[proposals.space]) spaceProposals[proposals.space] = proposals;
+  });
   log.info('[spaces] Proposals metrics loaded');
   mapSpaces();
 
   const votesMetrics = await getVotes();
-  for (const [space, metrics] of Object.entries(votesMetrics)) {
-    if (spaces[space]) spaceVotes[space] = metrics;
-  }
+  votesMetrics.forEach(votes => {
+    if (spaces[votes.space]) spaceVotes[votes.space] = votes;
+  });
   log.info('[spaces] Votes metrics loaded');
   mapSpaces();
 }
