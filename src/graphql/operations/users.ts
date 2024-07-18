@@ -16,7 +16,7 @@ export default async function (parent, args) {
   const whereQuery = buildWhereQuery(fields, 'u', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
-  const ids = (where.id_in || [where.id]).filter((id: any) => id);
+  const ids = (where.id_in || [where.id]).filter(Boolean);
   if (Object.keys(where).length > 1) ids.length = 0;
 
   let orderBy = args.orderBy || 'created';
