@@ -245,10 +245,11 @@ async function getFollowers(): Promise<
 }
 
 async function loadSpacesMetrics() {
-  [getFollowers, getProposals, getVotes].forEach(async metricFn => {
-    const results = await metricFn();
+  const metricsFn = [getFollowers, getProposals, getVotes];
+  const results = await Promise.all(metricsFn.map(fn => fn()));
 
-    for (const [space, metrics] of Object.entries(results)) {
+  metricsFn.forEach((metricFn, i) => {
+    for (const [space, metrics] of Object.entries(results[i])) {
       if (!spacesMetadata[space]) continue;
 
       spacesMetadata[space].counts = {
@@ -283,9 +284,11 @@ export async function getSpace(id: string) {
 
 export default async function run() {
   try {
+    log.info('[spaces] Start spaces refresh');
     await loadSpaces();
     await loadSpacesMetrics();
     sortSpaces();
+    log.info('[spaces] End spaces refresh');
   } catch (e: any) {
     capture(e);
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
