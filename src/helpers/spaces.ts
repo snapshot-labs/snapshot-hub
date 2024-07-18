@@ -133,7 +133,7 @@ async function loadSpaces() {
 
   while (true) {
     const query = `
-      SELECT id, settings, flagged, verified, turbo, hibernated
+      SELECT id, settings, flagged, verified, turbo, hibernated, follower_count, proposal_count, vote_count
       FROM spaces
       WHERE deleted = 0
       ORDER BY id ASC
@@ -151,7 +151,10 @@ async function loadSpaces() {
           flagged: space.flagged === 1,
           verified: space.verified === 1,
           turbo: space.turbo === 1,
-          hibernated: space.hibernated === 1
+          hibernated: space.hibernated === 1,
+          follower_count: space.follower_count,
+          vote_count: space.vote_count,
+          proposal_count: space.proposal_count
         }
       ])
     );
@@ -263,7 +266,7 @@ async function loadSpacesMetrics() {
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT settings, flagged, verified, turbo, hibernated, deleted
+    SELECT settings, flagged, verified, turbo, hibernated, deleted, follower_count, proposal_count, vote_count
     FROM spaces
     WHERE id = ?
     LIMIT 1`;
