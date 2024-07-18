@@ -127,46 +127,39 @@ function mapSpaces() {
 }
 
 async function loadSpaces() {
-  const limit = 25e3;
-  let newSpaces = {};
-  let start = 0;
+  const newSpaces = {};
+  const startTime = +Date.now();
 
-  while (true) {
-    const query = `
+  const query = `
       SELECT id, settings, flagged, verified, turbo, hibernated, follower_count, proposal_count, vote_count
       FROM spaces
       WHERE deleted = 0
       ORDER BY id ASC
-      LIMIT ${start}, ${limit}
     `;
-    const results = await db.queryAsync(query);
+  const results = await db.queryAsync(query);
 
-    if (!results.length) break;
+  spaces = Object.fromEntries(
+    results.map(space => [
+      space.id,
+      {
+        ...JSON.parse(space.settings),
+        flagged: space.flagged === 1,
+        verified: space.verified === 1,
+        turbo: space.turbo === 1,
+        hibernated: space.hibernated === 1,
+        follower_count: space.follower_count,
+        vote_count: space.vote_count,
+        proposal_count: space.proposal_count
+      }
+    ])
+  );
 
-    const formattedSpaces = Object.fromEntries(
-      results.map(space => [
-        space.id,
-        {
-          ...JSON.parse(space.settings),
-          flagged: space.flagged === 1,
-          verified: space.verified === 1,
-          turbo: space.turbo === 1,
-          hibernated: space.hibernated === 1,
-          follower_count: space.follower_count,
-          vote_count: space.vote_count,
-          proposal_count: space.proposal_count
-        }
-      ])
-    );
-
-    newSpaces = { ...newSpaces, ...formattedSpaces };
-
-    start += limit;
-  }
-
-  spaces = newSpaces;
-
-  log.info(`[spaces] total spaces ${Object.keys(spaces).length}`);
+  log.info(
+    `[spaces] total spaces ${Object.keys(spaces).length}, in (${(
+      (+Date.now() - startTime) /
+      1000
+    ).toFixed()}s)`
+  );
   mapSpaces();
 }
 
