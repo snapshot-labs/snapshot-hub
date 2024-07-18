@@ -127,7 +127,6 @@ function mapSpaces() {
 }
 
 async function loadSpaces() {
-  const newSpaces = {};
   const startTime = +Date.now();
 
   const query = `
