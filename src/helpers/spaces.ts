@@ -6,6 +6,18 @@ import log from './log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 
 const RUN_INTERVAL = 120e3;
+const TEST_STRATEGIES = [
+  'ticket',
+  'api',
+  'api-v2',
+  'api-post',
+  'api-v2-override'
+];
+const TESTNET_NETWORKS = (
+  Object.values(networks) as { testnet?: boolean; key: string }[]
+)
+  .filter(network => network.testnet)
+  .map(network => network.key);
 
 export let spaces = {};
 export let rankedSpaces: Metadata[] = [];
@@ -19,7 +31,7 @@ type Metadata = {
   turbo: boolean;
   hibernated: boolean;
   popularity: number;
-  rank: number;
+  rank: number | null;
   private: boolean;
   categories: string[];
   networks: string[];
@@ -36,17 +48,6 @@ type Metadata = {
   pluginNames: string[];
 };
 
-const testnets = Object.values(networks)
-  .filter((network: any) => network.testnet)
-  .map((network: any) => network.key);
-const testStrategies = [
-  'ticket',
-  'api',
-  'api-v2',
-  'api-post',
-  'api-v2-override'
-];
-
 function getPopularity(space: Metadata): number {
   let popularity =
     space.counts.votesCount / 100 +
@@ -56,9 +57,10 @@ function getPopularity(space: Metadata): number {
     space.counts.followersCount / 50 +
     space.counts.followersCount7d;
 
-  if (space.networks.some(network => testnets.includes(network)))
-    popularity = 1;
-  if (space.strategyNames.some(strategy => testStrategies.includes(strategy)))
+  if (
+    space.networks.some(network => TESTNET_NETWORKS.includes(network)) ||
+    space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
+  )
     popularity = 1;
 
   if (space.verified) popularity *= 100000000;
@@ -71,17 +73,18 @@ function getPopularity(space: Metadata): number {
 }
 
 function sortSpaces() {
-  Object.entries(spacesMetadata).forEach(([id, space]: any) => {
+  Object.entries(spacesMetadata).forEach(([id, space]) => {
     spacesMetadata[id].popularity = getPopularity(space);
   });
 
   rankedSpaces = Object.values(spacesMetadata)
-    .filter((space: any) => !space.private && !space.flagged)
-    .sort((a: any, b: any) => b.popularity - a.popularity);
-
-  rankedSpaces.forEach((space, i) => {
-    spacesMetadata[space.id].rank = i + 1;
-  });
+    .filter(space => !space.private && !space.flagged && space.popularity > 0)
+    .sort((a, b) => b.popularity - a.popularity)
+    .map((space, i) => {
+      spacesMetadata[space.id].rank = i + 1;
+      space.rank = i + 1;
+      return space;
+    });
 }
 
 function mapSpaces() {
@@ -104,7 +107,7 @@ function mapSpaces() {
       turbo: space.turbo,
       hibernated: space.hibernated,
       popularity: spacesMetadata[id]?.popularity || 0,
-      rank: spacesMetadata[id]?.rank || 0,
+      rank: spacesMetadata[id]?.rank || null,
       private: space.private ?? false,
       categories: space.categories ?? [],
       networks,
@@ -124,23 +127,43 @@ function mapSpaces() {
 }
 
 async function loadSpaces() {
-  const query =
-    'SELECT id, settings, flagged, verified, turbo, hibernated FROM spaces WHERE deleted = 0 ORDER BY id ASC';
-  const s = await db.queryAsync(query);
-  spaces = Object.fromEntries(
-    s.map(space => [
-      space.id,
-      {
-        ...JSON.parse(space.settings),
-        flagged: space.flagged === 1,
-        verified: space.verified === 1,
-        turbo: space.turbo === 1,
-        hibernated: space.hibernated === 1
-      }
-    ])
-  );
-  const totalSpaces = Object.keys(spaces).length;
-  log.info(`[spaces] total spaces ${totalSpaces}`);
+  const limit = 25e3;
+  let newSpaces = {};
+  let start = 0;
+
+  while (true) {
+    const query = `
+      SELECT id, settings, flagged, verified, turbo, hibernated
+      FROM spaces
+      WHERE deleted = 0
+      ORDER BY id ASC
+      LIMIT ${start}, ${limit}
+    `;
+    const results = await db.queryAsync(query);
+
+    if (!results.length) break;
+
+    const formattedSpaces = Object.fromEntries(
+      results.map(space => [
+        space.id,
+        {
+          ...JSON.parse(space.settings),
+          flagged: space.flagged === 1,
+          verified: space.verified === 1,
+          turbo: space.turbo === 1,
+          hibernated: space.hibernated === 1
+        }
+      ])
+    );
+
+    newSpaces = { ...newSpaces, ...formattedSpaces };
+
+    start += limit;
+  }
+
+  spaces = newSpaces;
+
+  log.info(`[spaces] total spaces ${Object.keys(spaces).length}`);
   mapSpaces();
 }
 
