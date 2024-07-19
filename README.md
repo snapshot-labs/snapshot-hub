@@ -54,7 +54,7 @@ yarn start
 ```json
 {
   "name": "snapshot-hub",
-  "network": "livenet",
+  "network": "mainnet",
   "version": "0.1.3",
   "tag": "alpha",
   "relayer": "0x8BBE4Ac64246d600BC2889ef5d83809D138F03DF"
