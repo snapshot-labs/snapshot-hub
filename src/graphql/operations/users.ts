@@ -65,7 +65,6 @@ export default async function (parent, args) {
       `,
         [usersWithOutCreated]
       );
-      console.log('counts', counts);
       counts.forEach((count: any) => {
         const user = users.find((u: any) => u.id === count.user);
         if (user) {
