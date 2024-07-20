@@ -29,11 +29,11 @@ export default async function (parent, args) {
   const query = `
     SELECT
       u.*,
-      SUM(l.vote_count) as votesCount,
-      SUM(l.proposal_count) as proposalsCount,
+      COALESCE(SUM(l.vote_count), 0)  as votesCount,
+      COALESCE(SUM(l.proposal_count), 0) as proposalsCount,
       MAX(l.last_vote) as lastVote
     FROM users u
-    INNER JOIN leaderboard l ON l.user = u.id
+    LEFT JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
     GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
@@ -56,8 +56,8 @@ export default async function (parent, args) {
         `
         SELECT
           user,
-          SUM(vote_count) as votesCount,
-          SUM(proposal_count) as proposalsCount,
+          COALESCE(SUM(vote_count), 0) as votesCount,
+          COALESCE(SUM(proposal_count) ,0) as proposalsCount,
           MAX(last_vote) as lastVote
         FROM leaderboard
         WHERE user IN (?)
