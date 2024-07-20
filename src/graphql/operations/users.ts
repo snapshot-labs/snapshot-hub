@@ -28,8 +28,12 @@ export default async function (parent, args) {
 
   const query = `
     SELECT
-      u.*
+      u.*,
+      SUM(l.vote_count) as votesCount,
+      SUM(l.proposal_count) as proposalsCount,
+      MAX(l.last_vote) as lastVote
     FROM users u
+    INNER JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
     GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
@@ -44,24 +48,33 @@ export default async function (parent, args) {
     });
     if (!users.length) return [];
 
-    const counts = await db.queryAsync(`
-      SELECT
-        user,
-        SUM(vote_count) as votesCount,
-        SUM(proposal_count) as proposalsCount,
-        MAX(last_vote) as lastVote
-      FROM leaderboard
-      WHERE user IN (${users.map((u: any) => `'${u.id}'`).join(',')})
-      GROUP BY user
-    `);
-    counts.forEach((count: any) => {
-      const user = users.find((u: any) => u.id === count.user);
-      if (user) {
-        user.votesCount = count.votesCount;
-        user.proposalsCount = count.proposalsCount;
-        user.lastVote = count.lastVote;
-      }
-    });
+    const usersWithOutCreated = users
+      .filter((u: any) => !u.created)
+      .map((u: any) => u.id);
+    if (usersWithOutCreated.length) {
+      const counts = await db.queryAsync(
+        `
+        SELECT
+          user,
+          SUM(vote_count) as votesCount,
+          SUM(proposal_count) as proposalsCount,
+          MAX(last_vote) as lastVote
+        FROM leaderboard
+        WHERE user IN (?)
+        GROUP BY user
+      `,
+        [usersWithOutCreated]
+      );
+      console.log('counts', counts);
+      counts.forEach((count: any) => {
+        const user = users.find((u: any) => u.id === count.user);
+        if (user) {
+          user.votesCount = count.votesCount;
+          user.proposalsCount = count.proposalsCount;
+          user.lastVote = count.lastVote;
+        }
+      });
+    }
     return users.map(formatUser);
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);
