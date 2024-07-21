@@ -16,6 +16,8 @@ export default async function (parent, args) {
   const whereQuery = buildWhereQuery(fields, 'u', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
+  const ids = (where.id_in || [where.id]).filter(Boolean);
+  if (Object.keys(where).length > 1) ids.length = 0;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -27,11 +29,11 @@ export default async function (parent, args) {
   const query = `
     SELECT
       u.*,
-      SUM(l.vote_count) as votesCount,
-      SUM(l.proposal_count) as proposalsCount,
+      COALESCE(SUM(l.vote_count), 0)  as votesCount,
+      COALESCE(SUM(l.proposal_count), 0) as proposalsCount,
       MAX(l.last_vote) as lastVote
     FROM users u
-    INNER JOIN leaderboard l ON l.user = u.id
+    LEFT JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
     GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
@@ -39,7 +41,38 @@ export default async function (parent, args) {
   params.push(skip, first);
   try {
     const users = await db.queryAsync(query, params);
-    return users.map(user => formatUser(user));
+    ids.forEach(element => {
+      if (!users.find((u: any) => u.id === element)) {
+        users.push({ id: element });
+      }
+    });
+    if (!users.length) return [];
+
+    const usersWithOutCreated = users
+      .filter((u: any) => !u.created)
+      .map((u: any) => u.id);
+    if (usersWithOutCreated.length) {
+      const counts = await db.queryAsync(
+        `
+        SELECT
+          user,
+          COALESCE(SUM(vote_count), 0) as votesCount,
+          COALESCE(SUM(proposal_count) ,0) as proposalsCount,
+          MAX(last_vote) as lastVote
+        FROM leaderboard
+        WHERE user IN (?)
+        GROUP BY user
+      `,
+        [usersWithOutCreated]
+      );
+      counts.forEach((count: any) => {
+        const user = users.find((u: any) => u.id === count.user);
+        user.votesCount = count.votesCount;
+        user.proposalsCount = count.proposalsCount;
+        user.lastVote = count.lastVote;
+      });
+    }
+    return users.map(formatUser);
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);
     capture(e, { args });
