@@ -67,11 +67,10 @@ export default async function (parent, args) {
       );
       counts.forEach((count: any) => {
         const user = users.find((u: any) => u.id === count.user);
-        if (user) {
-          user.votesCount = count.votesCount;
-          user.proposalsCount = count.proposalsCount;
-          user.lastVote = count.lastVote;
-        }
+        user.votesCount = count.votesCount;
+        user.proposalsCount = count.proposalsCount;
+        user.lastVote = count.lastVote;
+        
       });
     }
     return users.map(formatUser);
