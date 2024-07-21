@@ -70,7 +70,6 @@ export default async function (parent, args) {
         user.votesCount = count.votesCount;
         user.proposalsCount = count.proposalsCount;
         user.lastVote = count.lastVote;
-        
       });
     }
     return users.map(formatUser);
