@@ -30,7 +30,7 @@ export default async function (_parent, args, context, info) {
     let searchCategory = category?.toLowerCase() || '';
     if (searchCategory === 'all') searchCategory = '';
 
-    let filteredSpaces = rankedSpaces.filter((space: any) => {
+    let filteredSpaces = rankedSpaces.filter(space => {
       const filteredBySearch =
         space.id.includes(searchStr) ||
         space.name?.toLowerCase().includes(searchStr);
