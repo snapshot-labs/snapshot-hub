@@ -1325,10 +1325,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@snapshot-labs/eslint-config-base@^0.1.0-beta.15":
-  version "0.1.0-beta.15"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config-base/-/eslint-config-base-0.1.0-beta.15.tgz#2f64a21a0590d0ffea8a82852ab4bd5742495daa"
-  integrity sha512-uqOqCDTsl92e1k3edaGweQCSlDo9mU8I1ejqXCJHHDr/ZZyBldd8R73qOjhEVdYBtbdHd97QRdKh3JhMjzhrtg==
+"@snapshot-labs/eslint-config-base@^0.1.0-beta.16":
+  version "0.1.0-beta.16"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config-base/-/eslint-config-base-0.1.0-beta.16.tgz#14de6cc9fecd342490262dd413ed89f37a10df41"
+  integrity sha512-0RpFTI51kAYQ9PYv1FEPrUmd/ed6Vi/Ug7091uFtyFjVZSQrt42LTLBBXDMwkBDDygL2uyQ/EFpiE7jSb8Ublg==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^6.7.3"
     "@typescript-eslint/parser" "^6.7.3"
@@ -1336,12 +1336,12 @@
     eslint-plugin-import "^2.29.0"
     eslint-plugin-prettier "^5.0.1"
 
-"@snapshot-labs/eslint-config@^0.1.0-beta.15":
-  version "0.1.0-beta.15"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config/-/eslint-config-0.1.0-beta.15.tgz#9aef268a7946476180e433522a4e197d5149fe11"
-  integrity sha512-bzx8wxho5K1w7jFgo2nikVmr1jzGWE7zcGOlrrEYz9DRNccMAan83BqLSlzxJZn24Jey40eoARiEvFhgtY9MVg==
+"@snapshot-labs/eslint-config@^0.1.0-beta.16":
+  version "0.1.0-beta.16"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config/-/eslint-config-0.1.0-beta.16.tgz#bf3f5ead829278f4ffc9947d62858e887dd5b33f"
+  integrity sha512-EbW6zltneOen/8NJM1nPqMfQIzuXUjBwJ7HszImpoRs6qPx6TRZHvHX9aPsV35mI/EMzQT08BPKfohMhEYHztA==
   dependencies:
-    "@snapshot-labs/eslint-config-base" "^0.1.0-beta.15"
+    "@snapshot-labs/eslint-config-base" "^0.1.0-beta.16"
 
 "@snapshot-labs/keycard@^0.5.1":
   version "0.5.1"
