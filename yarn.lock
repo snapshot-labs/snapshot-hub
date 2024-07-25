@@ -1350,10 +1350,10 @@
   dependencies:
     node-fetch "^2.7.0"
 
-"@snapshot-labs/prettier-config@^0.1.0-beta.15":
-  version "0.1.0-beta.15"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.15.tgz#07e5ae35ed36304250462218e115bab1c1609812"
-  integrity sha512-va6zYSl8oIraBJeIZWEatOI292rfJQouyyvEeHv8qi9ns+LgxMsKayQtXSqn9GcmAfdWQVs/P9bDaCQ77FyJYw==
+"@snapshot-labs/prettier-config@^0.1.0-beta.17":
+  version "0.1.0-beta.17"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.17.tgz#ded7d95d31c53be21c2e1d30322e02c3534a6a74"
+  integrity sha512-G2XcHaeLFEvmOtniqbNPNfAFT5g/UIKefRHGqUuSd6sSJp3zHqbpplPdID0IsPaDxu6mJu+UYiLW2ohoB7WauQ==
 
 "@snapshot-labs/snapshot-metrics@^1.4.1":
   version "1.4.1"
