@@ -1,5 +1,5 @@
-import { formatAddresses, PublicError } from '../helpers';
 import users from './users';
+import { formatAddresses, PublicError } from '../helpers';
 
 export default async function (parent, args) {
   const addresses = formatAddresses([args.id]);

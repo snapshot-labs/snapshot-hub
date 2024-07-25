@@ -1,8 +1,8 @@
-import uniq from 'lodash/uniq';
-import db from '../../helpers/mysql';
-import log from '../../helpers/log';
-import { buildWhereQuery, checkLimits } from '../helpers';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import uniq from 'lodash/uniq';
+import log from '../../helpers/log';
+import db from '../../helpers/mysql';
+import { buildWhereQuery, checkLimits } from '../helpers';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;

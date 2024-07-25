@@ -1,8 +1,8 @@
-import snapshot from '@snapshot-labs/snapshot.js';
-import { spaces } from './spaces';
-import log from './log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 import { URL } from 'url';
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import snapshot from '@snapshot-labs/snapshot.js';
+import log from './log';
+import { spaces } from './spaces';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};

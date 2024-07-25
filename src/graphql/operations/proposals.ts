@@ -1,7 +1,7 @@
-import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
-import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
+import db from '../../helpers/mysql';
+import { buildWhereQuery, checkLimits, formatProposal } from '../helpers';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;

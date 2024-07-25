@@ -1,8 +1,8 @@
-import express from 'express';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import express from 'express';
 import { getSpace } from './helpers/spaces';
-import { name, version } from '../package.json';
 import { sendError } from './helpers/utils';
+import { name, version } from '../package.json';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';

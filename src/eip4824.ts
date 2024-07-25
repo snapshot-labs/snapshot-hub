@@ -1,6 +1,6 @@
 import express from 'express';
-import { getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
+import { getSpace } from './helpers/spaces';
 
 const router = express.Router();
 const context = '<http://www.daostar.org/schemas>';

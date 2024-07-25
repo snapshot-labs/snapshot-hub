@@ -1,10 +1,10 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Express, type Request, type Response } from 'express';
+import { Express, Request, Response } from 'express';
 import { GraphQLError, parse } from 'graphql';
+import db from './mysql';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
-import db from './mysql';
 import operations from '../graphql/operations/';
 
 const whitelistedPath = [
