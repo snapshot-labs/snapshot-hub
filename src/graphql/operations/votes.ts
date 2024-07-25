@@ -1,5 +1,8 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import graphqlFields from 'graphql-fields';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
+import serve from '../../helpers/requestDeduplicator';
 import {
   buildWhereQuery,
   checkLimits,
@@ -7,9 +10,6 @@ import {
   formatSpace,
   formatVote
 } from '../helpers';
-import serve from '../../helpers/requestDeduplicator';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};

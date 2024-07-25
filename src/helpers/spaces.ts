@@ -1,9 +1,9 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
 import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
-import db from './mysql';
 import log from './log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
+import db from './mysql';
 
 const RUN_INTERVAL = 120e3;
 const TEST_STRATEGIES = [

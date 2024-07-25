@@ -1,7 +1,7 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { formatProposal } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, { id }) {
   const query = `

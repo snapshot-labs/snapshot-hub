@@ -1,6 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import log from '../../helpers/log';
 import fetchVotes from './votes';
+import log from '../../helpers/log';
 
 export default async function (parent, { id }, context, info) {
   try {

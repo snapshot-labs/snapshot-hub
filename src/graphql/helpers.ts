@@ -1,12 +1,12 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import graphqlFields from 'graphql-fields';
-import fetch from 'node-fetch';
 import castArray from 'lodash/castArray';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
-import { jsonParse } from '../helpers/utils';
-import { spacesMetadata } from '../helpers/spaces';
+import fetch from 'node-fetch';
 import db from '../helpers/mysql';
+import { spacesMetadata } from '../helpers/spaces';
+import { jsonParse } from '../helpers/utils';
 
 const network = process.env.NETWORK || 'testnet';
 

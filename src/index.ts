@@ -1,14 +1,14 @@
 import 'dotenv/config';
+import { fallbackLogger, initLogger } from '@snapshot-labs/snapshot-sentry';
 import cors from 'cors';
 import express from 'express';
-import { initLogger, fallbackLogger } from '@snapshot-labs/snapshot-sentry';
 import api from './api';
 import eip4824 from './eip4824';
 import graphql from './graphql';
-import rateLimit from './helpers/rateLimit';
+import { checkKeycard } from './helpers/keycard';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
-import { checkKeycard } from './helpers/keycard';
+import rateLimit from './helpers/rateLimit';
 import refreshSpacesCache from './helpers/spaces';
 import './helpers/strategies';
 
