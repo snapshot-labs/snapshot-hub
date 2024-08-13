@@ -78,7 +78,7 @@ function sortSpaces() {
   });
 
   rankedSpaces = Object.values(spacesMetadata)
-    .filter(space => !space.private && !space.flagged && space.popularity > 0)
+    .filter(space => !space.private && !space.flagged)
     .sort((a, b) => b.popularity - a.popularity)
     .map((space, i) => {
       spacesMetadata[space.id].rank = i + 1;
