@@ -12,6 +12,7 @@ export default async function (parent, args) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
+    network: 'string',
     created: 'number',
     delegate: ['evmAddress', 'starknetAddress']
   };
