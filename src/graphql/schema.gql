@@ -334,6 +334,7 @@ input StatementsWhere {
   ipfs_in: [String]
   space: String
   space_in: [String]
+  network: String
   delegate: String
   delegate_in: [String]
   created: Int
