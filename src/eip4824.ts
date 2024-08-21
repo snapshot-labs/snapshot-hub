@@ -102,7 +102,6 @@ router.get('/:space/proposals', async (req, res) => {
   });
 });
 
-
 router.get('/:space/activities', async (req, res) => {
   const id = req.params.space;
   let space: any = {};
