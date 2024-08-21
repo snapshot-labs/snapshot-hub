@@ -82,6 +82,13 @@ router.get('/:space/proposals', async (req, res) => {
     type: 'proposal',
     id: proposal.id,
     name: proposal.title,
+    contentURI: {
+      body: proposal.body,
+      author: proposal.author,
+      ipfs: proposal.ipfs,
+      link: proposal.link
+    },
+    discussionURI: proposal.discussion,
     status:
       ts > proposal.end ? 'closed' : ts > proposal.start ? 'active' : 'pending',
     calls: []
