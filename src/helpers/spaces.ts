@@ -258,13 +258,13 @@ export async function getCombinedMembersAndVoters(
     return Promise.reject(new Error('NOT_FOUND'));
   }
 
-  const nextCursor = results.length === pageSize ? results[results.length - 1].address : null;
+  const nextCursor =
+    results.length === pageSize ? results[results.length - 1].address : null;
   return {
     members: results.map(row => row.address),
-    nextCursor: nextCursor,
+    nextCursor: nextCursor
   };
 }
-
 
 async function getFollowers(): Promise<
   Record<string, { followersCount7d: number }>

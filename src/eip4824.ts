@@ -1,6 +1,6 @@
 import express from 'express';
-import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
+import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 
 const router = express.Router();
 const context = ['https://snapshot.org', 'https://daostar.org/schemas'];
@@ -36,7 +36,7 @@ router.get('/:space', async (req, res) => {
 router.get('/:space/members', async (req, res) => {
   try {
     const spaceId = req.params.space;
-    const cursor = req.query.cursor || null;  
+    const cursor = req.query.cursor || null;
     const pageSize = 500; // Default page size
 
     const space = await getSpace(spaceId);
@@ -47,20 +47,23 @@ router.get('/:space/members', async (req, res) => {
       });
     }
 
-    let members: { type: string, id: string }[] = []; 
-    let nextCursor: string | null = null; 
+    let members: { type: string; id: string }[] = [];
+    let nextCursor: string | null = null;
 
     if (cursor) {
       const combinedMembersResult = await getCombinedMembersAndVoters(
         spaceId,
         cursor,
         pageSize,
-        [], 
-        [], 
-        []  
+        [],
+        [],
+        []
       );
-      members = combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }));
-      nextCursor = combinedMembersResult.nextCursor; 
+      members = combinedMembersResult.members.map(voter => ({
+        type: 'EthereumAddress',
+        id: voter
+      }));
+      nextCursor = combinedMembersResult.nextCursor;
     } else {
       const combinedMembersResult = await getCombinedMembersAndVoters(
         spaceId,
@@ -72,11 +75,20 @@ router.get('/:space/members', async (req, res) => {
       );
       members = [
         ...space.admins.map(admin => ({ type: 'EthereumAddress', id: admin })),
-        ...space.moderators.map(moderator => ({ type: 'EthereumAddress', id: moderator })),
-        ...space.members.map(member => ({ type: 'EthereumAddress', id: member })),
-        ...combinedMembersResult.members.map(voter => ({ type: 'EthereumAddress', id: voter }))
+        ...space.moderators.map(moderator => ({
+          type: 'EthereumAddress',
+          id: moderator
+        })),
+        ...space.members.map(member => ({
+          type: 'EthereumAddress',
+          id: member
+        })),
+        ...combinedMembersResult.members.map(voter => ({
+          type: 'EthereumAddress',
+          id: voter
+        }))
       ];
-      nextCursor = combinedMembersResult.nextCursor; 
+      nextCursor = combinedMembersResult.nextCursor;
     }
 
     const responseObject = {
@@ -84,7 +96,7 @@ router.get('/:space/members', async (req, res) => {
       type: 'DAO',
       name: space.name,
       members: members,
-      nextCursor: nextCursor 
+      nextCursor: nextCursor
     };
 
     return res.json(responseObject);
@@ -110,7 +122,6 @@ router.get('/:space/members', async (req, res) => {
     }
   }
 });
-
 
 router.get('/:space/proposals', async (req, res) => {
   const id = req.params.space;
