@@ -1,7 +1,6 @@
 import express from 'express';
 import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 import db, { sequencerDB } from './helpers/mysql';
-import { getSpace } from './helpers/spaces';
 
 const router = express.Router();
 const context = ['https://snapshot.org', 'https://daostar.org/schemas'];
