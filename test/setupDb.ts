@@ -1,9 +1,9 @@
-import mysql from 'mysql';
-import Pool from 'mysql/lib/Pool';
-import Connection from 'mysql/lib/Connection';
+import fs from 'fs';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
-import fs from 'fs';
+import mysql from 'mysql';
+import Connection from 'mysql/lib/Connection';
+import Pool from 'mysql/lib/Pool';
 import { TEST_DATABASE_SUFFIX } from './setup';
 
 // @ts-ignore

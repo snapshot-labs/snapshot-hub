@@ -1,13 +1,13 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
+import db from '../../helpers/mysql';
+import { rankedSpaces } from '../../helpers/spaces';
 import {
   checkLimits,
   formatSpace,
   handleRelatedSpaces,
   PublicError
 } from '../helpers';
-import log from '../../helpers/log';
-import db from '../../helpers/mysql';
-import { rankedSpaces } from '../../helpers/spaces';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (_parent, args, context, info) {
   checkLimits(args, 'ranking');
@@ -30,7 +30,7 @@ export default async function (_parent, args, context, info) {
     let searchCategory = category?.toLowerCase() || '';
     if (searchCategory === 'all') searchCategory = '';
 
-    let filteredSpaces = rankedSpaces.filter((space: any) => {
+    let filteredSpaces = rankedSpaces.filter(space => {
       const filteredBySearch =
         space.id.includes(searchStr) ||
         space.name?.toLowerCase().includes(searchStr);

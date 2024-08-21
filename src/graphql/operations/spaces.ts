@@ -1,11 +1,11 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import {
   checkLimits,
   fetchSpaces,
   handleRelatedSpaces,
   PublicError
 } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (_parent, args, context, info) {
   checkLimits(args, 'spaces');

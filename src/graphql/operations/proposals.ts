@@ -1,7 +1,7 @@
-import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
-import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
+import db from '../../helpers/mysql';
+import { buildWhereQuery, checkLimits, formatProposal } from '../helpers';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;
@@ -12,7 +12,7 @@ export default async function (parent, args) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
-    author: 'string',
+    author: 'evmAddress',
     network: 'string',
     created: 'number',
     updated: 'number',
@@ -41,8 +41,8 @@ export default async function (parent, args) {
 
   let searchSql = '';
   if (where.title_contains) {
-    searchSql = 'AND p.title LIKE ?';
-    params.push(`%${where.title_contains}%`);
+    searchSql = 'AND LOWER(p.title) LIKE ?';
+    params.push(`%${where.title_contains.toLowerCase()}%`);
   }
 
   if (where.strategies_contains) {

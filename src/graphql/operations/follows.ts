@@ -1,7 +1,7 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatFollow } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;
@@ -11,7 +11,7 @@ export default async function (parent, args) {
   const fields = {
     id: 'string',
     ipfs: 'string',
-    follower: 'string',
+    follower: ['evmAddress', 'starknetAddress'],
     space: 'string',
     network: 'string',
     created: 'number'

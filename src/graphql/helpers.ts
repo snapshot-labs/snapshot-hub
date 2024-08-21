@@ -1,11 +1,20 @@
-import { getAddress } from '@ethersproject/address';
+import snapshot from '@snapshot-labs/snapshot.js';
 import graphqlFields from 'graphql-fields';
+import castArray from 'lodash/castArray';
+import intersection from 'lodash/intersection';
+import uniq from 'lodash/uniq';
 import fetch from 'node-fetch';
-import { jsonParse } from '../helpers/utils';
-import { spacesMetadata } from '../helpers/spaces';
 import db from '../helpers/mysql';
+import { spacesMetadata } from '../helpers/spaces';
+import { jsonParse } from '../helpers/utils';
 
 const network = process.env.NETWORK || 'testnet';
+
+type AddressFormat = 'evmAddress' | 'starknetAddress';
+const DEFAULT_ADDRESS_FORMAT: AddressFormat[] = [
+  'evmAddress',
+  'starknetAddress'
+];
 
 export class PublicError extends Error {}
 
@@ -115,27 +124,64 @@ export function formatSpace({
   return space;
 }
 
-export function buildWhereQuery(fields, alias, where) {
+export function formatAddresses(
+  addresses: string[],
+  types: AddressFormat[] = DEFAULT_ADDRESS_FORMAT
+): string[] {
+  return addresses
+    .map(address => {
+      if (
+        types.includes('evmAddress') &&
+        snapshot.utils.isEvmAddress(address)
+      ) {
+        return snapshot.utils.getFormattedAddress(address, 'evm');
+      }
+
+      if (
+        types.includes('starknetAddress') &&
+        snapshot.utils.isStarknetAddress(address)
+      ) {
+        return snapshot.utils.getFormattedAddress(address, 'starknet');
+      }
+
+      throw new PublicError('Invalid address');
+    })
+    .filter(Boolean) as string[];
+}
+
+export function buildWhereQuery(
+  fields: Record<string, string | string[]>,
+  alias: string,
+  where
+) {
   let query: any = '';
   const params: any[] = [];
 
   Object.entries(fields).forEach(([field, type]) => {
-    if (type === 'EVMAddress') {
+    const arrayType = castArray(type);
+
+    if (intersection(DEFAULT_ADDRESS_FORMAT, arrayType).length > 0) {
       const conditions = ['', '_not', '_in', '_not_in'];
-      try {
-        conditions.forEach(condition => {
-          const key = `${field}${condition}`;
-          if (where[key]) {
-            where[key] = condition.includes('in')
-              ? where[key].map(getAddress)
-              : getAddress(where[key]);
-          }
-        });
-      } catch (e) {
-        throw new PublicError(`Invalid ${field} address`);
-      }
+
+      conditions.forEach(condition => {
+        const key = `${field}${condition}`;
+
+        if (!where[key]) return;
+
+        try {
+          const formattedAddresses = uniq(
+            formatAddresses(castArray(where[key]), arrayType)
+          );
+
+          where[key] = Array.isArray(where[key])
+            ? formattedAddresses
+            : formattedAddresses[0];
+        } catch (e: any) {
+          throw new PublicError(`Invalid addresses in ${field}`);
+        }
+      });
     }
-    if (where[field] !== undefined) {
+    if (where[field] !== undefined && !Array.isArray(where[field])) {
       query += `AND ${alias}.${field} = ? `;
       params.push(where[field]);
     }
@@ -422,7 +468,8 @@ async function getControllerDomains(address: string): Promise<string[]> {
       },
       body: JSON.stringify({
         method: 'lookup_domains',
-        params: address
+        params: address,
+        network: network === 'testnet' ? '11155111' : '1'
       })
     });
     const { result, error } = (await response.json()) as JsonRpcResponse;

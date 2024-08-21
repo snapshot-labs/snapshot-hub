@@ -1,8 +1,8 @@
-import mysql from 'mysql';
-import Pool from 'mysql/lib/Pool';
-import Connection from 'mysql/lib/Connection';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
+import mysql from 'mysql';
+import Connection from 'mysql/lib/Connection';
+import Pool from 'mysql/lib/Pool';
 import log from './log';
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
