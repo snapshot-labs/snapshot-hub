@@ -70,7 +70,7 @@ router.get('/:space/proposals', async (req, res) => {
     if (!space.verified) return res.status(400).json({ error: 'INVALID' });
 
     proposals = await db.queryAsync(
-      'SELECT id, title, start, end, body, author, ipfs, link, discussion FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
+      'SELECT * FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
       [id]
     );
   } catch (e) {
