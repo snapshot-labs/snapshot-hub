@@ -86,6 +86,7 @@ router.get('/:space/proposals', async (req, res) => {
       body: proposal.body,
       author: proposal.author,
       ipfs: proposal.ipfs,
+      link: `https://snapshot.org/#/${space.id}/proposal/${proposal.id}`,
     },
     discussionURI: proposal.discussion,
     status:
