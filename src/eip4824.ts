@@ -86,7 +86,6 @@ router.get('/:space/proposals', async (req, res) => {
       body: proposal.body,
       author: proposal.author,
       ipfs: proposal.ipfs,
-      link: proposal.link
     },
     discussionURI: proposal.discussion,
     status:
