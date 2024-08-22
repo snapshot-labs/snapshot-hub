@@ -148,13 +148,14 @@ CREATE TABLE users (
 
 CREATE TABLE statements (
   id VARCHAR(66) NOT NULL,
-  ipfs VARCHAR(64) NOT NULL,
+  ipfs VARCHAR(64) DEFAULT NULL,
   delegate VARCHAR(100) NOT NULL,
   space VARCHAR(100) NOT NULL,
   about TEXT,
   statement TEXT,
   network VARCHAR(24) NOT NULL DEFAULT 's',
   discourse VARCHAR(64),
+  source VARCHAR(100) DEFAULT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'INACTIVE',
   created INT(11) NOT NULL,
   updated INT(11) NOT NULL,
@@ -164,6 +165,7 @@ CREATE TABLE statements (
   INDEX network (network),
   INDEX created (created),
   INDEX updated (updated),
+  INDEX source (source),
   INDEX status (status)
 );
 

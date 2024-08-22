@@ -343,6 +343,8 @@ input StatementsWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  source: String
+  source_in: [String]
 }
 
 input LeaderboardsWhere {
@@ -580,6 +582,7 @@ type Statement {
   statement: String
   discourse: String
   status: String
+  source: String
   created: Int!
   updated: Int!
 }
