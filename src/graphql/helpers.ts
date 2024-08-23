@@ -234,6 +234,11 @@ export function buildWhereQuery(
         params.push(fieldLte);
       }
     }
+
+    if (type == 'boolean') {
+      query += `AND ${alias}.${field} = ? `;
+      params.push(where[field] ? '1' : '0');
+    }
   });
   return { query, params };
 }
@@ -241,7 +246,7 @@ export function buildWhereQuery(
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string', created: 'number' };
+  const fields = { id: 'string', created: 'number', verified: 'boolean' };
 
   if ('controller' in where) {
     if (!where.controller) return [];

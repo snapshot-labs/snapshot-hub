@@ -124,6 +124,7 @@ input SpaceWhere {
   strategy: String
   plugin: String
   controller: String
+  verified: Boolean
 }
 
 input RankingWhere {
