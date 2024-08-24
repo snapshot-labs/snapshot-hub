@@ -70,7 +70,7 @@ router.get('/:space/proposals', async (req, res) => {
     if (!space.verified) return res.status(400).json({ error: 'INVALID' });
 
     proposals = await db.queryAsync(
-      'SELECT id, title, start, end FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
+      'SELECT id, title, start, end, body, author, ipfs, discussion FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
       [id]
     );
   } catch (e) {
@@ -82,6 +82,13 @@ router.get('/:space/proposals', async (req, res) => {
     type: 'proposal',
     id: proposal.id,
     name: proposal.title,
+    contentURI: {
+      body: proposal.body,
+      author: proposal.author,
+      ipfs: proposal.ipfs,
+      link: `https://snapshot.org/#/${space.id}/proposal/${proposal.id}`,
+    },
+    discussionURI: proposal.discussion,
     status:
       ts > proposal.end ? 'closed' : ts > proposal.start ? 'active' : 'pending',
     calls: []
