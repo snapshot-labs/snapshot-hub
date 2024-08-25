@@ -235,7 +235,7 @@ export function buildWhereQuery(
       }
     }
 
-    if (type == 'boolean') {
+    if (type === 'boolean') {
       query += `AND ${alias}.${field} = ? `;
       params.push(where[field] ? '1' : '0');
     }
