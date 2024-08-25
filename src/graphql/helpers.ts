@@ -234,11 +234,6 @@ export function buildWhereQuery(
         params.push(fieldLte);
       }
     }
-
-    if (type === 'boolean') {
-      query += `AND ${alias}.${field} = ? `;
-      params.push(where[field] ? '1' : '0');
-    }
   });
   return { query, params };
 }
