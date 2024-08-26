@@ -241,7 +241,7 @@ export function buildWhereQuery(
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string', created: 'number' };
+  const fields = { id: 'string', created: 'number', verified: 'boolean' };
 
   if ('controller' in where) {
     if (!where.controller) return [];
