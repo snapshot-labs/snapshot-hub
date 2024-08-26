@@ -155,7 +155,7 @@ CREATE TABLE statements (
   statement TEXT,
   network VARCHAR(24) NOT NULL DEFAULT 's',
   discourse VARCHAR(64),
-  source VARCHAR(100) DEFAULT NULL,
+  source VARCHAR(24) DEFAULT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'INACTIVE',
   created INT(11) NOT NULL,
   updated INT(11) NOT NULL,
