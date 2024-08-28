@@ -507,6 +507,7 @@ type Validation {
 type DelegationPortal {
   delegationType: String!
   delegationContract: String!
+  delegationNetwork: String!
   delegationApi: String!
 }
 
