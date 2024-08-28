@@ -13,6 +13,7 @@ export default async function (parent, args) {
     ipfs: 'string',
     space: 'string',
     network: 'string',
+    source: 'string',
     created: 'number',
     delegate: ['evmAddress', 'starknetAddress']
   };
