@@ -44,6 +44,7 @@ async function query(parent, args, context?, info?) {
 
   const query = `
     SELECT v.* FROM votes v
+    INNER JOIN proposals p ON v.proposal = p.id
     WHERE 1 = 1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection}, v.id ASC LIMIT ?, ?
   `;
