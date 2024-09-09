@@ -388,6 +388,7 @@ type Space {
   private: Boolean
   about: String
   avatar: String
+  cover: String
   terms: String
   location: String
   website: String
