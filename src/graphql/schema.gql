@@ -414,6 +414,7 @@ type Space {
   treasuries: [Treasury]
   activeProposals: Int
   proposalsCount: Int
+  proposalsCount1d: Int
   proposalsCount7d: Int
   followersCount: Int
   followersCount7d: Int

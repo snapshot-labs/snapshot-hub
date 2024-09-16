@@ -38,6 +38,7 @@ type Metadata = {
   counts: {
     activeProposals: number;
     proposalsCount: number;
+    proposalsCount1d: number;
     proposalsCount7d: number;
     followersCount: number;
     followersCount7d: number;
@@ -114,6 +115,7 @@ function mapSpaces() {
       counts: {
         activeProposals: spacesMetadata[id]?.counts?.activeProposals || 0,
         proposalsCount: space.proposal_count || 0,
+        proposalsCount1d: spacesMetadata[id]?.counts?.proposalsCount1d || 0,
         proposalsCount7d: spacesMetadata[id]?.counts?.proposalsCount7d || 0,
         followersCount: space.follower_count || 0,
         followersCount7d: spacesMetadata[id]?.counts?.followersCount7d || 0,
@@ -171,16 +173,20 @@ async function getProposals(): Promise<
   const query = `
     SELECT
       space,
+      COUNT(CASE WHEN created > (UNIX_TIMESTAMP() - 86400) THEN 1 END) AS proposalsCount1d,
       COUNT(id) AS proposalsCount7d
     FROM proposals
     WHERE created > (UNIX_TIMESTAMP() - 604800)
     GROUP BY space
   `;
 
-  (await db.queryAsync(query)).forEach(({ space, proposalsCount7d }) => {
-    results[space] ||= {};
-    results[space].proposalsCount7d = proposalsCount7d;
-  });
+  (await db.queryAsync(query)).forEach(
+    ({ space, proposalsCount1d, proposalsCount7d }) => {
+      results[space] ||= {};
+      results[space].proposalsCount1d = proposalsCount1d;
+      results[space].proposalsCount7d = proposalsCount7d;
+    }
+  );
 
   const activeQuery = `
     SELECT
