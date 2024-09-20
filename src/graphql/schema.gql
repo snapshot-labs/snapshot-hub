@@ -416,6 +416,7 @@ type Space {
   proposalsCount: Int
   proposalsCount1d: Int
   proposalsCount7d: Int
+  proposalsCount30d: Int
   followersCount: Int
   followersCount7d: Int
   votesCount: Int
