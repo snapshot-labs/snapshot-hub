@@ -348,6 +348,7 @@ async function fetchRelatedSpaces(spaces) {
   }, []);
 
   return fetchSpaces({
+    first: relatedSpaceIDs.length,
     where: { id_in: relatedSpaceIDs }
   });
 }
