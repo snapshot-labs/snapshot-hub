@@ -274,7 +274,7 @@ export async function fetchSpaces(args) {
   }
 
   if (where.domain) {
-    queryStr += ` AND s.settings->'$.domain' = ?`;
+    queryStr += ` AND domain = ?`;
     params.push(where.domain);
   }
 
