@@ -273,6 +273,11 @@ export async function fetchSpaces(args) {
     params.push(where.plugin);
   }
 
+  if (where.domain) {
+    queryStr += ` AND s.settings->'$.domain' = ?`;
+    params.push(where.domain);
+  }
+
   const query = `
     SELECT s.* FROM spaces s
     WHERE s.deleted = 0 ${queryStr}
