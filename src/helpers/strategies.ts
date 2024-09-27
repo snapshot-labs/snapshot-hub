@@ -32,6 +32,10 @@ async function loadStrategies() {
     ids.forEach(id => {
       if (res[id]) {
         res[id].spacesCount = (res[id].spacesCount || 0) + 1;
+
+        if (space.verified) {
+          res[id].verifiedSpacesCount = (res[id].verifiedSpacesCount || 0) + 1;
+        }
       }
     });
   });
@@ -40,9 +44,10 @@ async function loadStrategies() {
     .map((strategy: any) => {
       strategy.id = strategy.key;
       strategy.spacesCount = strategy.spacesCount || 0;
+      strategy.verifiedSpacesCount = strategy.verifiedSpacesCount || 0;
       return strategy;
     })
-    .sort((a, b): any => b.spacesCount - a.spacesCount);
+    .sort((a, b): any => b.verifiedSpacesCount - a.verifiedSpacesCount);
 
   strategiesObj = Object.fromEntries(
     strategies.map(strategy => [strategy.id, strategy])
