@@ -413,6 +413,7 @@ type Space {
   voteValidation: Validation
   delegationPortal: DelegationPortal
   treasuries: [Treasury]
+  labels: [Label]
   activeProposals: Int
   proposalsCount: Int
   proposalsCount1d: Int
@@ -612,6 +613,13 @@ type Treasury {
   name: String
   address: String
   network: String
+}
+
+type Label {
+  id: String
+  name: String
+  description: String
+  color: String
 }
 
 type BoostSettings {

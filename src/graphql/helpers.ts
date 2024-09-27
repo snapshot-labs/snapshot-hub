@@ -111,6 +111,7 @@ export function formatSpace({
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
+  space.labels = space.labels || [];
 
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
