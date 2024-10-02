@@ -485,7 +485,7 @@ type Proposal {
   quorum: Float!
   quorumType: String!
   privacy: String
-  snapshot: String
+  snapshot: Int
   state: String
   link: String
   app: String
