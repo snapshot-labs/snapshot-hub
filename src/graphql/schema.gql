@@ -480,6 +480,7 @@ type Proposal {
   body: String
   discussion: String!
   choices: [String]!
+  labels: [String]!
   start: Int!
   end: Int!
   quorum: Float!
