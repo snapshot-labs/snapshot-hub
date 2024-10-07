@@ -45,6 +45,7 @@ CREATE TABLE proposals (
   body MEDIUMTEXT NOT NULL,
   discussion TEXT NOT NULL,
   choices JSON NOT NULL,
+  labels JSON DEFAULT NULL,
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
   quorum DECIMAL(64,30) NOT NULL,
