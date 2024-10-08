@@ -110,6 +110,8 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Leaderboard]
+
+  options: [Option]
 }
 
 input SpaceWhere {
@@ -639,4 +641,9 @@ type Leaderboard {
   proposalsCount: Int
   votesCount: Int
   lastVote: Int
+}
+
+type Option {
+  name: String
+  value: String
 }
