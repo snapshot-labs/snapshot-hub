@@ -1,13 +1,32 @@
+import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 
-export default async function (_, args) {
-  try {
-    return await db.queryAsync('SELECT s.* FROM options s');
-  } catch (e: any) {
-    log.error(`[graphql] options, ${JSON.stringify(e)}`);
-    capture(e, { args });
-    return Promise.reject(new Error('request failed'));
-  }
+const RUN_INTERVAL = 12e3;
+
+let options = [];
+
+export default async function () {
+  return options;
 }
+
+async function loadOptions() {
+  options = await db.queryAsync('SELECT s.* FROM options s');
+}
+
+async function run() {
+  try {
+    log.info('[options] Start options refresh');
+    await loadOptions();
+    log.info(`[options] ${options.length} options reloaded`);
+    log.info('[options] End options refresh');
+  } catch (e: any) {
+    capture(e);
+    log.error(`[options] failed to refresh options, ${JSON.stringify(e)}`);
+  }
+  await snapshot.utils.sleep(RUN_INTERVAL);
+  run();
+}
+
+run();
