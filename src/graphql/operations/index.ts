@@ -3,6 +3,7 @@ import follows from './follows';
 import leaderboards from './leaderboards';
 import messages from './messages';
 import networks from './networks';
+import options from './options';
 import plugins from './plugins';
 import proposal from './proposal';
 import proposals from './proposals';
@@ -36,6 +37,7 @@ export default {
   subscriptions,
   skins,
   networks,
+  options,
   validations,
   plugins,
   strategies,

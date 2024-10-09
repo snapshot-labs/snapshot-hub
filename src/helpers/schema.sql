@@ -184,3 +184,9 @@ CREATE TABLE leaderboard (
   INDEX proposal_count (proposal_count),
   INDEX last_vote (last_vote)
 );
+
+CREATE TABLE options (
+  name VARCHAR(100) NOT NULL,
+  value VARCHAR(100) NOT NULL,
+  PRIMARY KEY (name)
+);
