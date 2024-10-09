@@ -3,7 +3,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 
-const RUN_INTERVAL = 12e3;
+const RUN_INTERVAL = 120e3;
 
 let options = [];
 
