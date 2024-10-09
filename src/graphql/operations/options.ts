@@ -1,5 +1,5 @@
-import snapshot from '@snapshot-labs/snapshot.js';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import snapshot from '@snapshot-labs/snapshot.js';
 import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 
