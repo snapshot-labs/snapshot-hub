@@ -63,6 +63,7 @@ export function checkLimits(args: any = {}, type) {
 export function formatSpace({
   id,
   settings,
+  domain,
   verified,
   turbo,
   flagged,
@@ -72,6 +73,7 @@ export function formatSpace({
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
   space.id = id;
+  space.domain = domain || '';
   space.private = space.private || false;
   space.avatar = space.avatar || '';
   space.about = space.about || '';
@@ -403,6 +405,7 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace({
     id: proposal.space,
     settings: proposal.settings,
+    domain: proposal.spaceDomain,
     verified: proposal.spaceVerified,
     turbo: proposal.spaceTurbo,
     flagged: proposal.spaceFlagged,
@@ -426,6 +429,7 @@ export function formatVote(vote) {
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
   vote.space = formatSpace({
     id: vote.space,
+    domain: vote.spaceDomain,
     settings: vote.settings,
     verified: vote.spaceVerified,
     turbo: vote.spaceTurbo,
@@ -439,6 +443,7 @@ export function formatFollow(follow) {
   follow.space = formatSpace({
     id: follow.space,
     settings: follow.settings,
+    domain: follow.spaceDomain,
     verified: follow.spaceVerified,
     turbo: follow.spaceTurbo,
     flagged: follow.spaceFlagged,
@@ -451,6 +456,7 @@ export function formatSubscription(subscription) {
   subscription.space = formatSpace({
     id: subscription.space,
     settings: subscription.settings,
+    domain: subscription.spaceDomain,
     verified: subscription.spaceVerified,
     turbo: subscription.spaceTurbo,
     flagged: subscription.spaceFlagged,

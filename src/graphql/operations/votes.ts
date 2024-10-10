@@ -90,6 +90,7 @@ async function query(parent, args, context?, info?) {
     const query = `
       SELECT p.*,
         spaces.settings,
+        spaces.domain as spaceDomain,
         spaces.flagged as spaceFlagged,
         spaces.verified as spaceVerified,
         spaces.turbo as spaceTurbo,
