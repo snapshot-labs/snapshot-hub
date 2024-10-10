@@ -1,5 +1,3 @@
-import { domain } from "process";
-
 const fixtures: Record<string, any>[] = [
   {
     id: 'fabien.eth',
