@@ -25,7 +25,7 @@
     "@snapshot-labs/keycard": "^0.5.1",
     "@snapshot-labs/snapshot-metrics": "^1.4.1",
     "@snapshot-labs/snapshot-sentry": "^1.5.5",
-    "@snapshot-labs/snapshot.js": "^0.12.23",
+    "@snapshot-labs/snapshot.js": "^0.12.24",
     "bluebird": "^3.7.2",
     "connection-string": "^1.0.1",
     "cors": "^2.8.5",
