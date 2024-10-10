@@ -268,7 +268,7 @@ async function loadSpacesMetrics() {
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT settings, flagged, verified, turbo, hibernated, deleted, follower_count, proposal_count, vote_count
+    SELECT settings, domain, flagged, verified, turbo, hibernated, deleted, follower_count, proposal_count, vote_count
     FROM spaces
     WHERE id = ?
     LIMIT 1`;
@@ -279,6 +279,7 @@ export async function getSpace(id: string) {
 
   return {
     ...JSON.parse(space.settings),
+    domain: space.domain,
     flagged: space.flagged === 1,
     verified: space.verified === 1,
     turbo: space.turbo === 1,
