@@ -72,7 +72,7 @@ export default async function (parent, args) {
     searchSql += ' AND p.flagged = 0';
   }
 
-  if (where.labels_in) {
+  if (where?.labels_in?.length) {
     searchSql += ' AND JSON_OVERLAPS(p.labels, ?)';
     params.push(JSON.stringify(where.labels_in));
   }
