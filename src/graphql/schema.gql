@@ -221,6 +221,7 @@ input ProposalWhere {
   end_lte: Int
   scores_state: String
   scores_state_in: [String]
+  labels_in: [String]
   state: String
   space_verified: Boolean
   flagged: Boolean

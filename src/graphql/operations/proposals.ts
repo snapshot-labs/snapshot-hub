@@ -72,6 +72,11 @@ export default async function (parent, args) {
     searchSql += ' AND p.flagged = 0';
   }
 
+  if (where?.labels_in?.length) {
+    searchSql += ' AND JSON_OVERLAPS(p.labels, ?)';
+    params.push(JSON.stringify(where.labels_in));
+  }
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
