@@ -229,6 +229,53 @@ async function getVotes(): Promise<Record<string, { votesCount7d: number }>> {
   );
 }
 
+export async function getCombinedMembersAndVoters(
+  spaceId: string,
+  cursor: string | null,
+  pageSize: number,
+  knownAdmins: string[] = [],
+  knownModerators: string[] = [],
+  knownMembers: string[] = []
+) {
+  const params: (string | number)[] = [spaceId];
+  const exclusionList = [...knownAdmins, ...knownModerators, ...knownMembers];
+
+  // Other roles are already known and fetched at the app level while Space Verification
+  // Building the exclusion clause only if the exclusion list is not empty
+  let exclusionClause = '';
+  if (exclusionList.length > 0) {
+    const placeholders = exclusionList.map(() => '?').join(', ');
+    exclusionClause = `AND voter NOT IN (${placeholders})`;
+    params.push(...exclusionList);
+  }
+
+  const cursorClause = cursor ? ' AND voter > ?' : '';
+  if (cursor) {
+    params.push(cursor);
+  }
+
+  const query = `
+    SELECT DISTINCT voter AS address
+    FROM votes
+    WHERE space = ? ${exclusionClause} ${cursorClause}
+    ORDER BY voter
+    LIMIT ?
+  `;
+  params.push(pageSize);
+
+  const results = await db.queryAsync(query, params);
+  if (!results || results.length === 0) {
+    return Promise.reject(new Error('NOT_FOUND'));
+  }
+
+  const nextCursor =
+    results.length === pageSize ? results[results.length - 1].address : null;
+  return {
+    members: results.map(row => row.address),
+    nextCursor: nextCursor
+  };
+}
+
 async function getFollowers(): Promise<
   Record<string, { followersCount7d: number }>
 > {
