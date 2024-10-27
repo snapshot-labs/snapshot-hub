@@ -1,6 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import log from '../../helpers/log';
-import db from '../../helpers/mysql';
+import db, { envelopDB } from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatUser } from '../helpers';
 
 export default async function (parent, args) {
@@ -72,10 +72,36 @@ export default async function (parent, args) {
         user.lastVote = count.lastVote;
       });
     }
+
+    const subscriptions = await getEmailSubscribers(ids);
+    users.forEach((user: any) => {
+      user.emailSubscription = subscriptions[user.id] || {
+        status: 'NOT_SUBSCRIBED',
+        subscriptions: []
+      };
+    });
+
     return users.map(formatUser);
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);
     capture(e, { args });
     return Promise.reject(new Error('request failed'));
   }
+}
+
+async function getEmailSubscribers(user_ids: string[]) {
+  const subscribers = await envelopDB.queryAsync(
+    `SELECT verified, address, subscriptions FROM subscribers WHERE address IN (?)`,
+    user_ids
+  );
+
+  return Object.fromEntries(
+    subscribers.map((s: any) => [
+      s.address,
+      {
+        status: s.verified > 0 ? 'VERIFIED' : 'UNVERIFIED',
+        subscriptions: JSON.parse(s.subscriptions)
+      }
+    ])
+  );
 }

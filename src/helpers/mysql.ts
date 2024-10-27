@@ -19,7 +19,6 @@ hubConfig.connectTimeout = 60e3;
 hubConfig.acquireTimeout = 60e3;
 hubConfig.timeout = 60e3;
 hubConfig.charset = 'utf8mb4';
-
 const hubDB = mysql.createPool(hubConfig);
 
 // @ts-ignore
@@ -35,6 +34,19 @@ sequencerConfig.timeout = 60e3;
 sequencerConfig.charset = 'utf8mb4';
 const sequencerDB = mysql.createPool(sequencerConfig);
 
+// @ts-ignore
+const envelopConfig = parse(process.env.ENVELOP_DATABASE_URL);
+envelopConfig.connectionLimit = connectionLimit;
+envelopConfig.multipleStatements = true;
+envelopConfig.database = envelopConfig.path[0];
+envelopConfig.host = envelopConfig.hosts[0].name;
+envelopConfig.port = envelopConfig.hosts[0].port;
+envelopConfig.connectTimeout = 60e3;
+envelopConfig.acquireTimeout = 60e3;
+envelopConfig.timeout = 60e3;
+envelopConfig.charset = 'utf8mb4';
+const envelopDB = mysql.createPool(envelopConfig);
+
 bluebird.promisifyAll([Pool, Connection]);
 
-export { hubDB as default, sequencerDB };
+export { hubDB as default, sequencerDB, envelopDB };

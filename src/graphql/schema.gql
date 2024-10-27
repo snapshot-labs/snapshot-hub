@@ -520,6 +520,11 @@ type DelegationPortal {
   delegationApi: String!
 }
 
+type EmailSubscription {
+  status: String!
+  subscriptions: [String]
+}
+
 type Vote {
   id: String!
   ipfs: String
@@ -581,6 +586,7 @@ type User {
   votesCount: Int
   proposalsCount: Int
   lastVote: Int
+  emailSubscription: EmailSubscription
 }
 
 type Statement {
