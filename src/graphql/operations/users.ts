@@ -73,9 +73,9 @@ export default async function (parent, args) {
       });
     }
 
-    const subscriptions = await getEmailSubscribers(ids);
+    const subscribers = await getEmailSubscribers(ids);
     users.forEach((user: any) => {
-      user.emailSubscription = subscriptions[user.id] || {
+      user.emailSubscription = subscribers[user.id] || {
         status: 'NOT_SUBSCRIBED',
         subscriptions: []
       };
