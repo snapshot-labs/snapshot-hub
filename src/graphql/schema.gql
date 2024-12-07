@@ -400,6 +400,8 @@ type Space {
   github: String
   coingecko: String
   email: String
+  discussions: String
+  discourseCategory: Int
   network: String
   symbol: String
   skin: String
