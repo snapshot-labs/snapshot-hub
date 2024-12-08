@@ -89,7 +89,13 @@ export default async function (parent, args) {
   }
 }
 
-async function getEmailSubscribers(user_ids: string[]) {
+async function getEmailSubscribers(
+  user_ids: string[]
+): Promise<
+  Record<string, { status: 'VERIFIED' | 'UNVERIFIED'; subscriptions: string[] }>
+> {
+  if (!envelopDB) return {};
+
   const subscribers = await envelopDB.queryAsync(
     `SELECT verified, address, subscriptions FROM subscribers WHERE address IN (?)`,
     user_ids
