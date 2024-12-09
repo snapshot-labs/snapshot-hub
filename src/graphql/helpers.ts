@@ -9,6 +9,7 @@ import { spacesMetadata } from '../helpers/spaces';
 import { jsonParse } from '../helpers/utils';
 
 const network = process.env.NETWORK || 'testnet';
+const domain = `${network === 'testnet' ? 'testnet.' : ''}snapshot.box`;
 
 type AddressFormat = 'evmAddress' | 'starknetAddress';
 const DEFAULT_ADDRESS_FORMAT: AddressFormat[] = [
@@ -411,8 +412,8 @@ export function formatProposal(proposal) {
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated
   });
-  const networkStr = network === 'testnet' ? 'testnet.' : '';
-  proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
+  const networkPrefix = network === 'testnet' ? 's-tn' : 's';
+  proposal.link = `https://${domain}/#/${networkPrefix}:${proposal.space.id}/proposal/${proposal.id}`;
   proposal.strategies = proposal.strategies.map(strategy => ({
     ...strategy,
     // By default return proposal network if strategy network is not defined
