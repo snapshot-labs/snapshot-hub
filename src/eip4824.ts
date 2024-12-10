@@ -4,6 +4,9 @@ import { getSpace } from './helpers/spaces';
 
 const router = express.Router();
 const context = '<http://www.daostar.org/schemas>';
+const network = process.env.NETWORK || 'testnet';
+const domain = `${network === 'testnet' ? 'testnet.' : ''}snapshot.box`;
+const networkPrefix = network === 'testnet' ? 's-tn' : 's';
 
 router.get('/:space', async (req, res) => {
   let space: any = {};
@@ -86,7 +89,7 @@ router.get('/:space/proposals', async (req, res) => {
       body: proposal.body,
       author: proposal.author,
       ipfs: proposal.ipfs,
-      link: `https://snapshot.org/#/${space.id}/proposal/${proposal.id}`,
+      link: `https://${domain}/#/${networkPrefix}:${id}/proposal/${proposal.id}`
     },
     discussionURI: proposal.discussion,
     status:
