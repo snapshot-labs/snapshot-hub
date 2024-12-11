@@ -15,6 +15,8 @@ bluebird.promisifyAll([Pool, Connection]);
 const db = mysql.createPool(config);
 const dbName = config.path[0];
 
+const schemaFiles = ['./src/helpers/schema.sql', './test/schema_envelop.sql'];
+
 if (!dbName.endsWith(TEST_DATABASE_SUFFIX)) {
   console.error(
     `Invalid test database name. Must end with ${TEST_DATABASE_SUFFIX}`
@@ -33,8 +35,9 @@ async function run() {
   console.info(`- Creating new database: ${dbName}`);
   await db.queryAsync(`CREATE DATABASE ${dbName}`);
 
-  const schema = fs
-    .readFileSync('./src/helpers/schema.sql', 'utf8')
+  const schema = schemaFiles
+    .map(file => fs.readFileSync(file, 'utf8'))
+    .join(' ')
     .replaceAll('CREATE TABLE ', `CREATE TABLE ${dbName}.`)
     .split(splitToken)
     .filter(s => s.trim().length > 0);
