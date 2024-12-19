@@ -167,7 +167,15 @@ async function loadSpaces() {
 }
 
 async function getProposals(): Promise<
-  Record<string, { activeProposals: number; proposalsCount7d: number }>
+  Record<
+    string,
+    {
+      activeProposals: number;
+      proposalsCount1d: number;
+      proposalsCount7d: number;
+      proposalsCount30d: number;
+    }
+  >
 > {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const results = {};
@@ -250,19 +258,22 @@ async function getFollowers(): Promise<
 }
 
 async function loadSpacesMetrics() {
-  const metricsFn = [getFollowers, getProposals, getVotes];
-  const results = await Promise.all(metricsFn.map(fn => fn()));
-
-  metricsFn.forEach((metricFn, i) => {
-    for (const [space, metrics] of Object.entries(results[i])) {
-      if (!spacesMetadata[space]) continue;
-
-      spacesMetadata[space].counts = {
-        ...spacesMetadata[space].counts,
-        ...metrics
-      };
-    }
-    log.info(`[spaces] ${metricFn.name.replace('get', '')} metrics loaded`);
+  const results = await Promise.all([
+    getFollowers(),
+    getProposals(),
+    getVotes()
+  ]);
+  const [followerMetrics, proposalMetrics, voteMetrics] = results;
+  Object.keys(spacesMetadata).forEach(space => {
+    spacesMetadata[space].counts = {
+      ...spacesMetadata[space].counts,
+      activeProposals: proposalMetrics[space]?.activeProposals || 0,
+      proposalsCount1d: proposalMetrics[space]?.proposalsCount1d || 0,
+      proposalsCount7d: proposalMetrics[space]?.proposalsCount7d || 0,
+      proposalsCount30d: proposalMetrics[space]?.proposalsCount30d || 0,
+      followersCount7d: followerMetrics[space]?.followersCount7d || 0,
+      votesCount7d: voteMetrics[space]?.votesCount7d || 0
+    };
   });
 }
 
