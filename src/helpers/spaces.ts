@@ -263,6 +263,7 @@ async function loadSpacesMetrics() {
     getProposals(),
     getVotes()
   ]);
+  
   const [followerMetrics, proposalMetrics, voteMetrics] = results;
   Object.keys(spacesMetadata).forEach(space => {
     spacesMetadata[space].counts = {
