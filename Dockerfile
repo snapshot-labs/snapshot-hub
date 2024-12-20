@@ -31,5 +31,5 @@ EXPOSE 8080
 # Build the app
 RUN yarn run build
 
-# Start the aplication
+# Start the application
 CMD ["yarn", "run", "start" ]
