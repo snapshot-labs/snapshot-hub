@@ -9,6 +9,7 @@ import proposal from './proposal';
 import proposals from './proposals';
 import ranking from './ranking';
 import roles from './roles';
+import skin from './skin';
 import skins from './skins';
 import space from './space';
 import spaces from './spaces';
@@ -35,6 +36,7 @@ export default {
   aliases,
   follows,
   subscriptions,
+  skin,
   skins,
   networks,
   options,

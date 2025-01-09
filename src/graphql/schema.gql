@@ -81,7 +81,14 @@ type Query {
 
   statement(id: String!): Statement
 
-  skins: [Item]
+
+  skin(id: String!): Skin
+
+  skins(
+    first: Int! = 20
+    skip: Int! = 0,
+    where: SkinWhere
+  ): [Skin]
 
   networks: [Item]
 
@@ -379,6 +386,10 @@ input LeaderboardsWhere {
   vote_count_lte: [Int]
 }
 
+input SkinWhere {
+  id: String
+}
+
 enum OrderDirection {
   asc
   desc
@@ -650,4 +661,18 @@ type Leaderboard {
 type Option {
   name: String
   value: String
+}
+
+type SkinColors {
+    bg: String
+    link: String
+    text: String
+    border: String
+    heading: String
+    primary: String
+  }
+
+type Skin {
+  id: String!
+  colors: SkinColors
 }
