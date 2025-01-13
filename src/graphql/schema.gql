@@ -662,4 +662,5 @@ type SkinSettings {
   heading_color: String
   header_color: String
   primary_color: String
+  theme: String
 }

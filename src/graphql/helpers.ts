@@ -45,7 +45,8 @@ const SKIN_SETTINGS = [
   'border_color',
   'heading_color',
   'header_color',
-  'primary_color'
+  'primary_color',
+  'theme'
 ];
 
 export function checkLimits(args: any = {}, type) {
@@ -73,10 +74,12 @@ export function checkLimits(args: any = {}, type) {
 }
 
 function formatSkinSettings(result) {
-  return SKIN_SETTINGS.reduce((acc, color) => {
-    if (!result[color]) return acc;
+  return SKIN_SETTINGS.reduce((acc, colorName) => {
+    if (!result[colorName]) return acc;
 
-    acc[color] = `#${result[color]}`;
+    acc[colorName] = `${colorName.includes('_color') ? '#' : ''}${
+      result[colorName]
+    }`;
     return acc;
   }, {});
 }
