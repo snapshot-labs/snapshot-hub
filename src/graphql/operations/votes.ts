@@ -87,7 +87,10 @@ async function query(parent, args, context?, info?) {
   if (requestedFields.proposal && votes.length > 0) {
     const proposalIds = votes.map(vote => vote.proposal);
     const query = `
-      SELECT p.*,
+      SELECT
+        p.*,
+        skins.*,
+        p.id AS id,
         spaces.settings,
         spaces.domain as spaceDomain,
         spaces.flagged as spaceFlagged,
@@ -96,6 +99,7 @@ async function query(parent, args, context?, info?) {
         spaces.hibernated as spaceHibernated
       FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
+      LEFT JOIN skins ON spaces.id = skins.id
       WHERE spaces.settings IS NOT NULL AND p.id IN (?)
     `;
     try {

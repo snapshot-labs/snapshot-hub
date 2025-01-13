@@ -37,6 +37,18 @@ const ARG_LIMITS = {
   }
 };
 
+const SKIN_SETTINGS = [
+  'bg_color',
+  'link_color',
+  'text_color',
+  'content_color',
+  'border_color',
+  'heading_color',
+  'header_color',
+  'primary_color',
+  'theme'
+];
+
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
@@ -61,6 +73,17 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
+function formatSkinSettings(result) {
+  return SKIN_SETTINGS.reduce((acc, colorName) => {
+    if (!result[colorName]) return acc;
+
+    acc[colorName] = `${colorName.includes('_color') ? '#' : ''}${
+      result[colorName]
+    }`;
+    return acc;
+  }, {});
+}
+
 export function formatSpace({
   id,
   settings,
@@ -68,7 +91,8 @@ export function formatSpace({
   verified,
   turbo,
   flagged,
-  hibernated
+  hibernated,
+  skinSettings
 }) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
@@ -115,6 +139,7 @@ export function formatSpace({
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
   space.labels = space.labels || [];
+  space.skinSettings = skinSettings;
 
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
@@ -283,15 +308,20 @@ export async function fetchSpaces(args) {
   }
 
   const query = `
-    SELECT s.* FROM spaces s
+    SELECT s.*, skins.*, s.id AS id FROM spaces s
+    LEFT JOIN skins ON s.id = skins.id
     WHERE s.deleted = 0 ${queryStr}
-    GROUP BY s.id
     ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space => Object.assign(space, formatSpace(space)));
+  return spaces.map(space =>
+    Object.assign(
+      space,
+      formatSpace({ skinSettings: formatSkinSettings(space), ...space })
+    )
+  );
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
@@ -410,7 +440,8 @@ export function formatProposal(proposal) {
     verified: proposal.spaceVerified,
     turbo: proposal.spaceTurbo,
     flagged: proposal.spaceFlagged,
-    hibernated: proposal.spaceHibernated
+    hibernated: proposal.spaceHibernated,
+    skinSettings: formatSkinSettings(proposal)
   });
   const networkPrefix = network === 'testnet' ? 's-tn' : 's';
   proposal.link = `https://${domain}/#/${networkPrefix}:${proposal.space.id}/proposal/${proposal.id}`;
@@ -435,7 +466,8 @@ export function formatVote(vote) {
     verified: vote.spaceVerified,
     turbo: vote.spaceTurbo,
     flagged: vote.spaceFlagged,
-    hibernated: vote.spaceHibernated
+    hibernated: vote.spaceHibernated,
+    skinSettings: formatSkinSettings(vote)
   });
   return vote;
 }
@@ -448,7 +480,8 @@ export function formatFollow(follow) {
     verified: follow.spaceVerified,
     turbo: follow.spaceTurbo,
     flagged: follow.spaceFlagged,
-    hibernated: follow.spaceHibernated
+    hibernated: follow.spaceHibernated,
+    skinSettings: formatSkinSettings(follow)
   });
   return follow;
 }
@@ -461,7 +494,8 @@ export function formatSubscription(subscription) {
     verified: subscription.spaceVerified,
     turbo: subscription.spaceTurbo,
     flagged: subscription.spaceFlagged,
-    hibernated: subscription.spaceHibernated
+    hibernated: subscription.spaceHibernated,
+    skinSettings: formatSkinSettings(subscription)
   });
   return subscription;
 }

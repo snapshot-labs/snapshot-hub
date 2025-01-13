@@ -28,7 +28,10 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT f.*,
+    SELECT
+      f.*,
+      skins.*,
+      f.id AS id,
       spaces.settings,
       spaces.domain as spaceDomain,
       spaces.flagged as spaceFlagged,
@@ -37,6 +40,7 @@ export default async function (parent, args) {
       spaces.hibernated as spaceHibernated
     FROM follows f
     LEFT JOIN spaces ON spaces.id = f.space
+    LEFT JOIN skins ON spaces.id = skins.id
     WHERE 1=1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
