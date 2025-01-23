@@ -91,11 +91,15 @@ function sortSpaces() {
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    const networks = uniq(
-      (space.strategies || [])
-        .map(strategy => strategy?.network || space.network)
-        .concat(space.network)
-    );
+    const networks = uniq([
+      space.network,
+      ...space.strategies.map((strategy: any) => strategy.network),
+      ...space.strategies.flatMap((strategy: any) =>
+        Array.isArray(strategy.params?.strategies)
+          ? strategy.params.strategies.map((param: any) => param.network)
+          : []
+      )
+    ]);
     const strategyNames = uniq(
       (space.strategies || []).map(strategy => strategy.name)
     );
@@ -263,7 +267,7 @@ async function loadSpacesMetrics() {
     getProposals(),
     getVotes()
   ]);
-  
+
   const [followerMetrics, proposalMetrics, voteMetrics] = results;
   Object.keys(spacesMetadata).forEach(space => {
     spacesMetadata[space].counts = {
