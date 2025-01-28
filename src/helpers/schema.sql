@@ -198,3 +198,10 @@ CREATE TABLE options (
   value VARCHAR(100) NOT NULL,
   PRIMARY KEY (name)
 );
+
+CREATE TABLE networks (
+  id VARCHAR(64) NOT NULL,
+  premium SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  INDEX premium (premium)
+);

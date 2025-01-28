@@ -83,7 +83,7 @@ type Query {
 
   skins: [Item]
 
-  networks: [Item]
+  networks: [Network]
 
   validations: [Item]
 
@@ -650,4 +650,10 @@ type Leaderboard {
 type Option {
   name: String
   value: String
+}
+
+type Network {
+  id: String!
+  spacesCount: Int
+  premium: Boolean
 }
