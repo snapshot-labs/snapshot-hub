@@ -405,6 +405,7 @@ type Space {
   network: String
   symbol: String
   skin: String
+  skinSettings: SkinSettings
   domain: String
   strategies: [Strategy]
   admins: [String]
@@ -650,6 +651,18 @@ type Leaderboard {
 type Option {
   name: String
   value: String
+}
+
+type SkinSettings {
+  bg_color: String
+  link_color: String
+  text_color: String
+  content_color: String
+  border_color: String
+  heading_color: String
+  header_color: String
+  primary_color: String
+  theme: String
 }
 
 type Network {
