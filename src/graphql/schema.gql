@@ -83,7 +83,7 @@ type Query {
 
   skins: [Item]
 
-  networks: [Item]
+  networks: [Network]
 
   validations: [Item]
 
@@ -663,4 +663,10 @@ type SkinSettings {
   header_color: String
   primary_color: String
   theme: String
+}
+
+type Network {
+  id: String!
+  spacesCount: Int
+  premium: Boolean
 }
