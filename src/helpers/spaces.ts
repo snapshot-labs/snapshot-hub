@@ -52,24 +52,24 @@ type Metadata = {
 
 function getPopularity(space: Metadata): number {
   let popularity =
-    space.counts.votesCount / 100 +
+    space.counts.votesCount / 500 +
     space.counts.votesCount7d +
-    space.counts.proposalsCount / 100 +
+    space.counts.proposalsCount / 500 +
     space.counts.proposalsCount7d +
-    space.counts.followersCount / 50 +
+    space.counts.followersCount / 1000 +
     space.counts.followersCount7d;
 
-  if (
-    space.networks.some(network => TESTNET_NETWORKS.includes(network)) ||
-    space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
-  )
-    popularity = 1;
+  if (space.counts.activeProposals > 0) popularity += 1e5;
 
-  if (space.verified) popularity *= 100000000;
-  if (space.turbo) {
-    popularity += 1;
-    popularity *= 100000000;
-  }
+  if (
+    !space.networks.some(network => TESTNET_NETWORKS.includes(network)) &&
+    !space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
+  )
+    popularity += 1e10;
+
+  if (space.verified) popularity += 1e10;
+
+  if (space.turbo) popularity += 1e10;
 
   return popularity;
 }
