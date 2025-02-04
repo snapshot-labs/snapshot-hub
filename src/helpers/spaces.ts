@@ -59,7 +59,7 @@ function getPopularity(space: Metadata): number {
     space.counts.followersCount / 400 +
     space.counts.followersCount7d;
 
-  if (space.counts.activeProposals > 0) popularity += 2e10;
+  if (space.counts.activeProposals > 0) popularity += 1e5;
 
   if (
     !space.networks.some(network => TESTNET_NETWORKS.includes(network)) &&
