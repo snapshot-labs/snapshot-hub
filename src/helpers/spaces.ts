@@ -52,11 +52,11 @@ type Metadata = {
 
 function getPopularity(space: Metadata): number {
   let popularity =
-    space.counts.proposalsCount / 100 +
+    space.counts.proposalsCount / 50 +
     space.counts.proposalsCount7d +
-    space.counts.votesCount / 200 +
+    space.counts.votesCount / 100 +
     space.counts.votesCount7d +
-    space.counts.followersCount / 400 +
+    space.counts.followersCount / 200 +
     space.counts.followersCount7d;
 
   if (space.counts.activeProposals > 0) popularity += 1e5;
