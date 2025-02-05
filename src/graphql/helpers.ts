@@ -46,7 +46,8 @@ const SKIN_SETTINGS = [
   'heading_color',
   'header_color',
   'primary_color',
-  'theme'
+  'theme',
+  'logo'
 ];
 
 export function checkLimits(args: any = {}, type) {
