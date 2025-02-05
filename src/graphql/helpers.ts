@@ -75,11 +75,8 @@ export function checkLimits(args: any = {}, type) {
 
 function formatSkinSettings(result) {
   return SKIN_SETTINGS.reduce((acc, colorName) => {
-    if (!result[colorName]) return acc;
+    acc[colorName] = result[colorName];
 
-    acc[colorName] = `${colorName.includes('_color') ? '#' : ''}${
-      result[colorName]
-    }`;
     return acc;
   }, {});
 }
