@@ -663,6 +663,7 @@ type SkinSettings {
   header_color: String
   primary_color: String
   theme: String
+  logo: String
 }
 
 type Network {

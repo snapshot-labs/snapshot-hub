@@ -204,14 +204,16 @@ CREATE TABLE skins (
   bg_color VARCHAR(6) DEFAULT NULL,
   link_color VARCHAR(6) DEFAULT NULL,
   text_color VARCHAR(6) DEFAULT NULL,
+  content_color VARCHAR(6) DEFAULT NULL,
   border_color VARCHAR(6) DEFAULT NULL,
   heading_color VARCHAR(6) DEFAULT NULL,
   primary_color VARCHAR(6) DEFAULT NULL,
   header_color VARCHAR(6) DEFAULT NULL,
   theme VARCHAR(5) NOT NULL DEFAULT 'light',
+  logo VARCHAR(256) DEFAULT NULL,
   PRIMARY KEY (id)
 );
-  
+
 CREATE TABLE networks (
   id VARCHAR(64) NOT NULL,
   premium SMALLINT UNSIGNED NOT NULL DEFAULT '0',
