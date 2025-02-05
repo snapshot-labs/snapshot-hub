@@ -72,6 +72,11 @@ export default async function (parent, args) {
     searchSql += ' AND p.flagged = 0';
   }
 
+  if (where?.labels_in?.length) {
+    searchSql += ' AND JSON_CONTAINS(p.labels, ?)';
+    params.push(JSON.stringify(where.labels_in));
+  }
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
   if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
@@ -80,14 +85,19 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT p.*,
+    SELECT
+      p.*,
+      skins.*,
+      p.id AS id,
       spaces.settings,
+      spaces.domain as spaceDomain,
       spaces.flagged as spaceFlagged,
       spaces.verified as spaceVerified,
       spaces.turbo as spaceTurbo,
       spaces.hibernated as spaceHibernated
     FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
+    LEFT JOIN skins ON spaces.id = skins.id
     WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;

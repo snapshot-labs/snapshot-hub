@@ -10,10 +10,12 @@ CREATE TABLE spaces (
   proposal_count INT NOT NULL DEFAULT '0',
   vote_count INT NOT NULL DEFAULT '0',
   follower_count INT NOT NULL DEFAULT '0',
+  domain VARCHAR(64) DEFAULT NULL,
   created BIGINT NOT NULL,
   updated BIGINT NOT NULL,
   PRIMARY KEY (id),
   INDEX name (name),
+  UNIQUE KEY domain (domain),
   INDEX verified (verified),
   INDEX flagged (flagged),
   INDEX hibernated (hibernated),
@@ -26,6 +28,10 @@ CREATE TABLE spaces (
   INDEX updated (updated)
 );
 
+-- Note: The `proposals` table schema might have some discrepancies
+-- compared to the production database. This is due to legacy reasons
+-- and the challenges associated with updating the schema because of its size.
+-- `id` and `ipfs` columns should not have any default values.
 CREATE TABLE proposals (
   id VARCHAR(66) NOT NULL,
   ipfs VARCHAR(64) NOT NULL,
@@ -34,8 +40,8 @@ CREATE TABLE proposals (
   updated INT(11) DEFAULT NULL,
   space VARCHAR(64) NOT NULL,
   network VARCHAR(12) NOT NULL,
-  symbol VARCHAR(16) NOT NULL,
-  type VARCHAR(24) NOT NULL,
+  symbol VARCHAR(16) NOT NULL DEFAULT '',
+  type VARCHAR(24) NOT NULL DEFAULT '',
   strategies JSON NOT NULL,
   validation JSON NOT NULL,
   plugins JSON NOT NULL,
@@ -43,20 +49,24 @@ CREATE TABLE proposals (
   body MEDIUMTEXT NOT NULL,
   discussion TEXT NOT NULL,
   choices JSON NOT NULL,
+  labels JSON DEFAULT NULL,
   start INT(11) NOT NULL,
   end INT(11) NOT NULL,
   quorum DECIMAL(64,30) NOT NULL,
-  quorum_type VARCHAR(24) NOT NULL DEFAULT '',
+  quorum_type VARCHAR(24) DEFAULT '',
   privacy VARCHAR(24) NOT NULL,
   snapshot INT(24) NOT NULL,
   app VARCHAR(24) NOT NULL,
   scores JSON NOT NULL,
   scores_by_strategy JSON NOT NULL,
-  scores_state VARCHAR(24) NOT NULL,
+  scores_state VARCHAR(24) NOT NULL DEFAULT '',
   scores_total DECIMAL(64,30) NOT NULL,
   scores_updated INT(11) NOT NULL,
+  scores_total_value DECIMAL(64,30) NOT NULL DEFAULT '0.000000000000000000000000000000',
+  vp_value_by_strategy json NOT NULL,
   votes INT(12) NOT NULL,
   flagged INT NOT NULL DEFAULT 0,
+  cb INT NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   INDEX ipfs (ipfs),
   INDEX author (author),
@@ -70,7 +80,8 @@ CREATE TABLE proposals (
   INDEX scores_state (scores_state),
   INDEX scores_updated (scores_updated),
   INDEX votes (votes),
-  INDEX flagged (flagged)
+  INDEX flagged (flagged),
+  INDEX cb (cb)
 );
 
 CREATE TABLE votes (
@@ -148,13 +159,14 @@ CREATE TABLE users (
 
 CREATE TABLE statements (
   id VARCHAR(66) NOT NULL,
-  ipfs VARCHAR(64) NOT NULL,
+  ipfs VARCHAR(64) DEFAULT NULL,
   delegate VARCHAR(100) NOT NULL,
   space VARCHAR(100) NOT NULL,
   about TEXT,
   statement TEXT,
   network VARCHAR(24) NOT NULL DEFAULT 's',
   discourse VARCHAR(64),
+  source VARCHAR(24) DEFAULT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'INACTIVE',
   created INT(11) NOT NULL,
   updated INT(11) NOT NULL,
@@ -164,6 +176,7 @@ CREATE TABLE statements (
   INDEX network (network),
   INDEX created (created),
   INDEX updated (updated),
+  INDEX source (source),
   INDEX status (status)
 );
 
@@ -178,4 +191,32 @@ CREATE TABLE leaderboard (
   INDEX vote_count (vote_count),
   INDEX proposal_count (proposal_count),
   INDEX last_vote (last_vote)
+);
+
+CREATE TABLE options (
+  name VARCHAR(100) NOT NULL,
+  value VARCHAR(100) NOT NULL,
+  PRIMARY KEY (name)
+);
+
+CREATE TABLE skins (
+  id VARCHAR(100) NOT NULL,
+  bg_color VARCHAR(6) DEFAULT NULL,
+  link_color VARCHAR(6) DEFAULT NULL,
+  text_color VARCHAR(6) DEFAULT NULL,
+  content_color VARCHAR(6) DEFAULT NULL,
+  border_color VARCHAR(6) DEFAULT NULL,
+  heading_color VARCHAR(6) DEFAULT NULL,
+  primary_color VARCHAR(6) DEFAULT NULL,
+  header_color VARCHAR(6) DEFAULT NULL,
+  theme VARCHAR(5) NOT NULL DEFAULT 'light',
+  logo VARCHAR(256) DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE networks (
+  id VARCHAR(64) NOT NULL,
+  premium SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  INDEX premium (premium)
 );

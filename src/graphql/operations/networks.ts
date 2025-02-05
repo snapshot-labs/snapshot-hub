@@ -1,6 +1,7 @@
+import db from '../../helpers/mysql';
 import { spaces } from '../../helpers/spaces';
 
-export default function () {
+export default async function () {
   const networks: any = Object.values(spaces).reduce((acc: any, space: any) => {
     const spaceNetworks = [
       space.network,
@@ -22,8 +23,23 @@ export default function () {
     return acc;
   }, {});
 
-  return Object.entries(networks).map(([id, spacesCount]) => ({
-    id,
-    spacesCount
-  }));
+  const results = Object.entries(networks).reduce((acc, [id, spacesCount]) => {
+    acc[id] = {
+      id,
+      spacesCount: spacesCount,
+      premium: false
+    };
+
+    return acc;
+  }, {});
+
+  const premiumNetworks = await db.queryAsync(
+    'SELECT * FROM networks WHERE premium = 1'
+  );
+  premiumNetworks.forEach((network: any) => {
+    results[network.id] ||= { id: network.id, spacesCount: 0 };
+    results[network.id].premium = true;
+  });
+
+  return Object.values(results);
 }

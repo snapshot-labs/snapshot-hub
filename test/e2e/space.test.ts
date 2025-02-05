@@ -43,6 +43,7 @@ describe('GET /api/space/:key', () => {
         turbo: space.turbo,
         hibernated: space.hibernated,
         deleted: false,
+        domain: space.domain,
         ...space.settings
       };
 
@@ -76,6 +77,7 @@ describe('GET /api/space/:key', () => {
         turbo: space.turbo,
         hibernated: space.hibernated,
         deleted: true,
+        domain: space.domain,
         ...space.settings
       };
 

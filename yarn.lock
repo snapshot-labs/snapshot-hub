@@ -808,30 +808,31 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.1"
 
-"@graphql-tools/merge@^9.0.0":
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/merge/-/merge-9.0.0.tgz#b0a3636c82716454bff88e9bb40108b0471db281"
-  integrity sha512-J7/xqjkGTTwOJmaJQJ2C+VDBDOWJL3lKrHJN4yMaRLAJH3PosB7GiPRaSDZdErs0+F77sH2MKs2haMMkywzx7Q==
+"@graphql-tools/merge@^9.0.15":
+  version "9.0.15"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/merge/-/merge-9.0.15.tgz#deeb1cbc4de476dcaa9b95750dcc14cabb95dac1"
+  integrity sha512-uzegRVd4Lq4QyBA6BL3kxDetZQ6GHwNCcRbR+6YFN7Kmea/PlRX7AfmIgdpBbaUBpsDR7dFlLZKFXmYxwodohw==
   dependencies:
-    "@graphql-tools/utils" "^10.0.0"
+    "@graphql-tools/utils" "^10.7.0"
     tslib "^2.4.0"
 
 "@graphql-tools/schema@^10.0.0":
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/schema/-/schema-10.0.0.tgz#7b5f6b6a59f51c927de8c9069bde4ebbfefc64b3"
-  integrity sha512-kf3qOXMFcMs2f/S8Y3A8fm/2w+GaHAkfr3Gnhh2LOug/JgpY/ywgFVxO3jOeSpSEdoYcDKLcXVjMigNbY4AdQg==
+  version "10.0.14"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/schema/-/schema-10.0.14.tgz#186b2a18b4395fdcf8ef4019420dfd60cc2c7a0c"
+  integrity sha512-BbttXi4xHocecYkOb2Ng/b9LQHfYPfk13gABE5iEOWX1GnJHnWr+2m81cUx9foocxEGaV+agXWUW804b4DcqqQ==
   dependencies:
-    "@graphql-tools/merge" "^9.0.0"
-    "@graphql-tools/utils" "^10.0.0"
+    "@graphql-tools/merge" "^9.0.15"
+    "@graphql-tools/utils" "^10.7.0"
     tslib "^2.4.0"
     value-or-promise "^1.0.12"
 
-"@graphql-tools/utils@^10.0.0":
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-10.0.3.tgz#e5d5b217ba643b7b67a35b50086b5d831aadb71c"
-  integrity sha512-6uO41urAEIs4sXQT2+CYGsUTkHkVo/2MpM/QjoHj6D6xoEF2woXHBpdAVi0HKIInDwZqWgEYOwIFez0pERxa1Q==
+"@graphql-tools/utils@^10.7.0":
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-10.7.0.tgz#eb7747f905b334ffb2b6987b693cbcabba03f0d3"
+  integrity sha512-tCO0cZsnioXJBcN7geeER50PRZaKTq1zsSBg/aXe+u/ZkTiEyj6Hyu4Co39SNeG0mURoS2jhxsG03eYjTxloIg==
   dependencies:
     "@graphql-typed-document-node/core" "^3.1.1"
+    cross-inspect "1.0.1"
     dset "^3.1.2"
     tslib "^2.4.0"
 
@@ -1325,10 +1326,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@snapshot-labs/eslint-config-base@^0.1.0-beta.17":
-  version "0.1.0-beta.17"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config-base/-/eslint-config-base-0.1.0-beta.17.tgz#e989acfb31facb1518cdf170499de47aec1832c3"
-  integrity sha512-+NE6BTOKhxvs1el73r9cQEm3SOBhp9La8HUumE4WbMoZz67ovPsdJQt7QuqnqZNDAEiW5sP0eJNsnvvxGxO0ug==
+"@snapshot-labs/eslint-config-base@^0.1.0-beta.18":
+  version "0.1.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config-base/-/eslint-config-base-0.1.0-beta.18.tgz#b39a1e6f14e7cdccbc02a70ae52e8a49459a41c3"
+  integrity sha512-OLB5Lcw+SUkjVhz6lo4oTCFthEkQrczh6t73dW4wmlug+OSAUPa8Uk9mh//b1Dsc4kQuh63CRVwRChJQlsuUHg==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^6.7.3"
     "@typescript-eslint/parser" "^6.7.3"
@@ -1336,12 +1337,12 @@
     eslint-plugin-import "^2.29.0"
     eslint-plugin-prettier "^5.0.1"
 
-"@snapshot-labs/eslint-config@^0.1.0-beta.17":
-  version "0.1.0-beta.17"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config/-/eslint-config-0.1.0-beta.17.tgz#fe6d4721937902415888a1fa6fec15c57b114870"
-  integrity sha512-hgEL6hbMAeYKaw7D6Fh+axsU/RZtfCsZHdJOD+CpG/x4+jXaWnV+tKSe6AidT/Yz/wK/4V76t6cAkVJ10ciLOw==
+"@snapshot-labs/eslint-config@^0.1.0-beta.18":
+  version "0.1.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/eslint-config/-/eslint-config-0.1.0-beta.18.tgz#fb5b80f546a73399c3e071dcd29616077f489c4e"
+  integrity sha512-wE6Kd8aToMQSAf3wkRJxZBVboau9Wys04PC5yAUwABt1E2KOhJQ9d29NFpJtLPN+B0WBni/m6o46SmNMGkKXZg==
   dependencies:
-    "@snapshot-labs/eslint-config-base" "^0.1.0-beta.17"
+    "@snapshot-labs/eslint-config-base" "^0.1.0-beta.18"
 
 "@snapshot-labs/keycard@^0.5.1":
   version "0.5.1"
@@ -1350,10 +1351,10 @@
   dependencies:
     node-fetch "^2.7.0"
 
-"@snapshot-labs/prettier-config@^0.1.0-beta.17":
-  version "0.1.0-beta.17"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.17.tgz#ded7d95d31c53be21c2e1d30322e02c3534a6a74"
-  integrity sha512-G2XcHaeLFEvmOtniqbNPNfAFT5g/UIKefRHGqUuSd6sSJp3zHqbpplPdID0IsPaDxu6mJu+UYiLW2ohoB7WauQ==
+"@snapshot-labs/prettier-config@^0.1.0-beta.18":
+  version "0.1.0-beta.18"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/prettier-config/-/prettier-config-0.1.0-beta.18.tgz#fcbd86d4557821bff774d60e5c636ad47ed85d77"
+  integrity sha512-v6tj7l19KJUWjBbsWpwxaYO2mlIDBFyAG0OMSPhUgrhltO7b6R4Ejxn2k4Qgi/NtlnOrj+3Gt3eQRry8Jfgjrg==
 
 "@snapshot-labs/snapshot-metrics@^1.4.1":
   version "1.4.1"
@@ -1371,10 +1372,10 @@
   dependencies:
     "@sentry/node" "^7.81.1"
 
-"@snapshot-labs/snapshot.js@^0.12.5":
-  version "0.12.5"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.12.5.tgz#7888352ddc0352e20db708efdf46031cd1c9affa"
-  integrity sha512-oJRVCUR5dVwiniNe76joCV0SuiGJksZGQh2bIfFxmT2jngc24jmlFqVWDbhJOM3HhLcZro5l/irRLcwB+Ki1pA==
+"@snapshot-labs/snapshot.js@^0.12.46":
+  version "0.12.46"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.12.46.tgz#fe0ab1eade4e46d068ee5094ae07b05cdbf53213"
+  integrity sha512-lcLKDnwXDYNdx6tpCI181ezhTyTulk6NcbidDhsjFTFwec0m5tXnOKAkb/zjDkBRqeBWrruX7NH9Mf4YH3haBg==
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.6.4"
@@ -1392,7 +1393,7 @@
     cross-fetch "^3.1.6"
     json-to-graphql-query "^2.2.4"
     lodash.set "^4.3.2"
-    starknet "^5.24.3"
+    starknet "^5.19.3"
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
@@ -2357,6 +2358,13 @@ cross-fetch@^3.1.6:
   integrity sha512-riRvo06crlE8HiqOwIpQhxwdOk4fOeR7FVM/wXoxchFEqMNUjvbs3bfo4OTgMEMHzppd4DxFBDbyySj8Cv781g==
   dependencies:
     node-fetch "^2.6.11"
+
+cross-inspect@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/cross-inspect/-/cross-inspect-1.0.1.tgz#15f6f65e4ca963cf4cc1a2b5fef18f6ca328712b"
+  integrity sha512-Pcw1JTvZLSJH83iiGWt6fRcT+BjZlCDRVwYLbUcHzv/CRpB7r0MlSrGbIyQvVSNyGnbt7G4AXuyCiDR3POvZ1A==
+  dependencies:
+    tslib "^2.4.0"
 
 cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
@@ -5376,7 +5384,7 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@^5.24.3:
+starknet@^5.19.3:
   version "5.29.0"
   resolved "https://registry.yarnpkg.com/starknet/-/starknet-5.29.0.tgz#26d8074340f26a2da4bc373169a1a5ed6dc9bedf"
   integrity sha512-eEcd6uiYIwGvl8MtHOsXGBhREqjJk84M/qUkvPLQ3n/JAMkbKBGnygDlh+HAsvXJsGlMQfwrcVlm6KpDoPha7w==
@@ -5771,15 +5779,15 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
-typescript@^4.7.4:
-  version "4.7.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
-  integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
-
 typescript@^4.9.5:
   version "4.9.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
+
+typescript@^5.7.2:
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.7.2.tgz#3169cf8c4c8a828cde53ba9ecb3d2b1d5dd67be6"
+  integrity sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"

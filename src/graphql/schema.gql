@@ -83,7 +83,7 @@ type Query {
 
   skins: [Item]
 
-  networks: [Item]
+  networks: [Network]
 
   validations: [Item]
 
@@ -110,6 +110,8 @@ type Query {
     orderBy: String
     orderDirection: OrderDirection
   ): [Leaderboard]
+
+  options: [Option]
 }
 
 input SpaceWhere {
@@ -124,6 +126,8 @@ input SpaceWhere {
   strategy: String
   plugin: String
   controller: String
+  verified: Boolean
+  domain: String
 }
 
 input RankingWhere {
@@ -217,6 +221,7 @@ input ProposalWhere {
   end_lte: Int
   scores_state: String
   scores_state_in: [String]
+  labels_in: [String]
   state: String
   space_verified: Boolean
   flagged: Boolean
@@ -343,6 +348,8 @@ input StatementsWhere {
   created_gte: Int
   created_lt: Int
   created_lte: Int
+  source: String
+  source_in: [String]
 }
 
 input LeaderboardsWhere {
@@ -385,6 +392,7 @@ type Space {
   private: Boolean
   about: String
   avatar: String
+  cover: String
   terms: String
   location: String
   website: String
@@ -392,9 +400,12 @@ type Space {
   github: String
   coingecko: String
   email: String
+  discussions: String
+  discourseCategory: Int
   network: String
   symbol: String
   skin: String
+  skinSettings: SkinSettings
   domain: String
   strategies: [Strategy]
   admins: [String]
@@ -408,9 +419,12 @@ type Space {
   voteValidation: Validation
   delegationPortal: DelegationPortal
   treasuries: [Treasury]
+  labels: [Label]
   activeProposals: Int
   proposalsCount: Int
+  proposalsCount1d: Int
   proposalsCount7d: Int
+  proposalsCount30d: Int
   followersCount: Int
   followersCount7d: Int
   votesCount: Int
@@ -472,12 +486,13 @@ type Proposal {
   body: String
   discussion: String!
   choices: [String]!
+  labels: [String]!
   start: Int!
   end: Int!
   quorum: Float!
   quorumType: String!
   privacy: String
-  snapshot: String
+  snapshot: Int
   state: String
   link: String
   app: String
@@ -504,6 +519,7 @@ type Validation {
 type DelegationPortal {
   delegationType: String!
   delegationContract: String!
+  delegationNetwork: String!
   delegationApi: String!
 }
 
@@ -580,6 +596,7 @@ type Statement {
   statement: String
   discourse: String
   status: String
+  source: String
   created: Int!
   updated: Int!
 }
@@ -605,6 +622,13 @@ type Treasury {
   network: String
 }
 
+type Label {
+  id: String
+  name: String
+  description: String
+  color: String
+}
+
 type BoostSettings {
   enabled: Boolean
   bribeEnabled: Boolean
@@ -622,4 +646,28 @@ type Leaderboard {
   proposalsCount: Int
   votesCount: Int
   lastVote: Int
+}
+
+type Option {
+  name: String
+  value: String
+}
+
+type SkinSettings {
+  bg_color: String
+  link_color: String
+  text_color: String
+  content_color: String
+  border_color: String
+  heading_color: String
+  header_color: String
+  primary_color: String
+  theme: String
+  logo: String
+}
+
+type Network {
+  id: String!
+  spacesCount: Int
+  premium: Boolean
 }

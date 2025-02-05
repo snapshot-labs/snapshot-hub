@@ -38,7 +38,9 @@ type Metadata = {
   counts: {
     activeProposals: number;
     proposalsCount: number;
+    proposalsCount1d: number;
     proposalsCount7d: number;
+    proposalsCount30d: number;
     followersCount: number;
     followersCount7d: number;
     votesCount: number;
@@ -50,24 +52,24 @@ type Metadata = {
 
 function getPopularity(space: Metadata): number {
   let popularity =
-    space.counts.votesCount / 100 +
-    space.counts.votesCount7d +
-    space.counts.proposalsCount / 100 +
+    space.counts.proposalsCount / 20 +
     space.counts.proposalsCount7d +
-    space.counts.followersCount / 50 +
+    space.counts.votesCount / 40 +
+    space.counts.votesCount7d +
+    space.counts.followersCount / 80 +
     space.counts.followersCount7d;
 
-  if (
-    space.networks.some(network => TESTNET_NETWORKS.includes(network)) ||
-    space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
-  )
-    popularity = 1;
+  if (space.counts.activeProposals > 0) popularity += 1e5;
 
-  if (space.verified) popularity *= 100000000;
-  if (space.turbo) {
-    popularity += 1;
-    popularity *= 100000000;
-  }
+  if (
+    !space.networks.some(network => TESTNET_NETWORKS.includes(network)) &&
+    !space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
+  )
+    popularity += 1e10;
+
+  if (space.verified) popularity += 1e10;
+
+  if (space.turbo) popularity += 1e10;
 
   return popularity;
 }
@@ -89,11 +91,15 @@ function sortSpaces() {
 
 function mapSpaces() {
   Object.entries(spaces).forEach(([id, space]: any) => {
-    const networks = uniq(
-      (space.strategies || [])
-        .map(strategy => strategy?.network || space.network)
-        .concat(space.network)
-    );
+    const networks = uniq([
+      space.network,
+      ...space.strategies.map((strategy: any) => strategy.network),
+      ...space.strategies.flatMap((strategy: any) =>
+        Array.isArray(strategy.params?.strategies)
+          ? strategy.params.strategies.map((param: any) => param.network)
+          : []
+      )
+    ]);
     const strategyNames = uniq(
       (space.strategies || []).map(strategy => strategy.name)
     );
@@ -114,7 +120,9 @@ function mapSpaces() {
       counts: {
         activeProposals: spacesMetadata[id]?.counts?.activeProposals || 0,
         proposalsCount: space.proposal_count || 0,
+        proposalsCount1d: spacesMetadata[id]?.counts?.proposalsCount1d || 0,
         proposalsCount7d: spacesMetadata[id]?.counts?.proposalsCount7d || 0,
+        proposalsCount30d: spacesMetadata[id]?.counts?.proposalsCount30d || 0,
         followersCount: space.follower_count || 0,
         followersCount7d: spacesMetadata[id]?.counts?.followersCount7d || 0,
         votesCount: space.vote_count || 0,
@@ -163,7 +171,15 @@ async function loadSpaces() {
 }
 
 async function getProposals(): Promise<
-  Record<string, { activeProposals: number; proposalsCount7d: number }>
+  Record<
+    string,
+    {
+      activeProposals: number;
+      proposalsCount1d: number;
+      proposalsCount7d: number;
+      proposalsCount30d: number;
+    }
+  >
 > {
   const ts = parseInt((Date.now() / 1e3).toFixed());
   const results = {};
@@ -171,16 +187,22 @@ async function getProposals(): Promise<
   const query = `
     SELECT
       space,
-      COUNT(id) AS proposalsCount7d
+      COUNT(CASE WHEN created > (UNIX_TIMESTAMP() - 86400) THEN 1 END) AS proposalsCount1d,
+      COUNT(CASE WHEN created > (UNIX_TIMESTAMP() - 604800) THEN 1 END) AS proposalsCount7d,
+      COUNT(id) AS proposalsCount30d
     FROM proposals
-    WHERE created > (UNIX_TIMESTAMP() - 604800)
+    WHERE created > (UNIX_TIMESTAMP() - 2592000)
     GROUP BY space
   `;
 
-  (await db.queryAsync(query)).forEach(({ space, proposalsCount7d }) => {
-    results[space] ||= {};
-    results[space].proposalsCount7d = proposalsCount7d;
-  });
+  (await db.queryAsync(query)).forEach(
+    ({ space, proposalsCount1d, proposalsCount7d, proposalsCount30d }) => {
+      results[space] ||= {};
+      results[space].proposalsCount1d = proposalsCount1d;
+      results[space].proposalsCount7d = proposalsCount7d;
+      results[space].proposalsCount30d = proposalsCount30d;
+    }
+  );
 
   const activeQuery = `
     SELECT
@@ -281,25 +303,29 @@ async function getFollowers(): Promise<
 }
 
 async function loadSpacesMetrics() {
-  const metricsFn = [getFollowers, getProposals, getVotes];
-  const results = await Promise.all(metricsFn.map(fn => fn()));
+  const results = await Promise.all([
+    getFollowers(),
+    getProposals(),
+    getVotes()
+  ]);
 
-  metricsFn.forEach((metricFn, i) => {
-    for (const [space, metrics] of Object.entries(results[i])) {
-      if (!spacesMetadata[space]) continue;
-
-      spacesMetadata[space].counts = {
-        ...spacesMetadata[space].counts,
-        ...metrics
-      };
-    }
-    log.info(`[spaces] ${metricFn.name.replace('get', '')} metrics loaded`);
+  const [followerMetrics, proposalMetrics, voteMetrics] = results;
+  Object.keys(spacesMetadata).forEach(space => {
+    spacesMetadata[space].counts = {
+      ...spacesMetadata[space].counts,
+      activeProposals: proposalMetrics[space]?.activeProposals || 0,
+      proposalsCount1d: proposalMetrics[space]?.proposalsCount1d || 0,
+      proposalsCount7d: proposalMetrics[space]?.proposalsCount7d || 0,
+      proposalsCount30d: proposalMetrics[space]?.proposalsCount30d || 0,
+      followersCount7d: followerMetrics[space]?.followersCount7d || 0,
+      votesCount7d: voteMetrics[space]?.votesCount7d || 0
+    };
   });
 }
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT settings, flagged, verified, turbo, hibernated, deleted, follower_count, proposal_count, vote_count
+    SELECT settings, domain, flagged, verified, turbo, hibernated, deleted, follower_count, proposal_count, vote_count
     FROM spaces
     WHERE id = ?
     LIMIT 1`;
@@ -310,6 +336,7 @@ export async function getSpace(id: string) {
 
   return {
     ...JSON.parse(space.settings),
+    domain: space.domain,
     flagged: space.flagged === 1,
     verified: space.verified === 1,
     turbo: space.turbo === 1,

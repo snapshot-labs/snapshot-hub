@@ -9,6 +9,7 @@ import { spacesMetadata } from '../helpers/spaces';
 import { jsonParse } from '../helpers/utils';
 
 const network = process.env.NETWORK || 'testnet';
+const domain = `${network === 'testnet' ? 'testnet.' : ''}snapshot.box`;
 
 type AddressFormat = 'evmAddress' | 'starknetAddress';
 const DEFAULT_ADDRESS_FORMAT: AddressFormat[] = [
@@ -36,6 +37,19 @@ const ARG_LIMITS = {
   }
 };
 
+const SKIN_SETTINGS = [
+  'bg_color',
+  'link_color',
+  'text_color',
+  'content_color',
+  'border_color',
+  'heading_color',
+  'header_color',
+  'primary_color',
+  'theme',
+  'logo'
+];
+
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
@@ -60,18 +74,32 @@ export function checkLimits(args: any = {}, type) {
   return true;
 }
 
+function formatSkinSettings(result) {
+  return SKIN_SETTINGS.reduce((acc, colorName) => {
+    if (!result[colorName]) return acc;
+
+    acc[colorName] = `${colorName.includes('_color') ? '#' : ''}${
+      result[colorName]
+    }`;
+    return acc;
+  }, {});
+}
+
 export function formatSpace({
   id,
   settings,
+  domain,
   verified,
   turbo,
   flagged,
-  hibernated
+  hibernated,
+  skinSettings
 }) {
   const spaceMetadata = spacesMetadata[id] || {};
   const space = { ...jsonParse(settings, {}), ...spaceMetadata.counts };
 
   space.id = id;
+  space.domain = domain || '';
   space.private = space.private || false;
   space.avatar = space.avatar || '';
   space.about = space.about || '';
@@ -94,7 +122,9 @@ export function formatSpace({
   space.voting.aliased = space.voting.aliased || false;
   space.voting.hideAbstain = space.voting.hideAbstain || false;
   space.voteValidation = space.voteValidation || { name: 'any', params: {} };
-  space.delegationPortal = space.delegationPortal || null;
+  space.delegationPortal = space.delegationPortal
+    ? { delegationNetwork: '1', ...space.delegationPortal }
+    : null;
   space.boost = space.boost || { enabled: true, bribeEnabled: false };
   space.strategies = space.strategies?.map(strategy => ({
     ...strategy,
@@ -109,6 +139,8 @@ export function formatSpace({
   }
   space.validation = space.validation || { name: 'any', params: {} };
   space.treasuries = space.treasuries || [];
+  space.labels = space.labels || [];
+  space.skinSettings = skinSettings;
 
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
@@ -241,7 +273,7 @@ export function buildWhereQuery(
 export async function fetchSpaces(args) {
   const { first = 20, skip = 0, where = {} } = args;
 
-  const fields = { id: 'string', created: 'number' };
+  const fields = { id: 'string', created: 'number', verified: 'boolean' };
 
   if ('controller' in where) {
     if (!where.controller) return [];
@@ -271,16 +303,26 @@ export async function fetchSpaces(args) {
     params.push(where.plugin);
   }
 
+  if (where.domain) {
+    queryStr += ` AND domain = ?`;
+    params.push(where.domain);
+  }
+
   const query = `
-    SELECT s.* FROM spaces s
+    SELECT s.*, skins.*, s.id AS id FROM spaces s
+    LEFT JOIN skins ON s.id = skins.id
     WHERE s.deleted = 0 ${queryStr}
-    GROUP BY s.id
     ORDER BY s.${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
 
   const spaces = await db.queryAsync(query, params);
-  return spaces.map(space => Object.assign(space, formatSpace(space)));
+  return spaces.map(space =>
+    Object.assign(
+      space,
+      formatSpace({ skinSettings: formatSkinSettings(space), ...space })
+    )
+  );
 }
 
 function checkRelatedSpacesNesting(requestedFields): void {
@@ -346,6 +388,7 @@ async function fetchRelatedSpaces(spaces) {
   }, []);
 
   return fetchSpaces({
+    first: relatedSpaceIDs.length,
     where: { id_in: relatedSpaceIDs }
   });
 }
@@ -371,6 +414,7 @@ export function formatUser(user) {
 
 export function formatProposal(proposal) {
   proposal.choices = jsonParse(proposal.choices, []);
+  proposal.labels = jsonParse(proposal.labels, []) || [];
   proposal.strategies = jsonParse(proposal.strategies, []);
   proposal.validation = jsonParse(proposal.validation, {
     name: 'any',
@@ -393,13 +437,15 @@ export function formatProposal(proposal) {
   proposal.space = formatSpace({
     id: proposal.space,
     settings: proposal.settings,
+    domain: proposal.spaceDomain,
     verified: proposal.spaceVerified,
     turbo: proposal.spaceTurbo,
     flagged: proposal.spaceFlagged,
-    hibernated: proposal.spaceHibernated
+    hibernated: proposal.spaceHibernated,
+    skinSettings: formatSkinSettings(proposal)
   });
-  const networkStr = network === 'testnet' ? 'testnet.' : '';
-  proposal.link = `https://${networkStr}snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`;
+  const networkPrefix = network === 'testnet' ? 's-tn' : 's';
+  proposal.link = `https://${domain}/#/${networkPrefix}:${proposal.space.id}/proposal/${proposal.id}`;
   proposal.strategies = proposal.strategies.map(strategy => ({
     ...strategy,
     // By default return proposal network if strategy network is not defined
@@ -416,11 +462,13 @@ export function formatVote(vote) {
   vote.vp_by_strategy = jsonParse(vote.vp_by_strategy, []);
   vote.space = formatSpace({
     id: vote.space,
+    domain: vote.spaceDomain,
     settings: vote.settings,
     verified: vote.spaceVerified,
     turbo: vote.spaceTurbo,
     flagged: vote.spaceFlagged,
-    hibernated: vote.spaceHibernated
+    hibernated: vote.spaceHibernated,
+    skinSettings: formatSkinSettings(vote)
   });
   return vote;
 }
@@ -429,10 +477,12 @@ export function formatFollow(follow) {
   follow.space = formatSpace({
     id: follow.space,
     settings: follow.settings,
+    domain: follow.spaceDomain,
     verified: follow.spaceVerified,
     turbo: follow.spaceTurbo,
     flagged: follow.spaceFlagged,
-    hibernated: follow.spaceHibernated
+    hibernated: follow.spaceHibernated,
+    skinSettings: formatSkinSettings(follow)
   });
   return follow;
 }
@@ -441,10 +491,12 @@ export function formatSubscription(subscription) {
   subscription.space = formatSpace({
     id: subscription.space,
     settings: subscription.settings,
+    domain: subscription.spaceDomain,
     verified: subscription.spaceVerified,
     turbo: subscription.spaceTurbo,
     flagged: subscription.spaceFlagged,
-    hibernated: subscription.spaceHibernated
+    hibernated: subscription.spaceHibernated,
+    skinSettings: formatSkinSettings(subscription)
   });
   return subscription;
 }
