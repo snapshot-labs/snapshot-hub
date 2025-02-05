@@ -204,6 +204,7 @@ CREATE TABLE skins (
   bg_color VARCHAR(7) DEFAULT NULL,
   link_color VARCHAR(7) DEFAULT NULL,
   text_color VARCHAR(7) DEFAULT NULL,
+  content_color VARCHAR(7) DEFAULT NULL,
   border_color VARCHAR(7) DEFAULT NULL,
   heading_color VARCHAR(7) DEFAULT NULL,
   primary_color VARCHAR(7) DEFAULT NULL,
