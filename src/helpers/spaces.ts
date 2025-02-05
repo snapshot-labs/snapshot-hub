@@ -230,27 +230,20 @@ export async function getCombinedMembersAndVoters(
   const params: (string | number)[] = [spaceId];
   const exclusionList = [...knownAdmins, ...knownModerators, ...knownMembers];
 
-  // Other roles are already known and fetched at the app level while Space Verification
-  // Building the exclusion clause only if the exclusion list is not empty
-  let exclusionClause = '';
+  let query = 'SELECT DISTINCT voter AS address FROM votes WHERE space = ?';
+  
+  // Add exclusion clause only if there are items to exclude
   if (exclusionList.length > 0) {
-    const placeholders = exclusionList.map(() => '?').join(', ');
-    exclusionClause = `AND voter NOT IN (${placeholders})`;
+    query += ` AND voter NOT IN (${exclusionList.map(() => '?').join(',')})`;
     params.push(...exclusionList);
   }
 
-  const cursorClause = cursor ? ' AND voter > ?' : '';
   if (cursor) {
+    query += ' AND voter > ?';
     params.push(cursor);
   }
 
-  const query = `
-    SELECT DISTINCT voter AS address
-    FROM votes
-    WHERE space = ? ${exclusionClause} ${cursorClause}
-    ORDER BY voter
-    LIMIT ?
-  `;
+  query += ' ORDER BY voter LIMIT ?';
   params.push(pageSize);
 
   const results = await db.queryAsync(query, params);
@@ -260,6 +253,7 @@ export async function getCombinedMembersAndVoters(
 
   const nextCursor =
     results.length === pageSize ? results[results.length - 1].address : null;
+    
   return {
     members: results.map(row => row.address),
     nextCursor: nextCursor
