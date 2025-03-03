@@ -23,7 +23,7 @@ export let spaces = {};
 
 export let rankedSpaces: Metadata[] = [];
 
-export const networkSpaceCounts: Record<string, number> = {};
+export let networkSpaceCounts: Record<string, number> = {};
 
 export const spacesMetadata: Record<string, Metadata> = {};
 
@@ -96,6 +96,8 @@ function sortSpaces() {
 }
 
 function mapSpaces() {
+  networkSpaceCounts = {};
+
   Object.entries(spaces).forEach(([id, space]: any) => {
     const networks = uniq([
       space.network,
@@ -319,8 +321,10 @@ export async function getSpace(id: string) {
 export default async function run() {
   try {
     log.info('[spaces] Start spaces refresh');
+
     await loadSpaces();
     await loadSpacesMetrics();
+
     sortSpaces();
     log.info('[spaces] End spaces refresh');
   } catch (e: any) {
@@ -328,5 +332,6 @@ export default async function run() {
     log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
   }
   await snapshot.utils.sleep(RUN_INTERVAL);
+
   run();
 }
