@@ -669,6 +669,7 @@ type SkinSettings {
 
 type Network {
   id: String!
-  spacesCount: Int
+  name: String!
   premium: Boolean
+  spacesCount: Int
 }

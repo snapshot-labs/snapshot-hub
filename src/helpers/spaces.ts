@@ -20,7 +20,11 @@ const TESTNET_NETWORKS = (
   .map(network => network.key);
 
 export let spaces = {};
+
 export let rankedSpaces: Metadata[] = [];
+
+export const networkSpaceCounts: Record<string, number> = {};
+
 export const spacesMetadata: Record<string, Metadata> = {};
 
 type Metadata = {
@@ -102,6 +106,11 @@ function mapSpaces() {
           : []
       )
     ]);
+
+    networks.forEach(network => {
+      networkSpaceCounts[network] = (networkSpaceCounts[network] || 0) + 1;
+    });
+
     const strategyNames = uniq(
       (space.strategies || []).map(strategy => strategy.name)
     );
