@@ -1,9 +1,9 @@
 import express from 'express';
 import db, { sequencerDB } from './helpers/mysql';
-import { getSpace } from './helpers/spaces';
+import { getCombinedMembersAndVoters, getSpace } from './helpers/spaces';
 
 const router = express.Router();
-const context = '<http://www.daostar.org/schemas>';
+const context = ['https://snapshot.org', 'https://daostar.org/schemas'];
 const network = process.env.NETWORK || 'testnet';
 const domain = `${network === 'testnet' ? 'testnet.' : ''}snapshot.box`;
 const networkPrefix = network === 'testnet' ? 's-tn' : 's';
@@ -37,29 +37,93 @@ router.get('/:space', async (req, res) => {
 });
 
 router.get('/:space/members', async (req, res) => {
-  let space: any = {};
-
   try {
-    space = await getSpace(req.params.space);
+    const spaceId = req.params.space;
+    const cursor = req.query.cursor || null;
+    const pageSize = 500; // Default page size
 
-    if (!space.verified) return res.status(400).json({ error: 'INVALID' });
+    const space = await getSpace(spaceId);
+    if (!space.verified) {
+      return res.status(400).json({
+        error: 'INVALID_SPACE',
+        message: 'The specified space is not verified.'
+      });
+    }
+
+    let members: { type: string; id: string }[] = [];
+    let nextCursor: string | null = null;
+
+    if (cursor) {
+      const combinedMembersResult = await getCombinedMembersAndVoters(
+        spaceId,
+        cursor,
+        pageSize,
+        [],
+        [],
+        []
+      );
+      members = combinedMembersResult.members.map(voter => ({
+        type: 'EthereumAddress',
+        id: voter
+      }));
+      nextCursor = combinedMembersResult.nextCursor;
+    } else {
+      const combinedMembersResult = await getCombinedMembersAndVoters(
+        spaceId,
+        cursor,
+        pageSize,
+        space.admins,
+        space.moderators,
+        space.members
+      );
+      members = [
+        ...space.admins.map(admin => ({ type: 'EthereumAddress', id: admin })),
+        ...space.moderators.map(moderator => ({
+          type: 'EthereumAddress',
+          id: moderator
+        })),
+        ...space.members.map(member => ({
+          type: 'EthereumAddress',
+          id: member
+        })),
+        ...combinedMembersResult.members.map(voter => ({
+          type: 'EthereumAddress',
+          id: voter
+        }))
+      ];
+      nextCursor = combinedMembersResult.nextCursor;
+    }
+
+    const responseObject = {
+      '@context': context,
+      type: 'DAO',
+      name: space.name,
+      members: members,
+      nextCursor: nextCursor
+    };
+
+    return res.json(responseObject);
   } catch (e) {
-    return res.status(404).json({ error: 'NOT_FOUND' });
+    const error = e as Error;
+    console.error(error);
+
+    if (error.message.includes('database')) {
+      return res.status(500).json({
+        error: 'DATABASE_ERROR',
+        message: 'Failed to retrieve data from the database.'
+      });
+    } else if (error.message.includes('parameter')) {
+      return res.status(400).json({
+        error: 'INVALID_PARAMETER',
+        message: 'Invalid or missing parameter.'
+      });
+    } else {
+      return res.status(500).json({
+        error: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred.'
+      });
+    }
   }
-
-  const members = [...space.admins, ...space.moderators, ...space.members].map(
-    member => ({
-      type: 'EthereumAddress',
-      id: member
-    })
-  );
-
-  return res.json({
-    '@context': context,
-    type: 'DAO',
-    name: space.name,
-    members
-  });
 });
 
 router.get('/:space/proposals', async (req, res) => {
