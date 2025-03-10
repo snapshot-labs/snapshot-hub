@@ -45,6 +45,7 @@ async function loadStrategies() {
       strategy.id = strategy.key;
       strategy.spacesCount = strategy.spacesCount || 0;
       strategy.verifiedSpacesCount = strategy.verifiedSpacesCount || 0;
+      strategy.disabled = strategy.disabled || false;
       return strategy;
     })
     .sort((a, b): any => b.verifiedSpacesCount - a.verifiedSpacesCount);
