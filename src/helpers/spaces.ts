@@ -30,6 +30,7 @@ type Metadata = {
   flagged: boolean;
   turbo: boolean;
   hibernated: boolean;
+  parent: string;
   popularity: number;
   rank: number | null;
   private: boolean;
@@ -61,15 +62,16 @@ function getPopularity(space: Metadata): number {
 
   if (space.counts.activeProposals > 0) popularity += 1e5;
 
+  if (space.verified) popularity += 1e10;
+
+  if (space.turbo && !space.parent) popularity += 2e10;
+
   if (
+    !space.turbo &&
     !space.networks.some(network => TESTNET_NETWORKS.includes(network)) &&
     !space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
   )
     popularity += 1e10;
-
-  if (space.verified) popularity += 1e10;
-
-  if (space.turbo) popularity += 1e10;
 
   return popularity;
 }
@@ -112,6 +114,7 @@ function mapSpaces() {
       flagged: space.flagged,
       turbo: space.turbo,
       hibernated: space.hibernated,
+      parent: space.parent,
       popularity: spacesMetadata[id]?.popularity || 0,
       rank: spacesMetadata[id]?.rank || null,
       private: space.private ?? false,

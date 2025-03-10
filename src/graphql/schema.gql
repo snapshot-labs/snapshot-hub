@@ -614,7 +614,7 @@ type StrategyItem {
   examples: [Any]
   about: String
   spacesCount: Int
-  disabled: Boolean
+  verifiedSpacesCount: Int
 }
 
 type Treasury {
