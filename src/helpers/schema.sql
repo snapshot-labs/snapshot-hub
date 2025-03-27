@@ -7,7 +7,7 @@ CREATE TABLE spaces (
   flagged INT NOT NULL DEFAULT '0',
   hibernated INT NOT NULL DEFAULT '0',
   turbo INT NOT NULL DEFAULT '0',
-  turbo_expiration INT NOT NULL DEFAULT '0',
+  turbo_expiration BIGINT NOT NULL DEFAULT '0',
   proposal_count INT NOT NULL DEFAULT '0',
   vote_count INT NOT NULL DEFAULT '0',
   follower_count INT NOT NULL DEFAULT '0',
