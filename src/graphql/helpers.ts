@@ -450,6 +450,10 @@ export function formatProposal(proposal) {
   }));
   proposal.privacy = proposal.privacy || '';
   proposal.quorumType = proposal.quorum_type || 'default';
+  // quorum should only work with basic voting else use default values
+  const isBasicVoting = proposal.type === 'basic';
+  proposal.quorum = isBasicVoting ? proposal.quorum : 0;
+  proposal.quorumType = isBasicVoting ? proposal.quorumType : 'default';
   return proposal;
 }
 
