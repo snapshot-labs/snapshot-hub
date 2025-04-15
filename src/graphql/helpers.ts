@@ -88,7 +88,7 @@ export function formatSpace({
   domain,
   verified,
   turbo,
-  turbo_expiration,
+  turboExpiration,
   flagged,
   hibernated,
   skinSettings
@@ -144,7 +144,7 @@ export function formatSpace({
   space.flagged = flagged ?? null;
   space.hibernated = hibernated ?? null;
   space.turbo = turbo ?? null;
-  space.turboExpiration = turbo_expiration ?? 0;
+  space.turboExpiration = turboExpiration ?? 0;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -439,7 +439,7 @@ export function formatProposal(proposal) {
     domain: proposal.spaceDomain,
     verified: proposal.spaceVerified,
     turbo: proposal.spaceTurbo,
-    turbo_expiration: proposal.turboExpiration,
+    turboExpiration: proposal.turboExpiration,
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated,
     skinSettings: formatSkinSettings(proposal)
@@ -466,7 +466,7 @@ export function formatVote(vote) {
     settings: vote.settings,
     verified: vote.spaceVerified,
     turbo: vote.spaceTurbo,
-    turbo_expiration: vote.turboExpiration,
+    turboExpiration: vote.turboExpiration,
     flagged: vote.spaceFlagged,
     hibernated: vote.spaceHibernated,
     skinSettings: formatSkinSettings(vote)
@@ -481,7 +481,7 @@ export function formatFollow(follow) {
     domain: follow.spaceDomain,
     verified: follow.spaceVerified,
     turbo: follow.spaceTurbo,
-    turbo_expiration: follow.turboExpiration,
+    turboExpiration: follow.turboExpiration,
     flagged: follow.spaceFlagged,
     hibernated: follow.spaceHibernated,
     skinSettings: formatSkinSettings(follow)
@@ -496,7 +496,7 @@ export function formatSubscription(subscription) {
     domain: subscription.spaceDomain,
     verified: subscription.spaceVerified,
     turbo: subscription.spaceTurbo,
-    turbo_expiration: subscription.turboExpiration,
+    turboExpiration: subscription.turboExpiration,
     flagged: subscription.spaceFlagged,
     hibernated: subscription.spaceHibernated,
     skinSettings: formatSkinSettings(subscription)

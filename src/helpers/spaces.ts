@@ -125,7 +125,7 @@ function mapSpaces() {
       verified: space.verified,
       flagged: space.flagged,
       turbo: space.turbo,
-      turboExpiration: space.turbo_expiration,
+      turboExpiration: space.turboExpiration,
       hibernated: space.hibernated,
       parent: space.parent,
       popularity: spacesMetadata[id]?.popularity || 0,
