@@ -14,6 +14,7 @@ export default async function (parent, { id }) {
       spaces.flagged as spaceFlagged,
       spaces.verified as spaceVerified,
       spaces.turbo as spaceTurbo,
+      spaces.turbo_expiration as spaceTurboExpiration,
       spaces.hibernated as spaceHibernated
     FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space

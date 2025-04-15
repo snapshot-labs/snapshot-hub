@@ -442,7 +442,7 @@ type Space {
   flagged: Boolean
   hibernated: Boolean
   turbo: Boolean
-  turbo_expiration: Int
+  turboExpiration: Int
   rank: Float
   boost: BoostSettings
   created: Int!
