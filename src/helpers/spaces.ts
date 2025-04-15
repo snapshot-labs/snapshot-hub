@@ -316,7 +316,7 @@ export async function getSpace(id: string) {
     flagged: space.flagged === 1,
     verified: space.verified === 1,
     turbo: space.turbo === 1,
-    turbo_expiration: space.turbo_expiration,
+    turboExpiration: space.turbo_expiration,
     hibernated: space.hibernated === 1,
     deleted: space.deleted === 1
   };
