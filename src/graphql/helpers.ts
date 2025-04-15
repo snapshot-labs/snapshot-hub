@@ -319,7 +319,11 @@ export async function fetchSpaces(args) {
   return spaces.map(space =>
     Object.assign(
       space,
-      formatSpace({ skinSettings: formatSkinSettings(space), ...space })
+      formatSpace({
+        skinSettings: formatSkinSettings(space),
+        turboExpiration: space.turbo_expiration,
+        ...space
+      })
     )
   );
 }
