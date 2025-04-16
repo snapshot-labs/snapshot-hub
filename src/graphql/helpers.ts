@@ -88,6 +88,7 @@ export function formatSpace({
   domain,
   verified,
   turbo,
+  turboExpiration,
   flagged,
   hibernated,
   skinSettings
@@ -143,6 +144,7 @@ export function formatSpace({
   space.flagged = flagged ?? null;
   space.hibernated = hibernated ?? null;
   space.turbo = turbo ?? null;
+  space.turboExpiration = turboExpiration ?? 0;
   space.rank = spaceMetadata?.rank ?? null;
 
   // always return parent and children in child node format
@@ -317,7 +319,11 @@ export async function fetchSpaces(args) {
   return spaces.map(space =>
     Object.assign(
       space,
-      formatSpace({ skinSettings: formatSkinSettings(space), ...space })
+      formatSpace({
+        skinSettings: formatSkinSettings(space),
+        turboExpiration: space.turbo_expiration,
+        ...space
+      })
     )
   );
 }
@@ -437,6 +443,7 @@ export function formatProposal(proposal) {
     domain: proposal.spaceDomain,
     verified: proposal.spaceVerified,
     turbo: proposal.spaceTurbo,
+    turboExpiration: proposal.spaceTurboExpiration,
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated,
     skinSettings: formatSkinSettings(proposal)
@@ -463,6 +470,7 @@ export function formatVote(vote) {
     settings: vote.settings,
     verified: vote.spaceVerified,
     turbo: vote.spaceTurbo,
+    turboExpiration: vote.spaceTurboExpiration,
     flagged: vote.spaceFlagged,
     hibernated: vote.spaceHibernated,
     skinSettings: formatSkinSettings(vote)
@@ -477,6 +485,7 @@ export function formatFollow(follow) {
     domain: follow.spaceDomain,
     verified: follow.spaceVerified,
     turbo: follow.spaceTurbo,
+    turboExpiration: follow.spaceTurboExpiration,
     flagged: follow.spaceFlagged,
     hibernated: follow.spaceHibernated,
     skinSettings: formatSkinSettings(follow)
@@ -491,6 +500,7 @@ export function formatSubscription(subscription) {
     domain: subscription.spaceDomain,
     verified: subscription.spaceVerified,
     turbo: subscription.spaceTurbo,
+    turboExpiration: subscription.spaceTurboExpiration,
     flagged: subscription.spaceFlagged,
     hibernated: subscription.spaceHibernated,
     skinSettings: formatSkinSettings(subscription)
