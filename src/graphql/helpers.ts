@@ -443,7 +443,7 @@ export function formatProposal(proposal) {
     domain: proposal.spaceDomain,
     verified: proposal.spaceVerified,
     turbo: proposal.spaceTurbo,
-    turboExpiration: proposal.turboExpiration,
+    turboExpiration: proposal.spaceTurboExpiration,
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated,
     skinSettings: formatSkinSettings(proposal)
@@ -470,7 +470,7 @@ export function formatVote(vote) {
     settings: vote.settings,
     verified: vote.spaceVerified,
     turbo: vote.spaceTurbo,
-    turboExpiration: vote.turboExpiration,
+    turboExpiration: vote.spaceTurboExpiration,
     flagged: vote.spaceFlagged,
     hibernated: vote.spaceHibernated,
     skinSettings: formatSkinSettings(vote)
@@ -485,7 +485,7 @@ export function formatFollow(follow) {
     domain: follow.spaceDomain,
     verified: follow.spaceVerified,
     turbo: follow.spaceTurbo,
-    turboExpiration: follow.turboExpiration,
+    turboExpiration: follow.spaceTurboExpiration,
     flagged: follow.spaceFlagged,
     hibernated: follow.spaceHibernated,
     skinSettings: formatSkinSettings(follow)
@@ -500,7 +500,7 @@ export function formatSubscription(subscription) {
     domain: subscription.spaceDomain,
     verified: subscription.spaceVerified,
     turbo: subscription.spaceTurbo,
-    turboExpiration: subscription.turboExpiration,
+    turboExpiration: subscription.spaceTurboExpiration,
     flagged: subscription.spaceFlagged,
     hibernated: subscription.spaceHibernated,
     skinSettings: formatSkinSettings(subscription)
