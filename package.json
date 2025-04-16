@@ -20,6 +20,9 @@
     "extends": "@snapshot-labs"
   },
   "prettier": "@snapshot-labs/prettier-config",
+  "engines": {
+    "node": ">=22.6"
+  },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
     "@snapshot-labs/keycard": "^0.5.1",
