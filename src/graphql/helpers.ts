@@ -143,7 +143,8 @@ export function formatSpace({
   space.verified = verified ?? null;
   space.flagged = flagged ?? null;
   space.hibernated = hibernated ?? null;
-  space.turbo = turbo ?? null;
+  space.turbo =
+    new Date((turboExpiration || 0) * 1000) > new Date() ? true : turbo ?? null;
   space.turboExpiration = turboExpiration ?? 0;
   space.rank = spaceMetadata?.rank ?? null;
 
