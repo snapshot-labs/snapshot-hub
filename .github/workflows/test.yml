@@ -4,7 +4,11 @@ on: [push]
 
 jobs:
   test:
+    strategy:
+      matrix:
+        target: ['22.6']
     uses: snapshot-labs/actions/.github/workflows/test.yml@main
     secrets: inherit
     with:
       mysql_database_name: hub_test
+      target: ${{ matrix.target }}
