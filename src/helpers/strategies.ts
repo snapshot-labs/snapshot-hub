@@ -7,6 +7,7 @@ import { spaces } from './spaces';
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
 
+const RUN_INTERVAL = 60e3;
 const scoreApiURL: URL = new URL(
   process.env.SCORE_API_URL ?? 'https://score.snapshot.org'
 );
@@ -56,19 +57,22 @@ async function loadStrategies() {
 }
 
 async function run() {
-  try {
-    await loadStrategies();
-    consecutiveFailsCount = 0;
-  } catch (e: any) {
-    consecutiveFailsCount++;
+  while (true) {
+    try {
+      log.info('[strategies] Start strategies refresh');
+      await loadStrategies();
+      consecutiveFailsCount = 0;
+      log.info('[strategies] End strategies refresh');
+    } catch (e: any) {
+      consecutiveFailsCount++;
 
-    if (consecutiveFailsCount >= 3) {
-      capture(e);
+      if (consecutiveFailsCount >= 3) {
+        capture(e);
+      }
+      log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
     }
-    log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
+    await snapshot.utils.sleep(RUN_INTERVAL);
   }
-  await snapshot.utils.sleep(60e3);
-  run();
 }
 
 run();

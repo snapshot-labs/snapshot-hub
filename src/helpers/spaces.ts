@@ -323,19 +323,19 @@ export async function getSpace(id: string) {
 }
 
 export default async function run() {
-  try {
-    log.info('[spaces] Start spaces refresh');
+  while (true) {
+    try {
+      log.info('[spaces] Start spaces refresh');
 
-    await loadSpaces();
-    await loadSpacesMetrics();
+      await loadSpaces();
+      await loadSpacesMetrics();
 
-    sortSpaces();
-    log.info('[spaces] End spaces refresh');
-  } catch (e: any) {
-    capture(e);
-    log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
+      sortSpaces();
+      log.info('[spaces] End spaces refresh');
+    } catch (e: any) {
+      capture(e);
+      log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
+    }
+    await snapshot.utils.sleep(RUN_INTERVAL);
   }
-  await snapshot.utils.sleep(RUN_INTERVAL);
-
-  run();
 }
