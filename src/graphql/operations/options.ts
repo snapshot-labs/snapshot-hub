@@ -16,17 +16,18 @@ async function loadOptions() {
 }
 
 async function run() {
-  try {
-    log.info('[options] Start options refresh');
-    await loadOptions();
-    log.info(`[options] ${options.length} options reloaded`);
-    log.info('[options] End options refresh');
-  } catch (e: any) {
-    capture(e);
-    log.error(`[options] failed to refresh options, ${JSON.stringify(e)}`);
+  while (true) {
+    try {
+      log.info('[options] Start options refresh');
+      await loadOptions();
+      log.info(`[options] ${options.length} options reloaded`);
+      log.info('[options] End options refresh');
+    } catch (e: any) {
+      capture(e);
+      log.error(`[options] failed to refresh options, ${JSON.stringify(e)}`);
+    }
+    await snapshot.utils.sleep(RUN_INTERVAL);
   }
-  await snapshot.utils.sleep(RUN_INTERVAL);
-  run();
 }
 
 run();
