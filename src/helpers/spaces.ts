@@ -57,7 +57,7 @@ type Metadata = {
 };
 
 function isTurbo(turbo: number, turboExpiration: number): boolean {
-  return turbo === 1 || turboExpiration > Date.now();
+  return turbo === 1 || turboExpiration > Date.now() / 1e3;
 }
 
 function getPopularity(space: Metadata): number {
