@@ -1,14 +1,20 @@
-import { spaces } from '../../helpers/spaces';
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import db from '../../helpers/mysql';
 
-export default function () {
-  const validations = {};
-  Object.values(spaces).forEach((space: any) => {
-    if (space.validation)
-      validations[space.validation.name] =
-        (validations[space.validation.name] || 0) + 1;
-  });
-  return Object.entries(validations).map(validation => ({
-    id: validation[0],
-    spacesCount: validation[1]
-  }));
+export default async function () {
+  const query = `
+    SELECT
+      COALESCE(JSON_UNQUOTE(JSON_EXTRACT(settings, '$.validation.name')), '') AS validation,
+      COUNT(id) as spacesCount
+    FROM spaces
+    GROUP BY validation
+    ORDER BY spacesCount DESC
+  `;
+
+  try {
+    return (await db.queryAsync(query)).map(v => ({ ...v, id: v.validation }));
+  } catch (e: any) {
+    capture(e);
+    return Promise.reject(new Error('request failed'));
+  }
 }
