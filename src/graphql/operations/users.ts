@@ -1,7 +1,7 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatUser } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;
@@ -9,13 +9,15 @@ export default async function (parent, args) {
   checkLimits(args, 'users');
 
   const fields = {
-    id: 'string',
+    id: ['evmAddress', 'starknetAddress'],
     ipfs: 'string',
     created: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'u', where);
   const queryStr = whereQuery.query;
   const params: any[] = whereQuery.params;
+  const ids = (where.id_in || [where.id]).filter(Boolean);
+  if (Object.keys(where).length > 1) ids.length = 0;
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -24,17 +26,53 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  let users: any[] = [];
-
   const query = `
-    SELECT u.* FROM users u
+    SELECT
+      u.*,
+      COALESCE(SUM(l.vote_count), 0)  as votesCount,
+      COALESCE(SUM(l.proposal_count), 0) as proposalsCount,
+      MAX(l.last_vote) as lastVote
+    FROM users u
+    LEFT JOIN leaderboard l ON l.user = u.id
     WHERE 1=1 ${queryStr}
+    GROUP BY u.id
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
   try {
-    users = await db.queryAsync(query, params);
-    return users.map(user => formatUser(user));
+    const users = await db.queryAsync(query, params);
+    ids.forEach(element => {
+      if (!users.find((u: any) => u.id === element)) {
+        users.push({ id: element });
+      }
+    });
+    if (!users.length) return [];
+
+    const usersWithOutCreated = users
+      .filter((u: any) => !u.created)
+      .map((u: any) => u.id);
+    if (usersWithOutCreated.length) {
+      const counts = await db.queryAsync(
+        `
+        SELECT
+          user,
+          COALESCE(SUM(vote_count), 0) as votesCount,
+          COALESCE(SUM(proposal_count) ,0) as proposalsCount,
+          MAX(last_vote) as lastVote
+        FROM leaderboard
+        WHERE user IN (?)
+        GROUP BY user
+      `,
+        [usersWithOutCreated]
+      );
+      counts.forEach((count: any) => {
+        const user = users.find((u: any) => u.id === count.user);
+        user.votesCount = count.votesCount;
+        user.proposalsCount = count.proposalsCount;
+        user.lastVote = count.lastVote;
+      });
+    }
+    return users.map(formatUser);
   } catch (e: any) {
     log.error(`[graphql] users, ${JSON.stringify(e)}`);
     capture(e, { args });

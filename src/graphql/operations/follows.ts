@@ -1,7 +1,7 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatFollow } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;
@@ -11,13 +11,14 @@ export default async function (parent, args) {
   const fields = {
     id: 'string',
     ipfs: 'string',
-    follower: 'string',
+    follower: ['evmAddress', 'starknetAddress'],
     space: 'string',
+    network: 'string',
     created: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'f', where);
   const queryStr = whereQuery.query;
-  const params: any[] = whereQuery.params;
+  const params = whereQuery.params.concat(skip, first);
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
@@ -27,22 +28,26 @@ export default async function (parent, args) {
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT f.*,
+    SELECT
+      f.*,
+      skins.*,
+      f.id AS id,
       spaces.settings,
+      spaces.domain as spaceDomain,
       spaces.flagged as spaceFlagged,
       spaces.verified as spaceVerified,
       spaces.turbo as spaceTurbo,
+      spaces.turbo_expiration as spaceTurboExpiration,
       spaces.hibernated as spaceHibernated
     FROM follows f
-    INNER JOIN spaces ON spaces.id = f.space
-    WHERE spaces.settings IS NOT NULL ${queryStr}
+    LEFT JOIN spaces ON spaces.id = f.space
+    LEFT JOIN skins ON spaces.id = skins.id
+    WHERE 1=1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
-  params.push(skip, first);
 
-  let follows: any[] = [];
   try {
-    follows = await db.queryAsync(query, params);
+    const follows = await db.queryAsync(query, params);
     return follows.map(follow => formatFollow(follow));
   } catch (e: any) {
     log.error(`[graphql] follows, ${JSON.stringify(e)}`);

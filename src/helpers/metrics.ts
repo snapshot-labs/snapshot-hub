@@ -1,10 +1,10 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Express, type Request, type Response } from 'express';
+import { Express, Request, Response } from 'express';
 import { GraphQLError, parse } from 'graphql';
+import db from './mysql';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
-import db from './mysql';
 import operations from '../graphql/operations/';
 
 const whitelistedPath = [
@@ -40,7 +40,7 @@ export default function initMetrics(app: Express) {
     normalizedPath: [
       ['^/api/scores/.+', '/api/scores/#id'],
       ['^/api/spaces/([^/]+)(/poke)?$', '/api/spaces/#key$2'],
-      ['^/graphql/?$', '/graphql']
+      ['^/graphql.*$', '/graphql']
     ],
     whitelistedPath,
     errorHandler: (e: any) => capture(e)
@@ -198,6 +198,20 @@ new client.Gauge({
     strategies.forEach((s: any) => {
       this.set({ name: s.id }, s.spacesCount);
     });
+  }
+});
+
+new client.Gauge({
+  name: 'proposals_pending_scores_count',
+  help: 'Total number of closed proposals with a pending scores',
+  async collect() {
+    this.set(
+      (
+        await db.queryAsync(
+          "SELECT COUNT(id) as count FROM proposals WHERE scores_state = 'pending' AND end < UNIX_TIMESTAMP()"
+        )
+      )[0].count
+    );
   }
 });
 

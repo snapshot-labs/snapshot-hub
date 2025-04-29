@@ -5,7 +5,23 @@ const fixtures: Record<string, any>[] = [
     flagged: false,
     verified: true,
     turbo: false,
+    turbo_expiration: 0,
     hibernated: false,
+    domain: 'test.com',
+    settings: { network: 1 },
+    created: Math.floor(Date.now() / 1e3),
+    updated: Math.floor(Date.now() / 1e3)
+  },
+  {
+    id: 'snap.eth',
+    name: 'snap.eth',
+    flagged: false,
+    verified: true,
+    turbo: false,
+    turbo_expiration: 0,
+    hibernated: false,
+    deleted: true,
+    domain: 'test1.com',
     settings: { network: 1 },
     created: Math.floor(Date.now() / 1e3),
     updated: Math.floor(Date.now() / 1e3)

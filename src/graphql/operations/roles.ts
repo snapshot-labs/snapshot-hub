@@ -1,12 +1,10 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import db from '../../helpers/mysql';
 import log from '../../helpers/log';
+import db from '../../helpers/mysql';
 
 export default async function (parent, args) {
   const { where = {} } = args;
-
   const { address } = where;
-  if (!address) return Promise.reject(new Error('address is required'));
 
   const query = `
     SELECT * FROM spaces

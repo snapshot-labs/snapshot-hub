@@ -25,7 +25,7 @@ describe('GET /api/space/:key', () => {
   describe('when the space exists', () => {
     let response;
     beforeAll(async () => {
-      response = await fetch(`${HOST}/api/spaces/fabien.eth`);
+      response = await fetch(`${HOST}/api/spaces/${fixtures[0].id}`);
     });
 
     it('returns the correct HTTP response', () => {
@@ -41,7 +41,10 @@ describe('GET /api/space/:key', () => {
         flagged: space.flagged,
         verified: space.verified,
         turbo: space.turbo,
+        turboExpiration: space.turbo_expiration,
         hibernated: space.hibernated,
+        deleted: false,
+        domain: space.domain,
         ...space.settings
       };
 
@@ -61,6 +64,26 @@ describe('GET /api/space/:key', () => {
         error: 'unauthorized',
         error_description: 'not_found'
       });
+    });
+  });
+
+  describe('when the space is marked as deleted', () => {
+    it('returns the space data with a deleted:true', async () => {
+      const response = await fetch(`${HOST}/api/spaces/${fixtures[1].id}`);
+
+      const space = fixtures[1];
+      const expectedSpace = {
+        flagged: space.flagged,
+        verified: space.verified,
+        turbo: space.turbo,
+        turboExpiration: space.turbo_expiration,
+        hibernated: space.hibernated,
+        deleted: true,
+        domain: space.domain,
+        ...space.settings
+      };
+
+      expect(response.json()).resolves.toEqual(expectedSpace);
     });
   });
 });

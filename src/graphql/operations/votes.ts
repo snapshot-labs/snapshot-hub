@@ -1,5 +1,8 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import graphqlFields from 'graphql-fields';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
+import serve from '../../helpers/requestDeduplicator';
 import {
   buildWhereQuery,
   checkLimits,
@@ -7,9 +10,6 @@ import {
   formatSpace,
   formatVote
 } from '../helpers';
-import serve from '../../helpers/requestDeduplicator';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 async function query(parent, args, context?, info?) {
   const requestedFields = info ? graphqlFields(info) : {};
@@ -21,7 +21,7 @@ async function query(parent, args, context?, info?) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
-    voter: 'string',
+    voter: 'evmAddress',
     proposal: 'string',
     reason: 'string',
     app: 'string',
@@ -87,14 +87,20 @@ async function query(parent, args, context?, info?) {
   if (requestedFields.proposal && votes.length > 0) {
     const proposalIds = votes.map(vote => vote.proposal);
     const query = `
-      SELECT p.*,
+      SELECT
+        p.*,
+        skins.*,
+        p.id AS id,
         spaces.settings,
+        spaces.domain as spaceDomain,
         spaces.flagged as spaceFlagged,
         spaces.verified as spaceVerified,
         spaces.turbo as spaceTurbo,
+        spaces.turbo_expiration as spaceTurboExpiration,
         spaces.hibernated as spaceHibernated
       FROM proposals p
       INNER JOIN spaces ON spaces.id = p.space
+      LEFT JOIN skins ON spaces.id = skins.id
       WHERE spaces.settings IS NOT NULL AND p.id IN (?)
     `;
     try {

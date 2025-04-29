@@ -1,7 +1,7 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
   const { first, skip, where = {} } = args;
@@ -12,8 +12,10 @@ export default async function (parent, args) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
+    network: 'string',
+    source: 'string',
     created: 'number',
-    delegate: 'string'
+    delegate: ['evmAddress', 'starknetAddress']
   };
   const whereQuery = buildWhereQuery(fields, 's', where);
   const queryStr = whereQuery.query;
