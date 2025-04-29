@@ -1,10 +1,10 @@
-import db from '../../helpers/mysql';
-import { buildWhereQuery, formatProposal, checkLimits } from '../helpers';
-import log from '../../helpers/log';
 import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
+import db from '../../helpers/mysql';
+import { buildWhereQuery, checkLimits, formatProposal } from '../helpers';
 
 export default async function (parent, args) {
-  const { first = 20, skip = 0, where = {} } = args;
+  const { first, skip, where = {} } = args;
 
   checkLimits(args, 'proposals');
 
@@ -12,7 +12,7 @@ export default async function (parent, args) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
-    author: 'string',
+    author: 'evmAddress',
     network: 'string',
     created: 'number',
     updated: 'number',
@@ -20,7 +20,8 @@ export default async function (parent, args) {
     start: 'number',
     end: 'number',
     type: 'string',
-    scores_state: 'string'
+    scores_state: 'string',
+    votes: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'p', where);
   let queryStr = whereQuery.query;
@@ -41,8 +42,8 @@ export default async function (parent, args) {
 
   let searchSql = '';
   if (where.title_contains) {
-    searchSql = 'AND p.title LIKE ?';
-    params.push(`%${where.title_contains}%`);
+    searchSql = 'AND LOWER(p.title) LIKE ?';
+    params.push(`%${where.title_contains.toLowerCase()}%`);
   }
 
   if (where.strategies_contains) {
@@ -72,16 +73,34 @@ export default async function (parent, args) {
     searchSql += ' AND p.flagged = 0';
   }
 
+  if (where?.labels_in?.length) {
+    searchSql += ' AND JSON_CONTAINS(p.labels, ?)';
+    params.push(JSON.stringify(where.labels_in));
+  }
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
+  if (!['created', 'start', 'end', 'votes'].includes(orderBy))
+    orderBy = 'created';
   orderBy = `p.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
   const query = `
-    SELECT p.*, spaces.settings, spaces.flagged as spaceFlagged, spaces.verified as spaceVerified FROM proposals p
+    SELECT
+      p.*,
+      skins.*,
+      p.id AS id,
+      spaces.settings,
+      spaces.domain as spaceDomain,
+      spaces.flagged as spaceFlagged,
+      spaces.verified as spaceVerified,
+      spaces.turbo as spaceTurbo,
+      spaces.turbo_expiration as spaceTurboExpiration,
+      spaces.hibernated as spaceHibernated
+    FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
+    LEFT JOIN skins ON spaces.id = skins.id
     WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;

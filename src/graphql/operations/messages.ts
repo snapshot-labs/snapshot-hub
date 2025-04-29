@@ -1,10 +1,10 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import { sequencerDB } from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
-  const { first = 20, skip = 0, where = {} } = args;
+  const { first, skip, where = {} } = args;
 
   checkLimits(args, 'messages');
 

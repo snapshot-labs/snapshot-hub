@@ -54,20 +54,16 @@ yarn start
 ```json
 {
   "name": "snapshot-hub",
-  "network": "livenet",
+  "network": "mainnet",
   "version": "0.1.3",
   "tag": "alpha",
   "relayer": "0x8BBE4Ac64246d600BC2889ef5d83809D138F03DF"
 }
 ```
 
-## Usage
-
-Once your hub is running online, the main hub can relay the messages received to your own hub. Please provide the URL of your Snapshot hub to an admin to make sure it's connected to the network.
-
 ### Load a space setting
 
-To load a space settings in the database you can go on this endpoint http://localhost:3000/api/spaces/yam.eth/poke (change yam.eth with the space you want to activate).
+To load a space settings in the database you can go on this endpoint <http://localhost:3000/api/spaces/yam.eth/poke> (change yam.eth with the space you want to activate).
 
 ## License
 

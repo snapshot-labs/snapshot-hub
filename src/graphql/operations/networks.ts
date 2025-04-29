@@ -1,12 +1,14 @@
-import { spaces } from '../../helpers/spaces';
+import db from '../../helpers/mysql';
+import { networkSpaceCounts } from '../../helpers/spaces';
 
-export default function () {
-  const networks = {};
-  Object.values(spaces).forEach((space: any) => {
-    networks[space.network] = networks[space.network] ? networks[space.network] + 1 : 1;
-  });
-  return Object.entries(networks).map(network => ({
-    id: network[0],
-    spacesCount: network[1]
+export default async function (): Promise<any[]> {
+  let networks = await db.queryAsync('SELECT * FROM networks');
+
+  networks = networks.map(network => ({
+    ...network,
+    premium: !!network.premium,
+    spacesCount: networkSpaceCounts[network.id] || 0
   }));
+
+  return networks;
 }

@@ -1,14 +1,15 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import express from 'express';
-import { spaces } from './helpers/spaces';
-import { name, version } from '../package.json';
+import { getSpace } from './helpers/spaces';
 import { sendError } from './helpers/utils';
+import { name, version } from '../package.json';
 
 const router = express.Router();
 const network = process.env.NETWORK || 'testnet';
 const SEQUENCER_URL = process.env.SEQUENCER_URL || '';
 
 router.post('/message', async (req, res) => {
-  return sendError(res, 'personal sign is not supported anymore');
+  return sendError(res, 'personal sign is not supported anymore', 410);
 });
 
 router.post('/msg', async (req, res) => {
@@ -25,14 +26,18 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/spaces/:key', (req, res) => {
+router.get('/spaces/:key', async (req, res) => {
   const { key } = req.params;
 
-  if (!spaces[key]) {
-    return sendError(res, 'space not found', 404);
+  try {
+    return res.json(await getSpace(key));
+  } catch (e: any) {
+    if (e.message !== 'NOT_FOUND') {
+      capture(e);
+      return sendError(res, 'server_error', 500);
+    }
+    return sendError(res, 'not_found', 404);
   }
-
-  return res.json(spaces[key]);
 });
 
 router.get('/spaces/:key/poke', async (req, res) => {

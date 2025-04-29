@@ -1,18 +1,18 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
-  const { first = 20, skip = 0, where = {} } = args;
+  const { first, skip, where = {} } = args;
 
   checkLimits(args, 'aliases');
 
   const fields = {
     id: 'string',
     ipfs: 'string',
-    address: 'string',
-    alias: 'string',
+    address: ['evmAddress', 'starknetAddress'],
+    alias: 'evmAddress',
     created: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'a', where);

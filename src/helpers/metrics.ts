@@ -1,10 +1,10 @@
 import init, { client } from '@snapshot-labs/snapshot-metrics';
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import { Express, type Request, type Response } from 'express';
-import { parse } from 'graphql';
+import { Express, Request, Response } from 'express';
+import { GraphQLError, parse } from 'graphql';
+import db from './mysql';
 import { spacesMetadata } from './spaces';
 import { strategies } from './strategies';
-import db from './mysql';
 import operations from '../graphql/operations/';
 
 const whitelistedPath = [
@@ -24,7 +24,9 @@ const rateLimitedRequestsCount = new client.Counter({
 function instrumentRateLimitedRequests(req, res, next) {
   res.on('finish', () => {
     if (whitelistedPath.some(path => path.test(req.path))) {
-      rateLimitedRequestsCount.inc({ rate_limited: res.statusCode === 429 ? 1 : 0 });
+      rateLimitedRequestsCount.inc({
+        rate_limited: res.statusCode === 429 ? 1 : 0
+      });
     }
   });
 
@@ -38,7 +40,7 @@ export default function initMetrics(app: Express) {
     normalizedPath: [
       ['^/api/scores/.+', '/api/scores/#id'],
       ['^/api/spaces/([^/]+)(/poke)?$', '/api/spaces/#key$2'],
-      ['^/graphql/?$', '/graphql']
+      ['^/graphql.*$', '/graphql']
     ],
     whitelistedPath,
     errorHandler: (e: any) => capture(e)
@@ -58,11 +60,17 @@ export default function initMetrics(app: Express) {
           if (query && operationName) {
             const definition = parse(query).definitions.find(
               // @ts-ignore
-              def => def.name.value === operationName
+              def => def.name?.value === operationName
             );
 
+            if (!definition) {
+              return;
+            }
+
             // @ts-ignore
-            const types = definition.selectionSet.selections.map(sel => sel.name.value);
+            const types = definition.selectionSet.selections.map(
+              sel => sel.name.value
+            );
 
             for (const type of types) {
               if (GRAPHQL_TYPES.includes(type)) {
@@ -71,7 +79,9 @@ export default function initMetrics(app: Express) {
             }
           }
         } catch (e: any) {
-          capture(e);
+          if (!(e instanceof GraphQLError)) {
+            capture(e);
+          }
         }
       });
     }
@@ -85,9 +95,16 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    const verifiedCount = Object.values(spacesMetadata).filter((s: any) => s.verified).length;
-    this.set({ status: 'verified' }, verifiedCount);
-    this.set({ status: 'unverified' }, Object.keys(spacesMetadata).length - verifiedCount);
+    ['verified', 'flagged', 'turbo', 'hibernated'].forEach(async status => {
+      this.set(
+        { status },
+        (
+          await db.queryAsync(
+            `SELECT COUNT(id) as count FROM spaces WHERE ${status} = 1`
+          )
+        )[0].count
+      );
+    });
   }
 });
 
@@ -147,7 +164,9 @@ new client.Gauge({
   name: 'proposals_total_count',
   help: 'Total number of proposals',
   async collect() {
-    this.set((await db.queryAsync('SELECT COUNT(id) as count FROM proposals'))[0].count);
+    this.set(
+      (await db.queryAsync('SELECT COUNT(id) as count FROM proposals'))[0].count
+    );
   }
 });
 
@@ -155,7 +174,19 @@ new client.Gauge({
   name: 'users_total_count',
   help: 'Total number of users',
   async collect() {
-    this.set((await db.queryAsync('SELECT COUNT(id) as count FROM users'))[0].count);
+    this.set(
+      (await db.queryAsync('SELECT COUNT(id) as count FROM users'))[0].count
+    );
+  }
+});
+
+new client.Gauge({
+  name: 'spaces_total_count',
+  help: 'Total number of spaces',
+  async collect() {
+    this.set(
+      (await db.queryAsync('SELECT COUNT(id) as count FROM spaces'))[0].count
+    );
   }
 });
 
@@ -167,6 +198,20 @@ new client.Gauge({
     strategies.forEach((s: any) => {
       this.set({ name: s.id }, s.spacesCount);
     });
+  }
+});
+
+new client.Gauge({
+  name: 'proposals_pending_scores_count',
+  help: 'Total number of closed proposals with a pending scores',
+  async collect() {
+    this.set(
+      (
+        await db.queryAsync(
+          "SELECT COUNT(id) as count FROM proposals WHERE scores_state = 'pending' AND end < UNIX_TIMESTAMP()"
+        )
+      )[0].count
+    );
   }
 });
 

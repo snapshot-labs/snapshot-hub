@@ -1,11 +1,11 @@
-import path from 'path';
 import fs from 'fs';
-import { graphqlHTTP } from 'express-graphql';
+import path from 'path';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import queryCountLimit from 'graphql-query-count-limit';
+import { graphqlHTTP } from 'express-graphql';
 import depthLimit from 'graphql-depth-limit';
-import Query from './operations';
+import queryCountLimit from 'graphql-query-count-limit';
 import defaultQuery from './examples';
+import Query from './operations';
 
 const schemaFile = path.join(__dirname, './schema.gql');
 const typeDefs = fs.readFileSync(schemaFile, 'utf8');

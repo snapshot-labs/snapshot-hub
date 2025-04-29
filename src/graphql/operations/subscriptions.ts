@@ -1,17 +1,17 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatSubscription } from '../helpers';
-import log from '../../helpers/log';
-import { capture } from '@snapshot-labs/snapshot-sentry';
 
 export default async function (parent, args) {
-  const { first = 20, skip = 0, where = {} } = args;
+  const { first, skip, where = {} } = args;
 
   checkLimits(args, 'subscriptions');
 
   const fields = {
     id: 'string',
     ipfs: 'string',
-    address: 'string',
+    address: 'evmAddress',
     space: 'string',
     created: 'number'
   };
@@ -29,8 +29,20 @@ export default async function (parent, args) {
   let subscriptions: any[] = [];
 
   const query = `
-    SELECT s.*, spaces.settings, spaces.flagged as spaceFlagged, spaces.verified as spaceVerified FROM subscriptions s
+    SELECT
+      s.*,
+      skins.*,
+      s.id AS id,
+      spaces.settings,
+      spaces.domain as spaceDomain,
+      spaces.flagged as spaceFlagged,
+      spaces.verified as spaceVerified,
+      spaces.turbo as spaceTurbo,
+      spaces.turbo_expiration as spaceTurboExpiration,
+      spaces.hibernated as spaceHibernated
+    FROM subscriptions s
     INNER JOIN spaces ON spaces.id = s.space
+    LEFT JOIN skins ON spaces.id = skins.id
     WHERE spaces.settings IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
