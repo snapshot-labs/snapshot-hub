@@ -56,6 +56,10 @@ type Metadata = {
   pluginNames: string[];
 };
 
+function isTurbo(turbo: number, turboExpiration: number): boolean {
+  return turbo === 1 || turboExpiration > Date.now() / 1e3;
+}
+
 function getPopularity(space: Metadata): number {
   let popularity =
     space.counts.proposalsCount / 20 +
@@ -124,7 +128,7 @@ function mapSpaces() {
       name: space.name,
       verified: space.verified,
       flagged: space.flagged,
-      turbo: space.turbo,
+      turbo: isTurbo(space.turbo, space.turboExpiration),
       turboExpiration: space.turboExpiration,
       hibernated: space.hibernated,
       parent: space.parent,
@@ -168,7 +172,7 @@ async function loadSpaces() {
         ...JSON.parse(space.settings),
         flagged: space.flagged === 1,
         verified: space.verified === 1,
-        turbo: space.turbo === 1,
+        turbo: isTurbo(space.turbo, space.turbo_expiration),
         turboExpiration: space.turbo_expiration,
         hibernated: space.hibernated === 1,
         follower_count: space.follower_count,
@@ -315,7 +319,7 @@ export async function getSpace(id: string) {
     domain: space.domain,
     flagged: space.flagged === 1,
     verified: space.verified === 1,
-    turbo: space.turbo === 1,
+    turbo: isTurbo(space.turbo, space.turbo_expiration),
     turboExpiration: space.turbo_expiration,
     hibernated: space.hibernated === 1,
     deleted: space.deleted === 1
