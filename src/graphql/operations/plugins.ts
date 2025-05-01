@@ -1,6 +1,6 @@
 import { spacesMetadata } from '../../helpers/spaces';
 
-export default function getPluginsUsage() {
+export default function getPlugins() {
   const pluginUsageCount: Record<string, number> = {};
 
   for (const { pluginNames } of Object.values(spacesMetadata)) {
