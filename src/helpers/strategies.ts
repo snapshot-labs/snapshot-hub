@@ -2,7 +2,7 @@ import { URL } from 'url';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
 import log from './log';
-import { spaces } from './spaces';
+import { spacesMetadata } from './spaces';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
@@ -26,20 +26,21 @@ async function loadStrategies() {
     return true;
   }
 
-  Object.values(spaces).forEach((space: any) => {
-    const ids = new Set<string>(
-      space.strategies.map(strategy => strategy.name)
-    );
-    ids.forEach(id => {
-      if (res[id]) {
-        res[id].spacesCount = (res[id].spacesCount || 0) + 1;
+  Object.values(spacesMetadata).forEach(
+    (space: { verified: boolean; strategyNames: string[] }) => {
+      const ids = new Set<string>(space.strategyNames);
+      ids.forEach(id => {
+        if (res[id]) {
+          res[id].spacesCount = (res[id].spacesCount || 0) + 1;
 
-        if (space.verified) {
-          res[id].verifiedSpacesCount = (res[id].verifiedSpacesCount || 0) + 1;
+          if (space.verified) {
+            res[id].verifiedSpacesCount =
+              (res[id].verifiedSpacesCount || 0) + 1;
+          }
         }
-      }
-    });
-  });
+      });
+    }
+  );
 
   strategies = Object.values(res)
     .map((strategy: any) => {
