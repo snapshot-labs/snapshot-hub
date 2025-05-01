@@ -100,7 +100,7 @@ function sortSpaces() {
     });
 }
 
-function mapSpaces(spaces: Record<string, Space>) {
+function mapSpaces(spaces: Record<string, any>) {
   networkSpaceCounts = {};
 
   Object.entries(spaces).forEach(([id, space]: any) => {
