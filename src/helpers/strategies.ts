@@ -26,21 +26,20 @@ async function loadStrategies() {
     return true;
   }
 
-  Object.values(spacesMetadata).forEach(
-    (space: { verified: boolean; strategyNames: string[] }) => {
-      const ids = new Set<string>(space.strategyNames);
-      ids.forEach(id => {
-        if (res[id]) {
-          res[id].spacesCount = (res[id].spacesCount || 0) + 1;
+  Object.values(spacesMetadata).forEach(({ verified, strategyNames }) => {
+    const ids = new Set<string>(strategyNames);
+    ids.forEach(id => {
+      if (!res[id]) {
+        return;
+      }
 
-          if (space.verified) {
-            res[id].verifiedSpacesCount =
-              (res[id].verifiedSpacesCount || 0) + 1;
-          }
-        }
-      });
-    }
-  );
+      res[id].spacesCount = (res[id].spacesCount || 0) + 1;
+
+      if (verified) {
+        res[id].verifiedSpacesCount = (res[id].verifiedSpacesCount || 0) + 1;
+      }
+    });
+  });
 
   strategies = Object.values(res)
     .map((strategy: any) => {
