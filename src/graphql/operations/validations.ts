@@ -1,14 +1,16 @@
-import { spaces } from '../../helpers/spaces';
+import { spacesMetadata } from '../../helpers/spaces';
 
-export default function () {
-  const validations = {};
-  Object.values(spaces).forEach((space: any) => {
-    if (space.validation)
-      validations[space.validation.name] =
-        (validations[space.validation.name] || 0) + 1;
-  });
-  return Object.entries(validations).map(validation => ({
-    id: validation[0],
-    spacesCount: validation[1]
+export default function getValidations() {
+  const validations: Record<string, number> = {};
+
+  for (const { validationName } of Object.values(spacesMetadata)) {
+    if (validationName) {
+      validations[validationName] = (validations[validationName] || 0) + 1;
+    }
+  }
+
+  return Object.entries(validations).map(([id, spacesCount]) => ({
+    id,
+    spacesCount
   }));
 }

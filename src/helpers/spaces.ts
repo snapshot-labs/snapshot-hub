@@ -19,8 +19,6 @@ const TESTNET_NETWORKS = (
   .filter(network => network.testnet)
   .map(network => network.key);
 
-export let spaces = {};
-
 export let rankedSpaces: Metadata[] = [];
 
 export let networkSpaceCounts: Record<string, number> = {};
@@ -39,6 +37,8 @@ type Metadata = {
   popularity: number;
   rank: number | null;
   private: boolean;
+  skin: string | null;
+  validationName: string | null;
   categories: string[];
   networks: string[];
   counts: {
@@ -100,7 +100,7 @@ function sortSpaces() {
     });
 }
 
-function mapSpaces() {
+function mapSpaces(spaces) {
   networkSpaceCounts = {};
 
   Object.entries(spaces).forEach(([id, space]: any) => {
@@ -136,6 +136,8 @@ function mapSpaces() {
       rank: spacesMetadata[id]?.rank || null,
       private: space.private ?? false,
       categories: space.categories ?? [],
+      skin: space.skin || null,
+      validationName: space.validation?.name || null,
       networks,
       counts: {
         activeProposals: spacesMetadata[id]?.counts?.activeProposals || 0,
@@ -165,7 +167,7 @@ async function loadSpaces() {
     `;
   const results = await db.queryAsync(query);
 
-  spaces = Object.fromEntries(
+  const spaces = Object.fromEntries(
     results.map(space => [
       space.id,
       {
@@ -188,7 +190,7 @@ async function loadSpaces() {
       1000
     ).toFixed()}s)`
   );
-  mapSpaces();
+  mapSpaces(spaces);
 }
 
 async function getProposals(): Promise<

@@ -1,14 +1,16 @@
-import { spaces } from '../../helpers/spaces';
+import { spacesMetadata } from '../../helpers/spaces';
 
-export default function () {
-  const plugins = {};
-  Object.values(spaces).forEach((space: any) => {
-    Object.keys(space.plugins || {}).forEach(plugin => {
-      plugins[plugin] = (plugins[plugin] || 0) + 1;
-    });
-  });
-  return Object.entries(plugins).map(plugin => ({
-    id: plugin[0],
-    spacesCount: plugin[1]
+export default function getPluginsUsage() {
+  const pluginUsageCount: Record<string, number> = {};
+
+  for (const { pluginNames } of Object.values(spacesMetadata)) {
+    for (const plugin of pluginNames) {
+      pluginUsageCount[plugin] = (pluginUsageCount[plugin] || 0) + 1;
+    }
+  }
+
+  return Object.entries(pluginUsageCount).map(([id, spacesCount]) => ({
+    id,
+    spacesCount
   }));
 }
