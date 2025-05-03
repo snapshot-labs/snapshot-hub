@@ -5,7 +5,7 @@ FROM node:22.6.0-slim
 RUN apt-get update && apt-get upgrade -y
 
 # Install required O.S. packages
-RUN apt-get install -y git python make g++
+RUN apt-get install -y git python3 make g++
 
 # Create the application workdir
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
