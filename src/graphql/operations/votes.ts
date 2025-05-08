@@ -70,7 +70,13 @@ async function query(parent, args, context?, info?) {
       let spaces = await db.queryAsync(query, [spaceIds]);
 
       spaces = Object.fromEntries(
-        spaces.map(space => [space.id, formatSpace(space)])
+        spaces.map(space => [
+          space.id,
+          formatSpace({
+            turboExpiration: space.turbo_expiration,
+            ...space
+          })
+        ])
       );
       votes = votes.map(vote => {
         if (spaces[vote.space.id])
