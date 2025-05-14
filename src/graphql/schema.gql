@@ -128,6 +128,7 @@ input SpaceWhere {
   controller: String
   verified: Boolean
   domain: String
+  search: String
 }
 
 input RankingWhere {

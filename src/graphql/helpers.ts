@@ -308,6 +308,12 @@ export async function fetchSpaces(args) {
     params.push(where.domain);
   }
 
+  if (where.search) {
+    const wildcardSearch = `%${where.search}%`;
+    queryStr += ` AND (s.id LIKE ? OR s.name LIKE ?)`;
+    params.push(wildcardSearch, wildcardSearch);
+  }
+
   const query = `
     SELECT s.*, skins.*, s.id AS id FROM spaces s
     LEFT JOIN skins ON s.id = skins.id
