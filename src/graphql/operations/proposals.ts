@@ -66,7 +66,7 @@ export default async function (parent, args) {
   }
 
   if (where.flagged === true) {
-    searchSql += ' AND p.flagged = 1';
+    searchSql += ' AND p.flagged > 0';
   }
 
   if (where.flagged === false) {
