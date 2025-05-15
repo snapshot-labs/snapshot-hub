@@ -173,6 +173,7 @@ async function loadSpaces() {
       {
         ...JSON.parse(space.settings),
         flagged: space.flagged > 0,
+        flag_code: space.flagged,
         verified: space.verified === 1,
         turbo: isTurbo(!!space.turbo, space.turbo_expiration),
         turboExpiration: space.turbo_expiration,
