@@ -141,7 +141,7 @@ export function formatSpace({
   space.skinSettings = skinSettings;
 
   space.verified = verified ?? null;
-  space.flagged = flagged ?? null;
+  space.flagged = flagged > 0;
   space.hibernated = hibernated ?? null;
   space.turbo =
     new Date((turboExpiration || 0) * 1000) > new Date() ? true : turbo ?? null;

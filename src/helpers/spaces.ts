@@ -172,7 +172,7 @@ async function loadSpaces() {
       space.id,
       {
         ...JSON.parse(space.settings),
-        flagged: space.flagged === 1,
+        flagged: space.flagged > 0,
         verified: space.verified === 1,
         turbo: isTurbo(!!space.turbo, space.turbo_expiration),
         turboExpiration: space.turbo_expiration,
@@ -319,7 +319,7 @@ export async function getSpace(id: string) {
   return {
     ...JSON.parse(space.settings),
     domain: space.domain,
-    flagged: space.flagged === 1,
+    flagged: space.flagged > 0,
     verified: space.verified === 1,
     turbo: isTurbo(!!space.turbo, space.turbo_expiration),
     turboExpiration: space.turbo_expiration,
