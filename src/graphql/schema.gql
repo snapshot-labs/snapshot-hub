@@ -622,6 +622,7 @@ type StrategyItem {
   about: String
   spacesCount: Int
   verifiedSpacesCount: Int
+  override: Boolean
   disabled: Boolean
 }
 

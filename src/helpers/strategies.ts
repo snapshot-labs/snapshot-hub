@@ -46,6 +46,7 @@ async function loadStrategies() {
       strategy.id = strategy.key;
       strategy.spacesCount = strategy.spacesCount || 0;
       strategy.verifiedSpacesCount = strategy.verifiedSpacesCount || 0;
+      strategy.override = strategy.dependOnOtherAddress || false;
       strategy.disabled = strategy.disabled || false;
       return strategy;
     })
