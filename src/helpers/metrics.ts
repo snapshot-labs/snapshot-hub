@@ -100,7 +100,7 @@ new client.Gauge({
         { status },
         (
           await db.queryAsync(
-            `SELECT COUNT(id) as count FROM spaces WHERE ${status} = 1`
+            `SELECT COUNT(id) as count FROM spaces WHERE ${status} > 0`
           )
         )[0].count
       );
