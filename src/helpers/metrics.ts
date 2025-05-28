@@ -95,16 +95,26 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    ['verified', 'flagged', 'turbo', 'hibernated'].forEach(async status => {
-      this.set(
-        { status },
-        (
-          await db.queryAsync(
-            `SELECT COUNT(id) as count FROM spaces WHERE ${status} = 1`
-          )
-        )[0].count
-      );
-    });
+    const statusQueries = [
+      { status: 'verified', column: 'verified', pivot: 0 },
+      { status: 'flagged', column: 'flagged', pivot: 0 },
+      {
+        status: 'turbo',
+        column: 'turbo_expiration',
+        pivot: Math.floor(Date.now() / 1000)
+      },
+      { status: 'hibernated', column: 'hibernated', pivot: 0 }
+    ];
+
+    await Promise.all(
+      statusQueries.map(async ({ status, column, pivot }) => {
+        const [{ count }] = await db.queryAsync(
+          `SELECT COUNT(id) as count FROM spaces WHERE ${column} > ?`,
+          [pivot]
+        );
+        this.set({ status }, count);
+      })
+    );
   }
 });
 
