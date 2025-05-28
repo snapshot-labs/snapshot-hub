@@ -465,8 +465,9 @@ export function formatProposal(proposal) {
   }));
   proposal.privacy = proposal.privacy || '';
   proposal.quorumType = proposal.quorum_type || 'default';
-  proposal.flagCode = proposal.flagged;
-  proposal.flagged = proposal.flagged > 0;
+  const rawFlagged = proposal.flagged;
+  proposal.flagCode = rawFlagged;
+  proposal.flagged = rawFlagged > 0;
   return proposal;
 }
 
