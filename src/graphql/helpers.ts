@@ -142,7 +142,7 @@ export function formatSpace({
 
   space.verified = verified ?? null;
   space.flagged = flagged > 0;
-  space.flag_code = flagged;
+  space.flagCode = flagged;
   space.hibernated = hibernated ?? null;
   space.turbo =
     new Date((turboExpiration || 0) * 1000) > new Date() ? true : turbo ?? null;
@@ -465,7 +465,7 @@ export function formatProposal(proposal) {
   }));
   proposal.privacy = proposal.privacy || '';
   proposal.quorumType = proposal.quorum_type || 'default';
-  proposal.flag_code = proposal.flagged;
+  proposal.flagCode = proposal.flagged;
   proposal.flagged = proposal.flagged > 0;
   return proposal;
 }
