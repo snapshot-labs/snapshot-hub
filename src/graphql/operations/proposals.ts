@@ -95,7 +95,6 @@ export default async function (parent, args) {
       spaces.domain as spaceDomain,
       spaces.flagged as spaceFlagged,
       spaces.verified as spaceVerified,
-      spaces.turbo as spaceTurbo,
       spaces.turbo_expiration as spaceTurboExpiration,
       spaces.hibernated as spaceHibernated
     FROM proposals p
