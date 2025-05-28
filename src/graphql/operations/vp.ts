@@ -5,7 +5,6 @@ const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
 
 export default async function (_parent, { voter, space, proposal }) {
   if (voter === '0x0000000000000000000000000000000000000000' || voter === '') {
-    console.log('invalid address');
     return Promise.reject(new Error('invalid address'));
   }
 
