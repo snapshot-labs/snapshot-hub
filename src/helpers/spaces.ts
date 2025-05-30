@@ -1,6 +1,6 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
-import networks from '@snapshot-labs/snapshot.js/src/networks.json';
+import networksList from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import log from './log';
 import db from './mysql';
@@ -14,7 +14,7 @@ const TEST_STRATEGIES = [
   'api-v2-override'
 ];
 const TESTNET_NETWORKS = (
-  Object.values(networks) as { testnet?: boolean; key: string }[]
+  Object.values(networksList) as { testnet?: boolean; key: string }[]
 )
   .filter(network => network.testnet)
   .map(network => network.key);
