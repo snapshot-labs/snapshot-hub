@@ -13,11 +13,13 @@ const TEST_STRATEGIES = [
   'api-post',
   'api-v2-override'
 ];
-const TESTNET_NETWORKS = (
-  Object.values(networksList) as { testnet?: boolean; key: string }[]
-)
-  .filter(network => network.testnet)
-  .map(network => network.key);
+const STARKNET_TESTNET_CHAIN_ID = '0x534e5f5345504f4c4941';
+const TESTNET_NETWORKS = [
+  ...(Object.values(networksList) as { testnet?: boolean; key: string }[])
+    .filter(network => network.testnet)
+    .map(network => network.key),
+  STARKNET_TESTNET_CHAIN_ID
+];
 
 export let rankedSpaces: Metadata[] = [];
 
