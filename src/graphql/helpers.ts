@@ -141,7 +141,8 @@ export function formatSpace({
   space.skinSettings = skinSettings;
 
   space.verified = verified ?? null;
-  space.flagged = flagged ?? null;
+  space.flagged = flagged > 0;
+  space.flagCode = flagged;
   space.hibernated = hibernated ?? null;
   space.turbo =
     new Date((turboExpiration || 0) * 1000) > new Date() ? true : turbo ?? null;
@@ -464,6 +465,9 @@ export function formatProposal(proposal) {
   }));
   proposal.privacy = proposal.privacy || '';
   proposal.quorumType = proposal.quorum_type || 'default';
+  const rawFlagged = proposal.flagged;
+  proposal.flagCode = rawFlagged;
+  proposal.flagged = rawFlagged > 0;
   return proposal;
 }
 

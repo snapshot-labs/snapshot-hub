@@ -65,6 +65,18 @@ yarn start
 
 To load a space settings in the database you can go on this endpoint <http://localhost:3000/api/spaces/yam.eth/poke> (change yam.eth with the space you want to activate).
 
+## Flag codes
+
+The hub uses flag codes (`flagCode`) to mark proposals and spaces for various reasons:
+
+| Flag Code | Description             | Purpose                                                           |
+|-----------|-------------------------|-------------------------------------------------------------------|
+| `1`       | Spam/Malicious Content  | Reserved for content identified as spam or malicious             |
+| `2`       | DMCA Requests          | Reserved for Digital Millennium Copyright Act takedown requests  |
+| `3+`      | Future Use             | Additional codes may be introduced for other moderation purposes  |
+
+When content is flagged, it may have restricted visibility or functionality depending on the flag type applied.
+
 ## License
 
 Snapshot is open-sourced software licensed under the © [MIT license](LICENSE).

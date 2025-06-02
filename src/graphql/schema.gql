@@ -441,6 +441,7 @@ type Space {
   template: String
   verified: Boolean
   flagged: Boolean
+  flagCode: Int
   hibernated: Boolean
   turbo: Boolean
   turboExpiration: Int
@@ -510,6 +511,7 @@ type Proposal {
   scores_updated: Int
   votes: Int
   flagged: Boolean
+  flagCode: Int
 }
 
 type Strategy {
