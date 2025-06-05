@@ -404,6 +404,7 @@ type Space {
   website: String
   twitter: String
   github: String
+  farcaster: String
   coingecko: String
   email: String
   discussions: String
