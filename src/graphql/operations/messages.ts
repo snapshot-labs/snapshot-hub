@@ -27,8 +27,9 @@ export default async function (parent, args) {
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
+  const useSpaceIndex = where.space ? 'USE INDEX (space)' : '';
   const query = `
-    SELECT m.* FROM messages m
+    SELECT m.* FROM messages m ${useSpaceIndex}
     WHERE id IS NOT NULL ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
