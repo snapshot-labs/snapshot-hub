@@ -40,7 +40,7 @@ CREATE TABLE proposals (
   created INT(11) NOT NULL,
   updated INT(11) DEFAULT NULL,
   space VARCHAR(64) NOT NULL,
-  network VARCHAR(12) NOT NULL,
+  network VARCHAR(24) NOT NULL,
   symbol VARCHAR(16) NOT NULL DEFAULT '',
   type VARCHAR(24) NOT NULL DEFAULT '',
   strategies JSON NOT NULL,
