@@ -32,7 +32,7 @@ export default async function (parent, args) {
     where.space && orderBy !== 'm.mci' ? 'USE INDEX (space)' : '';
   const query = `
     SELECT m.* FROM messages m ${useSpaceIndex}
-    WHERE id IS NOT NULL ${queryStr}
+    WHERE 1=1 ${queryStr}
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
