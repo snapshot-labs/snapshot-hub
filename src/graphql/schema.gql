@@ -231,6 +231,12 @@ input ProposalWhere {
   votes_gte: Int,
   votes_lt: Int,
   votes_lte: Int,
+  scores_total_value: Float
+  scores_total_value_in: [Float]
+  scores_total_value_gt: Float
+  scores_total_value_gte: Float
+  scores_total_value_lt: Float
+  scores_total_value_lte: Float
 }
 
 input VoteWhere {
@@ -510,6 +516,8 @@ type Proposal {
   scores_state: String
   scores_total: Float
   scores_updated: Int
+  scores_total_value: Float
+  vp_value_by_strategy: Any
   votes: Int
   flagged: Boolean
   flagCode: Int
