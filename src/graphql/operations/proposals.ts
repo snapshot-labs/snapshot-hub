@@ -79,14 +79,13 @@ export default async function (parent, args) {
     params.push(JSON.stringify(where.labels_in));
   }
 
+  const orderByFields = Object.entries(fields)
+    .filter(field => field[1] === 'number')
+    .map(field => field[0]);
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (
-    !['created', 'start', 'end', 'votes', 'scores_total_value'].includes(
-      orderBy
-    )
-  )
-    orderBy = 'created';
+  if (!orderByFields.includes(orderBy)) orderBy = 'created';
   orderBy = `p.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
