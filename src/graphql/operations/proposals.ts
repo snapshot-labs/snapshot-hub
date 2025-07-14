@@ -21,7 +21,8 @@ export default async function (parent, args) {
     end: 'number',
     type: 'string',
     scores_state: 'string',
-    votes: 'number'
+    votes: 'number',
+    scores_total_value: 'number'
   };
   const whereQuery = buildWhereQuery(fields, 'p', where);
   let queryStr = whereQuery.query;
@@ -78,10 +79,13 @@ export default async function (parent, args) {
     params.push(JSON.stringify(where.labels_in));
   }
 
+  const orderByFields = Object.entries(fields)
+    .filter(field => field[1] === 'number')
+    .map(field => field[0]);
+
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created', 'start', 'end', 'votes'].includes(orderBy))
-    orderBy = 'created';
+  if (!orderByFields.includes(orderBy)) orderBy = 'created';
   orderBy = `p.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
