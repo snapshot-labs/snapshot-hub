@@ -37,4 +37,15 @@ const sequencerDB = mysql.createPool(sequencerConfig);
 
 bluebird.promisifyAll([Pool, Connection]);
 
+export const closeDatabase = (): Promise<void> => {
+  return new Promise(resolve => {
+    hubDB.end(() => {
+      sequencerDB.end(() => {
+        console.log('[mysql] Database connection pools closed');
+        resolve();
+      });
+    });
+  });
+};
+
 export { hubDB as default, sequencerDB };
