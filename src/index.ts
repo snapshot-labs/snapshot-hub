@@ -8,10 +8,10 @@ import graphql from './graphql';
 import { checkKeycard } from './helpers/keycard';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
+import { closeDatabase } from './helpers/mysql';
 import rateLimit from './helpers/rateLimit';
 import refreshSpacesCache from './helpers/spaces';
 import './helpers/strategies';
-import { closeDatabase } from './helpers/mysql';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
