@@ -41,7 +41,7 @@ export const closeDatabase = (): Promise<void> => {
   return new Promise(resolve => {
     hubDB.end(() => {
       sequencerDB.end(() => {
-        console.log('[mysql] Database connection pools closed');
+        log.info('[mysql] Database connection pools closed');
         resolve();
       });
     });

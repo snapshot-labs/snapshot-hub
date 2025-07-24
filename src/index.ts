@@ -38,17 +38,17 @@ const server = app.listen(PORT, () =>
 );
 
 const gracefulShutdown = async (signal: string) => {
-  console.log(`Received ${signal}. Starting graceful shutdown...`);
+  log.info(`Received ${signal}. Starting graceful shutdown...`);
 
   server.close(async () => {
-    console.log('Express server closed.');
+    log.info('Express server closed.');
 
     try {
       await closeDatabase();
-      console.log('Graceful shutdown completed.');
+      log.info('Graceful shutdown completed.');
       process.exit(0);
     } catch (error) {
-      console.error('Error during shutdown:', error);
+      log.error('Error during shutdown:', error);
       process.exit(1);
     }
   });
