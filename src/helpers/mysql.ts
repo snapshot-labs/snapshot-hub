@@ -4,6 +4,7 @@ import mysql from 'mysql';
 import Connection from 'mysql/lib/Connection';
 import Pool from 'mysql/lib/Pool';
 import log from './log';
+import { registerStopFunction } from './shutdown';
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
 log.info(`[mysql] connection limit ${connectionLimit}`);
@@ -37,15 +38,24 @@ const sequencerDB = mysql.createPool(sequencerConfig);
 
 bluebird.promisifyAll([Pool, Connection]);
 
-export const closeDatabase = (): Promise<void> => {
+const createCloseFunction = (pool: Pool, name: string) => (): Promise<void> => {
   return new Promise(resolve => {
-    hubDB.end(() => {
-      sequencerDB.end(() => {
-        console.log('[mysql] Database connection pools closed');
-        resolve();
-      });
+    pool.end((err: Error | null) => {
+      if (err) {
+        log.error(`[mysql] Error closing ${name}:`, err);
+      } else {
+        log.info(`[mysql] ${name} connection pool closed`);
+      }
+      resolve();
     });
   });
 };
+
+const closeHubDB = createCloseFunction(hubDB, 'hubDB');
+const closeSequencerDB = createCloseFunction(sequencerDB, 'sequencerDB');
+
+// Register each database shutdown individually with the shutdown helper
+registerStopFunction(closeHubDB);
+registerStopFunction(closeSequencerDB);
 
 export { hubDB as default, sequencerDB };

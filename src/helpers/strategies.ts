@@ -1,7 +1,7 @@
 import { URL } from 'url';
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
-import log from './log';
+import { createLoop } from './loop';
 import { spacesMetadata } from './spaces';
 
 export let strategies: any[] = [];
@@ -13,8 +13,6 @@ const scoreApiURL: URL = new URL(
 );
 scoreApiURL.pathname = '/api/strategies';
 const uri = scoreApiURL.toString();
-
-let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
   const res = await snapshot.utils.getJSON(uri);
@@ -57,23 +55,11 @@ async function loadStrategies() {
   );
 }
 
-async function run() {
-  while (true) {
-    try {
-      log.info('[strategies] Start strategies refresh');
-      await loadStrategies();
-      consecutiveFailsCount = 0;
-      log.info('[strategies] End strategies refresh');
-    } catch (e: any) {
-      consecutiveFailsCount++;
-
-      if (consecutiveFailsCount >= 3) {
-        capture(e);
-      }
-      log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
-    }
-    await snapshot.utils.sleep(RUN_INTERVAL);
-  }
-}
-
-run();
+createLoop({
+  name: 'strategies',
+  interval: RUN_INTERVAL,
+  task: async () => {
+    await loadStrategies();
+  },
+  maxConsecutiveFailsBeforeCapture: 3
+});

@@ -1,8 +1,7 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
-import snapshot from '@snapshot-labs/snapshot.js';
 import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import log from './log';
+import { createLoop } from './loop';
 import db from './mysql';
 
 const RUN_INTERVAL = 120e3;
@@ -329,20 +328,12 @@ export async function getSpace(id: string) {
   };
 }
 
-export default async function run() {
-  while (true) {
-    try {
-      log.info('[spaces] Start spaces refresh');
-
-      await loadSpaces();
-      await loadSpacesMetrics();
-
-      sortSpaces();
-      log.info('[spaces] End spaces refresh');
-    } catch (e: any) {
-      capture(e);
-      log.error(`[spaces] failed to load spaces, ${JSON.stringify(e)}`);
-    }
-    await snapshot.utils.sleep(RUN_INTERVAL);
+export default createLoop({
+  name: 'spaces',
+  interval: RUN_INTERVAL,
+  task: async () => {
+    await loadSpaces();
+    await loadSpacesMetrics();
+    sortSpaces();
   }
-}
+});
