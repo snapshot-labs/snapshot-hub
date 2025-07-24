@@ -8,7 +8,6 @@ import graphql from './graphql';
 import { checkKeycard } from './helpers/keycard';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
-import { closeDatabase } from './helpers/mysql';
 import rateLimit from './helpers/rateLimit';
 import { initiateShutdown } from './helpers/shutdown';
 import refreshSpacesCache from './helpers/spaces';
