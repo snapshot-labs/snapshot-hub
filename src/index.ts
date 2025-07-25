@@ -8,8 +8,8 @@ import graphql from './graphql';
 import { checkKeycard } from './helpers/keycard';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
-import { closeDatabase } from './helpers/mysql';
 import rateLimit from './helpers/rateLimit';
+import { initiateShutdown } from './helpers/shutdown';
 import refreshSpacesCache from './helpers/spaces';
 import './helpers/strategies';
 
@@ -40,18 +40,22 @@ const server = app.listen(PORT, () =>
 const gracefulShutdown = async (signal: string) => {
   log.info(`Received ${signal}. Starting graceful shutdown...`);
 
-  server.close(async () => {
-    log.info('Express server closed.');
+  // Stop all background processes (loops + database)
+  await initiateShutdown();
+  log.info('Background processes stopped.');
 
-    try {
-      await closeDatabase();
-      log.info('Graceful shutdown completed.');
-      process.exit(0);
-    } catch (error) {
-      log.error('Error during shutdown:', error);
-      process.exit(1);
-    }
+  // Close Express server
+  server.close(() => {
+    log.info('Express server closed.');
+    log.info('Graceful shutdown completed.');
+    process.exit(0);
   });
+
+  // Fallback timeout for the entire shutdown process
+  setTimeout(() => {
+    log.error('Graceful shutdown timeout exceeded, forcing exit');
+    process.exit(1);
+  }, 15000); // 15 seconds total shutdown timeout
 };
 
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
