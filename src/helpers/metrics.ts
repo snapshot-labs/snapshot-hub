@@ -3,7 +3,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express, Request, Response } from 'express';
 import { GraphQLError, parse } from 'graphql';
 import db from './mysql';
-import { spacesMetadata } from './spaces';
+import { networkSpaceCounts, spacesMetadata } from './spaces';
 import { strategies } from './strategies';
 import operations from '../graphql/operations/';
 
@@ -113,16 +113,8 @@ new client.Gauge({
   help: 'Number of spaces per network',
   labelNames: ['network'],
   async collect() {
-    const results = {};
-    Object.values(spacesMetadata).forEach((space: any) => {
-      space.networks.forEach(network => {
-        results[network] ||= 0;
-        results[network]++;
-      });
-    });
-
-    for (const r in results) {
-      this.set({ network: r }, results[r]);
+    for (const network in networkSpaceCounts) {
+      this.set({ network }, networkSpaceCounts[network]);
     }
   }
 });

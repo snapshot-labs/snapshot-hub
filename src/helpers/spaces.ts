@@ -104,15 +104,17 @@ function mapSpaces(spaces: Record<string, any>) {
   networkSpaceCounts = {};
 
   Object.entries(spaces).forEach(([id, space]: any) => {
-    const networks = uniq([
-      space.network,
-      ...space.strategies.map((strategy: any) => strategy.network),
-      ...space.strategies.flatMap((strategy: any) =>
-        Array.isArray(strategy.params?.strategies)
-          ? strategy.params.strategies.map((param: any) => param.network)
-          : []
-      )
-    ]);
+    const networks = uniq(
+      [
+        space.network,
+        ...space.strategies.map((strategy: any) => strategy.network),
+        ...space.strategies.flatMap((strategy: any) =>
+          Array.isArray(strategy.params?.strategies)
+            ? strategy.params.strategies.map((param: any) => param.network)
+            : []
+        )
+      ].filter(Boolean)
+    );
 
     networks.forEach(network => {
       networkSpaceCounts[network] = (networkSpaceCounts[network] || 0) + 1;
