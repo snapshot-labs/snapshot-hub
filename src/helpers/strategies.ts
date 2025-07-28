@@ -3,6 +3,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
 import log from './log';
 import { spacesMetadata } from './spaces';
+import { fetch } from './utils';
 
 export let strategies: any[] = [];
 export let strategiesObj: any = {};
@@ -17,7 +18,8 @@ const uri = scoreApiURL.toString();
 let consecutiveFailsCount = 0;
 
 async function loadStrategies() {
-  const res = await snapshot.utils.getJSON(uri);
+  const response = await fetch(uri);
+  const res = await response.json();
 
   if (res.hasOwnProperty('error')) {
     capture(new Error('Failed to load strategies'), {

@@ -53,7 +53,7 @@
     "@snapshot-labs/eslint-config": "^0.1.0-beta.18",
     "@snapshot-labs/prettier-config": "^0.1.0-beta.18",
     "@types/jest": "^29.5.3",
-    "@types/node": "^14.0.13",
+    "@types/node": "^22.0.0",
     "copyfiles": "^2.4.1",
     "dotenv-cli": "^7.2.1",
     "eslint": "^8.28.0",
