@@ -3,7 +3,6 @@ import graphqlFields from 'graphql-fields';
 import castArray from 'lodash/castArray';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
-import fetch from 'node-fetch';
 import db from '../helpers/mysql';
 import { spacesMetadata } from '../helpers/spaces';
 import { jsonParse } from '../helpers/utils';
@@ -531,18 +530,21 @@ async function getControllerDomains(address: string): Promise<string[]> {
   };
 
   try {
-    const response = await fetch(process.env.STAMP_URL ?? 'https://stamp.fyi', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        method: 'lookup_domains',
-        params: address,
-        network: network === 'testnet' ? ['11155111', '157'] : ['1', '109']
-      })
-    });
+    const response = await snapshot.utils.fetch(
+      process.env.STAMP_URL ?? 'https://stamp.fyi',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          method: 'lookup_domains',
+          params: address,
+          network: network === 'testnet' ? ['11155111', '157'] : ['1', '109']
+        })
+      } as any
+    );
     const { result, error } = (await response.json()) as JsonRpcResponse;
 
     if (error) throw new PublicError("Failed to resolve controller's domains");
