@@ -225,12 +225,12 @@ input ProposalWhere {
   labels_in: [String]
   state: String
   space_verified: Boolean
-  flagged: Boolean,
-  votes: Int,
-  votes_gt: Int,
-  votes_gte: Int,
-  votes_lt: Int,
-  votes_lte: Int,
+  flagged: Boolean
+  votes: Int
+  votes_gt: Int
+  votes_gte: Int
+  votes_lt: Int
+  votes_lte: Int
   scores_total_value: Float
   scores_total_value_in: [Float]
   scores_total_value_gt: Float
@@ -555,6 +555,7 @@ type Vote {
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
+  vp_value: Float
 }
 
 type Alias {
@@ -667,6 +668,7 @@ type Leaderboard {
   proposalsCount: Int
   votesCount: Int
   lastVote: Int
+  vpValue: Float
 }
 
 type Option {
