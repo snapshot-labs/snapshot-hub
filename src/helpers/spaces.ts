@@ -162,7 +162,7 @@ function mapSpaces(spaces: Record<string, any>) {
 async function loadSpaces() {
   const startTime = +Date.now();
   let offset = 0;
-  let allSpaces: Record<string, any> = {};
+  let allResults: any[] = [];
   let hasMore = true;
   let batchCount = 0;
 
@@ -179,31 +179,11 @@ async function loadSpaces() {
       const results = await db.queryAsync(query, [offset, BATCH_SIZE]);
       batchCount++;
 
-      const batchSpaces = Object.fromEntries(
-        results.map(space => [
-          space.id,
-          {
-            ...JSON.parse(space.settings),
-            flagged: space.flagged > 0,
-            flagCode: space.flagged,
-            verified: space.verified === 1,
-            turbo: isTurbo(!!space.turbo, space.turbo_expiration),
-            turboExpiration: space.turbo_expiration,
-            hibernated: space.hibernated === 1,
-            follower_count: space.follower_count,
-            vote_count: space.vote_count,
-            proposal_count: space.proposal_count
-          }
-        ])
-      );
-
-      allSpaces = { ...allSpaces, ...batchSpaces };
+      allResults = allResults.concat(results);
       offset += BATCH_SIZE;
 
       log.info(
-        `[spaces] loaded batch ${batchCount}: ${
-          results.length
-        } spaces (total: ${Object.keys(allSpaces).length})`
+        `[spaces] loaded batch ${batchCount}: ${results.length} spaces (total: ${allResults.length})`
       );
 
       if (results.length < BATCH_SIZE) {
@@ -219,15 +199,33 @@ async function loadSpaces() {
     }
   }
 
+  const spaces = Object.fromEntries(
+    allResults.map(space => [
+      space.id,
+      {
+        ...JSON.parse(space.settings),
+        flagged: space.flagged > 0,
+        flagCode: space.flagged,
+        verified: space.verified === 1,
+        turbo: isTurbo(!!space.turbo, space.turbo_expiration),
+        turboExpiration: space.turbo_expiration,
+        hibernated: space.hibernated === 1,
+        follower_count: space.follower_count,
+        vote_count: space.vote_count,
+        proposal_count: space.proposal_count
+      }
+    ])
+  );
+
   log.info(
     `[spaces] total spaces ${
-      Object.keys(allSpaces).length
+      Object.keys(spaces).length
     }, in ${batchCount} batches (${(
       (+Date.now() - startTime) /
       1000
     ).toFixed()}s)`
   );
-  mapSpaces(allSpaces);
+  mapSpaces(spaces);
 }
 async function getProposals(): Promise<
   Record<
