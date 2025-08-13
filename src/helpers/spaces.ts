@@ -6,7 +6,7 @@ import log from './log';
 import db from './mysql';
 
 const RUN_INTERVAL = 120e3;
-const BATCH_SIZE = 70000;
+const BATCH_SIZE = 40000;
 const TEST_STRATEGIES = [
   'ticket',
   'api',
