@@ -19,6 +19,7 @@ hubConfig.connectTimeout = 60e3;
 hubConfig.acquireTimeout = 60e3;
 hubConfig.timeout = 60e3;
 hubConfig.charset = 'utf8mb4';
+hubConfig.ssl = { rejectUnauthorized: true };
 
 const hubDB = mysql.createPool(hubConfig);
 
