@@ -167,35 +167,26 @@ async function loadSpaces() {
   let batchCount = 0;
 
   while (hasMore) {
-    try {
-      const query = `
-          SELECT id, settings, flagged, verified, turbo, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
-          FROM spaces
-          WHERE deleted = 0
-          ORDER BY id ASC
-          LIMIT ?, ?
-        `;
+    const query = `
+        SELECT id, settings, flagged, verified, turbo, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
+        FROM spaces
+        WHERE deleted = 0
+        ORDER BY id ASC
+        LIMIT ?, ?
+      `;
 
-      const results = await db.queryAsync(query, [offset, BATCH_SIZE]);
-      batchCount++;
+    const results = await db.queryAsync(query, [offset, BATCH_SIZE]);
+    batchCount++;
 
-      allResults = allResults.concat(results);
-      offset += BATCH_SIZE;
+    allResults = allResults.concat(results);
+    offset += BATCH_SIZE;
 
-      log.info(
-        `[spaces] loaded batch ${batchCount}: ${results.length} spaces (total: ${allResults.length})`
-      );
+    log.info(
+      `[spaces] loaded batch ${batchCount}: ${results.length} spaces (total: ${allResults.length})`
+    );
 
-      if (results.length < BATCH_SIZE) {
-        hasMore = false;
-      }
-    } catch (error: any) {
-      log.error(
-        `[spaces] failed to load batch ${batchCount + 1} at offset ${offset}: ${
-          error.message
-        }`
-      );
-      throw error;
+    if (results.length < BATCH_SIZE) {
+      hasMore = false;
     }
   }
 
