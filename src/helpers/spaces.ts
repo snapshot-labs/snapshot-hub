@@ -6,6 +6,7 @@ import log from './log';
 import db from './mysql';
 
 const RUN_INTERVAL = 120e3;
+const BATCH_SIZE = 70000;
 const TEST_STRATEGIES = [
   'ticket',
   'api',
@@ -160,42 +161,74 @@ function mapSpaces(spaces: Record<string, any>) {
 
 async function loadSpaces() {
   const startTime = +Date.now();
+  let offset = 0;
+  let allSpaces: Record<string, any> = {};
+  let hasMore = true;
+  let batchCount = 0;
 
-  const query = `
-      SELECT id, settings, flagged, verified, turbo, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
-      FROM spaces
-      WHERE deleted = 0
-      ORDER BY id ASC
-    `;
-  const results = await db.queryAsync(query);
+  while (hasMore) {
+    try {
+      const query = `
+          SELECT id, settings, flagged, verified, turbo, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
+          FROM spaces
+          WHERE deleted = 0
+          ORDER BY id ASC
+          LIMIT ?, ?
+        `;
 
-  const spaces = Object.fromEntries(
-    results.map(space => [
-      space.id,
-      {
-        ...JSON.parse(space.settings),
-        flagged: space.flagged > 0,
-        flagCode: space.flagged,
-        verified: space.verified === 1,
-        turbo: isTurbo(!!space.turbo, space.turbo_expiration),
-        turboExpiration: space.turbo_expiration,
-        hibernated: space.hibernated === 1,
-        follower_count: space.follower_count,
-        vote_count: space.vote_count,
-        proposal_count: space.proposal_count
+      const results = await db.queryAsync(query, [offset, BATCH_SIZE]);
+      batchCount++;
+
+      const batchSpaces = Object.fromEntries(
+        results.map(space => [
+          space.id,
+          {
+            ...JSON.parse(space.settings),
+            flagged: space.flagged > 0,
+            flagCode: space.flagged,
+            verified: space.verified === 1,
+            turbo: isTurbo(!!space.turbo, space.turbo_expiration),
+            turboExpiration: space.turbo_expiration,
+            hibernated: space.hibernated === 1,
+            follower_count: space.follower_count,
+            vote_count: space.vote_count,
+            proposal_count: space.proposal_count
+          }
+        ])
+      );
+
+      allSpaces = { ...allSpaces, ...batchSpaces };
+      offset += BATCH_SIZE;
+
+      log.info(
+        `[spaces] loaded batch ${batchCount}: ${
+          results.length
+        } spaces (total: ${Object.keys(allSpaces).length})`
+      );
+
+      if (results.length < BATCH_SIZE) {
+        hasMore = false;
       }
-    ])
-  );
+    } catch (error: any) {
+      log.error(
+        `[spaces] failed to load batch ${batchCount + 1} at offset ${offset}: ${
+          error.message
+        }`
+      );
+      throw error;
+    }
+  }
 
   log.info(
-    `[spaces] total spaces ${Object.keys(spaces).length}, in (${(
+    `[spaces] total spaces ${
+      Object.keys(allSpaces).length
+    }, in ${batchCount} batches (${(
       (+Date.now() - startTime) /
       1000
     ).toFixed()}s)`
   );
-  mapSpaces(spaces);
+  mapSpaces(allSpaces);
 }
-
 async function getProposals(): Promise<
   Record<
     string,
