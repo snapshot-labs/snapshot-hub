@@ -227,6 +227,7 @@ async function loadSpaces() {
   );
   mapSpaces(spaces);
 }
+
 async function getProposals(): Promise<
   Record<
     string,
