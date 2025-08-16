@@ -19,7 +19,7 @@ hubConfig.connectTimeout = 60e3;
 hubConfig.acquireTimeout = 60e3;
 hubConfig.timeout = 60e3;
 hubConfig.charset = 'utf8mb4';
-hubConfig.ssl = { rejectUnauthorized: true };
+hubConfig.ssl = { rejectUnauthorized: hubConfig.host !== 'localhost' };
 
 const hubDB = mysql.createPool(hubConfig);
 
@@ -34,7 +34,7 @@ sequencerConfig.connectTimeout = 60e3;
 sequencerConfig.acquireTimeout = 60e3;
 sequencerConfig.timeout = 60e3;
 sequencerConfig.charset = 'utf8mb4';
-sequencerConfig.ssl = { rejectUnauthorized: true };
+sequencerConfig.ssl = { rejectUnauthorized: hubConfig.host !== 'localhost' };
 
 const sequencerDB = mysql.createPool(sequencerConfig);
 
