@@ -22,7 +22,7 @@ const ARG_LIMITS = {
   default: {
     first: 1000,
     skip: 5000,
-    '*_in': 1000 // Default limit for all _in arguments
+    '*_in': 100 // Default limit for all _in arguments
   },
   proposals: {
     space_in: 10000
