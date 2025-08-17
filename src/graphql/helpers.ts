@@ -54,7 +54,7 @@ export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
 
-  // overwrite default limit for all *_in fields
+  // overwrite default limit for all *_in or *_not_in fields
   Object.keys(where).forEach(key => {
     if (key.endsWith('_in') && !(key in typeLimits)) {
       typeLimits[key] = typeLimits['*_in'];
