@@ -21,7 +21,8 @@ export class PublicError extends Error {}
 const ARG_LIMITS = {
   default: {
     first: 1000,
-    skip: 5000
+    skip: 5000,
+    '*_in': 1000 // Default limit for all _in arguments
   },
   proposals: {
     space_in: 10000
@@ -52,6 +53,13 @@ const SKIN_SETTINGS = [
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
+
+  // overwrite default limit for all *_in fields
+  Object.keys(where).forEach(key => {
+    if (key.endsWith('_in') && !(key in typeLimits)) {
+      typeLimits[key] = typeLimits['*_in'];
+    }
+  });
 
   for (const key in typeLimits) {
     const limit = typeLimits[key];
