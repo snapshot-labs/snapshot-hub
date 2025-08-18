@@ -105,7 +105,7 @@ export default async function (parent, args) {
     FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
     LEFT JOIN skins ON spaces.id = skins.id
-    WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
+    WHERE 1=1 ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;
   params.push(skip, first);
