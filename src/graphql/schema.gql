@@ -626,6 +626,7 @@ type Item {
 
 type StrategyItem {
   id: String!
+  name: String
   author: String
   version: String
   schema: Any
