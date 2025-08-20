@@ -29,7 +29,21 @@ export default async function (parent, args) {
   let orderDirection = (args.orderDirection || 'desc').toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
 
-  const orderQuery = uniq([orderBy, ...ORDER_FIELDS])
+  // Use a single extra field for deterministic ordering
+  // depending on the realm (space or user)
+  // This covers 100% of our use cases
+  // When neither space nor user filters are present (not coming from our UI),
+  // use last_vote as the secondary ordering field for consistency.
+  const orderFields = [orderBy];
+  if (where.space) {
+    orderFields.push('user');
+  } else if (where.user) {
+    orderFields.push('space');
+  } else {
+    orderFields.push('last_vote');
+  }
+
+  const orderQuery = uniq(orderFields)
     .map((field: string) => `l.${field} ${orderDirection}`)
     .join(', ');
 
