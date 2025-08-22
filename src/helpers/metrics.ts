@@ -96,23 +96,19 @@ new client.Gauge({
   labelNames: ['status'],
   async collect() {
     const statusResults = await db.queryAsync(`
-      SELECT 
-        SUM(CASE WHEN verified > 0 THEN 1 ELSE 0 END) AS verified,
-        SUM(CASE WHEN flagged > 0 THEN 1 ELSE 0 END) AS flagged,
-        SUM(CASE WHEN hibernated > 0 THEN 1 ELSE 0 END) AS hibernated,
-        SUM(CASE WHEN turbo_expiration > UNIX_TIMESTAMP() THEN 1 ELSE 0 END) AS active_turbo,
-        SUM(CASE WHEN turbo_expiration > 0 AND turbo_expiration <= UNIX_TIMESTAMP() THEN 1 ELSE 0 END) AS expired_turbo
-      FROM spaces
+      SELECT 'verified' as status, COUNT(*) as count FROM spaces WHERE verified > 0
+      UNION ALL
+      SELECT 'flagged' as status, COUNT(*) as count FROM spaces WHERE flagged > 0
+      UNION ALL
+      SELECT 'hibernated' as status, COUNT(*) as count FROM spaces WHERE hibernated > 0
+      UNION ALL
+      SELECT 'active_turbo' as status, COUNT(*) as count FROM spaces WHERE turbo_expiration > UNIX_TIMESTAMP()
+      UNION ALL
+      SELECT 'expired_turbo' as status, COUNT(*) as count FROM spaces WHERE turbo_expiration > 0 AND turbo_expiration <= UNIX_TIMESTAMP()
     `);
 
-    [
-      'verified',
-      'flagged',
-      'hibernated',
-      'active_turbo',
-      'expired_turbo'
-    ].forEach(status => {
-      this.set({ status }, statusResults[0][status]);
+    statusResults.forEach((row: any) => {
+      this.set({ status: row.status }, row.count);
     });
   }
 });
