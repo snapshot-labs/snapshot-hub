@@ -34,7 +34,9 @@ sequencerConfig.connectTimeout = 60e3;
 sequencerConfig.acquireTimeout = 60e3;
 sequencerConfig.timeout = 60e3;
 sequencerConfig.charset = 'utf8mb4';
-sequencerConfig.ssl = { rejectUnauthorized: sequencerConfig.host !== 'localhost' };
+sequencerConfig.ssl = {
+  rejectUnauthorized: sequencerConfig.host !== 'localhost'
+};
 
 const sequencerDB = mysql.createPool(sequencerConfig);
 
