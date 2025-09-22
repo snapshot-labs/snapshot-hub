@@ -24,7 +24,7 @@ export let rankedSpaces: Metadata[] = [];
 
 export let networkSpaceCounts: Record<string, number> = {};
 
-export const spacesMetadata: Record<string, Metadata> = {};
+export let spacesMetadata: Record<string, Metadata> = {};
 
 type Metadata = {
   id: string;
@@ -102,6 +102,7 @@ function sortSpaces() {
 }
 
 function mapSpaces(spaces: Record<string, any>) {
+  spacesMetadata = {};
   networkSpaceCounts = {};
 
   Object.entries(spaces).forEach(([id, space]: any) => {
