@@ -9,7 +9,13 @@ export default async function (parent, args) {
 
   checkLimits(args, 'leaderboards');
 
-  const ORDER_FIELDS = ['vote_count', 'proposal_count', 'last_vote', 'user'];
+  const ORDER_FIELDS = [
+    'vote_count',
+    'proposal_count',
+    'last_vote',
+    'user',
+    'vp_value'
+  ];
   const DEFAULT_ORDER_FIELD = 'vote_count';
 
   const fields = {
@@ -37,7 +43,8 @@ export default async function (parent, args) {
     SELECT l.*,
       l.vote_count as votesCount,
       l.proposal_count as proposalsCount,
-      l.last_vote as lastVote
+      l.last_vote as lastVote,
+      l.vp_value as vpValue
     FROM leaderboard l
     WHERE 1=1 ${whereQuery.query}
     ORDER BY ${orderQuery} LIMIT ?, ?
