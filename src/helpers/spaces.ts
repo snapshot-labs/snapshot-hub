@@ -75,8 +75,10 @@ function getPopularity(space: Metadata): number {
   const hasActiveProposals = space.counts.activeProposals > 0;
 
   if (isTurbo && hasActiveProposals) {
-    popularity += 4e20;
+    popularity += 5e20;
   } else if (isVerified && hasActiveProposals) {
+    popularity += 4e20;
+  } else if (isTurbo) {
     popularity += 3e20;
   } else if (isVerified) {
     popularity += 2e20;
