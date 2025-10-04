@@ -1,24 +1,11 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
-import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import log from './log';
 import db from './mysql';
 
 const RUN_INTERVAL = 120e3;
 const BATCH_SIZE = 40000;
-const TEST_STRATEGIES = [
-  'ticket',
-  'api',
-  'api-v2',
-  'api-post',
-  'api-v2-override'
-];
-const TESTNET_NETWORKS = (
-  Object.values(networks) as { testnet?: boolean; key: string }[]
-)
-  .filter(network => network.testnet)
-  .map(network => network.key);
 
 export let rankedSpaces: Metadata[] = [];
 
@@ -63,25 +50,28 @@ function isTurbo(turbo: boolean, turboExpiration: number): boolean {
 
 function getPopularity(space: Metadata): number {
   let popularity =
-    space.counts.proposalsCount / 20 +
+    space.counts.proposalsCount / 40 +
     space.counts.proposalsCount7d +
-    space.counts.votesCount / 40 +
+    space.counts.votesCount / 80 +
     space.counts.votesCount7d +
-    space.counts.followersCount / 80 +
+    space.counts.followersCount / 160 +
     space.counts.followersCount7d;
 
-  if (space.counts.activeProposals > 0) popularity += 1e5;
+  const isVerified = space.verified;
+  const isTurbo = space.turbo && !space.parent;
+  const hasActiveProposals = space.counts.activeProposals > 0;
 
-  if (space.verified) popularity += 1e10;
-
-  if (space.turbo && !space.parent) popularity += 2e10;
-
-  if (
-    !space.turbo &&
-    !space.networks.some(network => TESTNET_NETWORKS.includes(network)) &&
-    !space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
-  )
-    popularity += 1e10;
+  if (isTurbo && hasActiveProposals) {
+    popularity += 5e20;
+  } else if (isVerified && hasActiveProposals) {
+    popularity += 4e20;
+  } else if (isTurbo) {
+    popularity += 3e20;
+  } else if (isVerified) {
+    popularity += 2e20;
+  } else if (hasActiveProposals) {
+    popularity += 1e20;
+  }
 
   return popularity;
 }
