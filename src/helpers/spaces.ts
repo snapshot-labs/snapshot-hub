@@ -50,11 +50,11 @@ function isTurbo(turbo: boolean, turboExpiration: number): boolean {
 
 function getPopularity(space: Metadata): number {
   let popularity =
-    space.counts.proposalsCount / 40 +
+    space.counts.proposalsCount / 20 +
     space.counts.proposalsCount7d +
-    space.counts.votesCount / 80 +
+    space.counts.votesCount / 40 +
     space.counts.votesCount7d +
-    space.counts.followersCount / 160 +
+    space.counts.followersCount / 80 +
     space.counts.followersCount7d;
 
   const isVerified = space.verified;
