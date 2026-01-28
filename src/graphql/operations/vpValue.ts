@@ -12,8 +12,7 @@ export default async function (_parent, args) {
   const query = `
     SELECT
       v.space,
-      SUM(v.vp_value) as vp_value,
-      COUNT(*) as votes_count
+      SUM(v.vp_value) as vp_value
     FROM votes v
     WHERE v.voter = ?
     GROUP BY v.space
@@ -25,22 +24,18 @@ export default async function (_parent, args) {
     const results = await db.queryAsync(query, addresses);
 
     let totalVpValue = 0;
-    let votesCount = 0;
     const spaces = results.map(row => {
       totalVpValue += parseFloat(row.vp_value) || 0;
-      votesCount += Number(row.votes_count);
 
       return {
         id: row.space,
-        totalVpValue: parseFloat(row.vp_value) || 0,
-        votesCount: Number(row.votes_count)
+        totalVpValue: parseFloat(row.vp_value) || 0
       };
     });
 
     return {
       user: addresses[0],
       totalVpValue,
-      votesCount,
       spaces
     };
   } catch (err) {

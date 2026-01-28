@@ -667,14 +667,12 @@ type Vp {
 type VpValue {
   user: String!
   totalVpValue: Float!
-  votesCount: Int!
   spaces: [VpValueSpace]!
 }
 
 type VpValueSpace {
   id: String!
   totalVpValue: Float!
-  votesCount: Int!
 }
 
 type Leaderboard {
