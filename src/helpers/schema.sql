@@ -187,11 +187,13 @@ CREATE TABLE leaderboard (
   vote_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
   proposal_count SMALLINT UNSIGNED NOT NULL DEFAULT '0',
   last_vote BIGINT,
+  vp_value DECIMAL(13,3) NOT NULL DEFAULT 0.000,
   PRIMARY KEY user_space (user,space),
   INDEX space (space),
   INDEX vote_count (vote_count),
   INDEX proposal_count (proposal_count),
-  INDEX last_vote (last_vote)
+  INDEX last_vote (last_vote),
+  INDEX vp_value (vp_value)
 );
 
 CREATE TABLE options (
