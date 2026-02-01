@@ -61,6 +61,9 @@ function getPopularity(space: Metadata): number {
   const isTurbo = space.turbo && !space.parent;
   const hasActiveProposals = space.counts.activeProposals > 0;
 
+  if (space.id === 'xmaquina.eth') {
+    popularity += 1e20;
+  }
   if (isTurbo && hasActiveProposals) {
     popularity += 5e10;
   } else if (isVerified && hasActiveProposals) {
