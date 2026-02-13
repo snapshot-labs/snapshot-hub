@@ -283,6 +283,8 @@ export async function fetchSpaces(args) {
 
   const fields = { id: 'string', created: 'number', verified: 'boolean' };
 
+  // Note: turbo filter is handled separately after buildWhereQuery to account for turbo_expiration
+
   if ('controller' in where) {
     if (!where.controller) return [];
 
@@ -320,6 +322,17 @@ export async function fetchSpaces(args) {
     const wildcardSearch = `%${where.search}%`;
     queryStr += ` AND (s.id LIKE ? OR s.name LIKE ?)`;
     params.push(wildcardSearch, wildcardSearch);
+  }
+
+  // Handle turbo filter with semantic correctness (matches formatSpace logic)
+  if (where.turbo !== undefined) {
+    if (where.turbo) {
+      // Filter for active turbo: either permanent turbo flag OR active subscription
+      queryStr += ` AND (s.turbo = 1 OR s.turbo_expiration > UNIX_TIMESTAMP())`;
+    } else {
+      // Filter for non-turbo: no turbo flag AND no active subscription
+      queryStr += ` AND (s.turbo = 0 OR s.turbo IS NULL) AND (s.turbo_expiration IS NULL OR s.turbo_expiration <= UNIX_TIMESTAMP())`;
+    }
   }
 
   const query = `
