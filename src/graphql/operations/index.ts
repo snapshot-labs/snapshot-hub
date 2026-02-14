@@ -26,10 +26,12 @@ import votes from './votes';
 import vp from './vp';
 import log from '../../helpers/log';
 
+const IGNORED_ERROR_CODES = ['ER_QUERY_TIMEOUT'];
+
 function withErrorHandler(fn) {
   return (...args) =>
     fn(...args).catch(e => {
-      if (e.code !== 'ER_QUERY_TIMEOUT') capture(e);
+      if (!IGNORED_ERROR_CODES.includes(e.code)) capture(e);
       log.error(`[graphql] ${JSON.stringify(e)}`);
       return Promise.reject(new Error('request failed'));
     });
