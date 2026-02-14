@@ -24,7 +24,12 @@ import vote from './vote';
 import votes from './votes';
 import vp from './vp';
 
-export default {
+function safe(fn) {
+  return (...args) =>
+    fn(...args).catch(() => Promise.reject(new Error('request failed')));
+}
+
+const operations = {
   space,
   spaces,
   ranking,
@@ -51,3 +56,7 @@ export default {
   roles,
   leaderboards
 };
+
+export default Object.fromEntries(
+  Object.entries(operations).map(([key, fn]) => [key, safe(fn)])
+);
