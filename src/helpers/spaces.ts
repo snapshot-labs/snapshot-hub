@@ -281,6 +281,47 @@ async function getVotes(): Promise<Record<string, { votesCount7d: number }>> {
   );
 }
 
+export async function getCombinedMembersAndVoters(
+  spaceId: string,
+  cursor: string | null,
+  pageSize: number,
+  knownAdmins: string[] = [],
+  knownModerators: string[] = [],
+  knownMembers: string[] = []
+) {
+  const params: (string | number)[] = [spaceId];
+  const exclusionList = [...knownAdmins, ...knownModerators, ...knownMembers];
+
+  let query = 'SELECT DISTINCT voter AS address FROM votes WHERE space = ?';
+  
+  // Add exclusion clause only if there are items to exclude
+  if (exclusionList.length > 0) {
+    query += ` AND voter NOT IN (${exclusionList.map(() => '?').join(',')})`;
+    params.push(...exclusionList);
+  }
+
+  if (cursor) {
+    query += ' AND voter > ?';
+    params.push(cursor);
+  }
+
+  query += ' ORDER BY voter LIMIT ?';
+  params.push(pageSize);
+
+  const results = await db.queryAsync(query, params);
+  if (!results || results.length === 0) {
+    return Promise.reject(new Error('NOT_FOUND'));
+  }
+
+  const nextCursor =
+    results.length === pageSize ? results[results.length - 1].address : null;
+    
+  return {
+    members: results.map(row => row.address),
+    nextCursor: nextCursor
+  };
+}
+
 async function getFollowers(): Promise<
   Record<string, { followersCount7d: number }>
 > {
