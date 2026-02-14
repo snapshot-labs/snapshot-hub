@@ -1,4 +1,3 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 import mysql from 'mysql';
@@ -41,19 +40,7 @@ sequencerConfig.ssl = {
 
 const sequencerDB = mysql.createPool(sequencerConfig);
 
-bluebird.promisifyAll([Pool, Connection], {
-  filter: name => name !== 'query'
-});
-
-Pool.prototype.queryAsync = function (...args: any[]) {
-  return bluebird
-    .fromCallback(cb => this.query(...args, cb))
-    .catch(e => {
-      if (e.code !== 'ER_QUERY_TIMEOUT') capture(e);
-      log.error(`[mysql] ${JSON.stringify(e)}`);
-      return Promise.reject(new Error('request failed'));
-    });
-};
+bluebird.promisifyAll([Pool, Connection]);
 
 export const closeDatabase = (): Promise<void> => {
   return new Promise(resolve => {

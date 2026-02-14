@@ -1,3 +1,5 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
+import log from '../../helpers/log';
 import aliases from './aliases';
 import follows from './follows';
 import leaderboards from './leaderboards';
@@ -26,7 +28,11 @@ import vp from './vp';
 
 function safe(fn) {
   return (...args) =>
-    fn(...args).catch(() => Promise.reject(new Error('request failed')));
+    fn(...args).catch(e => {
+      if (e.code !== 'ER_QUERY_TIMEOUT') capture(e);
+      log.error(`[graphql] ${JSON.stringify(e)}`);
+      return Promise.reject(new Error('request failed'));
+    });
 }
 
 const operations = {
