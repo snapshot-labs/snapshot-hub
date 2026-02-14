@@ -49,7 +49,7 @@ Pool.prototype.queryAsync = function (...args: any[]) {
   return bluebird
     .fromCallback(cb => this.query(...args, cb))
     .catch(e => {
-      capture(e);
+      if (e.code !== 'ER_QUERY_TIMEOUT') capture(e);
       log.error(`[mysql] ${JSON.stringify(e)}`);
       return Promise.reject(new Error('request failed'));
     });
