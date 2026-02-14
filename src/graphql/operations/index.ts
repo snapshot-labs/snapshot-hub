@@ -1,5 +1,4 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
-import log from '../../helpers/log';
 import aliases from './aliases';
 import follows from './follows';
 import leaderboards from './leaderboards';
@@ -25,8 +24,9 @@ import validations from './validations';
 import vote from './vote';
 import votes from './votes';
 import vp from './vp';
+import log from '../../helpers/log';
 
-function safe(fn) {
+function withErrorHandler(fn) {
   return (...args) =>
     fn(...args).catch(e => {
       if (e.code !== 'ER_QUERY_TIMEOUT') capture(e);
@@ -64,5 +64,5 @@ const operations = {
 };
 
 export default Object.fromEntries(
-  Object.entries(operations).map(([key, fn]) => [key, safe(fn)])
+  Object.entries(operations).map(([key, fn]) => [key, withErrorHandler(fn)])
 );
