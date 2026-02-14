@@ -1,5 +1,3 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
-import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatFollow } from '../helpers';
 
@@ -46,12 +44,6 @@ export default async function (parent, args) {
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
 
-  try {
-    const follows = await db.queryAsync(query, params);
-    return follows.map(follow => formatFollow(follow));
-  } catch (e: any) {
-    log.error(`[graphql] follows, ${JSON.stringify(e)}`);
-    capture(e, { args });
-    return Promise.reject(new Error('request failed'));
-  }
+  const follows = await db.queryAsync(query, params);
+  return follows.map(follow => formatFollow(follow));
 }

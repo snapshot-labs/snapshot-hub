@@ -1,5 +1,3 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
-import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatProposal } from '../helpers';
 
@@ -109,12 +107,6 @@ export default async function (parent, args) {
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;
   params.push(skip, first);
-  try {
-    const proposals = await db.queryAsync(query, params);
-    return proposals.map(proposal => formatProposal(proposal));
-  } catch (e: any) {
-    log.error(`[graphql] proposals, ${JSON.stringify(e)}`);
-    capture(e, { args });
-    return Promise.reject(new Error('request failed'));
-  }
+  const proposals = await db.queryAsync(query, params);
+  return proposals.map(proposal => formatProposal(proposal));
 }
