@@ -127,6 +127,7 @@ input SpaceWhere {
   plugin: String
   controller: String
   verified: Boolean
+  turbo: Boolean
   domain: String
   search: String
 }

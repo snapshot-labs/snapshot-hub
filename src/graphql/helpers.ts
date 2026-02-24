@@ -322,6 +322,14 @@ export async function fetchSpaces(args) {
     params.push(wildcardSearch, wildcardSearch);
   }
 
+  if ('turbo' in where) {
+    if (where.turbo) {
+      queryStr += ` AND (s.turbo = 1 OR s.turbo_expiration > UNIX_TIMESTAMP())`;
+    } else {
+      queryStr += ` AND s.turbo = 0 AND s.turbo_expiration <= UNIX_TIMESTAMP()`;
+    }
+  }
+
   const query = `
     SELECT s.*, skins.*, s.id AS id FROM spaces s
     LEFT JOIN skins ON s.id = skins.id
