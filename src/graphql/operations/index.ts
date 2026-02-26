@@ -1,3 +1,4 @@
+import { capture } from '@snapshot-labs/snapshot-sentry';
 import aliases from './aliases';
 import follows from './follows';
 import leaderboards from './leaderboards';
@@ -23,8 +24,20 @@ import validations from './validations';
 import vote from './vote';
 import votes from './votes';
 import vp from './vp';
+import log from '../../helpers/log';
 
-export default {
+const IGNORED_ERROR_CODES = ['ER_QUERY_TIMEOUT'];
+
+function withErrorHandler(fn) {
+  return (...args) =>
+    fn(...args).catch(e => {
+      if (!IGNORED_ERROR_CODES.includes(e.code)) capture(e);
+      log.error(`[graphql] ${JSON.stringify(e)}`);
+      return Promise.reject(new Error('request failed'));
+    });
+}
+
+const operations = {
   space,
   spaces,
   ranking,
@@ -51,3 +64,7 @@ export default {
   roles,
   leaderboards
 };
+
+export default Object.fromEntries(
+  Object.entries(operations).map(([key, fn]) => [key, withErrorHandler(fn)])
+);
