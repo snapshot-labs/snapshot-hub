@@ -23,6 +23,7 @@ import validations from './validations';
 import vote from './vote';
 import votes from './votes';
 import vp from './vp';
+import vpValue from './vpValue';
 
 export default {
   space,
@@ -47,6 +48,7 @@ export default {
   statements,
   statement,
   vp,
+  vp_value: vpValue,
   messages,
   roles,
   leaderboards

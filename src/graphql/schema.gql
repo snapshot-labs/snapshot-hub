@@ -95,6 +95,8 @@ type Query {
 
   vp(voter: String!, space: String!, proposal: String): Vp
 
+  vp_value(voter: String!): VpValue
+
   messages(
     first: Int! = 20
     skip: Int! = 0
@@ -662,6 +664,17 @@ type Vp {
   vp: Float
   vp_by_strategy: [Float]
   vp_state: String
+}
+
+type VpValue {
+  user: String!
+  totalVpValue: Float!
+  spaces: [VpValueSpace]!
+}
+
+type VpValueSpace {
+  id: String!
+  totalVpValue: Float!
 }
 
 type Leaderboard {
