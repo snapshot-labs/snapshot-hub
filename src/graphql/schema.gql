@@ -3,8 +3,10 @@ scalar Any
 # Queries
 
 type Query {
+  "Returns a single space by its ID (e.g. \"ens.eth\")"
   space(id: String!): Space
 
+  "Returns a list of spaces with optional filtering, ordering, and pagination"
   spaces(
     first: Int! = 20
     skip: Int! = 0
@@ -13,10 +15,13 @@ type Query {
     orderDirection: OrderDirection
   ): [Space]
 
+  "Returns a ranked list of spaces with aggregated metrics"
   ranking(first: Int! = 20, skip: Int! = 0, where: RankingWhere): RankingObject
 
+  "Returns a single proposal by its ID"
   proposal(id: String!): Proposal
 
+  "Returns a list of proposals with optional filtering, ordering, and pagination"
   proposals(
     first: Int! = 20
     skip: Int! = 0
@@ -25,8 +30,10 @@ type Query {
     orderDirection: OrderDirection
   ): [Proposal]
 
+  "Returns a single vote by its ID"
   vote(id: String!): Vote
 
+  "Returns a list of votes with optional filtering, ordering, and pagination"
   votes(
     first: Int! = 20
     skip: Int! = 0
@@ -35,6 +42,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Vote]
 
+  "Returns a list of address aliases with optional filtering, ordering, and pagination"
   aliases(
     first: Int! = 20
     skip: Int! = 0
@@ -43,8 +51,10 @@ type Query {
     orderDirection: OrderDirection
   ): [Alias]
 
+  "Returns the roles and permissions for a given address"
   roles(where: RolesWhere!): [Role]
 
+  "Returns a list of space followers with optional filtering, ordering, and pagination"
   follows(
     first: Int! = 20
     skip: Int! = 0
@@ -53,6 +63,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Follow]
 
+  "Returns a list of proposal subscriptions with optional filtering, ordering, and pagination"
   subscriptions(
     first: Int! = 20
     skip: Int! = 0
@@ -61,6 +72,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Subscription]
 
+  "Returns a list of users with optional filtering, ordering, and pagination"
   users(
     first: Int! = 20
     skip: Int! = 0
@@ -69,6 +81,7 @@ type Query {
     orderDirection: OrderDirection
   ): [User]
 
+  "Returns a list of delegate statements with optional filtering, ordering, and pagination"
   statements(
     first: Int! = 20
     skip: Int! = 0
@@ -77,24 +90,34 @@ type Query {
     orderDirection: OrderDirection
   ): [Statement]
 
+  "Returns a single user by their address"
   user(id: String!): User
 
+  "Returns a single delegate statement by its ID"
   statement(id: String!): Statement
 
+  "Returns all available space skins"
   skins: [Item]
 
+  "Returns all supported networks"
   networks: [Network]
 
+  "Returns all available proposal validations"
   validations: [Item]
 
+  "Returns all available plugins"
   plugins: [Item]
 
+  "Returns all available voting strategies"
   strategies: [StrategyItem]
 
+  "Returns a single voting strategy by its ID"
   strategy(id: String!): StrategyItem
 
+  "Calculates the voting power for a voter in a space, optionally for a specific proposal"
   vp(voter: String!, space: String!, proposal: String): Vp
 
+  "Returns a list of signed messages (envelopes) with optional filtering, ordering, and pagination"
   messages(
     first: Int! = 20
     skip: Int! = 0
@@ -103,6 +126,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Message]
 
+  "Returns leaderboard entries for spaces with optional filtering, ordering, and pagination"
   leaderboards(
     first: Int! = 20
     skip: Int! = 0
@@ -111,6 +135,7 @@ type Query {
     orderDirection: OrderDirection
   ): [Leaderboard]
 
+  "Returns all available configuration options"
   options: [Option]
 }
 
@@ -163,16 +188,27 @@ input MessageWhere {
   type_in: [String]
 }
 
+"A signed message envelope submitted to the Snapshot sequencer"
 type Message {
+  "Message counter index, used for ordering"
   mci: Int
+  "Unique message identifier"
   id: String
+  "IPFS content identifier"
   ipfs: String
+  "Address of the message sender"
   address: String
+  "Protocol version"
   version: String
+  "Unix timestamp of when the message was submitted"
   timestamp: Int
+  "Space ID this message belongs to"
   space: String
+  "Message type (e.g. proposal, vote, delete-proposal)"
   type: String
+  "Cryptographic signature"
   sig: String
+  "Sequencer receipt"
   receipt: String
 }
 
@@ -399,301 +435,548 @@ enum OrderDirection {
 
 # Types
 
+"A Snapshot space (DAO or community) with its configuration and metadata"
 type Space {
+  "Unique identifier for the space (e.g. \"ens.eth\")"
   id: String!
+  "Display name of the space"
   name: String
+  "Whether the space is private"
   private: Boolean
+  "Description of the space"
   about: String
+  "URL of the space avatar image"
   avatar: String
+  "URL of the space cover image"
   cover: String
+  "URL to the space terms of service"
   terms: String
+  "Physical location of the organization"
   location: String
+  "Website URL"
   website: String
+  "Twitter/X handle"
   twitter: String
+  "GitHub organization or user"
   github: String
+  "Farcaster handle"
   farcaster: String
+  "CoinGecko identifier"
   coingecko: String
+  "Contact email"
   email: String
+  "URL to the discussions forum"
   discussions: String
+  "Discourse forum category ID"
   discourseCategory: Int
+  "Network ID the space primarily operates on"
   network: String
+  "Token symbol used in the space"
   symbol: String
+  "Custom skin/theme ID"
   skin: String
+  "Custom skin settings"
   skinSettings: SkinSettings
+  "Custom domain for the space"
   domain: String
+  "Voting strategies used to calculate voting power"
   strategies: [Strategy]
+  "List of admin addresses"
   admins: [String]
+  "List of member addresses"
   members: [String]
+  "List of moderator addresses"
   moderators: [String]
+  "Proposal filters configuration"
   filters: SpaceFilters
+  "Enabled plugins configuration"
   plugins: Any
+  "Voting configuration"
   voting: SpaceVoting
+  "Space categories"
   categories: [String]
+  "Proposal validation strategy"
   validation: Validation
+  "Vote validation strategy"
   voteValidation: Validation
+  "Delegation portal configuration"
   delegationPortal: DelegationPortal
+  "Treasury addresses managed by the space"
   treasuries: [Treasury]
+  "Labels that can be applied to proposals"
   labels: [Label]
+  "Number of currently active proposals"
   activeProposals: Int
+  "Total number of proposals"
   proposalsCount: Int
+  "Number of proposals created in the last 24 hours"
   proposalsCount1d: Int
+  "Number of proposals created in the last 7 days"
   proposalsCount7d: Int
+  "Number of proposals created in the last 30 days"
   proposalsCount30d: Int
+  "Total number of followers"
   followersCount: Int
+  "Number of new followers in the last 7 days"
   followersCount7d: Int
+  "Total number of votes cast"
   votesCount: Int
+  "Number of votes cast in the last 7 days"
   votesCount7d: Int
+  "Parent space (for sub-spaces)"
   parent: Space
+  "Child sub-spaces"
   children: [Space]
+  "Voting guidelines text"
   guidelines: String
+  "Proposal template"
   template: String
+  "Whether the space is verified"
   verified: Boolean
+  "Whether the space has been flagged"
   flagged: Boolean
+  "Flag reason code"
   flagCode: Int
+  "Whether the space is hibernated (inactive)"
   hibernated: Boolean
+  "Whether turbo mode is enabled"
   turbo: Boolean
+  "Unix timestamp when turbo mode expires"
   turboExpiration: Int
+  "Ranking score"
   rank: Float
+  "Boost settings"
   boost: BoostSettings
+  "Unix timestamp of when the space was created"
   created: Int!
 }
 
+"Ranked list of spaces with aggregated metrics"
 type RankingObject {
+  "List of ranked spaces"
   items: [Space]
+  "Aggregated metrics for the ranking query"
   metrics: Metrics
 }
 
+"Aggregated metrics for ranking queries"
 type Metrics {
+  "Total number of spaces matching the query"
   total: Int
+  "Breakdown of spaces by category"
   categories: Any
 }
 
+"Proposal filtering configuration for a space"
 type SpaceFilters {
+  "Minimum score required to create a proposal"
   minScore: Float
+  "Whether only members can create proposals"
   onlyMembers: Boolean
 }
 
+"Voting configuration for a space"
 type SpaceVoting {
+  "Delay in seconds before voting starts after proposal creation"
   delay: Int
+  "Voting period duration in seconds"
   period: Int
+  "Default voting type (e.g. single-choice, weighted)"
   type: String
+  "Quorum threshold"
   quorum: Float
+  "How quorum is calculated"
   quorumType: String!
+  "Whether votes are hidden until the voting period ends"
   blind: Boolean
+  "Whether the abstain option is hidden"
   hideAbstain: Boolean
+  "Privacy mode for votes (e.g. shutter)"
   privacy: String
+  "Whether aliased voting is enabled"
   aliased: Boolean
 }
 
+"A governance proposal"
 type Proposal {
+  "Unique proposal identifier"
   id: String!
+  "IPFS content identifier"
   ipfs: String
+  "Address of the proposal author"
   author: String!
+  "Unix timestamp of when the proposal was created"
   created: Int!
+  "Unix timestamp of the last update"
   updated: Int
+  "The space this proposal belongs to"
   space: Space
+  "Network ID"
   network: String!
+  "Token symbol"
   symbol: String!
+  "Voting type (e.g. single-choice, approval, quadratic, ranked-choice, weighted, basic)"
   type: String
+  "Voting strategies used for this proposal"
   strategies: [Strategy]!
+  "Proposal validation strategy"
   validation: Validation
+  "Enabled plugins"
   plugins: Any!
+  "Proposal title"
   title: String!
+  "Proposal body in Markdown"
   body: String
+  "URL to the discussion thread"
   discussion: String!
+  "List of voting choices"
   choices: [String]!
+  "Labels applied to this proposal"
   labels: [String]!
+  "Unix timestamp of when voting starts"
   start: Int!
+  "Unix timestamp of when voting ends"
   end: Int!
+  "Quorum threshold"
   quorum: Float!
+  "How quorum is calculated"
   quorumType: String!
+  "Privacy mode for votes"
   privacy: String
+  "Block number snapshot for voting power calculation"
   snapshot: Int
+  "Current state of the proposal (active, closed, pending)"
   state: String
+  "Direct link to the proposal"
   link: String
+  "Application that created the proposal"
   app: String
+  "Vote scores per choice"
   scores: [Float]
+  "Vote scores broken down by strategy"
   scores_by_strategy: Any
+  "Scoring state (e.g. final, pending)"
   scores_state: String
+  "Total score across all choices"
   scores_total: Float
+  "Unix timestamp of when scores were last updated"
   scores_updated: Int
+  "Total monetary value of scores"
   scores_total_value: Float
+  "Voting power value breakdown by strategy"
   vp_value_by_strategy: Any
+  "Total number of votes"
   votes: Int
+  "Whether the proposal has been flagged"
   flagged: Boolean
+  "Flag reason code"
   flagCode: Int
 }
 
+"A voting strategy used to calculate voting power"
 type Strategy {
+  "Strategy identifier"
   name: String!
+  "Network ID this strategy operates on"
   network: String
+  "Strategy-specific parameters"
   params: Any
 }
 
+"A validation strategy for proposals or votes"
 type Validation {
+  "Validation identifier"
   name: String!
+  "Validation-specific parameters"
   params: Any
 }
 
+"Delegation portal configuration"
 type DelegationPortal {
+  "Type of delegation"
   delegationType: String!
+  "Delegation contract address"
   delegationContract: String!
+  "Network of the delegation contract"
   delegationNetwork: String!
+  "API endpoint for delegation data"
   delegationApi: String!
 }
 
+"A vote cast on a proposal"
 type Vote {
+  "Unique vote identifier"
   id: String!
+  "IPFS content identifier"
   ipfs: String
+  "Address of the voter"
   voter: String!
+  "Unix timestamp of when the vote was cast"
   created: Int!
+  "The space this vote was cast in"
   space: Space!
+  "The proposal this vote was cast on"
   proposal: Proposal
+  "The voter's choice (format depends on voting type)"
   choice: Any!
+  "Additional vote metadata"
   metadata: Any
+  "Reason provided by the voter"
   reason: String
+  "Application used to cast the vote"
   app: String
+  "Voting power of the voter"
   vp: Float
+  "Voting power broken down by strategy"
   vp_by_strategy: [Float]
+  "Voting power state (e.g. final, pending)"
   vp_state: String
+  "Monetary value of the voting power"
   vp_value: Float
 }
 
+"An address alias mapping"
 type Alias {
+  "Unique alias identifier"
   id: String!
+  "IPFS content identifier"
   ipfs: String
+  "Primary address"
   address: String!
+  "Aliased address"
   alias: String!
+  "Unix timestamp of when the alias was created"
   created: Int!
 }
 
+"Role and permissions for an address in a space"
 type Role {
+  "Space ID"
   space: String
+  "List of permissions granted"
   permissions: [String]
 }
 
+"A follow relationship between an address and a space"
 type Follow {
+  "Unique follow identifier"
   id: String!
+  "IPFS content identifier"
   ipfs: String
+  "Address of the follower"
   follower: String!
+  "The space being followed"
   space: Space!
+  "Network ID"
   network: String!
+  "Unix timestamp of when the follow was created"
   created: Int!
 }
 
+"A subscription to a space's proposals"
 type Subscription {
+  "Unique subscription identifier"
   id: String!
+  "IPFS content identifier"
   ipfs: String
+  "Address of the subscriber"
   address: String!
+  "The space being subscribed to"
   space: Space!
+  "Unix timestamp of when the subscription was created"
   created: Int!
 }
 
+"A Snapshot user profile"
 type User {
+  "User address"
   id: String!
+  "IPFS content identifier"
   ipfs: String
+  "Display name"
   name: String
+  "Bio or description"
   about: String
+  "Avatar image URL"
   avatar: String
+  "Cover image URL"
   cover: String
+  "GitHub handle"
   github: String
+  "Twitter/X handle"
   twitter: String
+  "Lens handle"
   lens: String
+  "Farcaster handle"
   farcaster: String
+  "Unix timestamp of when the profile was created"
   created: Int
+  "Total number of votes cast"
   votesCount: Int
+  "Total number of proposals created"
   proposalsCount: Int
+  "Unix timestamp of the user's most recent vote"
   lastVote: Int
 }
 
+"A delegate statement"
 type Statement {
+  "Unique statement identifier"
   id: String!
+  "IPFS content identifier"
   ipfs: String!
+  "Space ID this statement belongs to"
   space: String!
+  "Network ID"
   network: String
+  "Short bio of the delegate"
   about: String
+  "Delegate address"
   delegate: String
+  "Full delegate statement text"
   statement: String
+  "Discourse forum username"
   discourse: String
+  "Statement status"
   status: String
+  "Source of the statement"
   source: String
+  "Unix timestamp of when the statement was created"
   created: Int!
+  "Unix timestamp of the last update"
   updated: Int!
 }
 
+"A reusable metadata item (skin, validation, plugin)"
 type Item {
+  "Item identifier"
   id: String!
+  "Number of spaces using this item"
   spacesCount: Int
 }
 
+"A voting strategy with full metadata"
 type StrategyItem {
+  "Strategy identifier"
   id: String!
+  "Display name"
   name: String
+  "Strategy author"
   author: String
+  "Strategy version"
   version: String
+  "JSON schema for strategy parameters"
   schema: Any
+  "Example configurations"
   examples: [Any]
+  "Description of the strategy"
   about: String
+  "Number of spaces using this strategy"
   spacesCount: Int
+  "Number of verified spaces using this strategy"
   verifiedSpacesCount: Int
+  "Whether this strategy overrides another"
   override: Boolean
+  "Whether the strategy is disabled"
   disabled: Boolean
 }
 
+"A treasury managed by a space"
 type Treasury {
+  "Treasury display name"
   name: String
+  "Treasury wallet address"
   address: String
+  "Network ID the treasury is on"
   network: String
 }
 
+"A label that can be applied to proposals"
 type Label {
+  "Label identifier"
   id: String
+  "Label display name"
   name: String
+  "Label description"
   description: String
+  "Hex color code"
   color: String
 }
 
+"Boost settings for a space"
 type BoostSettings {
+  "Whether boosting is enabled"
   enabled: Boolean
+  "Whether bribe-based boosting is enabled"
   bribeEnabled: Boolean
 }
 
+"Voting power information"
 type Vp {
+  "Total voting power"
   vp: Float
+  "Voting power broken down by strategy"
   vp_by_strategy: [Float]
+  "Voting power state (e.g. final, pending)"
   vp_state: String
 }
 
+"Leaderboard entry for a user in a space"
 type Leaderboard {
+  "Space ID"
   space: String
+  "User address"
   user: String
+  "Number of proposals created"
   proposalsCount: Int
+  "Number of votes cast"
   votesCount: Int
+  "Unix timestamp of the user's most recent vote"
   lastVote: Int
+  "Monetary value of the user's voting power"
   vpValue: Float
 }
 
+"A configuration option"
 type Option {
+  "Option name"
   name: String
+  "Option value"
   value: String
 }
 
+"Custom theme settings for a space skin"
 type SkinSettings {
+  "Background color"
   bg_color: String
+  "Link color"
   link_color: String
+  "Text color"
   text_color: String
+  "Content area color"
   content_color: String
+  "Border color"
   border_color: String
+  "Heading color"
   heading_color: String
+  "Header color"
   header_color: String
+  "Primary accent color"
   primary_color: String
+  "Theme name (light or dark)"
   theme: String
+  "Custom logo URL"
   logo: String
 }
 
+"A blockchain network"
 type Network {
+  "Network chain ID"
   id: String!
+  "Network display name"
   name: String!
+  "Whether this is a premium network"
   premium: Boolean
+  "Number of spaces on this network"
   spacesCount: Int
 }
