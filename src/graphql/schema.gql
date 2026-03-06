@@ -527,7 +527,7 @@ type Space {
   parent: Space
   "Child sub-spaces"
   children: [Space]
-  "Voting guidelines text"
+  "Voting guidelines link"
   guidelines: String
   "Proposal template"
   template: String
@@ -597,7 +597,7 @@ type SpaceVoting {
   aliased: Boolean
 }
 
-"A governance proposal"
+"proposal created on a space"
 type Proposal {
   "Unique proposal identifier"
   id: String!
@@ -645,7 +645,7 @@ type Proposal {
   privacy: String
   "Block number snapshot for voting power calculation"
   snapshot: Int
-  "Current state of the proposal (active, closed, pending)"
+  "Current state of the proposal (active, pending, closed)"
   state: String
   "Direct link to the proposal"
   link: String
@@ -875,7 +875,7 @@ type StrategyItem {
   spacesCount: Int
   "Number of verified spaces using this strategy"
   verifiedSpacesCount: Int
-  "Whether this strategy overrides another"
+  "Whether voting power depend on other addresses or not"
   override: Boolean
   "Whether the strategy is disabled"
   disabled: Boolean
@@ -977,6 +977,6 @@ type Network {
   name: String!
   "Whether this is a premium network"
   premium: Boolean
-  "Number of spaces on this network"
+  "Number of spaces using this network"
   spacesCount: Int
 }
