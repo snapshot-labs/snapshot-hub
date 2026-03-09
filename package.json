@@ -21,7 +21,7 @@
   },
   "prettier": "@snapshot-labs/prettier-config",
   "engines": {
-    "node": ">=22.22"
+    "node": ">=24.14"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
