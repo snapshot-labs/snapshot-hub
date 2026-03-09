@@ -7,7 +7,7 @@ jobs:
   create-sentry-release:
     strategy:
       matrix:
-        target: ['22.6']
+        target: ['24.14']
     uses: snapshot-labs/actions/.github/workflows/create-sentry-release.yml@main
     with:
       project: snapshot-hub
