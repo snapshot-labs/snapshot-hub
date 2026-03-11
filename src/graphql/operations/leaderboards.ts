@@ -1,6 +1,4 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
 import uniq from 'lodash/uniq';
-import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
 
@@ -50,11 +48,5 @@ export default async function (parent, args) {
     ORDER BY ${orderQuery} LIMIT ?, ?
   `;
 
-  try {
-    return db.queryAsync(query, [...whereQuery.params, skip, first]);
-  } catch (e) {
-    log.error(`[graphql] leaderboards, ${JSON.stringify(e)}`);
-    capture(e, { args });
-    return Promise.reject(new Error('request failed'));
-  }
+  return db.queryAsync(query, [...whereQuery.params, skip, first]);
 }

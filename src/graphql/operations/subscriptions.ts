@@ -1,5 +1,3 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
-import log from '../../helpers/log';
 import db from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits, formatSubscription } from '../helpers';
 
@@ -48,12 +46,6 @@ export default async function (parent, args) {
   `;
   params.push(skip, first);
 
-  try {
-    subscriptions = await db.queryAsync(query, params);
-    return subscriptions.map(subscription => formatSubscription(subscription));
-  } catch (e: any) {
-    log.error(`[graphql] subscriptions, ${JSON.stringify(e)}`);
-    capture(e, { args });
-    return Promise.reject(new Error('request failed'));
-  }
+  subscriptions = await db.queryAsync(query, params);
+  return subscriptions.map(subscription => formatSubscription(subscription));
 }

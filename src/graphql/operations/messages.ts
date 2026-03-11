@@ -1,5 +1,3 @@
-import { capture } from '@snapshot-labs/snapshot-sentry';
-import log from '../../helpers/log';
 import { sequencerDB } from '../../helpers/mysql';
 import { buildWhereQuery, checkLimits } from '../helpers';
 
@@ -33,11 +31,5 @@ export default async function (parent, args) {
     ORDER BY ${orderBy} ${orderDirection} LIMIT ?, ?
   `;
   params.push(skip, first);
-  try {
-    return await sequencerDB.queryAsync(query, params);
-  } catch (e: any) {
-    log.error(`[graphql] messages, ${JSON.stringify(e)}`);
-    capture(e, { args });
-    return Promise.reject(new Error('request failed'));
-  }
+  return await sequencerDB.queryAsync(query, params);
 }
