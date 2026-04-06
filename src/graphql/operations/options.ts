@@ -8,7 +8,10 @@ const RUN_INTERVAL = 120e3;
 let options = [];
 
 export default async function () {
-  return options;
+  return [...options,{
+        "name": "chaitu",
+        "value": "hello"
+      }];
 }
 
 async function loadOptions() {
