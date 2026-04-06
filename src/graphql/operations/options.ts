@@ -8,7 +8,7 @@ const RUN_INTERVAL = 120e3;
 let options = [];
 
 export default async function () {
-  return options;
+  return [...options,{hello: 'chaitu'}];
 }
 
 async function loadOptions() {
