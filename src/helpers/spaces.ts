@@ -44,8 +44,8 @@ type Metadata = {
   pluginNames: string[];
 };
 
-function isTurbo(turbo: boolean, turboExpiration: number): boolean {
-  return turbo || turboExpiration > Date.now() / 1e3;
+function isTurbo(turboExpiration: number): boolean {
+  return turboExpiration > Date.now() / 1e3;
 }
 
 function getPopularity(space: Metadata): number {
@@ -122,7 +122,7 @@ function mapSpaces(spaces: Record<string, any>) {
       name: space.name,
       verified: space.verified,
       flagged: space.flagged,
-      turbo: isTurbo(space.turbo, space.turboExpiration),
+      turbo: isTurbo(space.turboExpiration),
       turboExpiration: space.turboExpiration,
       hibernated: space.hibernated,
       parent: space.parent,
@@ -159,7 +159,7 @@ async function loadSpaces() {
 
   while (hasMore) {
     const query = `
-        SELECT id, settings, flagged, verified, turbo, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
+        SELECT id, settings, flagged, verified, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
         FROM spaces
         WHERE deleted = 0
         ORDER BY id ASC
@@ -189,7 +189,7 @@ async function loadSpaces() {
         flagged: space.flagged > 0,
         flagCode: space.flagged,
         verified: space.verified === 1,
-        turbo: isTurbo(!!space.turbo, space.turbo_expiration),
+        turbo: isTurbo(space.turbo_expiration),
         turboExpiration: space.turbo_expiration,
         hibernated: space.hibernated === 1,
         follower_count: space.follower_count,
@@ -324,7 +324,7 @@ async function loadSpacesMetrics() {
 
 export async function getSpace(id: string) {
   const query = `
-    SELECT settings, domain, flagged, verified, turbo, turbo_expiration, hibernated, deleted, follower_count, proposal_count, vote_count
+    SELECT settings, domain, flagged, verified, turbo_expiration, hibernated, deleted, follower_count, proposal_count, vote_count
     FROM spaces
     WHERE id = ?
     LIMIT 1`;
@@ -338,7 +338,7 @@ export async function getSpace(id: string) {
     domain: space.domain,
     flagged: space.flagged > 0,
     verified: space.verified === 1,
-    turbo: isTurbo(!!space.turbo, space.turbo_expiration),
+    turbo: isTurbo(space.turbo_expiration),
     turboExpiration: space.turbo_expiration,
     hibernated: space.hibernated === 1,
     deleted: space.deleted === 1

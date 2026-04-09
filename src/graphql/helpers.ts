@@ -94,7 +94,6 @@ export function formatSpace({
   settings,
   domain,
   verified,
-  turbo,
   turboExpiration,
   flagged,
   hibernated,
@@ -151,8 +150,7 @@ export function formatSpace({
   space.flagged = flagged > 0;
   space.flagCode = flagged;
   space.hibernated = hibernated ?? null;
-  space.turbo =
-    new Date((turboExpiration || 0) * 1000) > new Date() ? true : turbo ?? null;
+  space.turbo = new Date((turboExpiration || 0) * 1000) > new Date();
   space.turboExpiration = turboExpiration ?? 0;
   space.rank = spaceMetadata?.rank ?? null;
 
@@ -466,7 +464,6 @@ export function formatProposal(proposal) {
     settings: proposal.settings,
     domain: proposal.spaceDomain,
     verified: proposal.spaceVerified,
-    turbo: proposal.spaceTurbo,
     turboExpiration: proposal.spaceTurboExpiration,
     flagged: proposal.spaceFlagged,
     hibernated: proposal.spaceHibernated,
@@ -496,7 +493,6 @@ export function formatVote(vote) {
     domain: vote.spaceDomain,
     settings: vote.settings,
     verified: vote.spaceVerified,
-    turbo: vote.spaceTurbo,
     turboExpiration: vote.spaceTurboExpiration,
     flagged: vote.spaceFlagged,
     hibernated: vote.spaceHibernated,
@@ -511,7 +507,6 @@ export function formatFollow(follow) {
     settings: follow.settings,
     domain: follow.spaceDomain,
     verified: follow.spaceVerified,
-    turbo: follow.spaceTurbo,
     turboExpiration: follow.spaceTurboExpiration,
     flagged: follow.spaceFlagged,
     hibernated: follow.spaceHibernated,
@@ -526,7 +521,6 @@ export function formatSubscription(subscription) {
     settings: subscription.settings,
     domain: subscription.spaceDomain,
     verified: subscription.spaceVerified,
-    turbo: subscription.spaceTurbo,
     turboExpiration: subscription.spaceTurboExpiration,
     flagged: subscription.spaceFlagged,
     hibernated: subscription.spaceHibernated,

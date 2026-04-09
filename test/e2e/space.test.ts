@@ -23,12 +23,9 @@ describe('GET /api/space/:key', () => {
   });
 
   describe('when the space exists', () => {
-    let response;
-    beforeAll(async () => {
-      response = await fetch(`${HOST}/api/spaces/${fixtures[0].id}`);
-    });
+    it('returns the correct HTTP response', async () => {
+      const response = await fetch(`${HOST}/api/spaces/${fixtures[0].id}`);
 
-    it('returns the correct HTTP response', () => {
       expect(response.status);
       expect(response.headers.get('content-type')).toContain(
         'application/json'
@@ -37,10 +34,12 @@ describe('GET /api/space/:key', () => {
 
     it('returns the space data', async () => {
       const space = fixtures[0];
+      const response = await fetch(`${HOST}/api/spaces/${space.id}`);
+
       const expectedSpace = {
         flagged: space.flagged,
         verified: space.verified,
-        turbo: space.turbo,
+        turbo: false,
         turboExpiration: space.turbo_expiration,
         hibernated: space.hibernated,
         deleted: false,
@@ -48,7 +47,7 @@ describe('GET /api/space/:key', () => {
         ...space.settings
       };
 
-      expect(response.json()).resolves.toEqual(expectedSpace);
+      expect(await response.json()).toEqual(expectedSpace);
     });
   });
 
@@ -60,7 +59,7 @@ describe('GET /api/space/:key', () => {
       expect(response.headers.get('content-type')).toContain(
         'application/json'
       );
-      expect(response.json()).resolves.toEqual({
+      expect(await response.json()).toEqual({
         error: 'unauthorized',
         error_description: 'not_found'
       });
@@ -71,19 +70,29 @@ describe('GET /api/space/:key', () => {
     it('returns the space data with a deleted:true', async () => {
       const response = await fetch(`${HOST}/api/spaces/${fixtures[1].id}`);
 
-      const space = fixtures[1];
-      const expectedSpace = {
-        flagged: space.flagged,
-        verified: space.verified,
-        turbo: space.turbo,
-        turboExpiration: space.turbo_expiration,
-        hibernated: space.hibernated,
-        deleted: true,
-        domain: space.domain,
-        ...space.settings
-      };
+      expect(await response.json()).toEqual(
+        expect.objectContaining({ deleted: true })
+      );
+    });
+  });
 
-      expect(response.json()).resolves.toEqual(expectedSpace);
+  describe('when the space is turbo', () => {
+    it('returns the space as turbo', async () => {
+      const turboExpiration = Math.floor(Date.now() / 1e3) + 86400; // 1 day from now
+      const turboSpace = {
+        ...fixtures[0],
+        id: 'turbo-space.eth',
+        turbo_expiration: turboExpiration,
+        settings: JSON.stringify(fixtures[0].settings),
+        domain: 'turbo.com'
+      };
+      await db.queryAsync('INSERT INTO spaces SET ?', turboSpace);
+
+      const response = await fetch(`${HOST}/api/spaces/${turboSpace.id}`);
+
+      expect(await response.json()).toEqual(
+        expect.objectContaining({ turbo: true, turboExpiration })
+      );
     });
   });
 });
