@@ -1,29 +1,17 @@
 import { capture } from '@snapshot-labs/snapshot-sentry';
 import snapshot from '@snapshot-labs/snapshot.js';
-import networks from '@snapshot-labs/snapshot.js/src/networks.json';
 import { uniq } from 'lodash';
 import log from './log';
 import db from './mysql';
 
 const RUN_INTERVAL = 120e3;
-const TEST_STRATEGIES = [
-  'ticket',
-  'api',
-  'api-v2',
-  'api-post',
-  'api-v2-override'
-];
-const TESTNET_NETWORKS = (
-  Object.values(networks) as { testnet?: boolean; key: string }[]
-)
-  .filter(network => network.testnet)
-  .map(network => network.key);
+const BATCH_SIZE = 40000;
 
 export let rankedSpaces: Metadata[] = [];
 
 export let networkSpaceCounts: Record<string, number> = {};
 
-export const spacesMetadata: Record<string, Metadata> = {};
+export let spacesMetadata: Record<string, Metadata> = {};
 
 type Metadata = {
   id: string;
@@ -69,18 +57,21 @@ function getPopularity(space: Metadata): number {
     space.counts.followersCount / 80 +
     space.counts.followersCount7d;
 
-  if (space.counts.activeProposals > 0) popularity += 1e5;
+  const isVerified = space.verified;
+  const isTurbo = space.turbo && !space.parent;
+  const hasActiveProposals = space.counts.activeProposals > 0;
 
-  if (space.verified) popularity += 1e10;
-
-  if (space.turbo && !space.parent) popularity += 2e10;
-
-  if (
-    !space.turbo &&
-    !space.networks.some(network => TESTNET_NETWORKS.includes(network)) &&
-    !space.strategyNames.some(strategy => TEST_STRATEGIES.includes(strategy))
-  )
+  if (isTurbo && hasActiveProposals) {
+    popularity += 5e10;
+  } else if (isVerified && hasActiveProposals) {
+    popularity += 4e10;
+  } else if (isTurbo) {
+    popularity += 3e10;
+  } else if (isVerified) {
+    popularity += 2e10;
+  } else if (hasActiveProposals) {
     popularity += 1e10;
+  }
 
   return popularity;
 }
@@ -101,18 +92,21 @@ function sortSpaces() {
 }
 
 function mapSpaces(spaces: Record<string, any>) {
+  spacesMetadata = {};
   networkSpaceCounts = {};
 
   Object.entries(spaces).forEach(([id, space]: any) => {
-    const networks = uniq([
-      space.network,
-      ...space.strategies.map((strategy: any) => strategy.network),
-      ...space.strategies.flatMap((strategy: any) =>
-        Array.isArray(strategy.params?.strategies)
-          ? strategy.params.strategies.map((param: any) => param.network)
-          : []
-      )
-    ]);
+    const networks = uniq(
+      [
+        space.network,
+        ...space.strategies.map((strategy: any) => strategy.network),
+        ...space.strategies.flatMap((strategy: any) =>
+          Array.isArray(strategy.params?.strategies)
+            ? strategy.params.strategies.map((param: any) => param.network)
+            : []
+        )
+      ].filter(Boolean)
+    );
 
     networks.forEach(network => {
       networkSpaceCounts[network] = (networkSpaceCounts[network] || 0) + 1;
@@ -158,21 +152,42 @@ function mapSpaces(spaces: Record<string, any>) {
 
 async function loadSpaces() {
   const startTime = +Date.now();
+  let offset = 0;
+  let allResults: any[] = [];
+  let hasMore = true;
+  let batchCount = 0;
 
-  const query = `
-      SELECT id, settings, flagged, verified, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
-      FROM spaces
-      WHERE deleted = 0
-      ORDER BY id ASC
-    `;
-  const results = await db.queryAsync(query);
+  while (hasMore) {
+    const query = `
+        SELECT id, settings, flagged, verified, turbo_expiration, hibernated, follower_count, proposal_count, vote_count
+        FROM spaces
+        WHERE deleted = 0
+        ORDER BY id ASC
+        LIMIT ?, ?
+      `;
+
+    const results = await db.queryAsync(query, [offset, BATCH_SIZE]);
+    batchCount++;
+
+    allResults = allResults.concat(results);
+    offset += BATCH_SIZE;
+
+    log.info(
+      `[spaces] loaded batch ${batchCount}: ${results.length} spaces (total: ${allResults.length})`
+    );
+
+    if (results.length < BATCH_SIZE) {
+      hasMore = false;
+    }
+  }
 
   const spaces = Object.fromEntries(
-    results.map(space => [
+    allResults.map(space => [
       space.id,
       {
         ...JSON.parse(space.settings),
-        flagged: space.flagged === 1,
+        flagged: space.flagged > 0,
+        flagCode: space.flagged,
         verified: space.verified === 1,
         turbo: isTurbo(space.turbo_expiration),
         turboExpiration: space.turbo_expiration,
@@ -185,7 +200,9 @@ async function loadSpaces() {
   );
 
   log.info(
-    `[spaces] total spaces ${Object.keys(spaces).length}, in (${(
+    `[spaces] total spaces ${
+      Object.keys(spaces).length
+    }, in ${batchCount} batches (${(
       (+Date.now() - startTime) /
       1000
     ).toFixed()}s)`
@@ -319,7 +336,7 @@ export async function getSpace(id: string) {
   return {
     ...JSON.parse(space.settings),
     domain: space.domain,
-    flagged: space.flagged === 1,
+    flagged: space.flagged > 0,
     verified: space.verified === 1,
     turbo: isTurbo(space.turbo_expiration),
     turboExpiration: space.turbo_expiration,

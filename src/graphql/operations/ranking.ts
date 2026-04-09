@@ -77,8 +77,7 @@ export default async function (_parent, args, context, info) {
     if (!filteredSpaces.length) return { items: [], metrics };
 
     const query = `
-      SELECT s.* FROM spaces s WHERE s.deleted = 0
-      AND s.id IN (?)
+      SELECT s.* FROM spaces s WHERE s.id IN (?)
       GROUP BY s.id
       ORDER BY FIELD(s.id, ?) ASC
     `;

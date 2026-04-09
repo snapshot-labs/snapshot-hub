@@ -3,7 +3,7 @@ import { capture } from '@snapshot-labs/snapshot-sentry';
 import { Express, Request, Response } from 'express';
 import { GraphQLError, parse } from 'graphql';
 import db from './mysql';
-import { spacesMetadata } from './spaces';
+import { networkSpaceCounts, spacesMetadata } from './spaces';
 import { strategies } from './strategies';
 import operations from '../graphql/operations/';
 
@@ -95,26 +95,21 @@ new client.Gauge({
   help: 'Number of spaces per status',
   labelNames: ['status'],
   async collect() {
-    const statusQueries = [
-      { status: 'verified', column: 'verified', pivot: 0 },
-      { status: 'flagged', column: 'flagged', pivot: 0 },
-      {
-        status: 'turbo',
-        column: 'turbo_expiration',
-        pivot: Math.floor(Date.now() / 1000)
-      },
-      { status: 'hibernated', column: 'hibernated', pivot: 0 }
-    ];
+    const statusResults = await db.queryAsync(`
+      SELECT 'verified' as status, COUNT(*) as count FROM spaces WHERE verified > 0
+      UNION ALL
+      SELECT 'flagged' as status, COUNT(*) as count FROM spaces WHERE flagged > 0
+      UNION ALL
+      SELECT 'hibernated' as status, COUNT(*) as count FROM spaces WHERE hibernated > 0
+      UNION ALL
+      SELECT 'active_turbo' as status, COUNT(*) as count FROM spaces WHERE turbo_expiration > UNIX_TIMESTAMP()
+      UNION ALL
+      SELECT 'expired_turbo' as status, COUNT(*) as count FROM spaces WHERE turbo_expiration > 0 AND turbo_expiration <= UNIX_TIMESTAMP()
+    `);
 
-    await Promise.all(
-      statusQueries.map(async ({ status, column, pivot }) => {
-        const [{ count }] = await db.queryAsync(
-          `SELECT COUNT(id) as count FROM spaces WHERE ${column} > ?`,
-          [pivot]
-        );
-        this.set({ status }, count);
-      })
-    );
+    statusResults.forEach((row: any) => {
+      this.set({ status: row.status }, row.count);
+    });
   }
 });
 
@@ -123,16 +118,8 @@ new client.Gauge({
   help: 'Number of spaces per network',
   labelNames: ['network'],
   async collect() {
-    const results = {};
-    Object.values(spacesMetadata).forEach((space: any) => {
-      space.networks.forEach(network => {
-        results[network] ||= 0;
-        results[network]++;
-      });
-    });
-
-    for (const r in results) {
-      this.set({ network: r }, results[r]);
+    for (const network in networkSpaceCounts) {
+      this.set({ network }, networkSpaceCounts[network]);
     }
   }
 });

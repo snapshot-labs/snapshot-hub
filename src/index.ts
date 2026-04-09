@@ -8,6 +8,7 @@ import graphql from './graphql';
 import { checkKeycard } from './helpers/keycard';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
+import { closeDatabase } from './helpers/mysql';
 import rateLimit from './helpers/rateLimit';
 import refreshSpacesCache from './helpers/spaces';
 import './helpers/strategies';
@@ -32,4 +33,26 @@ app.use('/graphql', graphql);
 fallbackLogger(app);
 app.get('/*', (req, res) => res.redirect('/api'));
 
-app.listen(PORT, () => log.info(`Started on: http://localhost:${PORT}`));
+const server = app.listen(PORT, () =>
+  log.info(`Started on: http://localhost:${PORT}`)
+);
+
+const gracefulShutdown = async (signal: string) => {
+  log.info(`Received ${signal}. Starting graceful shutdown...`);
+
+  server.close(async () => {
+    log.info('Express server closed.');
+
+    try {
+      await closeDatabase();
+      log.info('Graceful shutdown completed.');
+      process.exit(0);
+    } catch (error) {
+      log.error('Error during shutdown:', error);
+      process.exit(1);
+    }
+  });
+};
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

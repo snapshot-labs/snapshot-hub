@@ -3,7 +3,6 @@ import graphqlFields from 'graphql-fields';
 import castArray from 'lodash/castArray';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
-import fetch from 'node-fetch';
 import db from '../helpers/mysql';
 import { spacesMetadata } from '../helpers/spaces';
 import { jsonParse } from '../helpers/utils';
@@ -22,7 +21,8 @@ export class PublicError extends Error {}
 const ARG_LIMITS = {
   default: {
     first: 1000,
-    skip: 5000
+    skip: 5000,
+    '*_in': 100 // Default limit for all _in arguments
   },
   proposals: {
     space_in: 10000
@@ -53,6 +53,13 @@ const SKIN_SETTINGS = [
 export function checkLimits(args: any = {}, type) {
   const { where = {} } = args;
   const typeLimits = { ...ARG_LIMITS.default, ...(ARG_LIMITS[type] || {}) };
+
+  // overwrite default limit for all *_in or *_not_in fields
+  Object.keys(where).forEach(key => {
+    if (key.endsWith('_in') && !(key in typeLimits)) {
+      typeLimits[key] = typeLimits['*_in'];
+    }
+  });
 
   for (const key in typeLimits) {
     const limit = typeLimits[key];
@@ -140,7 +147,8 @@ export function formatSpace({
   space.skinSettings = skinSettings;
 
   space.verified = verified ?? null;
-  space.flagged = flagged ?? null;
+  space.flagged = flagged > 0;
+  space.flagCode = flagged;
   space.hibernated = hibernated ?? null;
   space.turbo = new Date((turboExpiration || 0) * 1000) > new Date();
   space.turboExpiration = turboExpiration ?? 0;
@@ -312,6 +320,14 @@ export async function fetchSpaces(args) {
     params.push(wildcardSearch, wildcardSearch);
   }
 
+  if ('turbo' in where) {
+    if (where.turbo) {
+      queryStr += ` AND (s.turbo = 1 OR s.turbo_expiration > UNIX_TIMESTAMP())`;
+    } else {
+      queryStr += ` AND s.turbo = 0 AND s.turbo_expiration <= UNIX_TIMESTAMP()`;
+    }
+  }
+
   const query = `
     SELECT s.*, skins.*, s.id AS id FROM spaces s
     LEFT JOIN skins ON s.id = skins.id
@@ -437,6 +453,7 @@ export function formatProposal(proposal) {
   proposal.plugins = jsonParse(proposal.plugins, {});
   proposal.scores = jsonParse(proposal.scores, []);
   proposal.scores_by_strategy = jsonParse(proposal.scores_by_strategy, []);
+  proposal.vp_value_by_strategy = jsonParse(proposal.vp_value_by_strategy, []);
   let proposalState = 'pending';
   const ts = parseInt((Date.now() / 1e3).toFixed());
   if (ts > proposal.start) proposalState = 'active';
@@ -461,6 +478,9 @@ export function formatProposal(proposal) {
   }));
   proposal.privacy = proposal.privacy || '';
   proposal.quorumType = proposal.quorum_type || 'default';
+  const rawFlagged = proposal.flagged;
+  proposal.flagCode = rawFlagged;
+  proposal.flagged = rawFlagged > 0;
   return proposal;
 }
 
@@ -520,18 +540,21 @@ async function getControllerDomains(address: string): Promise<string[]> {
   };
 
   try {
-    const response = await fetch(process.env.STAMP_URL ?? 'https://stamp.fyi', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        method: 'lookup_domains',
-        params: address,
-        network: network === 'testnet' ? ['11155111', '157'] : ['1', '109']
-      })
-    });
+    const response = await snapshot.utils.fetch(
+      process.env.STAMP_URL ?? 'https://stamp.fyi',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          method: 'lookup_domains',
+          params: address,
+          network: network === 'testnet' ? ['11155111', '157'] : ['1', '109']
+        })
+      } as any
+    );
     const { result, error } = (await response.json()) as JsonRpcResponse;
 
     if (error) throw new PublicError("Failed to resolve controller's domains");

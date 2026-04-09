@@ -21,7 +21,7 @@ async function query(parent, args, context?, info?) {
     id: 'string',
     ipfs: 'string',
     space: 'string',
-    voter: 'evmAddress',
+    voter: ['evmAddress', 'starknetAddress'],
     proposal: 'string',
     reason: 'string',
     app: 'string',
