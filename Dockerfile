@@ -8,7 +8,7 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y git python3 make g++ curl unzip
 
 # Install Bun
-RUN curl -fsSL https://bun.sh/install | bash -s -- --no-modify-path \
+RUN curl -fsSL https://bun.sh/install | bash -s -- bun-v1.2.0 --no-modify-path \
   && mv /root/.bun/bin/bun /usr/local/bin/bun \
   && rm -rf /root/.bun
 
