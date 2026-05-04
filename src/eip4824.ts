@@ -43,7 +43,7 @@ router.get('/:space/members', async (req, res) => {
     space = await getSpace(req.params.space);
 
     if (!space.verified) return res.status(400).json({ error: 'INVALID' });
-  } catch (e) {
+  } catch {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
 
@@ -76,7 +76,7 @@ router.get('/:space/proposals', async (req, res) => {
       'SELECT id, title, start, end, body, author, ipfs, discussion FROM proposals WHERE space = ? ORDER BY created DESC LIMIT 20',
       [id]
     );
-  } catch (e) {
+  } catch {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
 
@@ -119,7 +119,7 @@ router.get('/:space/activities', async (req, res) => {
       'SELECT id, type, address FROM messages WHERE space = ? ORDER BY timestamp DESC LIMIT 20',
       [id]
     );
-  } catch (e) {
+  } catch {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
 
@@ -147,7 +147,7 @@ router.get('/:space/contracts', async (req, res) => {
     space = await getSpace(req.params.space);
 
     if (!space.verified) return res.status(400).json({ error: 'INVALID' });
-  } catch (e) {
+  } catch {
     return res.status(404).json({ error: 'NOT_FOUND' });
   }
 

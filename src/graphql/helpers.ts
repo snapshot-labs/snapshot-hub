@@ -152,7 +152,9 @@ export function formatSpace({
   space.flagCode = flagged;
   space.hibernated = hibernated ?? null;
   space.turbo =
-    new Date((turboExpiration || 0) * 1000) > new Date() ? true : turbo ?? null;
+    new Date((turboExpiration || 0) * 1000) > new Date()
+      ? true
+      : (turbo ?? null);
   space.turboExpiration = turboExpiration ?? 0;
   space.rank = spaceMetadata?.rank ?? null;
 
@@ -216,7 +218,7 @@ export function buildWhereQuery(
           where[key] = Array.isArray(where[key])
             ? formattedAddresses
             : formattedAddresses[0];
-        } catch (e: any) {
+        } catch {
           throw new PublicError(`Invalid addresses in ${field}`);
         }
       });
@@ -566,7 +568,7 @@ async function getControllerDomains(address: string): Promise<string[]> {
     if (error) throw new PublicError("Failed to resolve controller's domains");
 
     return result;
-  } catch (e) {
+  } catch {
     throw new PublicError("Failed to resolve controller's domains");
   }
 }
