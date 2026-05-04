@@ -4,17 +4,17 @@
   "repository": "snapshot-labs/snapshot-hub",
   "license": "MIT",
   "scripts": {
-    "lint": "yarn lint:nofix --fix",
+    "lint": "bun run lint:nofix --fix",
     "lint:nofix": "eslint . --ext .ts",
     "typecheck": "tsc --noEmit",
     "dev": "nodemon src/index.ts",
     "build": "tsc && copyfiles src/graphql/*.gql dist/",
     "start": "node dist/src/index.js",
-    "start:test": "dotenv -e test/.env.test yarn dev",
-    "test:setup": "dotenv -e test/.env.test yarn ts-node ./test/setupDb.ts",
-    "test": "yarn test:setup; PORT=3030 start-server-and-test 'yarn start:test' http://localhost:3030 'dotenv -e test/.env.test jest --runInBand'",
+    "start:test": "dotenv -e test/.env.test bun run dev",
+    "test:setup": "dotenv -e test/.env.test ts-node ./test/setupDb.ts",
+    "test": "bun run test:setup; PORT=3030 start-server-and-test 'bun run start:test' http://localhost:3030 'dotenv -e test/.env.test jest --runInBand'",
     "test:unit": "dotenv -e test/.env.test jest test/unit/",
-    "test:e2e": "PORT=3030 start-server-and-test 'yarn start:test' http://localhost:3030 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
+    "test:e2e": "PORT=3030 start-server-and-test 'bun run start:test' http://localhost:3030 'dotenv -e test/.env.test jest --runInBand --collectCoverage=false test/e2e/'"
   },
   "eslintConfig": {
     "extends": "@snapshot-labs"
@@ -23,6 +23,7 @@
   "engines": {
     "node": ">=24.14"
   },
+  "packageManager": "bun@1.2.0",
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
     "@snapshot-labs/keycard": "^0.5.1",

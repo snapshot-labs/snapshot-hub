@@ -11,3 +11,4 @@ jobs:
     secrets: inherit
     with:
       target: ${{ matrix.target }}
+      package_manager: bun

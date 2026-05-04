@@ -24,10 +24,10 @@
 
 ## Install
 
-1. Install Node.js, clone the repository, then say:
+1. Install [Bun](https://bun.sh) and Node.js, clone the repository, then say:
 
 ```sh
-yarn
+bun install
 ```
 
 2. Copy [`.env.example`](https://github.com/snapshot-labs/snapshot-hub/blob/master/.env.example), rename it to `.env` and set a value for these config vars:
@@ -46,7 +46,7 @@ https://github.com/snapshot-labs/snapshot-hub/blob/master/src/helpers/schema.sql
 - Use this command to run the hub:
 
 ```sh
-yarn start
+bun start
 ```
 
 - Go on this page: http://localhost:3000/api if everything is fine it should return details of the hub example:

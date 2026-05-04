@@ -5,7 +5,12 @@ FROM node:24.14-slim
 RUN apt-get update && apt-get upgrade -y
 
 # Install required O.S. packages
-RUN apt-get install -y git python3 make g++
+RUN apt-get install -y git python3 make g++ curl unzip
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash -s -- --no-modify-path \
+  && mv /root/.bun/bin/bun /usr/local/bin/bun \
+  && rm -rf /root/.bun
 
 # Create the application workdir
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
@@ -16,11 +21,11 @@ WORKDIR /home/node/app
 USER node
 
 # Copy app dependencies
-COPY package*.json ./
-COPY renovate*.json ./
+COPY --chown=node:node package.json bun.lock ./
+COPY --chown=node:node renovate*.json ./
 
 # Install app dependencies
-RUN yarn
+RUN bun install --frozen-lockfile
 
 # Bundle app source
 COPY --chown=node:node . .
@@ -29,7 +34,7 @@ COPY --chown=node:node . .
 EXPOSE 8080
 
 # Build the app
-RUN yarn run build
+RUN bun run build
 
 # Start the application
-CMD ["yarn", "run", "start" ]
+CMD ["bun", "run", "start"]

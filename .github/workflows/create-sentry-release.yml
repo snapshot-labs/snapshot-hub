@@ -12,4 +12,5 @@ jobs:
     with:
       project: snapshot-hub
       target: ${{ matrix.target }}
+      package_manager: bun
     secrets: inherit

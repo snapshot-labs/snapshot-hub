@@ -12,3 +12,4 @@ jobs:
     with:
       mysql_database_name: hub_test
       target: ${{ matrix.target }}
+      package_manager: bun
