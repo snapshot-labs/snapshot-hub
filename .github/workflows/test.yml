@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         target: ['24.14']
-    uses: snapshot-labs/actions/.github/workflows/test.yml@main
+    uses: snapshot-labs/actions/.github/workflows/test.yml@feat/bun-support
     secrets: inherit
     with:
       mysql_database_name: hub_test

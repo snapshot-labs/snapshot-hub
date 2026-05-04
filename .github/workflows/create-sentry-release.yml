@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         target: ['24.14']
-    uses: snapshot-labs/actions/.github/workflows/create-sentry-release.yml@main
+    uses: snapshot-labs/actions/.github/workflows/create-sentry-release.yml@feat/bun-support
     with:
       project: snapshot-hub
       target: ${{ matrix.target }}
