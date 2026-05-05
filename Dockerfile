@@ -1,34 +1,27 @@
-# Node version matching the version declared in the package.json
-FROM node:24.14-slim
+FROM oven/bun:1.2.0-slim
 
-# Update O.S.
-RUN apt-get update && apt-get upgrade -y
-
-# Install required O.S. packages
-RUN apt-get install -y git python3 make g++ curl unzip
-
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash -s -- bun-v1.2.0 --no-modify-path \
-  && mv /root/.bun/bin/bun /usr/local/bin/bun \
-  && rm -rf /root/.bun
+# Update O.S. and install required packages (for native module builds)
+RUN apt-get update && apt-get upgrade -y \
+  && apt-get install -y git python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 
 # Create the application workdir
-RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
-RUN mkdir -p /home/node/app/uploads && chown -R node:node /home/node/app/uploads
-WORKDIR /home/node/app
+RUN mkdir -p /home/bun/app && chown -R bun:bun /home/bun/app
+RUN mkdir -p /home/bun/app/uploads && chown -R bun:bun /home/bun/app/uploads
+WORKDIR /home/bun/app
 
 # Set current user
-USER node
+USER bun
 
 # Copy app dependencies
-COPY --chown=node:node package.json bun.lock ./
-COPY --chown=node:node renovate*.json ./
+COPY --chown=bun:bun package.json bun.lock ./
+COPY --chown=bun:bun renovate*.json ./
 
 # Install app dependencies
 RUN bun install --frozen-lockfile
 
 # Bundle app source
-COPY --chown=node:node . .
+COPY --chown=bun:bun . .
 
 # Set the container port
 EXPOSE 8080
