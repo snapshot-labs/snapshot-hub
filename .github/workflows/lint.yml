@@ -7,7 +7,8 @@ jobs:
     strategy:
       matrix:
         target: ['24.14']
-    uses: snapshot-labs/actions/.github/workflows/lint.yml@main
+    uses: snapshot-labs/actions/.github/workflows/lint.yml@feat/bun-support
     secrets: inherit
     with:
       target: ${{ matrix.target }}
+      package_manager: bun

@@ -24,7 +24,7 @@ const setup = async () => {
     }
   } catch (e: any) {
     if (e.code === 'ER_BAD_DB_ERROR') {
-      console.error('Test database not setup, please run `yarn test:setup`');
+      console.error('Test database not setup, please run `bun run test:setup`');
       throw new Error('Test database not setup');
     }
   }

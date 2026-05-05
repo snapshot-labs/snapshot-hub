@@ -1,9 +1,52 @@
+import * as tls from 'tls';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
 import mysql from 'mysql';
 import Connection from 'mysql/lib/Connection';
 import Pool from 'mysql/lib/Pool';
 import log from './log';
+
+// Bun's TLSSocket._start() is incompatible with mysql's manual socket-upgrade
+// path, so swap _startTLS to the public tls.connect({ socket }) API which
+// initiates the handshake via the documented contract on both Node and Bun.
+(Connection.prototype as any)._startTLS = function _startTLS(
+  onSecure: (err: Error | null) => void
+) {
+  const ssl = this.config.ssl;
+  const rejectUnauthorized = ssl.rejectUnauthorized;
+
+  this._socket.removeAllListeners('data');
+  this._protocol.removeAllListeners('data');
+
+  const secureSocket: any = tls.connect({
+    socket: this._socket,
+    servername: this.config.host,
+    rejectUnauthorized,
+    requestCert: true,
+    ca: ssl.ca,
+    cert: ssl.cert,
+    ciphers: ssl.ciphers,
+    crl: ssl.crl,
+    key: ssl.key,
+    passphrase: ssl.passphrase,
+    secureProtocol: ssl.secureProtocol
+  });
+
+  let secureEstablished = false;
+
+  secureSocket.on('error', (err: Error) => {
+    if (secureEstablished) this._handleNetworkError(err);
+    else onSecure(err);
+  });
+
+  secureSocket.pipe(this._protocol);
+  this._protocol.on('data', (data: Buffer) => secureSocket.write(data));
+
+  secureSocket.on('secureConnect', () => {
+    secureEstablished = true;
+    onSecure(rejectUnauthorized ? secureSocket.authorizationError : null);
+  });
+};
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
 log.info(`[mysql] connection limit ${connectionLimit}`);

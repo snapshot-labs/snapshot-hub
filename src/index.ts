@@ -1,3 +1,4 @@
+import './helpers/bunShim';
 import 'dotenv/config';
 import { fallbackLogger, initLogger } from '@snapshot-labs/snapshot-sentry';
 import cors from 'cors';
