@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 export function jsonParse(input, fallback?) {
   try {
     return JSON.parse(input);
-  } catch (err) {
+  } catch {
     return fallback || {};
   }
 }
