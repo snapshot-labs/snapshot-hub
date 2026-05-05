@@ -216,7 +216,7 @@ export function buildWhereQuery(
           where[key] = Array.isArray(where[key])
             ? formattedAddresses
             : formattedAddresses[0];
-        } catch (e: any) {
+        } catch {
           throw new PublicError(`Invalid addresses in ${field}`);
         }
       });
@@ -566,7 +566,7 @@ async function getControllerDomains(address: string): Promise<string[]> {
     if (error) throw new PublicError("Failed to resolve controller's domains");
 
     return result;
-  } catch (e) {
+  } catch {
     throw new PublicError("Failed to resolve controller's domains");
   }
 }
