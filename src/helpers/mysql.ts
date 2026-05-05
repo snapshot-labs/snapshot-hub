@@ -20,6 +20,7 @@ import log from './log';
 
   const secureSocket: any = tls.connect({
     socket: this._socket,
+    servername: this.config.host,
     rejectUnauthorized,
     requestCert: true,
     ca: ssl.ca,
