@@ -1,18 +1,18 @@
 import fs from 'fs';
 import bluebird from 'bluebird';
 import parse from 'connection-string';
-import mysql from 'mysql2';
+import mysql from 'mysql';
+import Connection from 'mysql/lib/Connection';
+import Pool from 'mysql/lib/Pool';
 import { TEST_DATABASE_SUFFIX } from './setup';
-
-const { Pool, Connection } = mysql as any;
-bluebird.promisifyAll([Pool, Connection]);
 
 // @ts-ignore
 const config = parse(process.env.HUB_DATABASE_URL);
 config.connectionLimit = 5;
 config.host = config.hosts[0].name;
 config.port = config.hosts[0].port;
-const db: any = mysql.createPool(config);
+bluebird.promisifyAll([Pool, Connection]);
+const db = mysql.createPool(config);
 const dbName = config.path[0];
 
 if (!dbName.endsWith(TEST_DATABASE_SUFFIX)) {

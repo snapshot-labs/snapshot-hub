@@ -7,13 +7,17 @@ const setup = async () => {
     await db.queryAsync('SELECT 1 + 1');
     await sequencerDB.queryAsync('SELECT 1 + 1');
 
-    if (db.config.database.endsWith(TEST_DATABASE_SUFFIX)) {
+    if (db.config.connectionConfig.database.endsWith(TEST_DATABASE_SUFFIX)) {
       throw new Error(
         `Hub database name is not ending by ${TEST_DATABASE_SUFFIX}`
       );
     }
 
-    if (sequencerDB.config.database.endsWith(TEST_DATABASE_SUFFIX)) {
+    if (
+      sequencerDB.config.connectionConfig.database.endsWith(
+        TEST_DATABASE_SUFFIX
+      )
+    ) {
       throw new Error(
         `Sequencer database name is not ending by ${TEST_DATABASE_SUFFIX}`
       );
