@@ -24,7 +24,7 @@
 
 ## Install
 
-1. Install [Bun](https://bun.sh) and Node.js, clone the repository, then say:
+1. Install [Bun](https://bun.sh), clone the repository, then say:
 
 ```sh
 bun install
