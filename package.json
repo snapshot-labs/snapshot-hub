@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "bun --hot src/index.ts",
     "build": "tsc && copyfiles src/graphql/*.gql dist/",
-    "start": "bun dist/src/index.js",
+    "start": "node dist/src/index.js",
     "start:test": "dotenv -e test/.env.test bun run dev",
     "test:setup": "dotenv -e test/.env.test bun ./test/setupDb.ts",
     "test": "bun run test:setup; PORT=3030 start-server-and-test 'bun run start:test' http://localhost:3030 'dotenv -e test/.env.test jest --runInBand'",
