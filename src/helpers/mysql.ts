@@ -1,9 +1,10 @@
 import bluebird from 'bluebird';
 import parse from 'connection-string';
-import mysql from 'mysql';
-import Connection from 'mysql/lib/Connection';
-import Pool from 'mysql/lib/Pool';
+import mysql from 'mysql2';
 import log from './log';
+
+const { Pool, Connection } = mysql as any;
+bluebird.promisifyAll([Pool, Connection]);
 
 const connectionLimit = parseInt(process.env.CONNECTION_LIMIT || '25');
 log.info(`[mysql] connection limit ${connectionLimit}`);
@@ -21,7 +22,7 @@ hubConfig.timeout = 60e3;
 hubConfig.charset = 'utf8mb4';
 hubConfig.ssl = { rejectUnauthorized: hubConfig.host !== 'localhost' };
 
-const hubDB = mysql.createPool(hubConfig);
+const hubDB: any = mysql.createPool(hubConfig);
 
 // @ts-ignore
 const sequencerConfig = parse(process.env.SEQ_DATABASE_URL);
@@ -38,9 +39,7 @@ sequencerConfig.ssl = {
   rejectUnauthorized: sequencerConfig.host !== 'localhost'
 };
 
-const sequencerDB = mysql.createPool(sequencerConfig);
-
-bluebird.promisifyAll([Pool, Connection]);
+const sequencerDB: any = mysql.createPool(sequencerConfig);
 
 export const closeDatabase = (): Promise<void> => {
   return new Promise(resolve => {

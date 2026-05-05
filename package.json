@@ -39,7 +39,7 @@
     "graphql-fields": "^2.0.3",
     "graphql-query-count-limit": "^1.0.0",
     "lodash": "^4.17.21",
-    "mysql": "^2.18.1",
+    "mysql2": "^3.22.3",
     "node-fetch": "2",
     "rate-limit-redis": "^3.1.0",
     "redis": "^4.6.8",
